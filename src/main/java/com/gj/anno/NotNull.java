@@ -3,7 +3,7 @@ package com.gj.anno;
 import java.lang.annotation.*;
 
 /**
- * @author GJ
+ * @author Archine
  * @date 2019-03-12
  * parameter check
  **/

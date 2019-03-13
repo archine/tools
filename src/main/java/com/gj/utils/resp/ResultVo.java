@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author GJ
+ * @author Archine
  * @date 2019-03-12
  * The response template
  **/

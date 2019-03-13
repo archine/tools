@@ -3,7 +3,7 @@ package com.gj.enums;
 import lombok.Getter;
 
 /**
- * @author GJ
+ * @author Archine
  * @date 2019-03-12
  **/
 @Getter

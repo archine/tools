@@ -1,7 +1,7 @@
 package com.gj.ex;
 
 /**
- * @author GJ
+ * @author Archine
  * @date 2019-03-12
  **/
 public class ParamException extends RuntimeException {
