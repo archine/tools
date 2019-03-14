@@ -1,19 +1,15 @@
 package com.gj.utils.resp;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @author Archine
  * This class is called if the response needs to respond to paging data
  **/
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class PageResult<T> {
-    private T data;
-    private Integer totals;
+    private T pageResult;
+    private Integer size;
 }

@@ -7,7 +7,11 @@ import org.springframework.lang.Nullable;
 import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +20,6 @@ import java.util.stream.Collectors;
  * param util
  **/
 public class GjUtil {
-
     /**
      * Checks if a single parameter is null
      *
@@ -223,5 +226,54 @@ public class GjUtil {
      */
     public static void excelExport(HttpServletResponse response, List<Object[]> list, String[] headers, String title, @Nullable String info) {
         ExportExcel.generateHaveExcelName(response, list, headers, title, info);
+    }
+
+    /**
+     * Determines whether an array contains other arrays
+     *
+     * @param t target array
+     * @param u param
+     * @return true is contains
+     */
+    public static boolean contains(String[] t, String u) {
+        if (t.length < 1) {
+            return false;
+        }
+        if (GjUtil.paramIsEmpty(u)) {
+            return false;
+        }
+        for (String t1 : t) {
+            if (t1.equals(u)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String getDateAsString(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(date);
+    }
+
+    public static String getDateAsString(Date date, String format) {
+        SimpleDateFormat format1 = new SimpleDateFormat(format);
+        return format1.format(format);
+    }
+
+    public static Date getDate(String date) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.parse(date);
+    }
+
+    public static Date getDate(String date, String format) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        return dateFormat.parse(date);
+    }
+
+    public static Calendar dateToCalendar(String str) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(simpleDateFormat.parse(str));
+        return calendar;
     }
 }

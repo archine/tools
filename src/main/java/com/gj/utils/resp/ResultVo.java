@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Archine
@@ -31,12 +30,20 @@ public class ResultVo<T> {
         return ResultVo.builder().code(HttpStatus.OK.getCode()).msg(HttpStatus.OK.getMsg()).build();
     }
 
+    public static ResultVo success(Object data) {
+        return ResultVo.builder().code(HttpStatus.OK.getCode()).msg(HttpStatus.OK.getMsg()).data(data).build();
+    }
+
     public static ResultVo error(Integer code, String msg) {
         return ResultVo.builder().code(code).msg(msg).build();
     }
 
     public static ResultVo error() {
         return ResultVo.builder().code(HttpStatus.BAD_REQUEST.getCode()).msg(HttpStatus.BAD_REQUEST.getMsg()).build();
+    }
+
+    public static ResultVo error(String msg) {
+        return ResultVo.builder().code(HttpStatus.BAD_REQUEST.getCode()).msg(msg).build();
     }
 
     /**
@@ -56,14 +63,14 @@ public class ResultVo<T> {
 
     /**
      * user define login status
-     * @param check Y is login
+     * @param isLogin Not null isLogin
      * @param keys others parameters
      * @param values others values
      * @return map
      */
-    public static Map<String, Object> login(String check,List<String> keys, List<Object> values) {
+    public static Map<String, Object> login(String isLogin,List<String> keys, List<Object> values) {
         Map<String, Object> map = new HashMap<>(10);
-        if (Objects.equals(GjUtil.toUpperCase(check), "Y")) {
+        if (GjUtil.paramIsNotEmpty(isLogin)) {
             map.put("code", HttpStatus.OK.getCode());
             map.put("msg", HttpStatus.OK.getMsg());
         }else {
