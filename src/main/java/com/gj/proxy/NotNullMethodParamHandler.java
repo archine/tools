@@ -13,7 +13,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
  * @author Archine
- * @date 2019-03-12
  * This class is primarily used to detect whether a parameter marked NotNull has a null value
  * Throws an {ParamException} if it contains null values
  **/

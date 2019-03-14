@@ -4,7 +4,6 @@ import lombok.Getter;
 
 /**
  * @author Archine
- * @date 2019-03-12
  **/
 @Getter
 public enum HttpStatus {

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author Archine
- * @date 2019-03-13
  * This class is called if the response needs to respond to paging data
  **/
 @Data

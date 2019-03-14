@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Archine
- * @date 2019-03-12
  **/
 @ControllerAdvice
 @ResponseBody

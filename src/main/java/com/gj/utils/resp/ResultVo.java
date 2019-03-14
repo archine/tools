@@ -13,7 +13,6 @@ import java.util.Objects;
 
 /**
  * @author Archine
- * @date 2019-03-12
  * The response template
  **/
 @Getter

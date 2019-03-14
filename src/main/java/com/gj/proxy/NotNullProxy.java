@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 /**
  * @author Archine
- * @date 2019-03-12
  * This class is primarily used for method parsing as a notnull annotation to detect whether all parameters on a method
  * contain null values , Throws an {ParamException} if it contains null values
  **/

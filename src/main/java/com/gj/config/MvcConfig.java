@@ -10,7 +10,6 @@ import java.util.List;
 
 /**
  * @author Archine
- * @date 2019-03-12
  **/
 @Configuration
 @EnableWebMvc

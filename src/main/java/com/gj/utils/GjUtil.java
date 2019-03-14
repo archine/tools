@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 /**
  * @author Archine
- * @date 2019-03-12
  * param util
  **/
 public class GjUtil {
@@ -160,7 +159,7 @@ public class GjUtil {
      * @param str    need to separated parameter
      * @param symbol symbol
      * @return has been separated
-     * @apiNote The length of the symbol can only be one
+     * warning: The length of the symbol can only be one
      */
     @SuppressWarnings("unchecked")
     public static String[] spilt(@NonNull String str, @NonNull String symbol) {

@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Archine
- * @date 2019-03-13
  **/
 @Configuration
 @ConditionalOnWebApplication
