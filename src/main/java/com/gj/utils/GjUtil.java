@@ -9,10 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +25,9 @@ public class GjUtil {
      */
     public static boolean paramIsEmpty(Object str) {
         if (str instanceof List) {
-            return ((List) str).size() < 1;
+            return ((List) str).isEmpty();
+        } else if (str instanceof Map) {
+            return ((Map) str).isEmpty();
         } else {
             return str == null || "".equals(str);
         }
@@ -42,7 +41,7 @@ public class GjUtil {
      */
     public static boolean multiParamHasEmpty(List<Object> params) {
         List<Object> paramNullList = params.stream().filter(GjUtil::paramIsEmpty).collect(Collectors.toList());
-        return paramNullList.size() > 0;
+        return !paramNullList.isEmpty();
     }
 
     /**
@@ -165,8 +164,8 @@ public class GjUtil {
      * warning: The length of the symbol can only be one
      */
     @SuppressWarnings("unchecked")
-    public static String[] spilt(@NonNull String str, @NonNull String symbol) {
-        if (paramIsEmpty(str) || symbol.length() > 1) {
+    public static String[] spilt(String str, String symbol) {
+        if (paramIsEmpty(str) || symbol.length() != 1) {
             return null;
         } else {
             List<String> list = new ArrayList();
@@ -276,4 +275,5 @@ public class GjUtil {
         calendar.setTime(simpleDateFormat.parse(str));
         return calendar;
     }
+
 }
