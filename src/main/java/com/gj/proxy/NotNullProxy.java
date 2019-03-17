@@ -9,16 +9,16 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +29,10 @@ import java.util.stream.Collectors;
 @Component
 @Aspect
 public class NotNullProxy {
+    @Resource
+    private ApplicationContext context;
+
+    private static Map<String, Object> map = new HashMap<>();
     @Pointcut("@annotation(com.gj.anno.NotNull)")
     public void cut() {
 
@@ -37,10 +41,15 @@ public class NotNullProxy {
     @Before("cut()")
     @SuppressWarnings("unchecked")
     public void doBefore(JoinPoint joinPoint) {
+        context.getBeansWithAnnotation(NotNull.class);
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        Object[] args = joinPoint.getArgs();
+        for (Object arg : args) {
+            System.out.println("类型名: " + arg.getClass().getName());
+        }
         Method method = methodSignature.getMethod();
         NotNull annotation = method.getDeclaredAnnotation(NotNull.class);
         List<String > exclude = Arrays.asList(annotation.exclude());
@@ -58,7 +67,11 @@ public class NotNullProxy {
             }
         }
         if (GjUtil.multiParamHasEmpty(needCheckParamList.stream().map(request::getParameter).collect(Collectors.toList()))) {
-            throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
+            if (GjUtil.paramIsEmpty(annotation.message())) {
+                throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
+            } else {
+                throw new ParamException(annotation.message());
+            }
         }
     }
 

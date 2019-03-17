@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
  * @author Archine
  * param util
  **/
-public class GjUtil {
+public final class GjUtil {
     /**
      * Checks if a single parameter is null
      *
@@ -28,6 +29,8 @@ public class GjUtil {
             return ((List) str).isEmpty();
         } else if (str instanceof Map) {
             return ((Map) str).isEmpty();
+        } else if (str instanceof Array) {
+            return Array.getLength(str) == 0;
         } else {
             return str == null || "".equals(str);
         }
@@ -39,8 +42,8 @@ public class GjUtil {
      * @param params multiple parameter
      * @return True is contain, false is not
      */
-    public static boolean multiParamHasEmpty(List<Object> params) {
-        List<Object> paramNullList = params.stream().filter(GjUtil::paramIsEmpty).collect(Collectors.toList());
+    public static<T> boolean multiParamHasEmpty(List<T> params) {
+        List<T> paramNullList = params.stream().filter(GjUtil::paramIsEmpty).collect(Collectors.toList());
         return !paramNullList.isEmpty();
     }
 
@@ -275,5 +278,4 @@ public class GjUtil {
         calendar.setTime(simpleDateFormat.parse(str));
         return calendar;
     }
-
 }

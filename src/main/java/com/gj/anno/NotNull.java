@@ -11,4 +11,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface NotNull {
     String[] exclude()default {};
+
+    String message() default "";
 }
