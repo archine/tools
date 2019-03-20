@@ -1,4 +1,4 @@
-package com.gj.ex;
+package com.gjing.ex;
 
 /**
  * @author Archine

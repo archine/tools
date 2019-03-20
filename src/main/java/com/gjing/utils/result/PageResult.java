@@ -1,4 +1,4 @@
-package com.gj.utils.resp;
+package com.gjing.utils.result;
 
 import lombok.Builder;
 import lombok.Data;

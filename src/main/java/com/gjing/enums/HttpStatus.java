@@ -1,4 +1,4 @@
-package com.gj.enums;
+package com.gjing.enums;
 
 import lombok.Getter;
 

@@ -1,9 +1,12 @@
-package com.gj.utils;
+package com.gjing.utils;
 
-import com.gj.utils.excel.ExportExcel;
+import com.gjing.utils.excel.ExportExcel;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Array;
 import java.security.MessageDigest;
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
  * @author Archine
  * param util
  **/
-public final class GjUtil {
+public final class Gj {
     /**
      * Checks if a single parameter is null
      *
@@ -40,10 +43,11 @@ public final class GjUtil {
      * Check multiple parameters for null
      *
      * @param params multiple parameter
+     * @param <T>    parameter type
      * @return True is contain, false is not
      */
-    public static<T> boolean multiParamHasEmpty(List<T> params) {
-        List<T> paramNullList = params.stream().filter(GjUtil::paramIsEmpty).collect(Collectors.toList());
+    public static <T> boolean multiParamHasEmpty(List<T> params) {
+        List<T> paramNullList = params.stream().filter(Gj::paramIsEmpty).collect(Collectors.toList());
         return !paramNullList.isEmpty();
     }
 
@@ -74,8 +78,8 @@ public final class GjUtil {
      * @return NonNull List
      */
     public static List<String> trim(List<String> list) {
-        List<String> listNonNull = list.stream().filter(GjUtil::paramIsNotEmpty).collect(Collectors.toList());
-        return listNonNull.size() <= 0 ? null : listNonNull.stream().map(GjUtil::trim).collect(Collectors.toList());
+        List<String> listNonNull = list.stream().filter(Gj::paramIsNotEmpty).collect(Collectors.toList());
+        return listNonNull.size() <= 0 ? null : listNonNull.stream().map(Gj::trim).collect(Collectors.toList());
     }
 
     /**
@@ -122,7 +126,7 @@ public final class GjUtil {
      * @return has been removed
      */
     public static String removeStartSymbol(String str, String symbol) {
-        int strLen = 0;
+        int strLen;
         if (paramIsNotEmpty(str) && (strLen = str.length()) != 0) {
             int start = 0;
             if (paramIsEmpty(symbol)) {
@@ -167,7 +171,7 @@ public final class GjUtil {
      * warning: The length of the symbol can only be one
      */
     @SuppressWarnings("unchecked")
-    public static String[] spilt(String str, String symbol) {
+    public static String[] split(String str, String symbol) {
         if (paramIsEmpty(str) || symbol.length() != 1) {
             return null;
         } else {
@@ -183,6 +187,7 @@ public final class GjUtil {
                     i++;
                 }
             }
+            list.add(str.substring(start));
             return list.toArray(new String[0]);
         }
     }
@@ -218,6 +223,47 @@ public final class GjUtil {
     }
 
     /**
+     * sha256 Hmac加密
+     *
+     * @param str    需要加密的消息
+     * @param secret 秘钥
+     * @return 加密后的字符串
+     */
+    public static String sha256Hmac(String str, String secret) {
+        String hash = "";
+        try {
+            Mac sha256Hmac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+            sha256Hmac.init(secretKey);
+            byte[] bytes = sha256Hmac.doFinal(str.getBytes());
+            hash = byteArrayToHexString(bytes);
+        } catch (Exception e) {
+            System.out.println("Error HmacSHA256 ====" + e.getMessage());
+        }
+        return hash;
+    }
+
+
+    /**
+     * 将加密后的字节数组转换成字符串
+     *
+     * @param b 字节数组
+     * @return 字符串
+     */
+    private static String byteArrayToHexString(byte[] b) {
+        StringBuilder hs = new StringBuilder();
+        String stmp;
+        for (int n = 0; b != null && n < b.length; n++) {
+            stmp = Integer.toHexString(b[n] & 0XFF);
+            if (stmp.length() == 1) {
+                hs.append('0');
+            }
+            hs.append(stmp);
+        }
+        return hs.toString().toLowerCase();
+    }
+
+    /**
      * Excel export
      *
      * @param response response
@@ -241,7 +287,7 @@ public final class GjUtil {
         if (t.length < 1) {
             return false;
         }
-        if (GjUtil.paramIsEmpty(u)) {
+        if (Gj.paramIsEmpty(u)) {
             return false;
         }
         for (String t1 : t) {
@@ -252,30 +298,108 @@ public final class GjUtil {
         return false;
     }
 
+    /**
+     * get text for time
+     *
+     * @param date date
+     * @return string
+     */
     public static String getDateAsString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(date);
     }
 
+    /**
+     * get custom format text for time
+     *
+     * @param date   date
+     * @param format format
+     * @return string
+     */
     public static String getDateAsString(Date date, String format) {
         SimpleDateFormat format1 = new SimpleDateFormat(format);
         return format1.format(format);
     }
 
+    /**
+     * get java for time
+     *
+     * @param date text for time
+     * @return java date
+     * @throws ParseException format exception
+     */
     public static Date getDate(String date) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.parse(date);
     }
 
+    /**
+     * get custom format java for time
+     *
+     * @param date   date
+     * @param format format
+     * @return java for time
+     * @throws ParseException format ex
+     */
     public static Date getDate(String date, String format) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.parse(date);
     }
 
+    /**
+     * text for time change to date
+     *
+     * @param str text for time
+     * @return date
+     * @throws ParseException format EX
+     */
     public static Calendar dateToCalendar(String str) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(simpleDateFormat.parse(str));
         return calendar;
+    }
+
+    /**
+     * url拼接
+     *
+     * @param map 参数
+     * @param url 需要拼接的url
+     * @return 拼接完后的url
+     */
+    public static String urlAppend(String url, MultiValueMap<String, String> map) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(url).append("?");
+        for (String s : map.keySet()) {
+            if (map.size() == 1) {
+                builder.append(s).append("=").append("{").append(s).append("}");
+            } else {
+                builder.append(s).append("=").append("{").append(s).append("}&");
+            }
+        }
+        return builder.toString().substring(0, builder.toString().length() - 1);
+    }
+
+    /**
+     * url append , example: http://ip:port?param1={param1}
+     * @param map param
+     * @param url url
+     * @return appended url
+     */
+    public static String urlAppend(String url, Map<String, Object> map) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(url).append("?");
+        for (String s : map.keySet()) {
+            if (map.size() == 1) {
+                builder.append(s).append("=").append("{").append(s).append("}");
+            } else {
+                builder.append(s).append("=").append("{").append(s).append("}&");
+            }
+        }
+        if (map.size() == 1) {
+            return builder.toString();
+        } else {
+            return builder.toString().substring(0, builder.toString().length() - 1);
+        }
     }
 }

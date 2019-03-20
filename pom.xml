@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>tools</name>
     <description>GJ himself wrote some commonly used functions</description>
     <properties>
@@ -50,6 +50,11 @@
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>20.0</version>
         </dependency>
 
         <dependency>

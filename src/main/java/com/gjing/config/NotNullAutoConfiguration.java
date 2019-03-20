@@ -1,7 +1,7 @@
-package com.gj.config;
+package com.gjing.config;
 
-import com.gj.ex.GlobalExceptionHandler;
-import com.gj.proxy.NotNullProxy;
+import com.gjing.ex.GlobalExceptionHandler;
+import com.gjing.handle.NotNullProxy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;

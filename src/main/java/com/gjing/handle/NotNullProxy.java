@@ -1,9 +1,9 @@
-package com.gj.proxy;
+package com.gjing.handle;
 
-import com.gj.anno.NotNull;
-import com.gj.enums.HttpStatus;
-import com.gj.ex.ParamException;
-import com.gj.utils.GjUtil;
+import com.gjing.anno.NotNull;
+import com.gjing.enums.HttpStatus;
+import com.gjing.ex.ParamException;
+import com.gjing.utils.Gj;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Component
 @Aspect
 public class NotNullProxy {
-    @Pointcut("@annotation(com.gj.anno.NotNull)")
+    @Pointcut("@annotation(com.gjing.anno.NotNull)")
     public void cut() {
 
     }
@@ -57,8 +57,8 @@ public class NotNullProxy {
                 }
             }
         }
-        if (GjUtil.multiParamHasEmpty(needCheckParamList.stream().map(request::getParameter).collect(Collectors.toList()))) {
-            if (GjUtil.paramIsEmpty(annotation.message())) {
+        if (Gj.multiParamHasEmpty(needCheckParamList.stream().map(request::getParameter).collect(Collectors.toList()))) {
+            if (Gj.paramIsEmpty(annotation.message())) {
                 throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
             } else {
                 throw new ParamException(annotation.message());
