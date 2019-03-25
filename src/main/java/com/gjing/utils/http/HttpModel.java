@@ -17,12 +17,12 @@ public class HttpModel {
     /**
      * 请求参数
      */
-    private MultiValueMap<String, Object> params;
+    private MultiValueMap<String, String> params;
 
     /**
      * 请求头信息
      */
-    private MultiValueMap<String, Object> headers;
+    private MultiValueMap<String, String> headers;
 
     /**
      * 代理ip
