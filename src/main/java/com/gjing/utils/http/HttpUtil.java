@@ -4,7 +4,7 @@ import com.gjing.config.HttpsClientRequestFactory;
 import com.gjing.enums.HttpStatus;
 import com.gjing.enums.RequestEnum;
 import com.gjing.ex.HttpException;
-import com.gjing.utils.Gj;
+import com.gjing.utils.ParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,31 +24,31 @@ public class HttpUtil {
     /**
      * GET
      *
-     * @param restModel request entity
+     * @param httpModel request entity
      * @return request result
      */
-    public String get(RestModel restModel) {
-        if (!Gj.multiParamHasEmpty(Arrays.asList(restModel.getProxyIp(), restModel.getProxyPort()))) {
-            setProxy(restModel.getProxyIp(), restModel.getProxyPort());
+    public String get(HttpModel httpModel) {
+        if (!ParamUtil.multiParamHasEmpty(Arrays.asList(httpModel.getProxyIp(), httpModel.getProxyPort()))) {
+            setProxy(httpModel.getProxyIp(), httpModel.getProxyPort());
         }
         try {
-            checkRequestType(restModel);
-            if (Gj.paramIsNotEmpty(restModel.getHeaders())) {
+            checkRequestType(httpModel);
+            if (ParamUtil.paramIsNotEmpty(httpModel.getHeaders())) {
                 HttpHeaders httpHeaders = new HttpHeaders();
-                for (String s : restModel.getHeaders().keySet()) {
-                    httpHeaders.add(s, restModel.getHeaders().get(s).toString());
+                for (String s : httpModel.getHeaders().keySet()) {
+                    httpHeaders.add(s, httpModel.getHeaders().get(s).toString());
                 }
                 HttpEntity<String> httpEntity = new HttpEntity<>(null, httpHeaders);
-                if (Gj.paramIsNotEmpty(restModel.getParams())) {
-                    return restTemplate.exchange(Gj.urlAppend(restModel.getRequestUrl(), restModel.getParams().toSingleValueMap()), HttpMethod.GET, httpEntity, String.class, restModel.getParams().toSingleValueMap()).getBody();
+                if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
+                    return restTemplate.exchange(UrlUtil.urlAppend(httpModel.getRequestUrl(), httpModel.getParams().toSingleValueMap()), HttpMethod.GET, httpEntity, String.class, httpModel.getParams().toSingleValueMap()).getBody();
                 } else {
-                    return restTemplate.exchange(restModel.getRequestUrl(), HttpMethod.GET, httpEntity, String.class).getBody();
+                    return restTemplate.exchange(httpModel.getRequestUrl(), HttpMethod.GET, httpEntity, String.class).getBody();
                 }
             } else {
-                if (Gj.paramIsNotEmpty(restModel.getParams())) {
-                    return restTemplate.getForObject(Gj.urlAppend(restModel.getRequestUrl(), restModel.getParams().toSingleValueMap()), String.class, restModel.getParams().toSingleValueMap());
+                if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
+                    return restTemplate.getForObject(UrlUtil.urlAppend(httpModel.getRequestUrl(), httpModel.getParams().toSingleValueMap()), String.class, httpModel.getParams().toSingleValueMap());
                 } else {
-                    return restTemplate.getForObject(restModel.getRequestUrl(), String.class);
+                    return restTemplate.getForObject(httpModel.getRequestUrl(), String.class);
                 }
             }
         } catch (Exception e) {
@@ -60,31 +60,31 @@ public class HttpUtil {
     /**
      * POST
      *
-     * @param restModel request entity
+     * @param httpModel request entity
      * @return request result
      */
-    public String post(RestModel restModel) {
-        if (!Gj.multiParamHasEmpty(Arrays.asList(restModel.getProxyIp(), restModel.getProxyPort()))) {
-            setProxy(restModel.getProxyIp(), restModel.getProxyPort());
+    public String post(HttpModel httpModel) {
+        if (!ParamUtil.multiParamHasEmpty(Arrays.asList(httpModel.getProxyIp(), httpModel.getProxyPort()))) {
+            setProxy(httpModel.getProxyIp(), httpModel.getProxyPort());
         }
         try {
-            checkRequestType(restModel);
+            checkRequestType(httpModel);
             HttpEntity<Object> httpEntity;
-            if (Gj.paramIsNotEmpty(restModel.getHeaders())) {
+            if (ParamUtil.paramIsNotEmpty(httpModel.getHeaders())) {
                 HttpHeaders httpHeaders = new HttpHeaders();
-                for (String s : httpHeaders.keySet()) {
-                    httpHeaders.add(s, restModel.getHeaders().get(s).toString());
+                for (String s : httpModel.getHeaders().keySet()) {
+                    httpHeaders.add(s, httpModel.getHeaders().get(s).toString());
                 }
                 httpEntity = new HttpEntity<>(null, httpHeaders);
-                if (Gj.paramIsNotEmpty(restModel.getParams())) {
-                    httpEntity = new HttpEntity<>(restModel.getParams(), httpHeaders);
+                if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
+                    httpEntity = new HttpEntity<>(httpModel.getParams(), httpHeaders);
                 }
-                return restTemplate.exchange(restModel.getRequestUrl(), HttpMethod.POST, httpEntity, String.class).getBody();
+                return restTemplate.exchange(httpModel.getRequestUrl(), HttpMethod.POST, httpEntity, String.class).getBody();
             } else {
-                if (Gj.paramIsNotEmpty(restModel.getParams())) {
-                    return restTemplate.postForEntity(restModel.getRequestUrl(), restModel.getParams(), String.class).getBody();
+                if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
+                    return restTemplate.postForEntity(httpModel.getRequestUrl(), httpModel.getParams(), String.class).getBody();
                 } else {
-                    return restTemplate.postForEntity(restModel.getRequestUrl(), HttpMethod.POST, String.class).getBody();
+                    return restTemplate.postForEntity(httpModel.getRequestUrl(), HttpMethod.POST, String.class).getBody();
                 }
             }
         } catch (Exception e) {
@@ -96,14 +96,14 @@ public class HttpUtil {
     /**
      * check request type for http or https
      *
-     * @param restModel rest
+     * @param httpModel rest
      */
-    private void checkRequestType(RestModel restModel) {
-        String[] urlArr = Gj.split(restModel.getRequestUrl(), ":");
-        if (Gj.paramIsNotEmpty(urlArr)) {
-            if (Objects.equals(Gj.toLowerCase(urlArr[0]), RequestEnum.HTTP.getType())) {
+    private void checkRequestType(HttpModel httpModel) {
+        String[] urlArr = ParamUtil.split(httpModel.getRequestUrl(), ":");
+        if (ParamUtil.paramIsNotEmpty(urlArr)) {
+            if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), RequestEnum.HTTP.getType())) {
                 restTemplate = new RestTemplate();
-            } else if (Objects.equals(Gj.toLowerCase(urlArr[0]), RequestEnum.HTTPS.getType())) {
+            } else if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), RequestEnum.HTTPS.getType())) {
                 restTemplate = new RestTemplate(new HttpsClientRequestFactory());
             } else {
                 throw new HttpException("The requested url is malformed");

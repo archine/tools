@@ -9,7 +9,7 @@ import org.springframework.util.MultiValueMap;
  **/
 @Data
 @NoArgsConstructor
-public class RestModel {
+public class HttpModel {
     /**
      * 请求url
      */

@@ -2,7 +2,7 @@ package com.gjing.utils.excel;
 
 import com.gjing.enums.HttpStatus;
 import com.gjing.ex.ParamException;
-import com.gjing.utils.Gj;
+import com.gjing.utils.ParamUtil;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -25,7 +25,7 @@ public class ExportExcel {
      * @param info     excel额外的内容,如果不需要直接传null或者空字符串
      */
     public static void generateHaveExcelName(HttpServletResponse response, List<Object[]> list, String[] headers, String title, String info) {
-        if (Gj.paramIsEmpty(response) || Gj.paramIsEmpty(headers)  || Gj.paramIsEmpty(title)) {
+        if (ParamUtil.paramIsEmpty(response) || ParamUtil.paramIsEmpty(headers)  || ParamUtil.paramIsEmpty(title)) {
             throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
         }
         HSSFWorkbook wb = export(list, headers, title, info);
@@ -76,7 +76,7 @@ public class ExportExcel {
             cell.setCellValue(headers[i]);
         }
         //如果含有excel的简介
-        if (Gj.paramIsNotEmpty(info)) {
+        if (ParamUtil.paramIsNotEmpty(info)) {
             //添加额外的excel内容
             row = sheet.createRow(1);
             HSSFCell cell;

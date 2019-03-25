@@ -1,7 +1,7 @@
 package com.gjing.config;
 
 import com.gjing.ex.GlobalExceptionHandler;
-import com.gjing.handle.NotNullProxy;
+import com.gjing.handle.NotNullProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Configuration;
 public class NotNullAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(NotNullProxy.class)
-    public NotNullProxy notNullProxy() {
-        return new NotNullProxy();
+    @ConditionalOnMissingBean(NotNullProcessor.class)
+    public NotNullProcessor notNullProxy() {
+        return new NotNullProcessor();
     }
 
 

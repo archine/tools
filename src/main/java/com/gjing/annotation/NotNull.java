@@ -1,4 +1,4 @@
-package com.gjing.anno;
+package com.gjing.annotation;
 
 import java.lang.annotation.*;
 

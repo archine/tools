@@ -1,7 +1,6 @@
 package com.gjing.ex;
 
 import com.gjing.enums.HttpStatus;
-import com.gjing.utils.result.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,9 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ParamException.class)
-    public ResultVo paramException(ParamException e) {
+    public ResponseEntity<String> paramException(ParamException e) {
         e.printStackTrace();
-        return ResultVo.error(HttpStatus.PARAM_EMPTY.getCode(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.PARAM_EMPTY.getCode()).body(e.getMessage());
     }
 
     @ExceptionHandler(HttpException.class)

@@ -1,7 +1,7 @@
 package com.gjing.utils.result;
 
 import com.gjing.enums.HttpStatus;
-import com.gjing.utils.Gj;
+import com.gjing.utils.ParamUtil;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * @author Archine
- * The response template
+ * 返回模板
  **/
 @Getter
 @Setter
@@ -70,7 +70,7 @@ public class ResultVo<T> {
      */
     public static Map<String, Object> login(String isLogin,List<String> keys, List<Object> values) {
         Map<String, Object> map = new HashMap<>(10);
-        if (Gj.paramIsNotEmpty(isLogin)) {
+        if (ParamUtil.paramIsNotEmpty(isLogin)) {
             map.put("code", HttpStatus.OK.getCode());
             map.put("msg", HttpStatus.OK.getMsg());
         }else {

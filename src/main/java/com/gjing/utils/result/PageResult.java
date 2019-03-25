@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * @author Archine
- * This class is called if the response needs to respond to paging data
+ * 主要用于分页查询时候进行返回,与ResultVo配合使用
  **/
 @Data
 @Builder

@@ -23,7 +23,7 @@ public enum HttpStatus {
     INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
     SERVICE_UNAVAILABLE(503, "Service Unavailable"),
     GATEWAY_TIMEOUT(504, "Gateway Timeout"),
-    PARAM_EMPTY(512, "Parameter Is Null"),
+    PARAM_EMPTY(512, "Parameter cannot be null"),
     NO_LOGIN(513,"Current Not Login,To Login Please");
     private Integer code;
     private String msg;
