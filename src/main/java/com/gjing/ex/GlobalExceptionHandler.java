@@ -32,4 +32,10 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.getCode()).body(e.getMessage());
     }
+
+    @ExceptionHandler(OssException.class)
+    public ResponseEntity<String> ossException(OssException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.getCode()).body(e.getMessage());
+    }
 }

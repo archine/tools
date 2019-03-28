@@ -9,9 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -40,13 +43,13 @@ public class HttpUtil {
                 }
                 HttpEntity<String> httpEntity = new HttpEntity<>(null, httpHeaders);
                 if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
-                    return restTemplate.exchange(UrlUtil.urlAppend(httpModel.getRequestUrl(), httpModel.getParams().toSingleValueMap()), HttpMethod.GET, httpEntity, String.class, httpModel.getParams().toSingleValueMap()).getBody();
+                    return restTemplate.exchange(UrlUtil.urlAppend(httpModel.getRequestUrl(), httpModel.getParams()), HttpMethod.GET, httpEntity, String.class, httpModel.getParams()).getBody();
                 } else {
                     return restTemplate.exchange(httpModel.getRequestUrl(), HttpMethod.GET, httpEntity, String.class).getBody();
                 }
             } else {
                 if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
-                    return restTemplate.getForObject(UrlUtil.urlAppend(httpModel.getRequestUrl(), httpModel.getParams().toSingleValueMap()), String.class, httpModel.getParams().toSingleValueMap());
+                    return restTemplate.getForObject(UrlUtil.urlAppend(httpModel.getRequestUrl(), httpModel.getParams()), String.class, httpModel.getParams());
                 } else {
                     return restTemplate.getForObject(httpModel.getRequestUrl(), String.class);
                 }
@@ -73,16 +76,16 @@ public class HttpUtil {
             if (ParamUtil.paramIsNotEmpty(httpModel.getHeaders())) {
                 HttpHeaders httpHeaders = new HttpHeaders();
                 for (String s : httpModel.getHeaders().keySet()) {
-                    httpHeaders.add(s, httpModel.getHeaders().get(s).toString());
+                    httpHeaders.add(s, httpModel.getHeaders().get(s));
                 }
                 httpEntity = new HttpEntity<>(null, httpHeaders);
                 if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
-                    httpEntity = new HttpEntity<>(httpModel.getParams(), httpHeaders);
+                    httpEntity = new HttpEntity<>(mapToMultiValueMap(httpModel.getParams()), httpHeaders);
                 }
                 return restTemplate.exchange(httpModel.getRequestUrl(), HttpMethod.POST, httpEntity, String.class).getBody();
             } else {
                 if (ParamUtil.paramIsNotEmpty(httpModel.getParams())) {
-                    return restTemplate.postForEntity(httpModel.getRequestUrl(), httpModel.getParams(), String.class).getBody();
+                    return restTemplate.postForEntity(httpModel.getRequestUrl(), mapToMultiValueMap(httpModel.getParams()), String.class).getBody();
                 } else {
                     return restTemplate.postForEntity(httpModel.getRequestUrl(), HttpMethod.POST, String.class).getBody();
                 }
@@ -109,6 +112,19 @@ public class HttpUtil {
                 throw new HttpException("The requested url is malformed");
             }
         }
+    }
+
+    /**
+     * map 转multiValueMap
+     * @param map hashMap
+     * @return multiValueMap
+     */
+    private MultiValueMap<String, String> mapToMultiValueMap(Map<String, String> map) {
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        for (String s : map.keySet()) {
+            multiValueMap.add(s, map.get(s));
+        }
+        return multiValueMap;
     }
 
     /**

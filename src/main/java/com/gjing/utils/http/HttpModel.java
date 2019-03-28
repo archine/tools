@@ -2,7 +2,8 @@ package com.gjing.utils.http;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.util.MultiValueMap;
+
+import java.util.Map;
 
 /**
  * @author Archine
@@ -17,12 +18,12 @@ public class HttpModel {
     /**
      * 请求参数
      */
-    private MultiValueMap<String, String> params;
+    private Map<String, String> params;
 
     /**
      * 请求头信息
      */
-    private MultiValueMap<String, String> headers;
+    private Map<String, String> headers;
 
     /**
      * 代理ip

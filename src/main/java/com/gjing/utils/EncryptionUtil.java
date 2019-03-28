@@ -1,10 +1,12 @@
 package com.gjing.utils;
 
 import com.gjing.ex.ParamException;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -126,14 +128,32 @@ public class EncryptionUtil {
         String hash;
         try {
             Mac sha256Hmac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
             sha256Hmac.init(secretKey);
-            byte[] bytes = sha256Hmac.doFinal(str.getBytes());
+            byte[] bytes = sha256Hmac.doFinal(str.getBytes(StandardCharsets.UTF_8));
             hash = byteArrayToHexString(bytes);
         } catch (Exception e) {
             throw new ParamException("Encryption abnormal");
         }
         return hash;
+    }
+
+    /**
+     *
+     * @param str 需要加密的内容
+     * @param secret 秘钥
+     * @return str 加密后的字符串
+     */
+    public static String sha1Hmac(String str, String secret) {
+        try {
+            SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA1");
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(signingKey);
+            byte[] rawHmac = mac.doFinal(str.getBytes(StandardCharsets.UTF_8));
+            return Hex.encodeHexString(rawHmac);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
