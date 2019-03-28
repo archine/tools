@@ -2,7 +2,7 @@ package com.gjing.utils.http;
 
 import com.gjing.config.HttpsClientRequestFactory;
 import com.gjing.enums.HttpStatus;
-import com.gjing.enums.RequestEnum;
+import com.gjing.enums.HttpType;
 import com.gjing.ex.HttpException;
 import com.gjing.utils.ParamUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -101,9 +101,9 @@ public class HttpUtil {
     private void checkRequestType(HttpModel httpModel) {
         String[] urlArr = ParamUtil.split(httpModel.getRequestUrl(), ":");
         if (ParamUtil.paramIsNotEmpty(urlArr)) {
-            if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), RequestEnum.HTTP.getType())) {
+            if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), HttpType.HTTP.getType())) {
                 restTemplate = new RestTemplate();
-            } else if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), RequestEnum.HTTPS.getType())) {
+            } else if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), HttpType.HTTPS.getType())) {
                 restTemplate = new RestTemplate(new HttpsClientRequestFactory());
             } else {
                 throw new HttpException("The requested url is malformed");

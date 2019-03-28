@@ -5,6 +5,18 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <version>1.0.4</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <name>tools</name>
     <description>GJ himself wrote some commonly used functions</description>
     <properties>
@@ -83,6 +95,13 @@
             <artifactId>poi</artifactId>
             <version>4.0.0</version>
             <scope>compile</scope>
+        </dependency>
+        <!--ali sms-->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.0.3</version>
+            <optional>true</optional>
         </dependency>
         <!--end-->
         <dependency>

@@ -26,4 +26,10 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.getCode()).body(e.getMessage());
     }
+
+    @ExceptionHandler(SmsException.class)
+    public ResponseEntity<String> smsException(SmsException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.getCode()).body(e.getMessage());
+    }
 }

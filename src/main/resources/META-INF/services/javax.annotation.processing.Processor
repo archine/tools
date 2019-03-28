@@ -1,2 +1,2 @@
-com.gjing.handle.GetterProcessor
+#com.gjing.handle.GetterProcessor
 com.gjing.handle.NonNullProcessor

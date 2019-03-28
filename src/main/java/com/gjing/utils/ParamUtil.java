@@ -1,11 +1,12 @@
 package com.gjing.utils;
 
-import org.springframework.lang.NonNull;
+import com.gjing.annotation.NonNull;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -19,7 +20,7 @@ public final class ParamUtil {
      * @param str 参数
      * @return True 为空,false不为空
      */
-    public static<T> boolean paramIsEmpty(T str) {
+    public static <T> boolean paramIsEmpty(T str) {
         if (str instanceof List) {
             return ((List) str).isEmpty();
         } else if (str instanceof Map) {
@@ -37,7 +38,7 @@ public final class ParamUtil {
      *
      * @param params 多个参数集合
      * @param <T>    参数类型,泛型
-     * @return true为包括,false不包括
+     * @return true为包括, false不包括
      */
     public static <T> boolean multiParamHasEmpty(List<T> params) {
         List<T> paramNullList = params.stream().filter(ParamUtil::paramIsEmpty).collect(Collectors.toList());
@@ -46,8 +47,9 @@ public final class ParamUtil {
 
     /**
      * 参数不为空或者size=0或者isEmpty
+     *
      * @param str 参数
-     * @return true为不含有,false为含有
+     * @return true为不含有, false为含有
      */
     public static boolean paramIsNotEmpty(Object str) {
         return !paramIsEmpty(str);
@@ -55,6 +57,7 @@ public final class ParamUtil {
 
     /**
      * 去除字符串的空格
+     *
      * @param str 字符串
      * @return 去除后
      */
@@ -79,7 +82,7 @@ public final class ParamUtil {
      * @param str 字符串
      * @return 大写
      */
-    public static String toUpperCase(@NonNull String str) {
+    public static String toUpperCase(String str) {
         return paramIsEmpty(str) ? null : str.toUpperCase();
     }
 
@@ -89,14 +92,14 @@ public final class ParamUtil {
      * @param str 字符串
      * @return 小写字符串
      */
-    public static String toLowerCase(@NonNull String str) {
+    public static String toLowerCase(String str) {
         return paramIsEmpty(str) ? null : str.toLowerCase();
     }
 
     /**
      * 移除字符串的符号
      *
-     * @param str 字符串
+     * @param str    字符串
      * @param symbol 符号
      * @return 移除后
      */
@@ -112,7 +115,7 @@ public final class ParamUtil {
     /**
      * 移除字符串开始的符号
      *
-     * @param str 字符串
+     * @param str    字符串
      * @param symbol 符号
      * @return 移除后的
      */
@@ -135,7 +138,7 @@ public final class ParamUtil {
     /**
      * 移除字符串末尾的符号
      *
-     * @param str 需要处理的字符串
+     * @param str    需要处理的字符串
      * @param symbol symbol 符号
      * @return 移除后的文本
      */
@@ -183,6 +186,28 @@ public final class ParamUtil {
     }
 
     /**
+     * 删除字符串里的符号
+     *
+     * @param str    字符串
+     * @param symbol 符号,仅可使用一个符号
+     * @return 删除符号后的字符串
+     */
+    public static String removeSymbol2(String str, String symbol) {
+        if (paramIsEmpty(str) || symbol.length() > 1) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        String[] strings = split(str, symbol);
+        if (paramIsNotEmpty(strings)) {
+            for (String s : strings) {
+                builder.append(s);
+            }
+            return builder.toString();
+        }
+        return null;
+    }
+
+    /**
      * 判断数组里是否包含指定值
      *
      * @param t 目标数组
@@ -202,5 +227,62 @@ public final class ParamUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * 验证是不是合法email
+     *
+     * @param email 验证的email
+     * @return true/false
+     */
+    public static boolean isEmail(String email) {
+        String regex = "^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$";
+        if (paramIsNotEmpty(email)) {
+            return Pattern.compile(regex).matcher(email).matches();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 验证是不是合法的手机号
+     *
+     * @param phone 验证的手机号
+     */
+    public static boolean isMobileNumber(String phone) {
+        String regex = "^1([3-8]){1}\\d{9}$";
+        if (paramIsNotEmpty(phone)) {
+            return Pattern.compile(regex).matcher(phone).matches();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 验证是不是合法的固话
+     *
+     * @param tel 验证的固话
+     */
+    public static boolean isTelPhone(String tel) {
+        String regex = "^(0[0-9]{2,3}\\-)?([2-9][0-9]{6,7})+(\\-[0-9]{1,4})?$";
+        if (paramIsNotEmpty(tel)) {
+            return Pattern.compile(regex).matcher(tel).matches();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 验证是不是合法的邮编
+     *
+     * @param postCode 验证的邮编
+     */
+    public static boolean isPostCode(String postCode) {
+        String regex = "^\\d{6}$";
+        if (paramIsNotEmpty(postCode)) {
+            return Pattern.compile(regex).matcher(postCode).matches();
+        } else {
+            return false;
+        }
     }
 }
