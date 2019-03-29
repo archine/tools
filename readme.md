@@ -1,5 +1,4 @@
 # Archine tools for java :smile:
----
 ![](https://img.shields.io/badge/version-1.0.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-archine-green.svg)
 With the rise of springboot and springcloud, rapid development is becoming more and more popular,    
 so I wrote this project, which is mainly used to improve the development speed,    
@@ -23,5 +22,4 @@ The recommended way to use Archine tools for Java in your project is to use it f
 ```
 :heart_eyes:For more information about installing the SDK by other means,go to <a href='https://search.maven.org/artifact/cn.gjing/tools/1.0.5/jar'>中心库</a>   
 #### **Authors**
----
 * Archine
