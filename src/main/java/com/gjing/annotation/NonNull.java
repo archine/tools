@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * @author Archine
  **/
-@Target({ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
 public @interface NonNull {
 }

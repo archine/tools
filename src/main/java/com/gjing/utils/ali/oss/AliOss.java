@@ -7,9 +7,9 @@ import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.gjing.enums.HttpStatus;
 import com.gjing.ex.OssException;
+import com.gjing.ex.ParamException;
 import com.gjing.utils.ParamUtil;
 import com.gjing.utils.TimeUtil;
-import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,18 +60,43 @@ public class AliOss {
     }
 
     /**
-     * 文件上传的文件后缀
-     *
-     * @param filenameExtension 文件扩展名
-     * @return ''
+     * 通过文件名判断并获取OSS服务文件上传时文件的contentType
+     * @param fileName 文件名
+     * @return 文件的contentType
      */
-    private static String getContentType(String filenameExtension) {
-        if (filenameExtension.equalsIgnoreCase("jpeg") ||
-                filenameExtension.equalsIgnoreCase("jpg") ||
-                filenameExtension.equalsIgnoreCase("png")) {
+    private static String getContentType(String fileName){
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".")+1);
+        if("bmp".equalsIgnoreCase(fileExtension)) {
+            return "image/bmp";
+        }
+        if("gif".equalsIgnoreCase(fileExtension)) {
+            return "image/gif";
+        }
+        if("jpeg".equalsIgnoreCase(fileExtension) || "jpg".equalsIgnoreCase(fileExtension)  ) {
             return "image/jpeg";
         }
-        return "multipart/form-data";
+        if("png".equalsIgnoreCase(fileExtension)) {
+            return "image/png";
+        }
+        if("html".equalsIgnoreCase(fileExtension)) {
+            return "text/html";
+        }
+        if("txt".equalsIgnoreCase(fileExtension)) {
+            return "text/plain";
+        }
+        if("vsd".equalsIgnoreCase(fileExtension)) {
+            return "application/vnd.visio";
+        }
+        if("ppt".equalsIgnoreCase(fileExtension) || "pptx".equalsIgnoreCase(fileExtension)) {
+            return "application/vnd.ms-powerpoint";
+        }
+        if("doc".equalsIgnoreCase(fileExtension) || "docx".equalsIgnoreCase(fileExtension)) {
+            return "application/msword";
+        }
+        if("xml".equalsIgnoreCase(fileExtension)) {
+            return "text/xml";
+        }
+        return "text/html";
     }
 
     /**
@@ -80,18 +105,17 @@ public class AliOss {
      * @param file 文件
      * @return 文件地址
      */
-    private static String uploadFile(MultipartFile file, OssModel ossModel, FileKey fileKey) {
+    private static String uploadFile(MultipartFile file, OssModel ossModel) {
         String fileName = String.format("%s.%s", UUID.randomUUID().toString(), FilenameUtils.getExtension(file.getOriginalFilename()));
         try (InputStream inputStream = file.getInputStream()) {
-
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(inputStream.available());
             objectMetadata.setCacheControl("no-cache");
             objectMetadata.setHeader("Pragma", "no-cache");
             objectMetadata.setContentType(FilenameUtils.getExtension("." + file.getOriginalFilename()));
             objectMetadata.setContentDisposition("inline;filename=" + fileName);
-            AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), fileKey.getDir() + "/" + fileName, inputStream, objectMetadata);
-            return fileKey.getDir() + "/" + fileName;
+            AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), ossModel.getFileDir() + "/" + fileName, inputStream, objectMetadata);
+            return ossModel.getFileDir() + "/" + fileName;
         } catch (OSSException oe) {
             throw new OssException(oe.getMessage());
         } catch (ClientException | IOException ce) {
@@ -104,20 +128,20 @@ public class AliOss {
      * 获取文件路径
      *
      * @param fileUrl 文件地址
-     * @param fileKey 文件key
      * @return 路径
      */
-    private static String getFileUrl(String fileUrl, FileKey fileKey, OssModel ossModel) {
+    private static String getFileUrl(String fileUrl, OssModel ossModel) {
         if (ParamUtil.paramIsEmpty(fileUrl)) {
-            throw new RuntimeException("文件地址为空!");
+            throw new ParamException("文件地址为空!");
         }
         String[] split = ParamUtil.split(fileUrl, "/");
         if (ParamUtil.paramIsEmpty(split)) {
             throw new OssException(HttpStatus.INVALID_PARAMETER.getMsg());
         }
-        URL url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), fileKey.getDir() + "/" + split[split.length - 1], TimeUtil.addDay(new Date(), 365));
+        URL url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), ossModel.getFileDir() + "/" + split[split.length - 1],
+                TimeUtil.addDay(new Date(), 365));
         if (url == null) {
-            throw new RuntimeException("获取OSS文件URL失败!");
+            throw new OssException("获取OSS文件URL失败!");
         }
         return url.toString();
     }
@@ -144,48 +168,34 @@ public class AliOss {
         try {
             AliOss.getOssClient(ossModel).deleteObjects(new DeleteObjectsRequest(ossModel.getBucketName()).withKeys(urlList));
             return true;
-        } catch (OSSException oe) {
-            throw new OssException(oe.getMessage());
-        } catch (ClientException ce) {
-            throw new OssException(ce.getMessage());
+        } catch (RuntimeException e) {
+            throw new OssException(e.getMessage());
         }
     }
 
     /**
-     * 文件上传
+     * 文件简单上传（最大文件不能超过5G）
      *
      * @param file     文件
-     * @param fileKey  文件key
      * @param ossModel oss模型
      * @return string
      */
-    public static String upload(MultipartFile file, FileKey fileKey, OssModel ossModel) {
+    public static String upload(MultipartFile file, OssModel ossModel) {
+        if (ParamUtil.paramIsEmpty(ossModel.getFileDir())) {
+            ossModel.setFileDir("");
+        }
+        if (file.getSize() > 5 * 1024 * 1024 * 1024) {
+            throw new OssException("上传失败，图片大小不能超过5G");
+        }
         AliOss.createBucket(ossModel);
-        String fileName = AliOss.uploadFile(file, ossModel, fileKey);
-        String fileOssUrl = AliOss.getFileUrl(fileName, fileKey, ossModel);
+        String fileName = AliOss.uploadFile(file, ossModel);
+        String fileOssUrl = AliOss.getFileUrl(fileName,ossModel);
         //去掉URL中的?后的时间戳
         int firstChar = fileOssUrl.indexOf("?");
         if (firstChar > 0) {
             fileOssUrl = fileOssUrl.substring(0, firstChar);
         }
         return fileOssUrl;
-    }
-
-    /**
-     * 文件key
-     */
-    @Getter
-    public enum FileKey {
-        /**
-         * 文件路径key
-         */
-        IMAGES("images"), VIDEO("video");
-
-        private String dir;
-
-        FileKey(String dir) {
-            this.dir = dir;
-        }
     }
 
 }
