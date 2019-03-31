@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Archine
+ * @author Gjing
  * 返回模板
  **/
 @Getter
@@ -47,7 +47,7 @@ public class ResultVo<T> {
     }
 
     /**
-     * user define return
+     * 用户自定义返回,一般用于返回多个数据
      *
      * @param keys key
      * @param val  value
@@ -62,10 +62,10 @@ public class ResultVo<T> {
     }
 
     /**
-     * user define login status
-     * @param isLogin Not null isLogin
-     * @param keys others parameters
-     * @param values others values
+     * 一般用于登录
+     * @param isLogin 非空则为登录
+     * @param keys 还要返回的其他参数
+     * @param values 参数对应的value
      * @return map
      */
     public static Map<String, Object> login(String isLogin,List<String> keys, List<Object> values) {

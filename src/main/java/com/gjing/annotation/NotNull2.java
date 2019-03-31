@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface NonNull {
+public @interface NotNull2 {
 }

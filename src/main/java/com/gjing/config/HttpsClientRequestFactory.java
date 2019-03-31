@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.security.cert.X509Certificate;
 
 /**
- * @author archine
+ * @author Gjing
  * https factory
  */
 public class HttpsClientRequestFactory extends SimpleClientHttpRequestFactory {

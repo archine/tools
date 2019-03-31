@@ -1,7 +1,7 @@
 package com.gjing.ex;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 public class OssException extends RuntimeException {
     public OssException(String message) {

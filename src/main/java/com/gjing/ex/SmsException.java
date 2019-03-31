@@ -1,7 +1,7 @@
 package com.gjing.ex;
 
 /**
- * @author archine
+ * @author Gjing
  * 短信异常
  **/
 public class SmsException extends RuntimeException {

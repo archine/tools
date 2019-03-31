@@ -19,9 +19,9 @@ import javax.lang.model.element.TypeElement;
 import java.util.Set;
 import java.util.stream.Collectors;
 /**
- * @author Archine
+ * @author Gjing
  **/
-@SupportedAnnotationTypes("com.gjing.annotation.NonNull")
+@SupportedAnnotationTypes("com.gjing.annotation.NotNull2")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class NonNullProcessor extends AbstractProcessor {
 
@@ -69,7 +69,7 @@ public class NonNullProcessor extends AbstractProcessor {
                                                                         null,
                                                                         List.nil(),
                                                                         buildExceptionClassExpression("java.lang.NullPointerException", treeMaker, names),
-                                                                        List.of(treeMaker.Literal("Parameter cannot be null")),
+                                                                        List.of(treeMaker.Literal("Parameter "+parameter.getName().toString()+" cannot be null")),
                                                                         null
                                                                 )
                                                         )

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 @Getter
 @NoArgsConstructor

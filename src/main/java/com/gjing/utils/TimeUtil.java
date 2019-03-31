@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 public class TimeUtil {
     /**
@@ -71,6 +71,25 @@ public class TimeUtil {
         return calendar;
     }
 
+    /**
+     * 日期转时间
+     * @param calendar 日期
+     * @param format 格式
+     * @return 时间
+     */
+    public static Date calendarToDate(Calendar calendar,String format) throws ParseException {
+        return getDate(calendarToStringDate(calendar, format));
+    }
+
+    /**
+     * 日期转文本时间
+     * @param calendar 日期
+     * @param format 格式
+     * @return 文本时间
+     */
+    public static String calendarToStringDate(Calendar calendar, String format) {
+        return getDateAsString(calendar.getTime(), format);
+    }
 
     /**
      * 获取日期时间当月的总天数，如2017-02-13，返回28
@@ -110,6 +129,7 @@ public class TimeUtil {
 
     /**
      * 获取日期时间的月份，如2017年2月13日，返回2
+     *
      * @param date 时间对象
      * @return month
      */
@@ -121,8 +141,9 @@ public class TimeUtil {
 
     /**
      * 在日期上增加数个整月
+     *
      * @param date 日期
-     * @param n 要增加的月数
+     * @param n    要增加的月数
      * @return date
      */
     public static Date addMonth(Date date, int n) {
@@ -134,8 +155,9 @@ public class TimeUtil {
 
     /**
      * 在日期上增加天数
+     *
      * @param date 日期
-     * @param n 要增加的天数
+     * @param n    要增加的天数
      * @return date
      */
     public static Date addDay(Date date, int n) {
@@ -146,21 +168,50 @@ public class TimeUtil {
     }
 
     /**
-     * 将时间转换为时间戳
+     * 将文本时间转换为时间戳
+     *
      * @param stringDate 文本时间
      * @return 时间戳
      */
-    public static String stringDateToStamp(String stringDate) throws ParseException{
-        return String.valueOf(TimeUtil.getDate(stringDate).getTime());
+    public static Long stringDateToStamp(String stringDate) throws ParseException {
+        return TimeUtil.getDate(stringDate).getTime();
     }
 
     /**
-     * 将时间戳转换为时间
+     * 将时间戳转换为文本时间
+     *
      * @param timeStamp 时间戳
      * @return 文本时间
      */
-    public static String stampToDate(String timeStamp){
-        long l = Long.parseLong(timeStamp);
+    public static String stampToStringDate(Long timeStamp) {
+        long l = timeStamp;
         return TimeUtil.getDateAsString(new Date(l));
     }
+
+    /**
+     * 获取两个日期（不含时分秒）相差的天数，不包含今天
+     *
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 相差的天数
+     * @throws ParseException 转换异常
+     */
+    public static int dateBetween(String startDate, String endDate) throws ParseException {
+        Date dateStart = getDate(startDate, "yyyy-MM-dd");
+        Date dateEnd = getDate(endDate, "yyyy-MM-dd");
+        return (int) ((dateEnd.getTime() - dateStart.getTime()) / 1000 / 60 / 60 / 24);
+    }
+
+    /**
+     * 获取两个日期（不含时分秒）相差的天数，包含今天
+     *
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 相差的天数
+     * @throws ParseException 转换异常
+     */
+    public static int dateBetweenIncludeToday(String startDate, String endDate) throws ParseException {
+        return dateBetween(startDate, endDate) + 1;
+    }
+
 }

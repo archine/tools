@@ -3,7 +3,7 @@ package com.gjing.utils.tengxun.sms;
 import lombok.*;
 
 /**
- * @author archine
+ * @author Gjing
  **/
 @Data
 @NoArgsConstructor
@@ -23,12 +23,10 @@ public class TxSmsModel {
     /**
      * 需要发送短信的手机号码 {"21212313123", "12345678902", "12345678903"}
      */
-    @NonNull
     private String[] phoneNumbers;
     /**
-     * //数组具体的元素个数和模板中变量个数必须一致，例如事例中templateId:5678对应一个变量，参数数组中元素个数也必须是一个
+     * 数组具体的元素个数和模板中变量个数必须一致，例如事例中templateId:5678对应一个变量，参数数组中元素个数也必须是一个
      */
-    @NonNull
     private String[] params;
     /**
      * 短信模板ID，需要在短信应用中申请

@@ -3,7 +3,7 @@ package com.gjing.enums;
 import lombok.Getter;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 @Getter
 public enum HttpStatus {
@@ -20,6 +20,7 @@ public enum HttpStatus {
     URI_TOO_LONG(414, "URI Too Long"),
     UNSUPPORTED_MEDIA_TYPE(415, "Unsupported Media Type"),
     TOO_MANY_REQUESTS(429, "Too Many Requests"),
+    REQUEST_HEADER_FIELDS_TOO_LARGE(431, "Request Header Fields Too Large"),
     INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
     SERVICE_UNAVAILABLE(503, "Service Unavailable"),
     GATEWAY_TIMEOUT(504, "Gateway Timeout"),

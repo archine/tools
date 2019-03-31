@@ -1,7 +1,7 @@
 package com.gjing.ex;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 public class HttpException extends RuntimeException {
     public HttpException(String message) {

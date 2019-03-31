@@ -3,7 +3,7 @@ package com.gjing.enums;
 import lombok.NoArgsConstructor;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 @NoArgsConstructor
 public enum HttpMethod {

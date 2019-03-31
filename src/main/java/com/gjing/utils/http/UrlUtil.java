@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 public class UrlUtil {
     /**
@@ -62,15 +62,15 @@ public class UrlUtil {
 
     /**
      * 参数按照字段名的Unicode码从小到大排序（字典序）
-     * @param paraMap    要排序的参数
+     * @param paramMap    要排序的参数
      * @param urlEncode  是否需要URLEncode，true：需要/false：不需要
      * @param keyToLower 是否需要将Key转换为全小写 true:key转化成小写，false:不转化
-     * @return 排序后的参数
+     * @return 排序后的参数字符串
      */
-    public static String unicodeSort(Map<String, String> paraMap, boolean urlEncode, boolean keyToLower) {
+    public static String unicodeSort(Map<String, String> paramMap, boolean urlEncode, boolean keyToLower) {
         String buff;
         try {
-            List<Map.Entry<String, String>> infoIds = new ArrayList<>(paraMap.entrySet());
+            List<Map.Entry<String, String>> infoIds = new ArrayList<>(paramMap.entrySet());
             // 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
             infoIds.sort(Comparator.comparing(Map.Entry::getKey));
             // 构造URL 键值对的格式

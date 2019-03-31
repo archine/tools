@@ -3,7 +3,7 @@ package com.gjing.utils.ali.oss;
 import lombok.*;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,16 +1,15 @@
 package com.gjing.utils;
 
-import com.gjing.annotation.NonNull;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * @author Archine
+ * @author Gjing
  * param util
  **/
 public final class ParamUtil {
@@ -21,17 +20,18 @@ public final class ParamUtil {
      * @return True 为空,false不为空
      */
     public static <T> boolean paramIsEmpty(T str) {
-        if (str instanceof List) {
+        if (str == null) {
+            return true;
+        } else if (str instanceof Collection) {
             return ((List) str).isEmpty();
         } else if (str instanceof Map) {
             return ((Map) str).isEmpty();
-        } else if (str instanceof Array) {
+        } else if (str.getClass().isArray()) {
             return Array.getLength(str) == 0;
         } else {
-            return str == null || "".equals(str);
+            return "".equals(str);
         }
     }
-
 
     /**
      * 检查多参数里面是否有空值

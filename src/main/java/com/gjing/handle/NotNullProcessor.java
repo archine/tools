@@ -1,7 +1,6 @@
 package com.gjing.handle;
 
 import com.gjing.annotation.NotNull;
-import com.gjing.enums.HttpStatus;
 import com.gjing.ex.ParamException;
 import com.gjing.utils.ParamUtil;
 import org.aspectj.lang.JoinPoint;
@@ -22,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Archine
+ * @author Gjing
  * This class is primarily used for method parsing as a notnull annotation to detect whether all parameters on a method
  * contain null values , Throws an {ParamException} if it contains null values
  **/
@@ -58,11 +57,7 @@ public class NotNullProcessor {
             }
         }
         if (ParamUtil.multiParamHasEmpty(needCheckParamList.stream().map(request::getParameter).collect(Collectors.toList()))) {
-            if (ParamUtil.paramIsEmpty(annotation.message())) {
-                throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
-            } else {
-                throw new ParamException(annotation.message());
-            }
+            throw new ParamException(annotation.message());
         }
     }
 

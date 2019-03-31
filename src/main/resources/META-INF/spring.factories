@@ -1,2 +1,2 @@
 # Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.gjing.config.NotNullAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.gjing.config.ToolsAutoConfiguration

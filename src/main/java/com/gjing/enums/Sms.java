@@ -3,7 +3,7 @@ package com.gjing.enums;
 import lombok.Getter;
 
 /**
- * @author archine
+ * @author Gjing
  **/
 @Getter
 public enum Sms {

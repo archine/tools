@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * @author Archine
+ * @author Gjing
  * Excel export
  **/
 public class ExportExcel {

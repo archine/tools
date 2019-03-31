@@ -1,7 +1,7 @@
 package com.gjing.ex;
 
 /**
- * @author Archine
+ * @author Gjing
  **/
 public class ParamException extends RuntimeException {
     public ParamException(String message) {

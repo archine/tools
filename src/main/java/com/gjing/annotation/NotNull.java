@@ -3,7 +3,7 @@ package com.gjing.annotation;
 import java.lang.annotation.*;
 
 /**
- * @author Archine
+ * @author Gjing
  * parameter check,Only for methods,example：@NotNull or @NotNull(exclude={“”,””})
  **/
 @Target({ElementType.METHOD})
@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 public @interface NotNull {
     String[] exclude()default {};
 
-    String message() default "";
+    String message() default "Parameter cannot be null";
 }
