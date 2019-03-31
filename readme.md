@@ -133,7 +133,9 @@ public static void main(String[] args) {
 ```
 * @NotNull: 只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull(exclude={"参数名1","参数名2"}),:exclamation: 参数名必须与方法的参数名相同,   
             默认异常信息为参数不能为空,可以自定义异常信息@NotNull(message="您要使用的异常异常");
-* @NotNull2: 可以在普通程序和web程序中使用,适用于方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到参数上; 
+* @NotNull2: 可以在普通程序和web程序中使用,适用于方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到参数上;   
+* @EnableSwagger: 启动swagger(如果您的项目需要用到swagger,可以直接在启动类上使用该注解,并且在您的配置文件中设置扫描路径等参数,
+                  包路径不能为空,其他几个参数可以为空)
 ```  
 返回结果模板:   
 ```

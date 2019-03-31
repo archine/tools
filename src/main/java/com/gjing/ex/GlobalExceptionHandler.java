@@ -38,4 +38,11 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.getCode()).body(e.getMessage());
     }
+
+    @ExceptionHandler(RegisterBeanException.class)
+    public ResponseEntity<String> registerBean(RegisterBeanException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.getCode()).body(e.getMessage());
+    }
+
 }
