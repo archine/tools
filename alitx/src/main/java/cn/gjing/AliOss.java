@@ -1,10 +1,7 @@
-package cn.gjing.ali.oss;
+package cn.gjing;
 
-import cn.gjing.ParamUtil;
-import cn.gjing.TimeUtil;
 import cn.gjing.annotation.NotNull2;
 import cn.gjing.enums.HttpStatus;
-import cn.gjing.ex.OssException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.GetObjectRequest;

@@ -1,11 +1,7 @@
-package cn.gjing.ali.sms;
+package cn.gjing;
 
-import cn.gjing.ParamUtil;
-import cn.gjing.ali.oss.AliOss;
 import cn.gjing.annotation.ExcludeParam;
 import cn.gjing.annotation.NotNull2;
-import cn.gjing.enums.Sms;
-import cn.gjing.ex.SmsException;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
 import com.aliyuncs.DefaultAcsClient;

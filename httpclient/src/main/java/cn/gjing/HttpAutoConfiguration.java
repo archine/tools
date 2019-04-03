@@ -1,4 +1,4 @@
-package cn.gjing.http;
+package cn.gjing;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HttpAutoConfiguration {
     @Bean
-    public HttpRequest httpRequest() {
-        return new HttpRequest();
+    public HttpClient httpClient() {
+        return new HttpClient();
     }
 }

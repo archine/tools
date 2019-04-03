@@ -1,4 +1,4 @@
-package cn.gjing.ali.sms;
+package cn.gjing;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

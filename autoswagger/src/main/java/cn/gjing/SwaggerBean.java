@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
  * @author Gjing
  **/
 @Component
-@ConfigurationProperties("com.gjing.swagger")
+@ConfigurationProperties("cn.gjing.swagger")
 @EnableConfigurationProperties
 @Data
-public class SwaggerBean {
+class SwaggerBean {
     /**
      * 要扫描的包路径(controller包路径)
      */

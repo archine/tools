@@ -15,7 +15,7 @@ import java.util.List;
  * @author Gjing
  * Excel export
  **/
-public class ExportExcel {
+class ExportExcel {
 
     /**
      * @param response 响应头
@@ -24,7 +24,7 @@ public class ExportExcel {
      * @param title    excel标题
      * @param info     excel额外的内容,如果不需要直接传null或者空字符串
      */
-    public static void generateHaveExcelName(HttpServletResponse response, List<Object[]> list, String[] headers, String title, String info) {
+    static void generateHaveExcelName(HttpServletResponse response, List<Object[]> list, String[] headers, String title, String info) {
         if (ParamUtil.paramIsEmpty(response) || ParamUtil.paramIsEmpty(headers)  || ParamUtil.paramIsEmpty(title)) {
             throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
         }
@@ -32,7 +32,7 @@ public class ExportExcel {
         try {
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
-                    "attachment;filename=" + new String(title.getBytes(), "ISO8859-1") + ".xls");
+                    "attachment;filename=" + new String(title.getBytes(), "ISO8859-1") + ".xlsx");
             OutputStream outputStream = response.getOutputStream();
             wb.write(outputStream);
             outputStream.flush();
@@ -65,7 +65,7 @@ public class ExportExcel {
         setStyle(style);
         //内容背景
         HSSFCellStyle style2 = wb.createCellStyle();
-        style2.setFillForegroundColor(IndexedColors.WHITE.getIndex());
+        style2.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
         style2.setAlignment(HorizontalAlignment.CENTER);
         style2.setVerticalAlignment(VerticalAlignment.CENTER);
         setStyle(style2);
@@ -85,7 +85,6 @@ public class ExportExcel {
             // 合并单元格CellRangeAddress构造参数依次表示起始行，截至行，起始列， 截至列. ========(合并4行)
             sheet.addMergedRegion(new CellRangeAddress(1, 4, 0, headers.length - 1));
             cell.setCellValue(info);
-            // 含有excel简介
             if (list != null) {
                 for (int i = 0; i < list.size(); i++) {
                     Object[] obj = list.get(i);
@@ -94,7 +93,7 @@ public class ExportExcel {
                     addCellValue(style2, obj, row1);
                 }
             }
-        } else {//不含有excel简介
+        } else {
             if (list != null) {
                 for (int i = 0; i < list.size(); i++) {
                     Object[] obj = list.get(i);

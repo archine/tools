@@ -1,5 +1,5 @@
 # Gjing tools for java :smile:
-![](https://img.shields.io/badge/version-1.0.9-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
+![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
 tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，从而摆脱每次构建项目都要重复封装，造成时间的浪费。    
      
 项目宗旨:   
@@ -116,17 +116,17 @@ REST请求(支持http/https,以及代理)
 * POST
 ```
 public static void main(String[] args) {
-    HttpRequest httpRequest = new HttpRequest();
+    HttpClient client = new HttpClient();
     Map<String, String> param = new HashMap<>(16);
-    System.out.println(httpRequest.post("url", param));
+    System.out.println(client.post("url", param));
 }
 ```
 * GET
 ```
 public static void main(String[] args) {
-    HttpRequest httpRequest = new HttpRequest();
+    HttpClient client = new HttpClient();
     Map<String, String> param = new HashMap<>(16);
-    System.out.println(httpRequest.get("url", param));
+    System.out.println(client.get("url", param));
 }
 ```
 注解:    

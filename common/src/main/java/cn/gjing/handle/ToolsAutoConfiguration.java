@@ -1,7 +1,6 @@
-package cn.gjing.config;
+package cn.gjing.handle;
 
 import cn.gjing.ex.GlobalExceptionHandler;
-import cn.gjing.handle.NotNullProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;

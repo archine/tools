@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.0.9</version>
+        <version>1.1.0</version>
     </parent>
     <artifactId>all</artifactId>
-    <version>1.0.9</version>
+    <version>1.1.0</version>
     <name>all</name>
     <description>Demo project for Spring Boot</description>
 
@@ -24,15 +24,26 @@
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>alitx</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>cn.gjing</groupId>
+                    <artifactId>common</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>httpclient</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>cn.gjing</groupId>
+                    <artifactId>common</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>autoswagger</artifactId>
-            <version>1.0.9</version>
         </dependency>
     </dependencies>
 

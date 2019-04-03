@@ -1,4 +1,4 @@
-package cn.gjing.enums;
+package cn.gjing;
 
 import lombok.Getter;
 
@@ -6,7 +6,7 @@ import lombok.Getter;
  * @author Gjing
  **/
 @Getter
-public enum Sms {
+enum Sms {
     /**
      * 1：sms单条短信，2：query（查询发送记录）
      */

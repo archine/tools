@@ -1,4 +1,4 @@
-package cn.gjing.ex;
+package cn.gjing;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

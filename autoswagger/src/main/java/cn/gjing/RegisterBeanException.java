@@ -3,8 +3,8 @@ package cn.gjing;
 /**
  * @author Gjing
  **/
-public class RegisterBeanException extends Exception{
-    public RegisterBeanException(String message) {
+class RegisterBeanException extends Exception{
+    RegisterBeanException(String message) {
         super(message);
     }
 }

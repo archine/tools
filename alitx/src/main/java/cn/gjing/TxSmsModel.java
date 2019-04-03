@@ -1,4 +1,4 @@
-package cn.gjing.tengxun.sms;
+package cn.gjing;
 
 import lombok.*;
 

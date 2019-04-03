@@ -1,4 +1,4 @@
-package cn.gjing.http;
+package cn.gjing;
 
 import cn.gjing.ParamUtil;
 import org.springframework.util.MultiValueMap;
@@ -18,13 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UrlUtil {
     /**
      * url拼接:其结果为:http://127.0.0.1:8080/test?param1={param1},这种格式会出现在restTemplate请求的get方法中
+     *
      * @param map 参数
      * @param url 需要拼接的url 例如：http://127.0.0.1:8080/test,需要尾随方法名
      * @return 拼接完后的url
      */
     public static String urlAppend(String url, MultiValueMap<String, String> map) {
         StringBuilder builder = new StringBuilder();
-        builder.append(url).append("?");
+        if (url.indexOf("?", url.length() - 1) != -1) {
+            builder.append(url).append("?");
+        }
         for (String s : map.keySet()) {
             if (map.size() == 1) {
                 builder.append(s).append("=").append("{").append(s).append("}");
@@ -44,7 +47,9 @@ public class UrlUtil {
      */
     public static String urlAppend(String url, Map<String, String> map) {
         StringBuilder builder = new StringBuilder();
-        builder.append(url).append("?");
+        if (url.indexOf("?", url.length() - 1) != -1) {
+            builder.append(url).append("?");
+        }
         for (String s : map.keySet()) {
             if (map.size() == 1) {
                 builder.append(s).append("=").append("{").append(s).append("}");
@@ -62,7 +67,8 @@ public class UrlUtil {
 
     /**
      * 参数按照字段名的Unicode码从小到大排序（字典序）
-     * @param paramMap    要排序的参数
+     *
+     * @param paramMap   要排序的参数
      * @param urlEncode  是否需要URLEncode，true：需要/false：不需要
      * @param keyToLower 是否需要将Key转换为全小写 true:key转化成小写，false:不转化
      * @return 排序后的参数字符串
@@ -102,12 +108,20 @@ public class UrlUtil {
 
     /**
      * 将URL中的查询参数部分解析成键值对
-     * @param queryString URL中的查询参数部分，不含前缀'?'
+     *
+     * @param url 将url的参数转为map
      * @return map
      */
-    public static Map<String, String> urlParamToMap(String queryString) {
+    public static Map<String, String> urlParamToMap(String url) {
         final Map<String, String> queryPairs = new ConcurrentHashMap<>(16);
-        final String[] pairs = queryString.split("&");
+        final String[] param = ParamUtil.split(url, "?");
+        if (ParamUtil.paramIsEmpty(param)||param.length<1) {
+            return null;
+        }
+        final String[] pairs = ParamUtil.split(param[1], "&");
+        if (ParamUtil.paramIsEmpty(pairs)) {
+            return null;
+        }
         for (String pair : pairs) {
             final int idx = pair.indexOf("=");
             String key;
@@ -124,5 +138,4 @@ public class UrlUtil {
         }
         return queryPairs;
     }
-
 }

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * @author Gjing
  **/
-@SupportedAnnotationTypes("NotNull2")
+@SupportedAnnotationTypes("cn.gjing.annotation.NotNull2")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class NonNullProcessor extends AbstractProcessor {
 

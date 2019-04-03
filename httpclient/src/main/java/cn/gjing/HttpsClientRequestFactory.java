@@ -1,4 +1,4 @@
-package cn.gjing.http;
+package cn.gjing;
 
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
@@ -13,25 +13,25 @@ import java.security.cert.X509Certificate;
  * @author Gjing
  * https factory
  */
-public class HttpsClientRequestFactory extends SimpleClientHttpRequestFactory {
+class HttpsClientRequestFactory extends SimpleClientHttpRequestFactory {
     @Override
     protected void prepareConnection(HttpURLConnection connection, String httpMethod) {
         try {
             if (!(connection instanceof HttpsURLConnection)) {
                 throw new RuntimeException("An instance of HttpsURLConnection is expected");
             }
-
             HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
-
             TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         @Override
                         public X509Certificate[] getAcceptedIssuers() {
                             return null;
                         }
+
                         @Override
                         public void checkClientTrusted(X509Certificate[] certs, String authType) {
                         }
+
                         @Override
                         public void checkServerTrusted(X509Certificate[] certs, String authType) {
                         }
@@ -61,6 +61,7 @@ public class HttpsClientRequestFactory extends SimpleClientHttpRequestFactory {
         /**
          * 返回默认启用的密码套件。除非一个列表启用，对SSL连接的握手会使用这些密码套件。
          * 这些默认的服务的最低质量要求保密保护和服务器身份验证
+         *
          * @return s
          */
         @Override
@@ -70,6 +71,7 @@ public class HttpsClientRequestFactory extends SimpleClientHttpRequestFactory {
 
         /**
          * 返回的密码套件可用于SSL连接启用的名字
+         *
          * @return r
          */
         @Override

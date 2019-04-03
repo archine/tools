@@ -1,9 +1,9 @@
-package cn.gjing.ex;
+package cn.gjing;
 
 /**
  * @author Gjing
  **/
-public class OssException extends RuntimeException {
+ class OssException extends RuntimeException {
     public OssException(String message) {
         super(message);
     }

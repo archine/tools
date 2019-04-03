@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  **/
 @Component
 @Aspect
-public class NotNullProcessor {
+class NotNullProcessor {
     @Pointcut("@annotation(cn.gjing.annotation.NotNull)")
     public void cut() {
 

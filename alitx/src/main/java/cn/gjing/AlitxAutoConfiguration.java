@@ -1,6 +1,5 @@
-package cn.gjing.config;
+package cn.gjing;
 
-import cn.gjing.ex.GlobalExceptionHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

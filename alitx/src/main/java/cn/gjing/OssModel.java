@@ -1,4 +1,4 @@
-package cn.gjing.ali.oss;
+package cn.gjing;
 
 import lombok.*;
 

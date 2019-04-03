@@ -1,7 +1,5 @@
-package cn.gjing.tengxun.sms;
+package cn.gjing;
 
-import cn.gjing.ParamUtil;
-import cn.gjing.ex.SmsException;
 import com.github.qcloudsms.SmsMultiSender;
 import com.github.qcloudsms.SmsMultiSenderResult;
 import com.github.qcloudsms.SmsSingleSender;

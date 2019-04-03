@@ -1,63 +1,48 @@
-package cn.gjing.http;
+package cn.gjing;
 
-import cn.gjing.ParamUtil;
 import cn.gjing.annotation.ExcludeParam;
-import cn.gjing.annotation.NotNull2;
-import cn.gjing.enums.HttpStatus;
-import cn.gjing.enums.HttpType;
 import cn.gjing.ex.HttpException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Gjing
  **/
 @Slf4j
-public class HttpRequest {
-    private static RestTemplate restTemplate;
-
-    @NotNull2
-    public String post(String requestUrl) {
+class HttpRequest {
+    static String post(String requestUrl, RestTemplate restTemplate) {
         try {
-            checkRequestType(requestUrl);
             return restTemplate.postForEntity(requestUrl, HttpMethod.POST, String.class).getBody();
         } catch (Exception e) {
             throw new HttpException(e.getMessage());
         }
     }
 
-
-    @NotNull2
-    public String post(String requestUrl, Map<String, String> params) {
+    static String post(String requestUrl, MultiValueMap<String, String> param, RestTemplate restTemplate) {
         try {
-            checkRequestType(requestUrl);
-            return restTemplate.postForEntity(requestUrl, mapToMultiValueMap(params), String.class).getBody();
+            return restTemplate.postForEntity(requestUrl, param, String.class).getBody();
         } catch (Exception e) {
             throw new HttpException(e.getMessage());
         }
     }
 
 
-    @NotNull2
-    public String post(String requestUrl, @ExcludeParam Map<String, String> params, Map<String, String> headers) {
+    static String post(String requestUrl, MultiValueMap<String, String> params, Map<String, String> headers, RestTemplate restTemplate) {
         try {
-            checkRequestType(requestUrl);
             HttpHeaders httpHeaders = new HttpHeaders();
             for (String s : headers.keySet()) {
                 httpHeaders.add(s, headers.get(s));
             }
             HttpEntity httpEntity = new HttpEntity<>(null, httpHeaders);
             if (ParamUtil.paramIsNotEmpty(params)) {
-                httpEntity = new HttpEntity<>(mapToMultiValueMap(params), httpHeaders);
+                httpEntity = new HttpEntity<>(params, httpHeaders);
             }
             return restTemplate.exchange(requestUrl, HttpMethod.POST, httpEntity, String.class).getBody();
         } catch (Exception e) {
@@ -66,13 +51,11 @@ public class HttpRequest {
     }
 
 
-    @NotNull2
-    public String post(String requestUrl, Map<String, String> params, Map<String, String> headers, String proxyIp, String proxyPort) {
+    static String post(String requestUrl, MultiValueMap<String, String> params, Map<String, String> headers, String proxyIp, String proxyPort, RestTemplate restTemplate) {
         if (!ParamUtil.multiParamHasEmpty(Arrays.asList(proxyIp, proxyPort))) {
             setProxy(proxyIp, proxyPort);
         }
         try {
-            checkRequestType(requestUrl);
             HttpEntity<Object> httpEntity;
             if (ParamUtil.paramIsNotEmpty(headers)) {
                 HttpHeaders httpHeaders = new HttpHeaders();
@@ -81,12 +64,12 @@ public class HttpRequest {
                 }
                 httpEntity = new HttpEntity<>(null, httpHeaders);
                 if (ParamUtil.paramIsNotEmpty(params)) {
-                    httpEntity = new HttpEntity<>(mapToMultiValueMap(params), httpHeaders);
+                    httpEntity = new HttpEntity<>(params, httpHeaders);
                 }
                 return restTemplate.exchange(requestUrl, HttpMethod.POST, httpEntity, String.class).getBody();
             } else {
                 if (ParamUtil.paramIsNotEmpty(params)) {
-                    return restTemplate.postForEntity(requestUrl, mapToMultiValueMap(params), String.class).getBody();
+                    return restTemplate.postForEntity(requestUrl, params, String.class).getBody();
                 } else {
                     return restTemplate.postForEntity(requestUrl, HttpMethod.POST, String.class).getBody();
                 }
@@ -98,10 +81,8 @@ public class HttpRequest {
     }
 
 
-    @NotNull2
-    public String get(String requestUrl) {
+    static String get(String requestUrl, RestTemplate restTemplate) {
         try {
-            checkRequestType(requestUrl);
             return restTemplate.getForObject(requestUrl, String.class);
         } catch (Exception e) {
             throw new HttpException(e.getMessage());
@@ -109,21 +90,16 @@ public class HttpRequest {
     }
 
 
-    @NotNull2
-    public String get(String requestUrl, Map<String, String> params) {
+    static String get(String requestUrl, Map<String, String> params, RestTemplate restTemplate) {
         try {
-            checkRequestType(requestUrl);
             return restTemplate.getForObject(UrlUtil.urlAppend(requestUrl, params), String.class, params);
         } catch (Exception e) {
             throw new HttpException(e.getMessage());
         }
     }
 
-
-    @NotNull2
-    public String get(String requestUrl, @ExcludeParam Map<String, String> params, Map<String, String> headers) {
+    static String get(String requestUrl, Map<String, String> params, Map<String, String> headers, RestTemplate restTemplate) {
         try {
-            checkRequestType(requestUrl);
             HttpHeaders httpHeaders = new HttpHeaders();
             for (String s : headers.keySet()) {
                 httpHeaders.add(s, headers.get(s));
@@ -140,13 +116,11 @@ public class HttpRequest {
     }
 
 
-    @NotNull2
-    public String get(String requestUrl, @ExcludeParam Map<String, String> params, @ExcludeParam Map<String, String> headers, String proxyIp, String proxyPort) {
+    static String get(String requestUrl, Map<String, String> params, @ExcludeParam Map<String, String> headers, String proxyIp, String proxyPort, RestTemplate restTemplate) {
         if (!ParamUtil.multiParamHasEmpty(Arrays.asList(proxyIp, proxyPort))) {
             setProxy(proxyIp, proxyPort);
         }
         try {
-            checkRequestType(requestUrl);
             if (ParamUtil.paramIsNotEmpty(headers)) {
                 HttpHeaders httpHeaders = new HttpHeaders();
                 for (String s : headers.keySet()) {
@@ -166,43 +140,8 @@ public class HttpRequest {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new HttpException(HttpStatus.BAD_REQUEST.getMsg());
+            throw new HttpException(e.getMessage());
         }
-    }
-
-    /**
-     * check request type for http or https
-     *
-     * @param url url
-     */
-    private void checkRequestType(String url) {
-        String[] urlArr = ParamUtil.split(url, ":");
-        if (ParamUtil.paramIsNotEmpty(urlArr)) {
-            if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), HttpType.HTTP.getType())) {
-                restTemplate = new RestTemplate();
-            } else if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), HttpType.HTTPS.getType())) {
-                restTemplate = new RestTemplate(new HttpsClientRequestFactory());
-            } else {
-                throw new HttpException("The requested url is invalid, please use an http or https address");
-            }
-        } else {
-            throw new HttpException("The parameter requestUrl cannot be null");
-        }
-    }
-
-    /**
-     * map 转multiValueMap
-     *
-     * @param map hashMap
-     * @return multiValueMap
-     */
-    private MultiValueMap<String, String> mapToMultiValueMap(Map<String, String> map) {
-        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-        for (String s : map.keySet()) {
-            multiValueMap.add(s, map.get(s));
-        }
-        return multiValueMap;
     }
 
     /**
@@ -211,7 +150,7 @@ public class HttpRequest {
      * @param proxyHost proxy_ip
      * @param proxyPort proxy_port
      */
-    private void setProxy(String proxyHost, String proxyPort) {
+    private static void setProxy(String proxyHost, String proxyPort) {
         System.setProperty("http.proxyHost", proxyHost);
         System.setProperty("http.proxyPort", proxyPort);
         System.setProperty("https.proxyHost", proxyHost);
