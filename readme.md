@@ -111,22 +111,25 @@ public static void main(String[] args) {
 }
 ```
 REST请求(支持http/https,以及代理)   
-1. 可以使用@Resourc和@AutoWired自动注入(使用于Spring项目),也可以使用new的方式(其他项目),本案例使用new的方式,执行成功后会返回请求结果,不需要的参数可以传null,   
+1. 执行成功后会返回请求结果,不需要的参数可以传null,   
     :exclamation: 请求地址不允许为空;
 * POST
 ```
 public static void main(String[] args) {
-    HttpClient client = new HttpClient();
+    //如果有参数，放map里
     Map<String, String> param = new HashMap<>(16);
-    System.out.println(client.post("url", param));
+    //get请求中参数根据实际情况填写
+    String result = HttpClient.post("url", param ,null ,null ,null)
+    System.out.println(result);
 }
 ```
 * GET
 ```
 public static void main(String[] args) {
-    HttpClient client = new HttpClient();
     Map<String, String> param = new HashMap<>(16);
-    System.out.println(client.get("url", param));
+    //get请求中参数根据实际情况填写
+    String result = HttpClient.get("url", param ,null ,null ,null)
+    System.out.println(result);
 }
 ```
 注解:    
@@ -155,5 +158,6 @@ public void zsyProductTemplate(HttpServletResponse response) {
 2. TimeUtil: 主要用于操作时间和日期;
 3. EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64
 4. UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接
+5. ExecutorUtil: 线程池工具类，暂时含有无返回值调用和有返回值调用
 #### **作者**
 * Gjing:sunny:有任何疑问可以添加我QQ: 87096937

@@ -32,6 +32,12 @@
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--腾讯短信-->
         <dependency>

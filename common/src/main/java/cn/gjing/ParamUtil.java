@@ -51,7 +51,7 @@ public final class ParamUtil {
      * @param str 参数
      * @return true为不含有, false为含有
      */
-    public static boolean paramIsNotEmpty(Object str) {
+    public static<T> boolean paramIsNotEmpty(T str) {
         return !paramIsEmpty(str);
     }
 
