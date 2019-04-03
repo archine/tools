@@ -30,7 +30,7 @@ public class ExecutorUtil {
     /**
      * 队列
      */
-    private static final int QUEUE = CORE_POOL_SIZE + MAXIMUM_POOL_SIZE + 1;
+    private static final int QUEUE = CPU_COUNT * 3;
     /**
      * 线程池对象
      */

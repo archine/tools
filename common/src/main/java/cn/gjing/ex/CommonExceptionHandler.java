@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  **/
 @ControllerAdvice
 @ResponseBody
-public class GlobalExceptionHandler {
+public class CommonExceptionHandler {
 
     @ExceptionHandler(ParamException.class)
     public ResponseEntity paramException(ParamException e) {

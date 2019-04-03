@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class AlitxAutoConfiguration {
 
     @Bean
-    @ConditionalOnBean(GlobalExceptionHandler.class)
-    public GlobalExceptionHandler globalExceptionHandler() {
-        return new GlobalExceptionHandler();
+    @ConditionalOnBean(AlitxExceptionHandler.class)
+    public AlitxExceptionHandler alitxExceptionHandler() {
+        return new AlitxExceptionHandler();
     }
 }

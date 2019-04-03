@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  **/
 @ControllerAdvice
 @ResponseBody
-public class GlobalExceptionHandler {
+public class AlitxExceptionHandler {
 
     @ExceptionHandler(SmsException.class)
     public ResponseEntity smsException(SmsException e) {

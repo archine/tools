@@ -4,7 +4,6 @@ import cn.gjing.annotation.ExcludeParam;
 import cn.gjing.annotation.NotNull2;
 import cn.gjing.enums.HttpType;
 import cn.gjing.ex.HttpException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,14 +18,13 @@ import java.util.Objects;
 /**
  * @author Gjing
  **/
-@Slf4j
 public class HttpClient {
 
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
     private static final RestTemplate REST_TEMPLATE2 = new RestTemplate(new HttpsClientRequestFactory());
 
     @NotNull2
-    public static String post(String requestUrl, @ExcludeParam MultiValueMap<String, String> params,@ExcludeParam Map<String, String> headers, @ExcludeParam String proxyIp,
+    public static String post(String requestUrl, @ExcludeParam Map<String, String> params,@ExcludeParam Map<String, String> headers, @ExcludeParam String proxyIp,
                               @ExcludeParam String proxyPort) {
         if (!ParamUtil.multiParamHasEmpty(Arrays.asList(proxyIp, proxyPort))) {
             setProxy(proxyIp, proxyPort);
@@ -45,7 +43,7 @@ public class HttpClient {
                 return getRestTemplate(requestUrl).exchange(requestUrl, HttpMethod.POST, httpEntity, String.class).getBody();
             } else {
                 if (ParamUtil.paramIsNotEmpty(params)) {
-                    return getRestTemplate(requestUrl).postForEntity(requestUrl, params, String.class).getBody();
+                    return getRestTemplate(requestUrl).postForEntity(requestUrl, mapToMultiValueMap(params), String.class).getBody();
                 } else {
                     return getRestTemplate(requestUrl).postForEntity(requestUrl, HttpMethod.POST, String.class).getBody();
                 }

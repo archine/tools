@@ -5,7 +5,7 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>tools</name>
     <modules>
         <module>common</module>
@@ -83,12 +83,12 @@
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>common</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>alitx</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
@@ -98,12 +98,12 @@
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>all</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
