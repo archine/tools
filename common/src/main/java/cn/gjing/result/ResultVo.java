@@ -70,7 +70,7 @@ public class ResultVo<T> {
      */
     public static Map<String, Object> login(String isLogin,List<String> keys, List<Object> values) {
         Map<String, Object> map = new HashMap<>(10);
-        if (ParamUtil.paramIsNotEmpty(isLogin)) {
+        if (ParamUtil.isNotEmpty(isLogin)) {
             map.put("code", HttpStatus.OK.getCode());
             map.put("msg", HttpStatus.OK.getMsg());
         }else {

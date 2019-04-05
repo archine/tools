@@ -5,7 +5,7 @@ package cn.gjing;
  * 短信异常
  **/
 class SmsException extends RuntimeException {
-    public SmsException(String message) {
+    SmsException(String message) {
         super(message);
     }
 }

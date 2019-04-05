@@ -54,7 +54,7 @@ public class TxSms {
      * @see <a href="https://cloud.tencent.com/document/product/382/3771"></a>
      */
     public static String send(TxSmsModel txSmsModel) {
-        if (ParamUtil.paramIsEmpty(txSmsModel.getPhoneNumbers())||txSmsModel.getPhoneNumbers().length>1) {
+        if (ParamUtil.isEmpty(txSmsModel.getPhoneNumbers())||txSmsModel.getPhoneNumbers().length>1) {
             throw new SmsException("PhoneNumbers cannot be empty and must have a length of one");
         }
         try {
@@ -75,7 +75,7 @@ public class TxSms {
      * @see <a href="https://cloud.tencent.com/document/product/382/3771"></a>
      */
     public static String multiSend(TxSmsModel txSmsModel) {
-        if (ParamUtil.paramIsEmpty(txSmsModel.getPhoneNumbers())) {
+        if (ParamUtil.isEmpty(txSmsModel.getPhoneNumbers())) {
             throw new SmsException("PhoneNumbers cannot be empty");
         }
         if (txSmsModel.getPhoneNumbers().length > 200) {

@@ -8,7 +8,7 @@
         <version>1.1.1</version>
     </parent>
     <artifactId>httpclient</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <name>httpclient</name>
     <description>http request tool</description>
 

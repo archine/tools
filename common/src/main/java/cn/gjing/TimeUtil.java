@@ -20,6 +20,7 @@ public class TimeUtil {
         return format.format(date);
     }
 
+
     /**
      * 自定义格式获取文本时间
      *
@@ -29,7 +30,7 @@ public class TimeUtil {
      */
     public static String getDateAsString(Date date, String format) {
         SimpleDateFormat format1 = new SimpleDateFormat(format);
-        return format1.format(format);
+        return format1.format(date);
     }
 
     /**
@@ -43,6 +44,7 @@ public class TimeUtil {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.parse(date);
     }
+
 
     /**
      * 自定义格式获取时间对象
@@ -64,7 +66,7 @@ public class TimeUtil {
      * @return 日期
      * @throws ParseException format EX
      */
-    public static Calendar dateToCalendar(String str) throws ParseException {
+    public static Calendar stringDateToCalendar(String str) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(simpleDateFormat.parse(str));

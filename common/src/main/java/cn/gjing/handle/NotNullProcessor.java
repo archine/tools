@@ -42,10 +42,12 @@ class NotNullProcessor {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
         NotNull annotation = method.getDeclaredAnnotation(NotNull.class);
+        //排除的参数
         List<String > exclude = Arrays.asList(annotation.exclude());
+        //定义一个需要检查的参数列表
         List<String> needCheckParamList = new ArrayList();
         Parameter[] parameters = method.getParameters();
-        if (exclude.size() < 1) {
+        if (exclude.isEmpty()) {
             for (Parameter parameter : parameters) {
                 needCheckParamList.add(parameter.getName());
             }
@@ -56,7 +58,7 @@ class NotNullProcessor {
                 }
             }
         }
-        if (ParamUtil.multiParamHasEmpty(needCheckParamList.stream().map(request::getParameter).collect(Collectors.toList()))) {
+        if (ParamUtil.listIncludeEmpty(needCheckParamList.stream().map(request::getParameter).collect(Collectors.toList()))) {
             throw new ParamException(annotation.message());
         }
     }

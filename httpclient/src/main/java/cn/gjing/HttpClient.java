@@ -11,7 +11,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,23 +25,23 @@ public class HttpClient {
     @NotNull2
     public static String post(String requestUrl, @ExcludeParam Map<String, String> params,@ExcludeParam Map<String, String> headers, @ExcludeParam String proxyIp,
                               @ExcludeParam String proxyPort) {
-        if (!ParamUtil.multiParamHasEmpty(Arrays.asList(proxyIp, proxyPort))) {
+        if (!ParamUtil.multiParamIncludeEmpty(proxyIp,proxyPort)) {
             setProxy(proxyIp, proxyPort);
         }
         try {
             HttpEntity<Object> httpEntity;
-            if (ParamUtil.paramIsNotEmpty(headers)) {
+            if (ParamUtil.isNotEmpty(headers)) {
                 HttpHeaders httpHeaders = new HttpHeaders();
                 for (String s : headers.keySet()) {
                     httpHeaders.add(s, headers.get(s));
                 }
                 httpEntity = new HttpEntity<>(null, httpHeaders);
-                if (ParamUtil.paramIsNotEmpty(params)) {
+                if (ParamUtil.isNotEmpty(params)) {
                     httpEntity = new HttpEntity<>(params, httpHeaders);
                 }
                 return getRestTemplate(requestUrl).exchange(requestUrl, HttpMethod.POST, httpEntity, String.class).getBody();
             } else {
-                if (ParamUtil.paramIsNotEmpty(params)) {
+                if (ParamUtil.isNotEmpty(params)) {
                     return getRestTemplate(requestUrl).postForEntity(requestUrl, mapToMultiValueMap(params), String.class).getBody();
                 } else {
                     return getRestTemplate(requestUrl).postForEntity(requestUrl, HttpMethod.POST, String.class).getBody();
@@ -57,23 +56,23 @@ public class HttpClient {
     @NotNull2
     public static String get(String requestUrl,@ExcludeParam Map<String, String> params, @ExcludeParam Map<String, String> headers, @ExcludeParam String proxyIp,
                              @ExcludeParam String proxyPort) {
-        if (!ParamUtil.multiParamHasEmpty(Arrays.asList(proxyIp, proxyPort))) {
+        if (!ParamUtil.multiParamIncludeEmpty(proxyIp,proxyPort)) {
             setProxy(proxyIp, proxyPort);
         }
         try {
-            if (ParamUtil.paramIsNotEmpty(headers)) {
+            if (ParamUtil.isNotEmpty(headers)) {
                 HttpHeaders httpHeaders = new HttpHeaders();
                 for (String s : headers.keySet()) {
                     httpHeaders.add(s, headers.get(s));
                 }
                 HttpEntity<String> httpEntity = new HttpEntity<>(null, httpHeaders);
-                if (ParamUtil.paramIsNotEmpty(params)) {
+                if (ParamUtil.isNotEmpty(params)) {
                     return getRestTemplate(requestUrl).exchange(UrlUtil.urlAppend(requestUrl, params), HttpMethod.GET, httpEntity, String.class, params).getBody();
                 } else {
                     return getRestTemplate(requestUrl).exchange(requestUrl, HttpMethod.GET, httpEntity, String.class).getBody();
                 }
             } else {
-                if (ParamUtil.paramIsNotEmpty(params)) {
+                if (ParamUtil.isNotEmpty(params)) {
                     return getRestTemplate(requestUrl).getForObject(UrlUtil.urlAppend(requestUrl, params), String.class, params);
                 } else {
                     return getRestTemplate(requestUrl).getForObject(requestUrl, String.class);
@@ -104,7 +103,7 @@ public class HttpClient {
      */
     private static RestTemplate getRestTemplate(String url) {
         String[] urlArr = ParamUtil.split(url, ":");
-        if (ParamUtil.paramIsNotEmpty(urlArr)) {
+        if (ParamUtil.isNotEmpty(urlArr)) {
             if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), HttpType.HTTP.getType())) {
                 return REST_TEMPLATE;
             } else if (Objects.equals(ParamUtil.toLowerCase(urlArr[0]), HttpType.HTTPS.getType())) {

@@ -1,6 +1,5 @@
 package cn.gjing;
 
-import cn.gjing.ParamUtil;
 import org.springframework.util.MultiValueMap;
 
 import java.io.UnsupportedEncodingException;
@@ -25,8 +24,11 @@ public class UrlUtil {
      */
     public static String urlAppend(String url, MultiValueMap<String, String> map) {
         StringBuilder builder = new StringBuilder();
-        if (url.indexOf("?", url.length() - 1) != -1) {
+        int len = url.indexOf("?", url.length() - 1);
+        if (len == -1) {
             builder.append(url).append("?");
+        } else {
+            builder.append(url);
         }
         for (String s : map.keySet()) {
             if (map.size() == 1) {
@@ -35,7 +37,11 @@ public class UrlUtil {
                 builder.append(s).append("=").append("{").append(s).append("}&");
             }
         }
-        return builder.toString().substring(0, builder.toString().length() - 1);
+        if (map.size() == 1) {
+            return builder.toString();
+        } else {
+            return builder.toString().substring(0, builder.toString().length() - 1);
+        }
     }
 
     /**
@@ -47,8 +53,11 @@ public class UrlUtil {
      */
     public static String urlAppend(String url, Map<String, String> map) {
         StringBuilder builder = new StringBuilder();
-        if (url.indexOf("?", url.length() - 1) != -1) {
+        int len = url.indexOf("?", url.length() - 1);
+        if (len == -1) {
             builder.append(url).append("?");
+        } else {
+            builder.append(url);
         }
         for (String s : map.keySet()) {
             if (map.size() == 1) {
@@ -82,7 +91,7 @@ public class UrlUtil {
             // 构造URL 键值对的格式
             StringBuilder buf = new StringBuilder();
             for (Map.Entry<String, String> item : infoIds) {
-                if (ParamUtil.paramIsNotEmpty(item.getKey())) {
+                if (ParamUtil.isNotEmpty(item.getKey())) {
                     String key = item.getKey();
                     String val = item.getValue();
                     if (urlEncode) {
@@ -97,7 +106,7 @@ public class UrlUtil {
                 }
             }
             buff = buf.toString();
-            if (ParamUtil.paramIsNotEmpty(buf)) {
+            if (ParamUtil.isNotEmpty(buf)) {
                 buff = buff.substring(0, buff.length() - 1);
             }
         } catch (Exception e) {
@@ -115,11 +124,11 @@ public class UrlUtil {
     public static Map<String, String> urlParamToMap(String url) {
         final Map<String, String> queryPairs = new ConcurrentHashMap<>(16);
         final String[] param = ParamUtil.split(url, "?");
-        if (ParamUtil.paramIsEmpty(param)||param.length<1) {
+        if (ParamUtil.isEmpty(param) || param.length < 1) {
             return null;
         }
         final String[] pairs = ParamUtil.split(param[1], "&");
-        if (ParamUtil.paramIsEmpty(pairs)) {
+        if (ParamUtil.isEmpty(pairs)) {
             return null;
         }
         for (String pair : pairs) {

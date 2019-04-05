@@ -72,6 +72,7 @@ public class ExecutorUtil {
      * 返回值
      *
      * @param callable c
+     * @return future
      */
     public static <T> Future<T> submit(Callable<T> callable) {
         return getThreadPool().submit(callable);

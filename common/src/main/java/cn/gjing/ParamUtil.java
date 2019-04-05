@@ -1,10 +1,9 @@
 package cn.gjing;
 
+import cn.gjing.annotation.NotNull2;
+
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -19,8 +18,8 @@ public final class ParamUtil {
      * @param str 参数
      * @return True 为空,false不为空
      */
-    public static <T> boolean paramIsEmpty(T str) {
-        if (str == null) {
+    public static <T> boolean isEmpty(T str) {
+        if (str == null||"".equals(str)) {
             return true;
         } else if (str instanceof Collection) {
             return ((List) str).isEmpty();
@@ -28,21 +27,42 @@ public final class ParamUtil {
             return ((Map) str).isEmpty();
         } else if (str.getClass().isArray()) {
             return Array.getLength(str) == 0;
-        } else {
-            return "".equals(str);
         }
+        return false;
+    }
+
+    /**
+     * 不为空返回原对象值,为空跑出NPE
+     * @param str 参数
+     * @param <T> 泛型
+     * @return 原参数
+     */
+    @NotNull2
+    public static <T> T requireNotNull(T str) {
+        return str;
+    }
+
+    /**
+     * 判断集合里是否含有空值
+     * @param list 参数集合
+     * @param <T> 泛型
+     * @return true为包含
+     */
+    @NotNull2
+    public static <T> boolean listIncludeEmpty(Collection<? extends T> list) {
+        return list.stream().anyMatch(ParamUtil::isEmpty);
     }
 
     /**
      * 检查多参数里面是否有空值
-     *
      * @param params 多个参数集合
      * @param <T>    参数类型,泛型
      * @return true为包括, false不包括
      */
-    public static <T> boolean multiParamHasEmpty(List<T> params) {
-        List<T> paramNullList = params.stream().filter(ParamUtil::paramIsEmpty).collect(Collectors.toList());
-        return !paramNullList.isEmpty();
+    @NotNull2
+    @SafeVarargs
+    public static <T> boolean multiParamIncludeEmpty(T...params) {
+        return Arrays.stream(params).anyMatch(ParamUtil::isEmpty);
     }
 
     /**
@@ -51,8 +71,18 @@ public final class ParamUtil {
      * @param str 参数
      * @return true为不含有, false为含有
      */
-    public static<T> boolean paramIsNotEmpty(T str) {
-        return !paramIsEmpty(str);
+    public static<T> boolean isNotEmpty(T str) {
+        return !isEmpty(str);
+    }
+
+    /**
+     * 判断两个参数是否相等
+     * @param t 参数1
+     * @param u 参数2
+     * @return true为相等
+     */
+    public static boolean equals(Object t, Object u) {
+        return t == u || (requireNotNull(t).equals(u));
     }
 
     /**
@@ -62,7 +92,7 @@ public final class ParamUtil {
      * @return 去除后
      */
     public static String trim(String str) {
-        return paramIsEmpty(str) ? null : str.trim();
+        return isEmpty(str) ? null : str.trim();
     }
 
     /**
@@ -71,8 +101,9 @@ public final class ParamUtil {
      * @param list 集合
      * @return 不包含空值的集合
      */
+    @NotNull2
     public static List<String> trim(List<String> list) {
-        List<String> listNonNull = list.stream().filter(ParamUtil::paramIsNotEmpty).collect(Collectors.toList());
+        List<String> listNonNull = list.stream().filter(ParamUtil::isNotEmpty).collect(Collectors.toList());
         return listNonNull.size() <= 0 ? null : listNonNull.stream().map(ParamUtil::trim).collect(Collectors.toList());
     }
 
@@ -83,7 +114,7 @@ public final class ParamUtil {
      * @return 大写
      */
     public static String toUpperCase(String str) {
-        return paramIsEmpty(str) ? null : str.toUpperCase();
+        return isEmpty(str) ? null : str.toUpperCase();
     }
 
     /**
@@ -93,7 +124,7 @@ public final class ParamUtil {
      * @return 小写字符串
      */
     public static String toLowerCase(String str) {
-        return paramIsEmpty(str) ? null : str.toLowerCase();
+        return isEmpty(str) ? null : str.toLowerCase();
     }
 
     /**
@@ -104,7 +135,7 @@ public final class ParamUtil {
      * @return 移除后
      */
     public static String removeSymbol(String str, String symbol) {
-        if (paramIsEmpty(str)) {
+        if (isEmpty(str)) {
             return null;
         } else {
             str = removeStartSymbol(str, symbol);
@@ -121,9 +152,9 @@ public final class ParamUtil {
      */
     public static String removeStartSymbol(String str, String symbol) {
         int strLen;
-        if (paramIsNotEmpty(str) && (strLen = str.length()) != 0) {
+        if (isNotEmpty(str) && (strLen = str.length()) != 0) {
             int start = 0;
-            if (paramIsEmpty(symbol)) {
+            if (isEmpty(symbol)) {
                 return trim(str);
             } else {
                 while (start != strLen && symbol.indexOf(str.charAt(start)) != -1) {
@@ -144,8 +175,8 @@ public final class ParamUtil {
      */
     public static String removeEndSymbol(String str, String symbol) {
         int end;
-        if (paramIsNotEmpty(str) && (end = str.length()) != 0) {
-            if (paramIsEmpty(symbol)) {
+        if (isNotEmpty(str) && (end = str.length()) != 0) {
+            if (isEmpty(symbol)) {
                 return trim(str);
             }
             while (end != 0 && symbol.indexOf(str.charAt(end - 1)) != -1) {
@@ -165,7 +196,7 @@ public final class ParamUtil {
      */
     @SuppressWarnings("unchecked")
     public static String[] split(String str, String symbol) {
-        if (paramIsEmpty(str) || symbol.length() != 1) {
+        if (isEmpty(str) || symbol.length() != 1) {
             return null;
         } else {
             List<String> list = new ArrayList();
@@ -192,13 +223,13 @@ public final class ParamUtil {
      * @param symbol 符号,仅可使用一个符号
      * @return 删除符号后的字符串
      */
-    public static String removeSymbol2(String str, String symbol) {
-        if (paramIsEmpty(str) || symbol.length() > 1) {
+    public static String removeAllSymbol(String str, String symbol) {
+        if (isEmpty(str) || symbol.length() > 1) {
             return null;
         }
         StringBuilder builder = new StringBuilder();
         String[] strings = split(str, symbol);
-        if (paramIsNotEmpty(strings)) {
+        if (isNotEmpty(strings)) {
             for (String s : strings) {
                 builder.append(s);
             }
@@ -214,15 +245,12 @@ public final class ParamUtil {
      * @param u param 值
      * @return 返回true为包含
      */
-    public static boolean contains(String[] t, String u) {
-        if (t.length < 1) {
+    public static boolean contains(Object[] t, Object u) {
+        if (multiParamIncludeEmpty(t,u)) {
             return false;
         }
-        if (ParamUtil.paramIsEmpty(u)) {
-            return false;
-        }
-        for (String t1 : t) {
-            if (t1.equals(u)) {
+        for (Object o : t) {
+            if (equals(o,u)) {
                 return true;
             }
         }
@@ -237,7 +265,7 @@ public final class ParamUtil {
      */
     public static boolean isEmail(String email) {
         String regex = "^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$";
-        if (paramIsNotEmpty(email)) {
+        if (isNotEmpty(email)) {
             return Pattern.compile(regex).matcher(email).matches();
         } else {
             return false;
@@ -251,7 +279,7 @@ public final class ParamUtil {
      */
     public static boolean isMobileNumber(String phone) {
         String regex = "^1([3-8]){1}\\d{9}$";
-        if (paramIsNotEmpty(phone)) {
+        if (isNotEmpty(phone)) {
             return Pattern.compile(regex).matcher(phone).matches();
         } else {
             return false;
@@ -265,7 +293,7 @@ public final class ParamUtil {
      */
     public static boolean isTelPhone(String tel) {
         String regex = "^(0[0-9]{2,3}\\-)?([2-9][0-9]{6,7})+(\\-[0-9]{1,4})?$";
-        if (paramIsNotEmpty(tel)) {
+        if (isNotEmpty(tel)) {
             return Pattern.compile(regex).matcher(tel).matches();
         } else {
             return false;
@@ -279,7 +307,7 @@ public final class ParamUtil {
      */
     public static boolean isPostCode(String postCode) {
         String regex = "^\\d{6}$";
-        if (paramIsNotEmpty(postCode)) {
+        if (isNotEmpty(postCode)) {
             return Pattern.compile(regex).matcher(postCode).matches();
         } else {
             return false;

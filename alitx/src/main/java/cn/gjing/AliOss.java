@@ -2,6 +2,7 @@ package cn.gjing;
 
 import cn.gjing.annotation.NotNull2;
 import cn.gjing.enums.HttpStatus;
+import cn.gjing.ex.ParamException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.GetObjectRequest;
@@ -15,6 +16,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -111,7 +113,7 @@ public class AliOss {
             objectMetadata.setHeader("Pragma", "no-cache");
             objectMetadata.setContentType(FilenameUtils.getExtension("." + file.getOriginalFilename()));
             objectMetadata.setContentDisposition("inline;filename=" + fileName);
-            if (ParamUtil.paramIsNotEmpty(ossModel.getFileDir())) {
+            if (ParamUtil.isEmpty(ossModel.getFileDir())) {
                 AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), ossModel.getFileDir() + "/" + fileName, inputStream, objectMetadata);
                 return ossModel.getFileDir() + "/" + fileName;
             } else {
@@ -131,15 +133,15 @@ public class AliOss {
      * @return 路径
      */
     private static String getFileUrl(String fileUrl, OssModel ossModel) {
-        if (ParamUtil.paramIsEmpty(fileUrl)) {
+        if (ParamUtil.isEmpty(fileUrl)) {
             throw new OssException("The parameter fileUrl cannot be null!");
         }
         String[] split = ParamUtil.split(fileUrl, "/");
-        if (ParamUtil.paramIsEmpty(split)) {
+        if (ParamUtil.isEmpty(split)) {
             throw new OssException(HttpStatus.INVALID_PARAMETER.getMsg());
         }
         URL url;
-        if (ParamUtil.paramIsNotEmpty(ossModel.getFileDir())) {
+        if (ParamUtil.isEmpty(ossModel.getFileDir())) {
             url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), ossModel.getFileDir() + "/" + split[split.length - 1], TimeUtil.addDay(new Date(), 365 * 10));
         } else {
             url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), split[split.length - 1], TimeUtil.addDay(new Date(), 365 * 10));
@@ -163,7 +165,7 @@ public class AliOss {
 
     /**
      * 文件删除
-     *
+     * @param ossModel oss模型
      * @param fileOssUrls 文件地址集合
      * @return 返回true为删除成功
      */
@@ -202,17 +204,29 @@ public class AliOss {
     }
 
     /**
-     * @param ossModel  oss模型
-     * @param fileOssUrl  要下载oss服务器上的文件地址
-     * @param localFile 保存本地文件,不存在会创建一个本地文件;(完整路径)
+     * @param ossModel   oss模型
+     * @param fileOssUrl 要下载oss服务器上的文件地址
+     * @param mkdir      本地文件夹
+     * @param fileName   文件名,带后缀
+     * @return boolean
      */
     @NotNull2
-    public static boolean downloadFile(OssModel ossModel, String fileOssUrl, String localFile) {
+    public static boolean downloadFile(OssModel ossModel, String fileOssUrl, String mkdir, String fileName) {
         try {
-            OSSClient ossClient = getOssClient(ossModel);
-            ossClient.getObject(new GetObjectRequest(ossModel.getBucketName(), getPathUrl(fileOssUrl,ossModel)), new File(localFile));
-            return true;
-        } catch (RuntimeException e) {
+            if (ParamUtil.isNotEmpty(mkdir)) {
+                File file = new File(mkdir);
+                if (!file.exists()) {
+                    if (!file.mkdir()) {
+                        throw new OssException("create file exception");
+                    }
+                }
+                OSSClient ossClient = getOssClient(ossModel);
+                Predicate<String> predicate = e -> e.indexOf("/", e.length() - 1) != -1;
+                ossClient.getObject(new GetObjectRequest(ossModel.getBucketName(), getPathUrl(fileOssUrl, ossModel)), new File(predicate.test(mkdir) ? mkdir + fileName : mkdir + "/" + fileName));
+                return true;
+            }
+            throw new ParamException("mkdir cannot be null");
+        } catch (Exception e) {
             throw new OssException(e.getMessage());
         }
     }

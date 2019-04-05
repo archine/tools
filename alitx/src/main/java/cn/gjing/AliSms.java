@@ -63,7 +63,7 @@ public class AliSms {
         request.setVersion(Sms.SMS.getVersion());
         request.putQueryParameter("PhoneNumbers", phoneNumbers);
         request.putQueryParameter("TemplateCode", smsTemplateCode);
-        if (ParamUtil.paramIsNotEmpty(smsTemplateParam)) {
+        if (ParamUtil.isNotEmpty(smsTemplateParam)) {
             request.putQueryParameter("TemplateParam", gson.toJson(smsTemplateParam));
         }
         request.putQueryParameter("SignName", smsSignName);
@@ -98,7 +98,7 @@ public class AliSms {
         request.setVersion(Sms.QUERY.getVersion());
         request.setAction(Sms.QUERY.getAction());
         request.putQueryParameter("PhoneNumber", phoneNumber);
-        request.putQueryParameter("SendDate", ParamUtil.removeSymbol2(sendData, "-"));
+        request.putQueryParameter("SendDate", ParamUtil.removeAllSymbol(sendData, "-"));
         request.putQueryParameter("PageSize", pageSize);
         request.putQueryParameter("CurrentPage", currentPage);
         try {

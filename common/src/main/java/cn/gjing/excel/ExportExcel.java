@@ -25,7 +25,7 @@ class ExportExcel {
      * @param info     excel额外的内容,如果不需要直接传null或者空字符串
      */
     static void generateHaveExcelName(HttpServletResponse response, List<Object[]> list, String[] headers, String title, String info) {
-        if (ParamUtil.paramIsEmpty(response) || ParamUtil.paramIsEmpty(headers)  || ParamUtil.paramIsEmpty(title)) {
+        if (ParamUtil.isEmpty(response) || ParamUtil.isEmpty(headers)  || ParamUtil.isEmpty(title)) {
             throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
         }
         HSSFWorkbook wb = export(list, headers, title, info);
@@ -76,7 +76,7 @@ class ExportExcel {
             cell.setCellValue(headers[i]);
         }
         //如果含有excel的简介
-        if (ParamUtil.paramIsNotEmpty(info)) {
+        if (ParamUtil.isNotEmpty(info)) {
             //添加额外的excel内容
             row = sheet.createRow(1);
             HSSFCell cell;

@@ -1,17 +1,19 @@
 # Gjing tools for java :smile:
 ![](https://img.shields.io/badge/version-1.1.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
-tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，从而摆脱每次构建项目都要重复封装，造成时间的浪费。    
+tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，从而摆脱每次构建项目都要重复封装,而且封装的及其复杂,让新人头疼,由于笔者从毕业到今,甚至朋友所在的公司   
+都出现了这种情况,所以抽出时间写了这个工具包,笔者技术有限,欢迎各位大佬指点.
      
 项目宗旨:   
 * 提高开发速度;   
 * 提供用于项目开发的公共工具，而不必在每次编写项目时重新封装;   
+* 解决新人刚去一家公司对已存在的工具类的方案.
 * 简单、实用;     
      
 **安装**
 ---
 在您的项目中使用Java Gjing tools的推荐方法是从Maven中使用它。如下:
 * <a href="https://mvnrepository.com/artifact/cn.gjing/all/" title="整合包">cn.gjing.all</a> （整合所有工具包）
-* <a href="https://mvnrepository.com/artifact/cn.gjing/common/" title="公用组件包">cn.gjing.common</a> （参数处理，excel，时间，加密等）
+* <a href="https://mvnrepository.com/artifact/cn.gjing/common/" title="公用组件包">cn.gjing.common</a> （参数处理，excel，时间，加密,线程池,验证码等）
 * <a href="https://mvnrepository.com/artifact/cn.gjing/alitx/" title="腾讯和阿里工具包">cn.gjing.alitx</a> （阿里和腾讯的常用工具：短信，OSS）
 * <a href="https://mvnrepository.com/artifact/cn.gjing/autoswagger/" title="swagger包">cn.gjing.autoswagger</a> （swagger）
 * <a href="https://mvnrepository.com/artifact/cn.gjing/httpclient/" title="http工具包">cn.gjing.httpclient</a> （http请求工具)   
@@ -51,7 +53,7 @@ public ResultVo deleteImg(String fileOssUrl) {
     return ResultVo.error();
 }
 ```   
-下载文件: fileOssUrl为上传oss成功后返回的url,localFilePath为下载到本地的什么位置,目录不存在会创建,文件后缀必须与要下载的文件后缀对应,返回true为成功;
+下载文件: fileOssUrl为上传oss成功后返回的url,目录不存在会创建,文件后缀必须与要下载的文件后缀对应,返回true为成功;
 ```
 @RequestMapping("/downloadImg")
 @ApiOperation(value = "文件下载", httpMethod = "POST", response = ApiResponse.class)
@@ -59,7 +61,7 @@ public ResultVo downloadImg(String fileOssUrl,String localFilePath) {
     OssModel ossModel = OssModel.builder().accessKeyId("您的accessKeyId").accessKeySecret("您的accessKey秘钥").bucketName("存储空间名字")
             .endPoint("oss访问域名").build();
     //为ture表示执行成功,成功后会自动保存到你指定的目录
-    boolean b = AliOss.downloadFile(ossModel, fileOssUrl, localFilePath);
+    boolean b = AliOss.downloadFile(ossModel, fileOssUrl, "本地目录","文件名带后缀");
     if (b) {
         return ResultVo.success();
     }
@@ -154,10 +156,78 @@ public void zsyProductTemplate(HttpServletResponse response) {
 }
 ```
 实用工具类:   
-1. ParamUtil: 主要提供参数校验、处理,字符串符号移除, 分割,匹配是否为邮件地址或者手机号等等;
+1. ParamUtil: 主要提供参数校验、处理,匹配等等;
+```
+里面主要包括(方法名:对应功能): 
+    1.isEmpty: 判断给定参数是否为空; 2.isNotEmpty: 不为空; 3.listIncludeEmpty: 判断集合里是否含空; 4.requireNotNull: 不为空返回原值;   
+    5.multiParamIncludeEmpty: 多参数判断是否含空; 6.equals: 判断两个参数是否相等; 7.trim: 去除参数或者集合里每个参数的多余的空;   
+    8.toUpperCase/toLowerCase: 大小写; 9.removeSymbol: 移除字符串两边的符号,对应的startSymbol和endSymbol为首尾坐标; 10.removeSymbol2:移除参数中所有的符号;   
+    11.split: 根据符号分割; 12.contains: 判断数组里是否含某值; 13.其他手机号,邮箱等匹配.
+```
 2. TimeUtil: 主要用于操作时间和日期;
-3. EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64
-4. UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接
-5. ExecutorUtil: 线程池工具类，暂时含有无返回值调用和有返回值调用
+```
+里面包括(方法名:对应功能):
+    1.getDateAsString: 获取文本时间; 2.getDate:获取Date; 3.stringDateToCalendar: 文本时间转成日期; 4.calendarToDate:日期转Date; 5.calendarToStringDate: 日期转文本;   
+    6.getAllDaysOfMonth: 获取某个日期的当月总天数; 7.getDays: 获取给定日期的天数; 8.getYears:获取给定日期的年份; 9:getMonth:获取给定日期的月份; 10.addMonth:给定日期增加月份.   
+    11.addDay:日期上增加天数; 12.stringDateToStamp: 文本时间转为时间戳; 13.stampToStringDate:时间戳转为文本时间; 14: dateBetween:获取两个日期相差的天数,带include的为包括今天; 
+```
+3. EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64;
+4. UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接;
+```
+里面包括(方法名:对应功能):
+    1.urlAppend: url和参数拼接,结果为http://127.0.0.1:8080/test?param1={param1}; 2.unicodeSort:参数按照字段名的Unicode码从小到大排序（字典序);   
+    3.urlParamToMap:将url中的参数转成map; 
+```
+5. ExecutorUtil: 线程池工具类，暂时含有无返回值调用和有返回值调用;
+```
+里面包括(方法名:对应功能):
+    1. execute: 无返回值调用; 2.submit: 有返回值调用; 3.cancel:任务移除等待队列;
+```
+6. AuthCodeUtil: 简单验证码工具类, 目前只支持英文和数字混合验证码,后期会加上拼图等类型验证码;
+```
+//第一种情况: 生成验证码到本地指定路径,以下为简单测试,具体逻辑根据业务需求自行设计
+public static void main(String[] args) {
+    AuthCodeUtil authCodeUtil = new AuthCodeUtil(160,40,5,150);
+    try {
+        String path="指定的路径/文件名/".png";
+        System.out.println(vCode.getCode()+" >"+path);
+        authCodeUtil.write(path);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+//第二种情况: 以流的方式返回给前端
+@RequestMapping("/code")
+public void getCode(HttpServletResponse response, HttpServletRequest request) throws IOException {
+    AuthCodeUtil authCodeUtil = new AuthCodeUtil(100, 50, 4, 50);
+    response.setContentType("image/jpeg");
+    //禁止图像缓存
+    response.setHeader("param", "no-cache");
+    response.setDateHeader("Expires", 0);
+    //该案例将验证码存在session中,具体业务中根据场景自行设计
+    HttpSession session = request.getSession();
+    session.setAttribute("code", authCodeUtil.getCode());
+    authCodeUtil.write(response.getOutputStream());
+}
+/**
+ * 验证码验证,由于示例为服务端session存储,所以下面为session方式验证,具体根据个人存储条件相应更改
+ * @param code 前端传来的验证码
+ * @param request request
+ * @return .
+ */
+@RequestMapping("/verifyCode")
+@NotNull(exclude = {"request"})
+public ResultVo verifyCode(String code,HttpServletRequest request) {
+    HttpSession httpSession = request.getSession();
+    String sessionCode = (String) httpSession.getAttribute("code");
+    if (ParamUtil.paramIsEmpty(sessionCode)) {
+        return ResultVo.error(HttpStatus.BAD_REQUEST.getMsg());
+    }
+    if (sessionCode.toLowerCase().equals(code.toLowerCase())) {
+        return ResultVo.success();
+    }
+    return ResultVo.error("invalid code");
+}
+```
 #### **作者**
-* Gjing:sunny:有任何疑问可以添加我QQ: 87096937
+* Gjing:sunny:使用中出现任何BUG和有任何疑问可以添加我QQ: 87096937,我会及时回复并验证BUG并且发布更新.
