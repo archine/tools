@@ -23,5 +23,11 @@ public class CommonExceptionHandler {
         e.printStackTrace();
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(GjingException.class)
+    public ResponseEntity gjingException(GjingException e) {
+        e.printStackTrace();
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
     
 }

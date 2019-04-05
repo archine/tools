@@ -1,12 +1,13 @@
 # Gjing tools for java :smile:
-![](https://img.shields.io/badge/version-1.1.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
-tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，从而摆脱每次构建项目都要重复封装,而且封装的及其复杂,让新人头疼,由于笔者从毕业到今,甚至朋友所在的公司   
-都出现了这种情况,所以抽出时间写了这个工具包,笔者技术有限,欢迎各位大佬指点.
+![](https://img.shields.io/badge/version-1.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
+tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，杜绝每次新项目都要封装或者其他地方拷贝工具类,繁琐而费时.   
+笔者技术有限,欢迎各位大佬指点,本人会及时优化.   
+> **推荐使用最新版本**
      
 项目宗旨:   
 * 提高开发速度;   
 * 提供用于项目开发的公共工具，而不必在每次编写项目时重新封装;   
-* 解决新人刚去一家公司对已存在的工具类的方案.
+* 解决新人刚去一家公司对已存在的工具类的反感.
 * 简单、实用;     
      
 **安装**
@@ -156,7 +157,7 @@ public void zsyProductTemplate(HttpServletResponse response) {
 }
 ```
 实用工具类:   
-1. ParamUtil: 主要提供参数校验、处理,匹配等等;
+* ParamUtil: 主要提供参数校验、处理,匹配等等;
 ```
 里面主要包括(方法名:对应功能): 
     1.isEmpty: 判断给定参数是否为空; 2.isNotEmpty: 不为空; 3.listIncludeEmpty: 判断集合里是否含空; 4.requireNotNull: 不为空返回原值;   
@@ -164,26 +165,26 @@ public void zsyProductTemplate(HttpServletResponse response) {
     8.toUpperCase/toLowerCase: 大小写; 9.removeSymbol: 移除字符串两边的符号,对应的startSymbol和endSymbol为首尾坐标; 10.removeSymbol2:移除参数中所有的符号;   
     11.split: 根据符号分割; 12.contains: 判断数组里是否含某值; 13.其他手机号,邮箱等匹配.
 ```
-2. TimeUtil: 主要用于操作时间和日期;
+* TimeUtil: 主要用于操作时间和日期;
 ```
 里面包括(方法名:对应功能):
     1.getDateAsString: 获取文本时间; 2.getDate:获取Date; 3.stringDateToCalendar: 文本时间转成日期; 4.calendarToDate:日期转Date; 5.calendarToStringDate: 日期转文本;   
     6.getAllDaysOfMonth: 获取某个日期的当月总天数; 7.getDays: 获取给定日期的天数; 8.getYears:获取给定日期的年份; 9:getMonth:获取给定日期的月份; 10.addMonth:给定日期增加月份.   
     11.addDay:日期上增加天数; 12.stringDateToStamp: 文本时间转为时间戳; 13.stampToStringDate:时间戳转为文本时间; 14: dateBetween:获取两个日期相差的天数,带include的为包括今天; 
 ```
-3. EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64;
-4. UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接;
+* EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64;
+* UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接;
 ```
 里面包括(方法名:对应功能):
     1.urlAppend: url和参数拼接,结果为http://127.0.0.1:8080/test?param1={param1}; 2.unicodeSort:参数按照字段名的Unicode码从小到大排序（字典序);   
     3.urlParamToMap:将url中的参数转成map; 
 ```
-5. ExecutorUtil: 线程池工具类，暂时含有无返回值调用和有返回值调用;
+* ExecutorUtil: 线程池工具类，暂时含有无返回值调用和有返回值调用;
 ```
 里面包括(方法名:对应功能):
     1. execute: 无返回值调用; 2.submit: 有返回值调用; 3.cancel:任务移除等待队列;
 ```
-6. AuthCodeUtil: 简单验证码工具类, 目前只支持英文和数字混合验证码,后期会加上拼图等类型验证码;
+* AuthCodeUtil: 简单验证码工具类, 目前只支持英文和数字混合验证码,后期会加上拼图等类型验证码;
 ```
 //第一种情况: 生成验证码到本地指定路径,以下为简单测试,具体逻辑根据业务需求自行设计
 public static void main(String[] args) {
@@ -227,6 +228,19 @@ public ResultVo verifyCode(String code,HttpServletRequest request) {
         return ResultVo.success();
     }
     return ResultVo.error("invalid code");
+}
+```
+* EmailUtil: 邮件工具类,支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功,否则抛出GjingException.
+```
+里面参数主要包括: host(smtp服务器地址,比如qq邮箱:smtp.qq.com);password(发送者邮箱密码,有些邮箱需要用授权码代替密码);from(发送人邮箱地址);subject(邮件主题);body(邮件内容,支持html);   
+files(要发送的附件物理地址,不要可以传null或者空数组);tos(收件人邮箱账号,多个逗号隔开);copyTo(抄送人邮箱地址,多个逗号隔开,不抄送可以传null或者空字符串"");
+案例:
+public static void main(String[] args) {
+    boolean b = EmailUtil.getInstance("smtp.qq.com", "发送人密码或者授权码", "发送人邮箱")
+            .sendEmail("主题", "内容",new String[]{"附件物理地址"},"收件人邮箱地址", "抄送人邮箱地址");
+    if (b) {
+        System.out.println("发送成功");
+    }
 }
 ```
 #### **作者**

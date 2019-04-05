@@ -56,12 +56,10 @@ public final class ParamUtil {
     /**
      * 检查多参数里面是否有空值
      * @param params 多个参数集合
-     * @param <T>    参数类型,泛型
      * @return true为包括, false不包括
      */
     @NotNull2
-    @SafeVarargs
-    public static <T> boolean multiParamIncludeEmpty(T...params) {
+    public static boolean multiParamIncludeEmpty(Object...params) {
         return Arrays.stream(params).anyMatch(ParamUtil::isEmpty);
     }
 
@@ -197,7 +195,7 @@ public final class ParamUtil {
     @SuppressWarnings("unchecked")
     public static String[] split(String str, String symbol) {
         if (isEmpty(str) || symbol.length() != 1) {
-            return null;
+            return new String[]{};
         } else {
             List<String> list = new ArrayList();
             int i = 0;
@@ -225,7 +223,7 @@ public final class ParamUtil {
      */
     public static String removeAllSymbol(String str, String symbol) {
         if (isEmpty(str) || symbol.length() > 1) {
-            return null;
+            return str;
         }
         StringBuilder builder = new StringBuilder();
         String[] strings = split(str, symbol);
