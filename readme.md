@@ -22,8 +22,9 @@ tools是一个用于提供快速开发的工具包，整合了很多实际项目
 ---
 :heart_eyes: 有关以其他方式或者安装最新SDK的更多信息，请访问 <a href='https://mvnrepository.com/artifact/cn.gjing/'>中心库</a>   
 ---
-快速举例:   
-   
+快速举例(jar包区分):   
+> **alitx**   
+     
 阿里OSS:   
 1. 构建oss模板;   
 2. 调用方法   
@@ -113,6 +114,8 @@ public static void main(String[] args) {
     System.out.println("result: "+result);
 }
 ```
+> **httpclient**
+
 REST请求(支持http/https,以及代理)   
 1. 执行成功后会返回请求结果,不需要的参数可以传null,   
     :exclamation: 请求地址不允许为空;
@@ -135,13 +138,26 @@ public static void main(String[] args) {
     System.out.println(result);
 }
 ```
-注解:    
+> **autoswagger**
+```
+* @EnableSwagger: 启动swagger(如果您的项目需要用到swagger,可以直接在启动类上使用该注解,并且在您的配置文件中设置扫描路径等参数,
+                  包路径不能为空,其他几个参数可以为空),配置文件前缀为'cn.gjing.swagger';
+> 配置如下(yml格式):
+  cn:
+    gjing:
+      swagger:
+        base-package: com.example.demo(controller层完整包路径,不可以为空)
+        title: 我是标题(可以为空)
+        version: 1.0(默认1.0)
+        description: 我是描述(可以为空)
+```  
+> **common**
+
+注解:
 ```
 * @NotNull: 只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull(exclude={"参数名1","参数名2"}),:exclamation: 参数名必须与方法的参数名相同,   
             默认异常信息为参数不能为空,可以自定义异常信息@NotNull(message="您要使用的异常异常");
 * @NotNull2: 可以在普通程序和web程序中使用,适用于方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到参数上;   
-* @EnableSwagger: 启动swagger(如果您的项目需要用到swagger,可以直接在启动类上使用该注解,并且在您的配置文件中设置扫描路径等参数,
-                  包路径不能为空,其他几个参数可以为空),配置文件前缀为'cn.gjing.swagger';
 ```  
 返回结果模板:   
 ```
