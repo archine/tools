@@ -53,6 +53,11 @@ public class NonNullProcessor extends AbstractProcessor {
                             List<JCTree.JCVariableDecl> parameters = jcMethodDecl.getParameters();
                             ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
                             for (JCTree.JCVariableDecl parameter : parameters) {
+                                //过滤掉基本类型
+                                if (parameter.getType().type.isPrimitive()) {
+                                    continue;
+                                }
+                                //拿到这个参数上的所有注解
                                 java.util.List<String> collect = parameter.mods.annotations.stream().map(JCTree::toString).collect(Collectors.toList());
                                 if (collect.contains("@ExcludeParam()")) {
                                     continue;
@@ -70,7 +75,8 @@ public class NonNullProcessor extends AbstractProcessor {
                                                                         null,
                                                                         List.nil(),
                                                                         buildExceptionClassExpression("java.lang.NullPointerException", treeMaker, names),
-                                                                        List.of(treeMaker.Literal("Parameter "+parameter.getName().toString()+" cannot be null")),
+                                                                        List.of(treeMaker.Literal(
+                                                                                "The parameter @NotNull2 is used, so null is not allowed")),
                                                                         null
                                                                 )
                                                         )

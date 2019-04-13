@@ -34,8 +34,4 @@ public class OssModel {
     @NonNull
     private String bucketName;
 
-    /**
-     * 文件目录
-     */
-    private String fileDir;
 }

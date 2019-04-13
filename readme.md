@@ -1,5 +1,5 @@
 # Gjing tools for java :smile:
-![](https://img.shields.io/badge/version-1.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
+![](https://img.shields.io/badge/version-1.1.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
 tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，杜绝每次新项目都要封装或者其他地方拷贝工具类,繁琐而费时.   
 笔者技术有限,欢迎各位大佬指点,本人会及时优化.   
 > **推荐使用最新版本**
@@ -34,7 +34,7 @@ tools是一个用于提供快速开发的工具包，整合了很多实际项目
 @ApiOperation(value = "文件上传", httpMethod = "POST", response = ApiResponse.class)
 public ResultVo testUpload(@RequestParam(name = "file") MultipartFile file) {
     OssModel ossModel = OssModel.builder().accessKeyId("您的accessKeyId").accessKeySecret("您的accessKey秘钥").bucketName("存储空间名字")
-            .endPoint("oss访问域名").fileDir("存放文件到哪个目录,可以不传,最好传一下,不同类型文件放不同目录").build();
+            .endPoint("oss访问域名").build();
     //文件上传后得到的文件url地址
     String fileOssUrl = AliOss.upload(file, ossModel);
     return ResultVo.success(upload);
@@ -55,7 +55,7 @@ public ResultVo deleteImg(String fileOssUrl) {
     return ResultVo.error();
 }
 ```   
-下载文件: fileOssUrl为上传oss成功后返回的url,目录不存在会创建,文件后缀必须与要下载的文件后缀对应,返回true为成功;
+下载文件: fileOssUrl为上传oss成功后返回的url,localFilePath为你要保存的本地目录(不存在会创建),返回true为成功;
 ```
 @RequestMapping("/downloadImg")
 @ApiOperation(value = "文件下载", httpMethod = "POST", response = ApiResponse.class)
@@ -63,7 +63,22 @@ public ResultVo downloadImg(String fileOssUrl,String localFilePath) {
     OssModel ossModel = OssModel.builder().accessKeyId("您的accessKeyId").accessKeySecret("您的accessKey秘钥").bucketName("存储空间名字")
             .endPoint("oss访问域名").build();
     //为ture表示执行成功,成功后会自动保存到你指定的目录
-    boolean b = AliOss.downloadFile(ossModel, fileOssUrl, "本地目录","文件名带后缀");
+    boolean b = AliOss.downloadFile(ossModel, fileOssUrl, "本地目录");
+    if (b) {
+        return ResultVo.success();
+    }
+    return ResultVo.error();
+}
+```
+流式下载文件:
+```
+@RequestMapping("/streamDown")
+@ApiOperation(value = "文件下载", httpMethod = "POST", response = ApiResponse.class)
+public ResultVo downloadImg(String fileOssUrl) {
+    OssModel ossModel = OssModel.builder().accessKeyId("您的accessKeyId").accessKeySecret("您的accessKey秘钥").bucketName("存储空间名字")
+            .endPoint("oss访问域名").build();
+    //为ture表示执行成功,成功后会自动保存到你指定的目录
+    boolean b = AliOss.downloadStream(ossModel, fileOssUrl);
     if (b) {
         return ResultVo.success();
     }
@@ -138,6 +153,12 @@ public static void main(String[] args) {
     System.out.println(result);
 }
 ```
+* UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接;
+```
+里面包括(方法名:对应功能):
+    1.urlAppend: url和参数拼接,结果为http://127.0.0.1:8080/test?param1={param1}; 2.unicodeSort:参数按照字段名的Unicode码从小到大排序（字典序);   
+    3.urlParamToMap:将url中的参数转成map; 
+```
 > **autoswagger**
 ```
 * @EnableSwagger: 启动swagger(如果您的项目需要用到swagger,可以直接在启动类上使用该注解,并且在您的配置文件中设置扫描路径等参数,
@@ -158,10 +179,11 @@ public static void main(String[] args) {
 * @NotNull: 只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull(exclude={"参数名1","参数名2"}),:exclamation: 参数名必须与方法的参数名相同,   
             默认异常信息为参数不能为空,可以自定义异常信息@NotNull(message="您要使用的异常异常");
 * @NotNull2: 可以在普通程序和web程序中使用,适用于方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到参数上;   
+* @EnableCors: 允许跨域,标注在启动类上
 ```  
 返回结果模板:   
 ```
-* ResultVo: 用于接口返回,包含code(状态码),msg(提示信息)和data(数据), 如若分页查询,可以搭配PageResult使用,设置进data,随同一起返回,pageResult里设置数据和总条数;   
+* ResultVo: 用于接口返回,包含code(状态码),msg(提示信息)和data(数据), 如若分页查询,可以搭配PageResult使用,设置进data,随同一起返回,pageResult里设置数据和总页数;   
 ```
 Excel:   
 * 导出: :exclamation: response, excel表头,excel文件名,不能为空 
@@ -186,15 +208,11 @@ public void zsyProductTemplate(HttpServletResponse response) {
 里面包括(方法名:对应功能):
     1.getDateAsString: 获取文本时间; 2.getDate:获取Date; 3.stringDateToCalendar: 文本时间转成日期; 4.calendarToDate:日期转Date; 5.calendarToStringDate: 日期转文本;   
     6.getAllDaysOfMonth: 获取某个日期的当月总天数; 7.getDays: 获取给定日期的天数; 8.getYears:获取给定日期的年份; 9:getMonth:获取给定日期的月份; 10.addMonth:给定日期增加月份.   
-    11.addDay:日期上增加天数; 12.stringDateToStamp: 文本时间转为时间戳; 13.stampToStringDate:时间戳转为文本时间; 14: dateBetween:获取两个日期相差的天数,带include的为包括今天; 
+    11.addDay:日期上增加天数; 12.stringDateToStamp: 文本时间转为时间戳; 13.stampToStringDate:时间戳转为文本时间; 14: dateBetween:获取两个日期相差的天数,带include的为包括今天;   15.dateToLocalDateTime:Date转LocalDateTime; 16.dateToLocalDate:Date转LocalDate; 17. localDateToDate: LocalDate转Date; 18.localDateToString: localDate转String;   
+    19: stringToLocalDate: String格式日期转LocalDate; 20: localDateTimeToStamp: localDateTime转时间戳; 21: getYearsByStartTime: 查询指定日期距离当前多少年;   
+    22: stampToLocalDateTime: 时间戳转LocalDateTime.......
 ```
 * EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64;
-* UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接;
-```
-里面包括(方法名:对应功能):
-    1.urlAppend: url和参数拼接,结果为http://127.0.0.1:8080/test?param1={param1}; 2.unicodeSort:参数按照字段名的Unicode码从小到大排序（字典序);   
-    3.urlParamToMap:将url中的参数转成map; 
-```
 * ExecutorUtil: 线程池工具类，暂时含有无返回值调用和有返回值调用;
 ```
 里面包括(方法名:对应功能):

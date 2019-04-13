@@ -1,7 +1,11 @@
 package cn.gjing;
 
+import cn.gjing.annotation.NotNull2;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -18,6 +22,117 @@ public class TimeUtil {
     public static String getDateAsString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(date);
+    }
+
+    /**
+     * date 转localDateTime
+     *
+     * @param date date
+     * @return localDateTime
+     */
+    public static LocalDateTime dateToLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    }
+
+    /**
+     * date 转localDate
+     *
+     * @param date date
+     * @return localDate
+     */
+    public static LocalDate dateToLocalDate(Date date) {
+        return dateToLocalDateTime(date).toLocalDate();
+    }
+
+    /**
+     * localDate转date
+     *
+     * @param localDate localDate
+     * @return date
+     */
+    public static Date localDateToDate(LocalDate localDate) {
+        return localDateTimeToDate(localDate.atStartOfDay());
+    }
+
+    /**
+     * LocalDate转化为指定格式字符串
+     *
+     * @param localDate localDate
+     * @param format    format
+     * @return .
+     */
+    @NotNull2
+    public static String localDateToString(LocalDate localDate, String format) {
+        return localDate.format(DateTimeFormatter.ofPattern(format));
+    }
+
+    @NotNull2
+    public static String localDateTimeToString(LocalDateTime localDateTime, String format) {
+        return localDateTime.format(DateTimeFormatter.ofPattern(format));
+    }
+
+    @NotNull2
+    public static String localTimeToString(LocalTime localTime, String format) {
+        return localTime.format(DateTimeFormatter.ofPattern(format));
+    }
+
+    @NotNull2
+    public static LocalDate stringToLocalDate(String time, String format) {
+        return LocalDate.parse(time, DateTimeFormatter.ofPattern(format));
+    }
+
+    @NotNull2
+    public static LocalDateTime stringToLocalDateTime(String time, String format) {
+        return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(format));
+    }
+
+    /**
+     * localDateTime转date
+     *
+     * @param dateTime local
+     * @return date
+     */
+    public static Date localDateTimeToDate(LocalDateTime dateTime) {
+        return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 获得时间戳
+     *
+     * @param localDateTime lo
+     * @return .
+     */
+    public static long localDateTimeToStamp(LocalDateTime localDateTime) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDateTime.atZone(zone).toInstant();
+        return instant.toEpochMilli();
+    }
+
+    /**
+     * 查询一个日期(年月日)到目前过了多少年
+     *
+     * @param startTime 开始时间
+     * @return 相差数量
+     */
+    @NotNull2
+    public static Integer getYearsByStartTime(String startTime) {
+        LocalDate startDate = stringToLocalDate(startTime, "yyyy-MM-dd");
+        LocalDate currentDate = LocalDate.now();
+        if (currentDate.isBefore(startDate)) {
+            return 0;
+        } else {
+            return startDate.until(currentDate).getYears();
+        }
+    }
+
+    /**
+     * Long类型时间戳转化为LocalDateTime
+     *
+     * @param stamp 时间戳
+     * @return .
+     */
+    public static LocalDateTime stampToLocalDateTime(Long stamp) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(stamp), ZoneId.systemDefault());
     }
 
 
@@ -75,18 +190,20 @@ public class TimeUtil {
 
     /**
      * 日期转时间
+     *
      * @param calendar 日期
-     * @param format 格式
+     * @param format   格式
      * @return 时间
      */
-    public static Date calendarToDate(Calendar calendar,String format) throws ParseException {
+    public static Date calendarToDate(Calendar calendar, String format) throws ParseException {
         return getDate(calendarToStringDate(calendar, format));
     }
 
     /**
      * 日期转文本时间
+     *
      * @param calendar 日期
-     * @param format 格式
+     * @param format   格式
      * @return 文本时间
      */
     public static String calendarToStringDate(Calendar calendar, String format) {
@@ -194,7 +311,7 @@ public class TimeUtil {
      * 获取两个日期（不含时分秒）相差的天数，不包含今天
      *
      * @param startDate 开始时间
-     * @param endDate 结束时间
+     * @param endDate   结束时间
      * @return 相差的天数
      * @throws ParseException 转换异常
      */
@@ -208,7 +325,7 @@ public class TimeUtil {
      * 获取两个日期（不含时分秒）相差的天数，包含今天
      *
      * @param startDate 开始时间
-     * @param endDate 结束时间
+     * @param endDate   结束时间
      * @return 相差的天数
      * @throws ParseException 转换异常
      */

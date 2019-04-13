@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.handle;
 
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
@@ -6,9 +6,9 @@ import org.springframework.core.type.AnnotationMetadata;
 /**
  * @author Gjing
  **/
-public class SwaggerSelector implements ImportSelector {
+public class CorsSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
-        return new String[]{SwaggerBean.class.getName(), SwaggerConfig.class.getName(), SwaggerExceptionHandler.class.getName()};
+        return new String[]{CrosConfig.class.getName()};
     }
 }

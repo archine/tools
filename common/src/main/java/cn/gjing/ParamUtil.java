@@ -22,7 +22,7 @@ public final class ParamUtil {
         if (str == null||"".equals(str)) {
             return true;
         } else if (str instanceof Collection) {
-            return ((List) str).isEmpty();
+            return ((Collection) str).isEmpty();
         } else if (str instanceof Map) {
             return ((Map) str).isEmpty();
         } else if (str.getClass().isArray()) {

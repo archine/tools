@@ -15,5 +15,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PageResult<T> {
     private T pageResult;
-    private Integer size;
+    private Integer totalPage;
 }

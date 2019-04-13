@@ -6,13 +6,15 @@ import cn.gjing.ex.ParamException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.GetObjectRequest;
+import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.ObjectMetadata;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.InputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -113,13 +115,8 @@ public class AliOss {
             objectMetadata.setHeader("Pragma", "no-cache");
             objectMetadata.setContentType(FilenameUtils.getExtension("." + file.getOriginalFilename()));
             objectMetadata.setContentDisposition("inline;filename=" + fileName);
-            if (ParamUtil.isEmpty(ossModel.getFileDir())) {
-                AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), ossModel.getFileDir() + "/" + fileName, inputStream, objectMetadata);
-                return ossModel.getFileDir() + "/" + fileName;
-            } else {
-                AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), fileName, inputStream, objectMetadata);
-                return fileName;
-            }
+            AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), fileName, inputStream, objectMetadata);
+            return fileName;
         } catch (Exception oe) {
             throw new OssException(oe.getMessage());
         }
@@ -140,12 +137,7 @@ public class AliOss {
         if (ParamUtil.isEmpty(split)) {
             throw new OssException(HttpStatus.INVALID_PARAMETER.getMsg());
         }
-        URL url;
-        if (ParamUtil.isEmpty(ossModel.getFileDir())) {
-            url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), ossModel.getFileDir() + "/" + split[split.length - 1], TimeUtil.addDay(new Date(), 365 * 10));
-        } else {
-            url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), split[split.length - 1], TimeUtil.addDay(new Date(), 365 * 10));
-        }
+        URL url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), split[split.length - 1], TimeUtil.addDay(new Date(), 365 * 10));
         if (url == null) {
             throw new OssException("get oss file url error");
         }
@@ -165,7 +157,8 @@ public class AliOss {
 
     /**
      * 文件删除
-     * @param ossModel oss模型
+     *
+     * @param ossModel    oss模型
      * @param fileOssUrls 文件地址集合
      * @return 返回true为删除成功
      */
@@ -207,11 +200,10 @@ public class AliOss {
      * @param ossModel   oss模型
      * @param fileOssUrl 要下载oss服务器上的文件地址
      * @param mkdir      本地文件夹
-     * @param fileName   文件名,带后缀
      * @return boolean
      */
     @NotNull2
-    public static boolean downloadFile(OssModel ossModel, String fileOssUrl, String mkdir, String fileName) {
+    public static boolean downloadFile(OssModel ossModel, String fileOssUrl, String mkdir) {
         try {
             if (ParamUtil.isNotEmpty(mkdir)) {
                 File file = new File(mkdir);
@@ -222,7 +214,8 @@ public class AliOss {
                 }
                 OSSClient ossClient = getOssClient(ossModel);
                 Predicate<String> predicate = e -> e.indexOf("/", e.length() - 1) != -1;
-                ossClient.getObject(new GetObjectRequest(ossModel.getBucketName(), getPathUrl(fileOssUrl, ossModel)), new File(predicate.test(mkdir) ? mkdir + fileName : mkdir + "/" + fileName));
+                String pathUrl = getPathUrl(fileOssUrl, ossModel);
+                ossClient.getObject(new GetObjectRequest(ossModel.getBucketName(), pathUrl), new File(predicate.test(mkdir) ? mkdir + pathUrl : mkdir + "/" + pathUrl));
                 return true;
             }
             throw new ParamException("mkdir cannot be null");
@@ -231,4 +224,40 @@ public class AliOss {
         }
     }
 
+    /**
+     * 阿里oss文件流式下载
+     *
+     * @param ossModel   oss模型
+     * @param fileOssUrl 上传文件返回的url
+     * @param response   response
+     * @return true为成功
+     */
+    @NotNull2
+    public static boolean downloadStream(OssModel ossModel, String fileOssUrl, HttpServletResponse response) {
+        try {
+            String pathUrl = getPathUrl(fileOssUrl, ossModel);
+            OSSObject object = getOssClient(ossModel).getObject(ossModel.getBucketName(), pathUrl);
+            InputStream is = object.getObjectContent();
+            OutputStream os = new BufferedOutputStream(response.getOutputStream());
+            response.setCharacterEncoding("utf-8");
+            // 设置返回类型
+            response.setContentType("multipart/form-data");
+            // 文件名转码一下，不然会出现中文乱码
+            response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(
+                    getPathUrl(fileOssUrl, ossModel), "UTF-8"));
+            // 设置返回的文件的大小
+            response.setContentLength((int) object.getObjectMetadata().getContentLength());
+            byte[] b = new byte[1024];
+            int len;
+            while (-1 != (len = is.read(b))) {
+                os.write(b, 0, len);
+            }
+            os.flush();
+            os.close();
+            is.close();
+        } catch (Exception e) {
+            throw new OssException(e.getMessage());
+        }
+        return true;
+    }
 }

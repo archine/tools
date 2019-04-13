@@ -1,9 +1,7 @@
 package cn.gjing.result;
 
 import cn.gjing.enums.HttpStatus;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import cn.gjing.ParamUtil;
 
 import java.util.HashMap;
@@ -14,8 +12,7 @@ import java.util.Map;
  * @author Gjing
  * 返回模板
  **/
-@Getter
-@Setter
+@Data
 @Builder
 public class ResultVo<T> {
     private Integer code;

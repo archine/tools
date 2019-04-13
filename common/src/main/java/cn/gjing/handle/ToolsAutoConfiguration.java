@@ -2,7 +2,6 @@ package cn.gjing.handle;
 
 import cn.gjing.ex.CommonExceptionHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 public class ToolsAutoConfiguration {
 
     @Bean
-    @ConditionalOnWebApplication
     @ConditionalOnClass(NotNullProcessor.class)
     public NotNullProcessor notNullProxy() {
         return new NotNullProcessor();
