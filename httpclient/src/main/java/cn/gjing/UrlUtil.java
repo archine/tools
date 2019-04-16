@@ -22,7 +22,7 @@ public class UrlUtil {
      * @param url 需要拼接的url 例如：http://127.0.0.1:8080/test,需要尾随方法名
      * @return 拼接完后的url
      */
-    public static String urlAppend(String url, MultiValueMap<String, String> map) {
+    static String urlAppend(String url, MultiValueMap<String, String> map) {
         StringBuilder builder = new StringBuilder();
         int len = url.indexOf("?", url.length() - 1);
         if (len == -1) {
@@ -51,7 +51,7 @@ public class UrlUtil {
      * @param url 需要拼接的url 例如：http://127.0.0.1:8080/test,需要尾随方法名
      * @return 拼接完后的url
      */
-    public static String urlAppend(String url, Map<String, String> map) {
+    static String urlAppend(String url, Map<String, String> map) {
         StringBuilder builder = new StringBuilder();
         int len = url.indexOf("?", url.length() - 1);
         if (len == -1) {
@@ -73,6 +73,23 @@ public class UrlUtil {
         }
     }
 
+    /**
+     * 用户请求连接采用占位符的时候进行url和参数拼接,结果例子为: http://localhost:xx/test/2414/42daf
+     * @param url 请求地址
+     * @param params 参数
+     * @return string
+     */
+    public static String urlAppend(String url,Object[] params) {
+        StringBuilder builder = new StringBuilder(url);
+        if (url.indexOf("/", url.length() - 1) == -1) {
+            builder.append("/");
+        }
+        for (Object param : params) {
+            builder.append(param).append("/");
+        }
+        return builder.toString();
+    }
+
 
     /**
      * 参数按照字段名的Unicode码从小到大排序（字典序）
@@ -82,18 +99,18 @@ public class UrlUtil {
      * @param keyToLower 是否需要将Key转换为全小写 true:key转化成小写，false:不转化
      * @return 排序后的参数字符串
      */
-    public static String unicodeSort(Map<String, String> paramMap, boolean urlEncode, boolean keyToLower) {
+    public static String paramUnicodeSort(Map<String, ?> paramMap, boolean urlEncode, boolean keyToLower) {
         String buff;
         try {
-            List<Map.Entry<String, String>> infoIds = new ArrayList<>(paramMap.entrySet());
+            List<Map.Entry<String, ?>> infoIds = new ArrayList<>(paramMap.entrySet());
             // 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
             infoIds.sort(Comparator.comparing(Map.Entry::getKey));
             // 构造URL 键值对的格式
             StringBuilder buf = new StringBuilder();
-            for (Map.Entry<String, String> item : infoIds) {
+            for (Map.Entry<String, ?> item : infoIds) {
                 if (ParamUtil.isNotEmpty(item.getKey())) {
                     String key = item.getKey();
-                    String val = item.getValue();
+                    String val = (String) item.getValue();
                     if (urlEncode) {
                         val = URLEncoder.encode(val, "utf-8");
                     }
@@ -147,4 +164,5 @@ public class UrlUtil {
         }
         return queryPairs;
     }
+
 }

@@ -1,5 +1,6 @@
 package cn.gjing.http2;
 
+import cn.gjing.UrlUtil;
 import org.springframework.http.HttpMethod;
 
 import java.util.Map;
@@ -8,8 +9,14 @@ import java.util.Map;
  * @author Gjing
  **/
 @SuppressWarnings({"rawtypes"})
-public class HttpClient {
+public class HttpClient2 {
+    /**
+     * 默认连接超时3000毫秒
+     */
     private static final int CONNECT_TIMEOUT = 3000;
+    /**
+     * 默认读超时 5000毫秒
+     */
     private static final int READ_TIMEOUT = 5000;
     /**
      * post请求
@@ -22,7 +29,8 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T post(String url, Map<String, String> params, Map<String, String> headers, int connectTimeout, int readTimeout, Class<T> responseType) {
+    
+    public static <T> T post(String url, Map<String, ?> params, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, connectTimeout, readTimeout, HttpMethod.POST, responseType);
     }
 
@@ -36,7 +44,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T post(String url, Map<String, String> params, int connectTimeout, int readTimeout, Class<T> responseType) {
+    public static <T> T post(String url, Map<String, ?> params, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, null, connectTimeout, readTimeout, HttpMethod.POST, responseType);
     }
 
@@ -48,7 +56,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T post(String url, Map<String, String> params, Class<T> responseType) {
+    public static <T> T post(String url, Map<String, ?> params, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
     }
 
@@ -60,7 +68,8 @@ public class HttpClient {
      * @return responseType
      */
     public static <T> T post(String url, Class<T> responseType) {
-        return HttpHandle.invokeUrl(url, null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+        return HttpHandle.invokeUrl(url, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.POST, responseType);
     }
 
     /**
@@ -72,7 +81,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T post(String url, Map<String, String> params, Map<String, String> headers, Class<T> responseType) {
+    public static <T> T post(String url, Map<String, ?> params, Map<String, ?> headers, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
     }
 
@@ -87,7 +96,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, String> params, Map<String, String> headers, int connectTimeout, int readTimeout, Class<T> responseType) {
+    public static <T> T get(String url, Map<String, ?> params, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, connectTimeout, readTimeout, HttpMethod.GET, responseType);
 
     }
@@ -102,7 +111,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, String> params, int connectTimeout, int readTimeout, Class<T> responseType) {
+    public static <T> T get(String url, Map<String, ?> params, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, null, connectTimeout, readTimeout, HttpMethod.GET, responseType);
     }
 
@@ -114,7 +123,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, String> params, Class<T> responseType) {
+    public static <T> T get(String url, Map<String, ?> params, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET, responseType);
     }
 
@@ -127,7 +136,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, String> params, Map<String, String> headers, Class<T> responseType) {
+    public static <T> T get(String url, Map<String, ?> params, Map<String, ?> headers, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET, responseType);
     }
 
@@ -140,11 +149,8 @@ public class HttpClient {
      * @return responseType
      */
     public static <T> T get(String url, Class<T> responseType, Object... params) {
-        StringBuilder builder = new StringBuilder(url + "/");
-        for (Object param : params) {
-            builder.append(param).append("/");
-        }
-        return HttpHandle.invokeUrl(builder.toString(), null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET, responseType);
+        return HttpHandle.invokeUrl(UrlUtil.urlAppend(url,params), null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.GET, responseType);
     }
 
     /**
@@ -168,7 +174,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T put(String url, Map<String, String> params, int connectTimeout, int readTimeout,Class<T> responseType) {
+    public static <T> T put(String url, Map<String, ?> params, Integer connectTimeout, Integer readTimeout,Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, null, connectTimeout, readTimeout, HttpMethod.PUT,responseType);
     }
 
@@ -183,20 +189,20 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T put(String url, Map<String, String> params, Map<String,String> headers,int connectTimeout, int readTimeout,Class<T> responseType) {
+    public static <T> T put(String url, Map<String, ?> params, Map<String,?> headers,Integer connectTimeout, Integer readTimeout,Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, connectTimeout, readTimeout, HttpMethod.PUT,responseType);
     }
 
     /**
      * PUT请求
      * @param url 请求url
-     * @param headers 请求头
+     * @param params 请求头
      * @param responseType 响应类型
      * @param <T> T
      * @return responseType
      */
-    public static <T> T put(String url, Map<String, String> headers,Class<T> responseType) {
-        return HttpHandle.invokeUrl(url,null, headers, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT,responseType);
+    public static <T> T put(String url, Map<String, ?> params,Class<T> responseType) {
+        return HttpHandle.invokeUrl(url,params, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT,responseType);
     }
 
     /**
@@ -207,7 +213,8 @@ public class HttpClient {
      * @return responseType
      */
     public static <T> T put(String url,Class<T> responseType) {
-        return HttpHandle.invokeUrl(url,null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT,responseType);
+        return HttpHandle.invokeUrl(url,null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.PUT,responseType);
     }
 
     /**
@@ -219,7 +226,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static<T> T put(String url, Map<String, String> params, Map<String, String> headers, Class<T> responseType) {
+    public static<T> T put(String url, Map<String, ?> params, Map<String, ?> headers, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, CONNECT_TIMEOUT,READ_TIMEOUT, HttpMethod.PUT, responseType);
     }
 
@@ -232,11 +239,8 @@ public class HttpClient {
      * @return responseType
      */
     public static <T> T put(String url, Class<T> responseType, Object... params) {
-        StringBuilder builder = new StringBuilder(url + "/");
-        for (Object param : params) {
-            builder.append(param).append("/");
-        }
-        return HttpHandle.invokeUrl(builder.toString(), null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT, responseType);
+        return HttpHandle.invokeUrl(UrlUtil.urlAppend(url,params), null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.PUT, responseType);
     }
 
     /**
@@ -249,7 +253,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, String> params, int connectTimeout, int readTimeout, Class<T>responseType) {
+    public static <T> T delete(String url, Map<String, ?> params, Integer connectTimeout, Integer readTimeout, Class<T>responseType) {
         return HttpHandle.invokeUrl(url, params, null, connectTimeout, readTimeout, HttpMethod.DELETE,responseType);
     }
 
@@ -264,7 +268,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, String> params, Map<String, String> headers, int connectTimeout, int readTimeout, Class<T> responseType) {
+    public static <T> T delete(String url, Map<String, ?> params, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, connectTimeout, readTimeout, HttpMethod.DELETE,responseType);
     }
 
@@ -276,7 +280,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, String> params, Map<String, String> headers, Class<T> responseType) {
+    public static <T> T delete(String url, Map<String, ?> params, Map<String, ?> headers, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, params, headers, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE, responseType);
     }
 
@@ -287,7 +291,7 @@ public class HttpClient {
      * @param <T> T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, String> headers, Class<T> responseType) {
+    public static <T> T delete(String url, Map<String, ?> headers, Class<T> responseType) {
         return HttpHandle.invokeUrl(url, null, headers, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE, responseType);
     }
 
@@ -300,10 +304,7 @@ public class HttpClient {
      * @return responseType
      */
     public static <T> T delete(String url, Class<T> responseType, Object... params) {
-        StringBuilder builder = new StringBuilder(url + "/");
-        for (Object param : params) {
-            builder.append(param).append("/");
-        }
-        return HttpHandle.invokeUrl(builder.toString(), null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE, responseType);
+        return HttpHandle.invokeUrl(UrlUtil.urlAppend(url,params), null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.DELETE, responseType);
     }
 }

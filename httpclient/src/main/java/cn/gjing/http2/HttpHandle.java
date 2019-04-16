@@ -2,6 +2,8 @@ package cn.gjing.http2;
 
 import cn.gjing.ParamUtil;
 import cn.gjing.UrlUtil;
+import cn.gjing.annotation.ExcludeParam;
+import cn.gjing.annotation.NotNull2;
 import cn.gjing.enums.HttpType;
 import cn.gjing.ex.HttpException;
 import org.springframework.http.HttpMethod;
@@ -27,11 +29,12 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 class HttpHandle {
 
-    static <T> T invokeUrl(String url, Map<String, String> params, Map<String, String> headers, int connectTimeout, int readTimeout, HttpMethod method,
+    @NotNull2
+    static <T> T invokeUrl(String url, @ExcludeParam Map<String, ?> params, @ExcludeParam Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, HttpMethod method,
                            Class<T> responseType) {
         String paramsStr = null;
         if (ParamUtil.isNotEmpty(params)) {
-            paramsStr = UrlUtil.unicodeSort(params, false, false);
+            paramsStr = UrlUtil.paramUnicodeSort(params, false, false);
             //只有POST方法才能通过OutputStream(即form的形式)提交参数
             if (method != HttpMethod.POST) {
                 assert paramsStr != null;
@@ -62,13 +65,16 @@ class HttpHandle {
                 out.write(paramsStr);
                 out.flush();
             }
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = null;
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), Charset.defaultCharset()));
-            String line;
-            while ((line = in.readLine()) != null) {
-                result.append(line);
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                result = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    result.append(line);
+                }
             }
-            return (T) result.toString();
+            return (T) (result != null ? result.toString() : null);
         } catch (Exception e) {
             throw new HttpException(e.getMessage());
         } finally {
@@ -88,41 +94,22 @@ class HttpHandle {
         }
     }
 
-    private static void addHeaders(Map<String, String> headers, HttpURLConnection conn) {
+    private static void addHeaders(Map<String, ?> headers, HttpURLConnection conn) {
         if (ParamUtil.isNotEmpty(headers)) {
             Set<String> headerSet = headers.keySet();
             for (String key : headerSet) {
-                conn.setRequestProperty(key, headers.get(key));
+                conn.setRequestProperty(key, (String) headers.get(key));
             }
-        }   
+        }
     }
-//
-//    /**
-//     * 处理错误流
-//     * @param conn HttpUrlConnection
-//     */
-//    private static void processException(HttpURLConnection conn) {
-//        //处理错误流，提高http连接被重用的几率
-//        try {
-//            byte[] buf = new byte[256];
-//            assert conn != null;
-//            InputStream es = conn.getErrorStream();
-//            if (es != null) {
-//                while (es.read(buf) <= 0) {
-//                    es.close();
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new HttpException(e.getMessage());
-//        }
-//    }
 
     /**
      * 设置属性
+     *
      * @param connectTimeout 超时时间
-     * @param readTimeout 读超时
-     * @param method 方法类型
-     * @param conn 连接
+     * @param readTimeout    读超时
+     * @param method         方法类型
+     * @param conn           连接
      * @throws ProtocolException 协议异常
      */
     private static void setProperty(int connectTimeout, int readTimeout, HttpMethod method, HttpURLConnection conn) throws ProtocolException {

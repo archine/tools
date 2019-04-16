@@ -1,5 +1,5 @@
 # Gjing tools for java :smile:
-![](https://img.shields.io/badge/version-1.1.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
+![](https://img.shields.io/badge/version-1.1.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
 tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，杜绝每次新项目都要封装或者其他地方拷贝工具类,繁琐而费时.   
 笔者技术有限,欢迎各位大佬指点,本人会及时优化.   
 > **推荐使用最新版本**
@@ -23,8 +23,8 @@ tools是一个用于提供快速开发的工具包，整合了很多实际项目
 :heart_eyes: 有关以其他方式或者安装最新SDK的更多信息，请访问 <a href='https://mvnrepository.com/artifact/cn.gjing/'>中心库</a>   
 ---
 快速举例(jar包区分):   
-> **alitx**   
-     
+> **alitx工具包**   
+--- 
 阿里OSS:   
 1. 构建oss模板;   
 2. 调用方法   
@@ -77,7 +77,7 @@ public ResultVo downloadImg(String fileOssUrl,String localFilePath) {
 public ResultVo downloadImg(String fileOssUrl) {
     OssModel ossModel = OssModel.builder().accessKeyId("您的accessKeyId").accessKeySecret("您的accessKey秘钥").bucketName("存储空间名字")
             .endPoint("oss访问域名").build();
-    //为ture表示执行成功,成功后会自动保存到你指定的目录
+    //为ture表示执行成功
     boolean b = AliOss.downloadStream(ossModel, fileOssUrl);
     if (b) {
         return ResultVo.success();
@@ -129,9 +129,9 @@ public static void main(String[] args) {
     System.out.println("result: "+result);
 }
 ```
-> **httpclient**
-
-REST请求(支持http/https,以及代理)   
+> **httpclient工具包**
+---
+a. ***HttpClient*** (支持http/https,以及代理)   
 1. 执行成功后会返回请求结果,不需要的参数可以传null,   
     :exclamation: 请求地址不允许为空;
 * POST
@@ -153,13 +153,28 @@ public static void main(String[] args) {
     System.out.println(result);
 }
 ```
+b. ***HttpClient2*** (推荐使用,支持https和http)
+```
+tips:   url为请求参数; params为参数构建的map; headers为请求头构建的map; connectTimeout为连接超时时间,默认3000毫秒;    
+        readTimeout为读超时时间,默认5000毫秒; responseType为返回类型;
+例子:    
+        使用中可以使用 HttpClient2.post(参数....)或者其他请求方式直接请求,返回结果为你指定的返回类型;
+        public static void main(String[] args) {
+            Map<String, String> param = new HashMap<>(16);
+            //post请求中参数根据实际情况填写
+            String result = HttpClient2.post("url", param ,String.class)
+            System.out.println(result);
+        }
+```
 * UrlUtil: 用于url的处理,目前含有unicode字符编码排序(字典序),url参数转map,restTemplate请求url拼接;
 ```
 里面包括(方法名:对应功能):
-    1.urlAppend: url和参数拼接,结果为http://127.0.0.1:8080/test?param1={param1}; 2.unicodeSort:参数按照字段名的Unicode码从小到大排序（字典序);   
+    1.urlAppend: url和参数拼接,用于url直接带参,结果为http://127.0.0.1/test/param1/param2; 2.paramUnicodeSort: 将需要转化的参数构建成map后使用方法转成字符串,结果如: param1&param2&param3,   
+    方法中urlEncode参数为true时表示将参数进行url编码,默认false; keyToLower参数为true时表示全部转小写,默认false;
     3.urlParamToMap:将url中的参数转成map; 
 ```
-> **autoswagger**
+> **autoswagger工具包**
+---
 ```
 * @EnableSwagger: 启动swagger(如果您的项目需要用到swagger,可以直接在启动类上使用该注解,并且在您的配置文件中设置扫描路径等参数,
                   包路径不能为空,其他几个参数可以为空),配置文件前缀为'cn.gjing.swagger';
@@ -172,8 +187,8 @@ public static void main(String[] args) {
         version: 1.0(默认1.0)
         description: 我是描述(可以为空)
 ```  
-> **common**
-
+> **common工具包**
+---
 注解:
 ```
 * @NotNull: 只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull(exclude={"参数名1","参数名2"}),:exclamation: 参数名必须与方法的参数名相同,   
@@ -278,4 +293,5 @@ public static void main(String[] args) {
 }
 ```
 #### **作者**
-* Gjing:sunny:使用中出现任何BUG和有任何疑问可以添加我QQ: 87096937,我会及时回复并验证BUG并且发布更新.
+* Gjing   
+:sunny:使用中出现任何BUG和有任何疑问可以添加我QQ: 87096937,我会及时回复并验证BUG并且发布更新.
