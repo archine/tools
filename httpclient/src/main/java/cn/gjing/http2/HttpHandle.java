@@ -2,17 +2,20 @@ package cn.gjing.http2;
 
 import cn.gjing.ParamUtil;
 import cn.gjing.UrlUtil;
-import cn.gjing.enums.HttpStatus;
 import cn.gjing.enums.HttpType;
 import cn.gjing.ex.HttpException;
-import com.google.gson.Gson;
 import org.springframework.http.HttpMethod;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -21,11 +24,11 @@ import java.util.Set;
 /**
  * @author Gjing
  **/
+@SuppressWarnings("unchecked")
 class HttpHandle {
-    private static Gson gson = new Gson();
 
     static <T> T invokeUrl(String url, Map<String, String> params, Map<String, String> headers, int connectTimeout, int readTimeout, HttpMethod method,
-                                   Class<T> responseType) {
+                           Class<T> responseType) {
         String paramsStr = null;
         if (ParamUtil.isNotEmpty(params)) {
             paramsStr = UrlUtil.unicodeSort(params, false, false);
@@ -40,60 +43,34 @@ class HttpHandle {
         BufferedWriter out = null;
         BufferedReader in = null;
         try {
-            if (ParamUtil.split(url, ":")[0].equals(HttpType.HTTPS.getType())) {
-                //创建SSLContext
-                SSLContext sslContext=SSLContext.getInstance("SSL");
-                TrustManager[] tm={new HttpsProcess()};
-                //初始化
-                sslContext.init(null, tm, new java.security.SecureRandom());;
-                //获取SSLSocketFactory对象
-                SSLSocketFactory ssf=sslContext.getSocketFactory();
-                conn.set
-            }
             uUrl = new URL(url);
-            conn = (HttpURLConnection) uUrl.openConnection();
-            conn.setRequestProperty("content-type", "application/x-www-form-urlencoded");
-            conn.setRequestMethod(method.toString());
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-            conn.setConnectTimeout(connectTimeout);
-            conn.setReadTimeout(readTimeout);
-            if (ParamUtil.isNotEmpty(headers)) {
-                Set<String> headerSet = headers.keySet();
-                for (String key : headerSet) {
-                    conn.setRequestProperty(key, headers.get(key));
-                }
+            if (ParamUtil.split(url, ":")[0].equals(HttpType.HTTPS.getType())) {
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                TrustManager[] tm = {new HttpsProcess()};
+                sslContext.init(null, tm, new java.security.SecureRandom());
+                SSLSocketFactory ssf = sslContext.getSocketFactory();
+                HttpsURLConnection httpsConn = (HttpsURLConnection) uUrl.openConnection();
+                httpsConn.setSSLSocketFactory(ssf);
+                conn = httpsConn;
+            } else {
+                conn = (HttpURLConnection) uUrl.openConnection();
             }
+            setProperty(connectTimeout, readTimeout, method, conn);
+            addHeaders(headers, conn);
             if (paramsStr != null && method == HttpMethod.POST) {
-                //发送请求参数
                 out = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), Charset.defaultCharset()));
                 out.write(paramsStr);
                 out.flush();
             }
-            //接收返回结果
             StringBuilder result = new StringBuilder();
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), Charset.defaultCharset()));
             String line;
             while ((line = in.readLine()) != null) {
                 result.append(line);
             }
-            return gson.fromJson(result.toString(), responseType);
+            return (T) result.toString();
         } catch (Exception e) {
-            //处理错误流，提高http连接被重用的几率
-            try {
-                byte[] buf = new byte[256];
-                assert conn != null;
-                InputStream es = conn.getErrorStream();
-                if (es != null) {
-                    while (es.read(buf) <= 0) {
-                        es.close();
-                    }
-                }
-            } catch (Exception d) {
-                d.printStackTrace();
-                throw new HttpException(d.getMessage());
-            }
-
+            throw new HttpException(e.getMessage());
         } finally {
             try {
                 if (out != null) {
@@ -109,6 +86,51 @@ class HttpHandle {
                 e.printStackTrace();
             }
         }
-        throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR.getMsg());
+    }
+
+    private static void addHeaders(Map<String, String> headers, HttpURLConnection conn) {
+        if (ParamUtil.isNotEmpty(headers)) {
+            Set<String> headerSet = headers.keySet();
+            for (String key : headerSet) {
+                conn.setRequestProperty(key, headers.get(key));
+            }
+        }   
+    }
+//
+//    /**
+//     * 处理错误流
+//     * @param conn HttpUrlConnection
+//     */
+//    private static void processException(HttpURLConnection conn) {
+//        //处理错误流，提高http连接被重用的几率
+//        try {
+//            byte[] buf = new byte[256];
+//            assert conn != null;
+//            InputStream es = conn.getErrorStream();
+//            if (es != null) {
+//                while (es.read(buf) <= 0) {
+//                    es.close();
+//                }
+//            }
+//        } catch (Exception e) {
+//            throw new HttpException(e.getMessage());
+//        }
+//    }
+
+    /**
+     * 设置属性
+     * @param connectTimeout 超时时间
+     * @param readTimeout 读超时
+     * @param method 方法类型
+     * @param conn 连接
+     * @throws ProtocolException 协议异常
+     */
+    private static void setProperty(int connectTimeout, int readTimeout, HttpMethod method, HttpURLConnection conn) throws ProtocolException {
+        conn.setRequestProperty("content-type", "application/x-www-form-urlencoded");
+        conn.setRequestMethod(method.toString());
+        conn.setDoOutput(true);
+        conn.setDoInput(true);
+        conn.setConnectTimeout(connectTimeout);
+        conn.setReadTimeout(readTimeout);
     }
 }

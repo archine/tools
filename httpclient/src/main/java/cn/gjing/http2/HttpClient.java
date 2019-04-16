@@ -142,7 +142,7 @@ public class HttpClient {
     public static <T> T get(String url, Class<T> responseType, Object... params) {
         StringBuilder builder = new StringBuilder(url + "/");
         for (Object param : params) {
-            builder.append(param);
+            builder.append(param).append("/");
         }
         return HttpHandle.invokeUrl(builder.toString(), null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET, responseType);
     }
@@ -234,7 +234,7 @@ public class HttpClient {
     public static <T> T put(String url, Class<T> responseType, Object... params) {
         StringBuilder builder = new StringBuilder(url + "/");
         for (Object param : params) {
-            builder.append(param);
+            builder.append(param).append("/");
         }
         return HttpHandle.invokeUrl(builder.toString(), null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT, responseType);
     }
@@ -302,7 +302,7 @@ public class HttpClient {
     public static <T> T delete(String url, Class<T> responseType, Object... params) {
         StringBuilder builder = new StringBuilder(url + "/");
         for (Object param : params) {
-            builder.append(param);
+            builder.append(param).append("/");
         }
         return HttpHandle.invokeUrl(builder.toString(), null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE, responseType);
     }
