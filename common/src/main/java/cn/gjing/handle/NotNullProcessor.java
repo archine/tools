@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -17,7 +18,6 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Gjing
@@ -42,30 +42,29 @@ class NotNullProcessor {
         Method method = methodSignature.getMethod();
         NotNull annotation = method.getDeclaredAnnotation(NotNull.class);
         //排除的参数
-        List<String > exclude = Arrays.asList(annotation.exclude());
+        List<String> exclude = Arrays.asList(annotation.exclude());
         //定义一个需要检查的参数列表
         List<String> needCheckParamList = new ArrayList();
         //方法的参数
         Parameter[] parameters = method.getParameters();
-        //如果使用占位符模式,则跳过
-        if (ParamUtil.isEmpty(request.getQueryString())) {
-            System.out.println("-------------------1");
-            if (exclude.isEmpty()) {
-                for (Parameter parameter : parameters) {
+        if (exclude.isEmpty()) {
+            for (Parameter parameter : parameters) {
+                if (!parameter.getType().isPrimitive()&&parameter.getAnnotation(PathVariable.class)==null) {
                     needCheckParamList.add(parameter.getName());
                 }
-            }else {
-                for (Parameter parameter : parameters) {
-                    if (!exclude.contains(parameter.getName())) {
-                        needCheckParamList.add(parameter.getName());
-                    }
+            }
+        } else {
+            for (Parameter parameter : parameters) {
+                if (!exclude.contains(parameter.getName()) && !parameter.getType().isPrimitive()&&parameter.getAnnotation(PathVariable.class)==null) {
+                    needCheckParamList.add(parameter.getName());
                 }
             }
-            if (ParamUtil.listIncludeEmpty(needCheckParamList.stream().map(request::getParameter).collect(Collectors.toList()))) {
-                throw new NullPointerException("The parameter @NotNull is used, so null is not allowed");
+        }
+        for (String paramName : needCheckParamList) {
+            if (ParamUtil.isEmpty(request.getParameter(paramName))) {
+                throw new NullPointerException("The parameter '"+paramName+"' has been used @NotNull, so it cannot be null.");
             }
         }
-
     }
 
 }

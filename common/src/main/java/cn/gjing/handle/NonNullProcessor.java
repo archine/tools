@@ -76,7 +76,7 @@ public class NonNullProcessor extends AbstractProcessor {
                                                                         List.nil(),
                                                                         buildExceptionClassExpression("java.lang.NullPointerException", treeMaker, names),
                                                                         List.of(treeMaker.Literal(
-                                                                                "The parameter @NotNull2 is used, so null is not allowed")),
+                                                                                "The parameter '"+parameter.getName().toString()+"' has been used @NotNull, so it cannot be null.")),
                                                                         null
                                                                 )
                                                         )
