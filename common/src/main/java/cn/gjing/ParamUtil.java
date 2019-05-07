@@ -1,7 +1,5 @@
 package cn.gjing;
 
-import cn.gjing.annotation.NotNull2;
-
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -37,7 +35,6 @@ public final class ParamUtil {
      * @param <T> 泛型
      * @return 原参数
      */
-    @NotNull2
     public static <T> T requireNotNull(T str) {
         return str;
     }
@@ -48,8 +45,7 @@ public final class ParamUtil {
      * @param <T> 泛型
      * @return true为包含
      */
-    @NotNull2
-    public static <T> boolean listIncludeEmpty(Collection<? extends T> list) {
+    public static <T> boolean ListHasEmpty(Collection<? extends T> list) {
         return list.stream().anyMatch(ParamUtil::isEmpty);
     }
 
@@ -58,8 +54,7 @@ public final class ParamUtil {
      * @param params 多个参数集合
      * @return true为包括, false不包括
      */
-    @NotNull2
-    public static boolean multiParamIncludeEmpty(Object...params) {
+    public static boolean multiEmpty(Object...params) {
         return Arrays.stream(params).anyMatch(ParamUtil::isEmpty);
     }
 
@@ -99,7 +94,6 @@ public final class ParamUtil {
      * @param list 集合
      * @return 不包含空值的集合
      */
-    @NotNull2
     public static List<String> trim(List<String> list) {
         List<String> listNonNull = list.stream().filter(ParamUtil::isNotEmpty).collect(Collectors.toList());
         return listNonNull.size() <= 0 ? null : listNonNull.stream().map(ParamUtil::trim).collect(Collectors.toList());
@@ -244,7 +238,7 @@ public final class ParamUtil {
      * @return 返回true为包含
      */
     public static boolean contains(Object[] t, Object u) {
-        if (multiParamIncludeEmpty(t,u)) {
+        if (multiEmpty(t,u)) {
             return false;
         }
         for (Object o : t) {

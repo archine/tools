@@ -196,12 +196,4 @@ public class EmailUtil {
         return mm;
     }
 
-    public static void main(String[] args) {
-        boolean b = EmailUtil.getInstance("smtp.qq.com", "gctlzcsfrwyscaif", "a87096937@qq.com")
-                .sendEmail("测试", "你好哦",new String[]{"/Users/colin/Desktop/个人工具类/返回结果/ResultVo.java"},
-                        "a87096937@qq.com", "a87096937@qq.com");
-        if (b) {
-            System.out.println("发送成功");
-        }
-    }
 }

@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 public class ToolsAutoConfiguration {
 
     @Bean
-    @ConditionalOnClass(NotNullProcessor.class)
-    public NotNullProcessor notNullProxy() {
-        return new NotNullProcessor();
+    @ConditionalOnClass(NotNull2Processor.class)
+    public NotNull2Processor notNullProxy() {
+        return new NotNull2Processor();
     }
 
     @Bean

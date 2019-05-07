@@ -21,11 +21,11 @@ class ExportExcel {
      * @param response 响应头
      * @param list     excel单元格内容集合,导出空白excel时传null
      * @param headers  excel列表头
-     * @param title    excel标题
+     * @param title    excel文件名
      * @param info     excel额外的内容,如果不需要直接传null或者空字符串
      */
     static void generateHaveExcelName(HttpServletResponse response, List<Object[]> list, String[] headers, String title, String info) {
-        if (ParamUtil.isEmpty(response) || ParamUtil.isEmpty(headers)  || ParamUtil.isEmpty(title)) {
+        if (ParamUtil.multiEmpty(response,headers,title)) {
             throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
         }
         HSSFWorkbook wb = export(list, headers, title, info);

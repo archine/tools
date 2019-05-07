@@ -1,7 +1,7 @@
 package cn.gjing;
 
 import cn.gjing.annotation.ExcludeParam;
-import cn.gjing.annotation.NotNull2;
+import cn.gjing.annotation.NotNull;
 import cn.gjing.enums.HttpType;
 import cn.gjing.ex.HttpException;
 import org.springframework.http.HttpEntity;
@@ -22,10 +22,10 @@ public class HttpClient {
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
     private static final RestTemplate REST_TEMPLATE2 = new RestTemplate(new HttpsClientRequestFactory());
 
-    @NotNull2
+    @NotNull
     public static String post(String requestUrl, @ExcludeParam Map<String, String> params,@ExcludeParam Map<String, String> headers, @ExcludeParam String proxyIp,
                               @ExcludeParam String proxyPort) {
-        if (!ParamUtil.multiParamIncludeEmpty(proxyIp,proxyPort)) {
+        if (!ParamUtil.multiEmpty(proxyIp,proxyPort)) {
             setProxy(proxyIp, proxyPort);
         }
         try {
@@ -53,10 +53,10 @@ public class HttpClient {
         }
     }
 
-    @NotNull2
+    @NotNull
     public static String get(String requestUrl,@ExcludeParam Map<String, String> params, @ExcludeParam Map<String, String> headers, @ExcludeParam String proxyIp,
                              @ExcludeParam String proxyPort) {
-        if (!ParamUtil.multiParamIncludeEmpty(proxyIp,proxyPort)) {
+        if (!ParamUtil.multiEmpty(proxyIp,proxyPort)) {
             setProxy(proxyIp, proxyPort);
         }
         try {

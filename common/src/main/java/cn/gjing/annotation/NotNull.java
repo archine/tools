@@ -1,16 +1,14 @@
 package cn.gjing.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Gjing
- * parameter check,Only for methods,example：@NotNull or @NotNull(exclude={“”,””})
  **/
 @Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Retention(RetentionPolicy.SOURCE)
 public @interface NotNull {
-    String[] exclude()default {};
-
-    String message() default "Parameter cannot be null";
 }

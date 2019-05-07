@@ -3,7 +3,7 @@ package cn.gjing.http2;
 import cn.gjing.ParamUtil;
 import cn.gjing.UrlUtil;
 import cn.gjing.annotation.ExcludeParam;
-import cn.gjing.annotation.NotNull2;
+import cn.gjing.annotation.NotNull;
 import cn.gjing.enums.HttpType;
 import cn.gjing.ex.HttpException;
 import org.springframework.http.HttpMethod;
@@ -29,7 +29,7 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 class HttpHandle {
 
-    @NotNull2
+    @NotNull
     static <T> T invokeUrl(String url, @ExcludeParam Map<String, ?> params, @ExcludeParam Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, HttpMethod method,
                            Class<T> responseType) {
         String paramsStr = null;

@@ -2,6 +2,8 @@ package cn.gjing;
 
 import cn.gjing.annotation.ExcludeParam;
 import cn.gjing.annotation.NotNull2;
+import cn.gjing.ex.GjingException;
+import cn.gjing.ex.ParamException;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
 import com.aliyuncs.DefaultAcsClient;
@@ -71,7 +73,7 @@ public class AliSms {
             CommonResponse response = client.getCommonResponse(request);
             return response.getData();
         } catch (ClientException e) {
-            throw new SmsException(e.getMessage());
+            throw new GjingException(e.getMessage());
         }
     }
 
@@ -88,7 +90,7 @@ public class AliSms {
     @NotNull2
     public static synchronized String querySendDetails(AliSmsModel smsModel, String phoneNumber, String sendData, String pageSize, String currentPage) {
         if (!ParamUtil.isMobileNumber(phoneNumber)) {
-            throw new SmsException("Specified parameter phoneNumber is not valid");
+            throw new ParamException("Specified parameter phoneNumber is not valid");
         }
         DefaultProfile profile = DefaultProfile.getProfile("default", smsModel.getAccessKeyId(),smsModel.getAccessKeySecret());
         IAcsClient client = getInstance(profile);
@@ -105,7 +107,7 @@ public class AliSms {
             CommonResponse response = client.getCommonResponse(request);
             return response.getData();
         } catch (ClientException e) {
-            throw new SmsException(e.getMessage());
+            throw new GjingException(e.getMessage());
         }
     }
 }

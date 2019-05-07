@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.1.6</version>
+        <version>1.1.7</version>
     </parent>
     <artifactId>all</artifactId>
     <version>1.1.6</version>
@@ -29,11 +29,15 @@
                     <artifactId>spring-core</artifactId>
                     <groupId>org.springframework</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>commons-codec</artifactId>
+                    <groupId>commons-codec</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>cn.gjing</groupId>
-            <artifactId>alitx</artifactId>
+            <artifactId>alibaba</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>cn.gjing</groupId>
@@ -47,6 +51,10 @@
         </dependency>
         <dependency>
             <groupId>cn.gjing</groupId>
+            <artifactId>tengxun</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.gjing</groupId>
             <artifactId>httpclient</artifactId>
             <exclusions>
                 <exclusion>
@@ -57,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>cn.gjing</groupId>
-            <artifactId>autoswagger</artifactId>
+            <artifactId>tools-starter-swagger</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>

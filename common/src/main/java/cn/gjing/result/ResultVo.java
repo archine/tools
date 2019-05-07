@@ -16,31 +16,31 @@ import java.util.Map;
 @Builder
 public class ResultVo<T> {
     private Integer code;
-    private String msg;
+    private String message;
     private T data;
 
-    public static ResultVo success(String msg, Object data) {
-        return ResultVo.builder().code(HttpStatus.OK.getCode()).msg(msg).data(data).build();
+    public static ResultVo success(String message, Object data) {
+        return ResultVo.builder().code(HttpStatus.OK.getCode()).message(message).data(data).build();
     }
 
     public static ResultVo success() {
-        return ResultVo.builder().code(HttpStatus.OK.getCode()).msg(HttpStatus.OK.getMsg()).build();
+        return ResultVo.builder().code(HttpStatus.OK.getCode()).message(HttpStatus.OK.getMsg()).build();
     }
 
     public static ResultVo success(Object data) {
-        return ResultVo.builder().code(HttpStatus.OK.getCode()).msg(HttpStatus.OK.getMsg()).data(data).build();
+        return ResultVo.builder().code(HttpStatus.OK.getCode()).message(HttpStatus.OK.getMsg()).data(data).build();
     }
 
-    public static ResultVo error(Integer code, String msg) {
-        return ResultVo.builder().code(code).msg(msg).build();
+    public static ResultVo error(Integer code, String message) {
+        return ResultVo.builder().code(code).message(message).build();
     }
 
     public static ResultVo error() {
-        return ResultVo.builder().code(HttpStatus.BAD_REQUEST.getCode()).msg(HttpStatus.BAD_REQUEST.getMsg()).build();
+        return ResultVo.builder().code(HttpStatus.BAD_REQUEST.getCode()).message(HttpStatus.BAD_REQUEST.getMsg()).build();
     }
 
-    public static ResultVo error(String msg) {
-        return ResultVo.builder().code(HttpStatus.BAD_REQUEST.getCode()).msg(msg).build();
+    public static ResultVo error(String message) {
+        return ResultVo.builder().code(HttpStatus.BAD_REQUEST.getCode()).message(message).build();
     }
 
     /**
@@ -69,10 +69,10 @@ public class ResultVo<T> {
         Map<String, Object> map = new HashMap<>(10);
         if (ParamUtil.isNotEmpty(isLogin)) {
             map.put("code", HttpStatus.OK.getCode());
-            map.put("msg", HttpStatus.OK.getMsg());
+            map.put("message", HttpStatus.OK.getMsg());
         }else {
             map.put("code", HttpStatus.NO_LOGIN.getCode());
-            map.put("msg", HttpStatus.NO_LOGIN.getMsg());
+            map.put("message", HttpStatus.NO_LOGIN.getMsg());
         }
         if (keys != null && values != null) {
             for (int i = 0; i < keys.size(); i++) {

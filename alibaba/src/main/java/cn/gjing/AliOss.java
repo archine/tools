@@ -2,6 +2,7 @@ package cn.gjing;
 
 import cn.gjing.annotation.NotNull2;
 import cn.gjing.enums.HttpStatus;
+import cn.gjing.ex.GjingException;
 import cn.gjing.ex.ParamException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.DeleteObjectsRequest;
@@ -55,7 +56,7 @@ public class AliOss {
                 AliOss.getOssClient(ossModel).createBucket(ossModel.getBucketName());
             }
         } catch (Exception e) {
-            throw new OssException("创建Bucket失败,请核对Bucket名称(规则：只能包含小写字母、数字和短横线，必须以小写字母和数字开头和结尾，长度在3-63之间)");
+            throw new GjingException("创建Bucket失败,请核对Bucket名称(规则：只能包含小写字母、数字和短横线，必须以小写字母和数字开头和结尾，长度在3-63之间)");
         }
     }
 
@@ -118,7 +119,7 @@ public class AliOss {
             AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), fileName, inputStream, objectMetadata);
             return fileName;
         } catch (Exception oe) {
-            throw new OssException(oe.getMessage());
+            throw new GjingException(oe.getMessage());
         }
     }
 
@@ -131,15 +132,15 @@ public class AliOss {
      */
     private static String getFileUrl(String fileUrl, OssModel ossModel) {
         if (ParamUtil.isEmpty(fileUrl)) {
-            throw new OssException("The parameter fileUrl cannot be null!");
+            throw new ParamException("The parameter fileUrl cannot be null!");
         }
         String[] split = ParamUtil.split(fileUrl, "/");
         if (ParamUtil.isEmpty(split)) {
-            throw new OssException(HttpStatus.INVALID_PARAMETER.getMsg());
+            throw new ParamException(HttpStatus.INVALID_PARAMETER.getMsg());
         }
         URL url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), split[split.length - 1], TimeUtil.addDay(new Date(), 365 * 10));
         if (url == null) {
-            throw new OssException("get oss file url error");
+            throw new GjingException("get oss file url error");
         }
         return url.toString();
     }
@@ -169,7 +170,7 @@ public class AliOss {
             AliOss.getOssClient(ossModel).deleteObjects(new DeleteObjectsRequest(ossModel.getBucketName()).withKeys(urlList));
             return true;
         } catch (RuntimeException e) {
-            throw new OssException(e.getMessage());
+            throw new GjingException(e.getMessage());
         }
     }
 
@@ -183,7 +184,7 @@ public class AliOss {
     @NotNull2
     public static String upload(MultipartFile file, OssModel ossModel) {
         if (file.getSize() > 5 * 1024 * 1024 * 1024) {
-            throw new OssException("Upload failed. file size cannot more than 5 gb");
+            throw new ParamException("Upload failed. file size cannot more than 5 gb");
         }
         AliOss.createBucket(ossModel);
         String fileName = AliOss.uploadFile(file, ossModel);
@@ -209,7 +210,7 @@ public class AliOss {
                 File file = new File(mkdir);
                 if (!file.exists()) {
                     if (!file.mkdir()) {
-                        throw new OssException("create file exception");
+                        throw new GjingException("create file exception");
                     }
                 }
                 OSSClient ossClient = getOssClient(ossModel);
@@ -220,7 +221,7 @@ public class AliOss {
             }
             throw new ParamException("mkdir cannot be null");
         } catch (Exception e) {
-            throw new OssException(e.getMessage());
+            throw new GjingException(e.getMessage());
         }
     }
 
@@ -256,7 +257,7 @@ public class AliOss {
             os.close();
             is.close();
         } catch (Exception e) {
-            throw new OssException(e.getMessage());
+            throw new GjingException(e.getMessage());
         }
         return true;
     }

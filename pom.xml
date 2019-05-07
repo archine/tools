@@ -5,16 +5,17 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.6</version>
+    <version>1.1.7</version>
     <name>tools</name>
     <modules>
         <module>common</module>
-        <module>alitx</module>
+        <module>alibaba</module>
+        <module>tengxun</module>
         <module>all</module>
-        <module>autoswagger</module>
+        <module>tools-starter-swagger</module>
         <module>httpclient</module>
     </modules>
-    <description>GJ himself wrote some commonly used functions</description>
+    <description>develop tool</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -32,7 +33,7 @@
     <developers>
         <developer>
             <name>Gjing</name>
-            <email>a87096937@qq.com</email>
+            <email>me@gjing.cn</email>
             <organization>Gjing</organization>
             <url>https://github.com/archine</url>
         </developer>
@@ -72,22 +73,27 @@
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>common</artifactId>
-                <version>1.1.5</version>
+                <version>1.1.6</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
-                <artifactId>alitx</artifactId>
-                <version>1.1.4</version>
+                <artifactId>alibaba</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
-                <artifactId>autoswagger</artifactId>
-                <version>1.1.2</version>
+                <artifactId>tengxun</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.gjing</groupId>
+                <artifactId>tools-starter-swagger</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>1.1.5</version>
+                <version>1.1.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -109,6 +115,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -122,6 +129,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -131,7 +139,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- mvn deploy -P release -Dgpg.passphrase=a87096937@qq.com-->
+                    <!-- mvn deploy -P release -Dgpg.passphrase=Gj980621-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>

@@ -1,7 +1,7 @@
 package cn.gjing.excel;
 
 import cn.gjing.annotation.ExcludeParam;
-import cn.gjing.annotation.NotNull2;
+import cn.gjing.annotation.NotNull;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -20,7 +20,7 @@ public class ExcelUtil {
      * @param title    Excel file name
      * @param info     Excel introduction, Pass null or "" if you don't need it
      */
-    @NotNull2
+    @NotNull
     public static void excelExport(HttpServletResponse response, @ExcludeParam List<Object[]> list, String[] headers, String title, @ExcludeParam String info) {
         ExportExcel.generateHaveExcelName(response, list, headers, title, info);
     }

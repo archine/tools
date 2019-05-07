@@ -1,5 +1,7 @@
 package cn.gjing;
 
+import cn.gjing.ex.GjingException;
+import cn.gjing.ex.ParamException;
 import com.github.qcloudsms.SmsMultiSender;
 import com.github.qcloudsms.SmsMultiSenderResult;
 import com.github.qcloudsms.SmsSingleSender;
@@ -55,7 +57,7 @@ public class TxSms {
      */
     public static String send(TxSmsModel txSmsModel) {
         if (ParamUtil.isEmpty(txSmsModel.getPhoneNumbers())||txSmsModel.getPhoneNumbers().length>1) {
-            throw new SmsException("PhoneNumbers cannot be empty and must have a length of one");
+            throw new ParamException("PhoneNumbers cannot be empty and must have a length of one");
         }
         try {
             SmsSingleSender sender = getSingleSender(txSmsModel.getAppId(), txSmsModel.getAppKey());
@@ -63,7 +65,7 @@ public class TxSms {
                     txSmsModel.getSmsTemplateId(), txSmsModel.getParams(), txSmsModel.getSmsSign(), "", "");
             return result.toString();
         } catch (Exception e) {
-            throw new SmsException(e.getMessage());
+            throw new GjingException(e.getMessage());
         }
     }
 
@@ -76,10 +78,10 @@ public class TxSms {
      */
     public static String multiSend(TxSmsModel txSmsModel) {
         if (ParamUtil.isEmpty(txSmsModel.getPhoneNumbers())) {
-            throw new SmsException("PhoneNumbers cannot be empty");
+            throw new ParamException("PhoneNumbers cannot be empty");
         }
         if (txSmsModel.getPhoneNumbers().length > 200) {
-            throw new SmsException("Currently only 200 Numbers are supported");
+            throw new ParamException("Currently only 200 Numbers are supported");
         }
         try {
             SmsMultiSender multiSender = getMultiSender(txSmsModel.getAppId(), txSmsModel.getAppKey());
@@ -88,7 +90,7 @@ public class TxSms {
                     txSmsModel.getSmsTemplateId(), txSmsModel.getParams(), txSmsModel.getSmsSign(), "", "");
             return result.toString();
         } catch (Exception e) {
-            throw new SmsException(e.getMessage());
+            throw new GjingException(e.getMessage());
         }
     }
 

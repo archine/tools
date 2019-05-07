@@ -1,7 +1,7 @@
 package cn.gjing.handle;
 
 import cn.gjing.ParamUtil;
-import cn.gjing.annotation.NotNull;
+import cn.gjing.annotation.NotNull2;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -26,8 +26,8 @@ import java.util.List;
  **/
 @Component
 @Aspect
-class NotNullProcessor {
-    @Pointcut("@annotation(cn.gjing.annotation.NotNull)")
+class NotNull2Processor {
+    @Pointcut("@annotation(cn.gjing.annotation.NotNull2)")
     public void cut() {
 
     }
@@ -40,7 +40,7 @@ class NotNullProcessor {
         HttpServletRequest request = attributes.getRequest();
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        NotNull annotation = method.getDeclaredAnnotation(NotNull.class);
+        NotNull2 annotation = method.getDeclaredAnnotation(NotNull2.class);
         //排除的参数
         List<String> exclude = Arrays.asList(annotation.exclude());
         //定义一个需要检查的参数列表
@@ -62,7 +62,7 @@ class NotNullProcessor {
         }
         for (String paramName : needCheckParamList) {
             if (ParamUtil.isEmpty(request.getParameter(paramName))) {
-                throw new NullPointerException("The parameter '"+paramName+"' has been used @NotNull, so it cannot be null.");
+                throw new NullPointerException("The parameter '"+paramName+"' has been used @NotNull2, so it cannot be null.");
             }
         }
     }

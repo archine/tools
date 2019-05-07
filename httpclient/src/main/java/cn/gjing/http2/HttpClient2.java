@@ -276,6 +276,7 @@ public class HttpClient2 {
      * delete请求
      * @param url 请求URl
      * @param params 参数
+     * @param headers 请求头
      * @param responseType 返回类型
      * @param <T> T
      * @return responseType
@@ -288,6 +289,7 @@ public class HttpClient2 {
      * delete请求
      * @param url 请求URl
      * @param responseType 返回类型
+     * @param headers 请求头
      * @param <T> T
      * @return responseType
      */
