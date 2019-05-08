@@ -1,5 +1,5 @@
 # Gjing tools for java :smile:
-![](https://img.shields.io/badge/version-1.1.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
+![](https://img.shields.io/badge/version-1.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
 tools是一个用于提供快速开发的工具包，整合了很多实际项目开发中所要用到的功能，杜绝每次新项目都要封装或者其他地方拷贝工具类,繁琐而费时.   
 笔者技术有限,欢迎各位大佬指点,本人会及时优化.   
 > **推荐使用最新版本**

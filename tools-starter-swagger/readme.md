@@ -7,6 +7,7 @@
      
 **安装**
 ---
+* <a href="https://mvnrepository.com/artifact/cn.gjing/tools-starter-swagger/" title="swagger包">cn.gjing.tools-starter-swagger</a>
 > **autoswagger工具包**
 ---
 ```
