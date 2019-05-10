@@ -1,6 +1,6 @@
 package cn.gjing;
 
-import cn.gjing.ex.GjingException;
+import cn.gjing.ex.HttpException;
 import cn.gjing.ex.ParamException;
 
 import javax.activation.DataHandler;
@@ -72,7 +72,7 @@ public class EmailUtil {
             msg.saveChanges();
             startSend(session, msg);
         } catch (Exception e) {
-            throw new GjingException(e.getMessage());
+            throw new HttpException(e.getMessage());
         }
         return true;
     }
@@ -92,7 +92,7 @@ public class EmailUtil {
             sendEmail(subject, body, tos, copyTo);
         }
         if (ParamUtil.isEmpty(tos)) {
-            throw new GjingException("The parameter tos cannot be null");
+            throw new ParamException("The parameter tos cannot be null");
         }
         try {
             Properties props = getProperties();
@@ -119,7 +119,7 @@ public class EmailUtil {
             msg.saveChanges();
             startSend(session, msg);
         } catch (Exception e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
         return true;
     }

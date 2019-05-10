@@ -2,7 +2,6 @@ package cn.gjing;
 
 import cn.gjing.annotation.NotNull2;
 import cn.gjing.enums.HttpStatus;
-import cn.gjing.ex.GjingException;
 import cn.gjing.ex.ParamException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.DeleteObjectsRequest;
@@ -13,7 +12,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
@@ -56,7 +58,7 @@ public class AliOss {
                 AliOss.getOssClient(ossModel).createBucket(ossModel.getBucketName());
             }
         } catch (Exception e) {
-            throw new GjingException("创建Bucket失败,请核对Bucket名称(规则：只能包含小写字母、数字和短横线，必须以小写字母和数字开头和结尾，长度在3-63之间)");
+            throw new IllegalStateException("创建Bucket失败,请核对Bucket名称(规则：只能包含小写字母、数字和短横线，必须以小写字母和数字开头和结尾，长度在3-63之间)");
         }
     }
 
@@ -119,7 +121,7 @@ public class AliOss {
             AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), fileName, inputStream, objectMetadata);
             return fileName;
         } catch (Exception oe) {
-            throw new GjingException(oe.getMessage());
+            throw new IllegalStateException(oe.getMessage());
         }
     }
 
@@ -140,7 +142,7 @@ public class AliOss {
         }
         URL url = AliOss.getOssClient(ossModel).generatePresignedUrl(ossModel.getBucketName(), split[split.length - 1], TimeUtil.addDay(new Date(), 365 * 10));
         if (url == null) {
-            throw new GjingException("get oss file url error");
+            throw new IllegalStateException("get oss file url error");
         }
         return url.toString();
     }
@@ -170,7 +172,7 @@ public class AliOss {
             AliOss.getOssClient(ossModel).deleteObjects(new DeleteObjectsRequest(ossModel.getBucketName()).withKeys(urlList));
             return true;
         } catch (RuntimeException e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
     }
 
@@ -210,7 +212,7 @@ public class AliOss {
                 File file = new File(mkdir);
                 if (!file.exists()) {
                     if (!file.mkdir()) {
-                        throw new GjingException("create file exception");
+                        throw new IllegalStateException("create file exception");
                     }
                 }
                 OSSClient ossClient = getOssClient(ossModel);
@@ -221,7 +223,7 @@ public class AliOss {
             }
             throw new ParamException("mkdir cannot be null");
         } catch (Exception e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
     }
 
@@ -257,7 +259,7 @@ public class AliOss {
             os.close();
             is.close();
         } catch (Exception e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
         return true;
     }

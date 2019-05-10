@@ -15,6 +15,7 @@ import java.util.Map;
 @Data
 @Builder
 public class ResultVo<T> {
+
     private Integer code;
     private String message;
     private T data;
@@ -50,6 +51,7 @@ public class ResultVo<T> {
      * @param val  value
      * @return map
      */
+    @Deprecated
     public static Map<String, Object> find(List<String> keys, List<Object> val) {
         Map<String, Object> map = new HashMap<>(16);
         for (int i = 0; i < keys.size(); i++) {
@@ -65,6 +67,7 @@ public class ResultVo<T> {
      * @param values 参数对应的value
      * @return map
      */
+    @Deprecated
     public static Map<String, Object> login(String isLogin,List<String> keys, List<Object> values) {
         Map<String, Object> map = new HashMap<>(10);
         if (ParamUtil.isNotEmpty(isLogin)) {

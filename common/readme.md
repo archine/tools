@@ -1,5 +1,5 @@
 # common
-![](https://img.shields.io/badge/version-1.1.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  提供参数校验与处理，excel导出，时间转换，数据加密,线程池,验证码,发送邮件等功能...
  > **推荐使用最新版本**    
@@ -17,9 +17,10 @@
 * @EnableCors: 允许跨域,标注在启动类上
 ```  
 返回结果模板:   
-```
-* ResultVo: 用于接口返回,包含code(状态码),message(提示信息)和data(数据), 如若分页查询,可以搭配PageResult使用,设置进data,随同一起返回,pageResult里设置数据和总页数;   
-```
+* ResultVo: 通用返回结果模板,包含code(状态码),message(提示信息),data(数据)三个参数,里面包含success和error静态方法,直接调用即可.
+* PageResult: 分页查询返回结果模板,包含data(数据)和totalPage(总页数),使用时可以直接使用builder构造,也可以调用其中of方法.
+* ErrorResult: 错误返回模板, 里面包含failure(状态码400时使用,里包含code和message,code用于进一步确定错误),error(服务器型异常,一般用于500等,只包含message)
+---
 Excel:   
 * 导出: :exclamation: response, headers,title不能为空 
 ```

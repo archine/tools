@@ -1,7 +1,5 @@
 package cn.gjing;
 
-import cn.gjing.annotation.NotNull2;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -61,27 +59,22 @@ public class TimeUtil {
      * @param format    format
      * @return .
      */
-    @NotNull2
     public static String localDateToString(LocalDate localDate, String format) {
         return localDate.format(DateTimeFormatter.ofPattern(format));
     }
 
-    @NotNull2
     public static String localDateTimeToString(LocalDateTime localDateTime, String format) {
         return localDateTime.format(DateTimeFormatter.ofPattern(format));
     }
 
-    @NotNull2
     public static String localTimeToString(LocalTime localTime, String format) {
         return localTime.format(DateTimeFormatter.ofPattern(format));
     }
 
-    @NotNull2
     public static LocalDate stringToLocalDate(String time, String format) {
         return LocalDate.parse(time, DateTimeFormatter.ofPattern(format));
     }
 
-    @NotNull2
     public static LocalDateTime stringToLocalDateTime(String time, String format) {
         return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(format));
     }
@@ -114,7 +107,6 @@ public class TimeUtil {
      * @param startTime 开始时间
      * @return 相差数量
      */
-    @NotNull2
     public static Integer getYearsByStartTime(String startTime) {
         LocalDate startDate = stringToLocalDate(startTime, "yyyy-MM-dd");
         LocalDate currentDate = LocalDate.now();

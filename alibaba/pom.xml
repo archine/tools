@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.1.8</version>
+        <version>1.1.9</version>
     </parent>
     <artifactId>alibaba</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>alibaba</name>
     <description>alibaba tool</description>
 

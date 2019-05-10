@@ -2,7 +2,6 @@ package cn.gjing;
 
 import cn.gjing.annotation.ExcludeParam;
 import cn.gjing.annotation.NotNull2;
-import cn.gjing.ex.GjingException;
 import cn.gjing.ex.ParamException;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
@@ -73,7 +72,7 @@ public class AliSms {
             CommonResponse response = client.getCommonResponse(request);
             return response.getData();
         } catch (ClientException e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
     }
 
@@ -107,7 +106,7 @@ public class AliSms {
             CommonResponse response = client.getCommonResponse(request);
             return response.getData();
         } catch (ClientException e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
     }
 }

@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.swagger;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,7 +16,7 @@ class SwaggerBean {
     /**
      * 要扫描的包路径(controller包路径)
      */
-    private String basePackage;
+    private String basePackage="";
     /**
      * swagger文档标题
      */

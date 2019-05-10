@@ -1,6 +1,5 @@
 package cn.gjing;
 
-import cn.gjing.ex.GjingException;
 import cn.gjing.ex.ParamException;
 import com.github.qcloudsms.SmsMultiSender;
 import com.github.qcloudsms.SmsMultiSenderResult;
@@ -65,7 +64,7 @@ public class TxSms {
                     txSmsModel.getSmsTemplateId(), txSmsModel.getParams(), txSmsModel.getSmsSign(), "", "");
             return result.toString();
         } catch (Exception e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
     }
 
@@ -90,7 +89,7 @@ public class TxSms {
                     txSmsModel.getSmsTemplateId(), txSmsModel.getParams(), txSmsModel.getSmsSign(), "", "");
             return result.toString();
         } catch (Exception e) {
-            throw new GjingException(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
     }
 

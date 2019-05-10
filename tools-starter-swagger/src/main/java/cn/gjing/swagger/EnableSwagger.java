@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.swagger;
 
 import org.springframework.context.annotation.Import;
 
