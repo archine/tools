@@ -20,7 +20,7 @@ class SwaggerBean {
     /**
      * swagger文档标题
      */
-    private String title="";
+    private String title="Api documentation";
     /**
      * swagger文档描述
      */
@@ -29,4 +29,5 @@ class SwaggerBean {
      * swagger版本号
      */
     private String version="1.0";
+
 }

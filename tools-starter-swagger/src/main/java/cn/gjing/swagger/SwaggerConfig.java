@@ -1,6 +1,6 @@
 package cn.gjing.swagger;
 
-import com.google.common.base.Predicates;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -23,15 +23,21 @@ public class SwaggerConfig {
     private SwaggerBean swaggerBean;
     @Bean
     public Docket createRestApi(ApiInfo apiInfo) {
-        verifyParam.verify(swaggerBean.getBasePackage());
-        return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage(swaggerBean.getBasePackage()))
-                .paths(PathSelectors.any())
-                // 不显示错误的接口地址
-                .paths(Predicates.not(PathSelectors.regex("/error.*")))
-                .build();
+        if (verifyParam.verify(swaggerBean.getBasePackage())) {
+            return new Docket(DocumentationType.SWAGGER_2)
+                    .apiInfo(apiInfo)
+                    .select()
+                    .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+                    .paths(PathSelectors.any())
+                    .build();
+        } else {
+            return new Docket(DocumentationType.SWAGGER_2)
+                    .apiInfo(apiInfo)
+                    .select()
+                    .apis(RequestHandlerSelectors.basePackage(swaggerBean.getBasePackage()))
+                    .paths(PathSelectors.any())
+                    .build();
+        }
     }
 
     @Bean
@@ -42,4 +48,5 @@ public class SwaggerConfig {
                 .version(swaggerBean.getVersion())
                 .build();
     }
+
 }
