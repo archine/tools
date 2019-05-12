@@ -1,7 +1,7 @@
 package cn.gjing;
 
 import cn.gjing.annotation.ExcludeParam;
-import cn.gjing.annotation.NotNull2;
+import cn.gjing.annotation.NotNull;
 import cn.gjing.ex.ParamException;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
@@ -52,7 +52,7 @@ public class AliSms {
      * @return 发送结果, 返回内容中含有ok表示发送成功 BizId:回执id；code，状态码；message：状态吗的描述；RequestId：请求id
      * @see <a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.14.633f56e06vZoyq"></a>
      */
-    @NotNull2
+    @NotNull
     public static String send(AliSmsModel smsModel, String phoneNumbers, String smsTemplateCode,@ExcludeParam Map<String, String> smsTemplateParam,
                                            String smsSignName) {
         DefaultProfile profile = DefaultProfile.getProfile("default", smsModel.getAccessKeyId(), smsModel.getAccessKeySecret());
@@ -86,7 +86,7 @@ public class AliSms {
      * @return 响应结果，返回OK代表请求成功,其他响应信息请查看下面链接
      * @see <a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.13.450fbc454bQfCJ"></a>
      */
-    @NotNull2
+    @NotNull
     public static synchronized String querySendDetails(AliSmsModel smsModel, String phoneNumber, String sendData, String pageSize, String currentPage) {
         if (!ParamUtil.isMobileNumber(phoneNumber)) {
             throw new ParamException("Specified parameter phoneNumber is not valid");

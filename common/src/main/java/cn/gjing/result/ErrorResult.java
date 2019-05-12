@@ -35,6 +35,8 @@ public class ErrorResult {
 
     /**
      * 错误请求时使用,包含code和message
+     * @param code 状态码
+     * @param message 提示信息
      * @return ErrorResult
      */
     public static ErrorResult failure(Integer code, String message) {
@@ -46,6 +48,7 @@ public class ErrorResult {
 
     /**
      * 错误请求时使用,包含code和message
+     * @param message 提示信息
      * @return ErrorResult
      */
     public static ErrorResult failure(String message) {

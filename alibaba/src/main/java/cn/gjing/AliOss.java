@@ -1,5 +1,6 @@
 package cn.gjing;
 
+import cn.gjing.annotation.NotNull;
 import cn.gjing.annotation.NotNull2;
 import cn.gjing.enums.HttpStatus;
 import cn.gjing.ex.ParamException;
@@ -205,7 +206,7 @@ public class AliOss {
      * @param mkdir      本地文件夹
      * @return boolean
      */
-    @NotNull2
+    @NotNull
     public static boolean downloadFile(OssModel ossModel, String fileOssUrl, String mkdir) {
         try {
             if (ParamUtil.isNotEmpty(mkdir)) {
@@ -235,7 +236,7 @@ public class AliOss {
      * @param response   response
      * @return true为成功
      */
-    @NotNull2
+    @NotNull
     public static boolean downloadStream(OssModel ossModel, String fileOssUrl, HttpServletResponse response) {
         try {
             String pathUrl = getPathUrl(fileOssUrl, ossModel);

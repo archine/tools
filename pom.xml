@@ -5,7 +5,7 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <name>tools</name>
     <modules>
         <module>common</module>
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>common</artifactId>
-                <version>1.1.7</version>
+                <version>1.1.8</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
@@ -88,7 +88,7 @@
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>tools-starter-swagger</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
