@@ -11,6 +11,7 @@ class FeignSelector implements ImportSelector {
     @Override
     @NonNull
     public String[] selectImports(@NonNull AnnotationMetadata annotationMetadata) {
-        return new String[]{FeignClientImpl.class.getName(),FeignProcess.class.getName()};
+        return new String[]{FeignServiceImpl.class.getName(), FeignConfig.class.getName()};
     }
+
 }

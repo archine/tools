@@ -3,7 +3,7 @@ package cn.gjing;
 /**
  * @author Gjing
  **/
-public interface FeignService {
+interface FeignService {
     /**
      * 通过url创建feign客户端实例
      *

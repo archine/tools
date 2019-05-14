@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-public interface FeignBean {
+interface FeignBean {
 
     /**
      * post

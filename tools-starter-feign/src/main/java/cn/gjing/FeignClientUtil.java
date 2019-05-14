@@ -1,9 +1,7 @@
 package cn.gjing;
 
 import com.google.gson.Gson;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -12,10 +10,11 @@ import java.util.Objects;
 /**
  * @author Gjing
  **/
-@Component
 public class FeignClientUtil<T> {
-    @Resource
-    private FeignProcess feignProcess;
+
+
+    private static final FeignProcess FEIGN_PROCESS = (FeignProcess) BeanUtil.getBean("feignProcess");
+
     private static final Gson GSON = new Gson();
     /**
      * 响应类型
@@ -26,47 +25,74 @@ public class FeignClientUtil<T> {
      * 路由类型，url or name
      */
     private final RouteType routeType;
+
+    /**
+     * 服务名或url
+     */
+    private final String targetAddress;
     /**
      * 请求结果
      */
     private T result;
 
-    private FeignClientUtil(Class<T> responseType,RouteType routeType) {
+    private FeignClientUtil(Class<T> responseType, RouteType routeType, String targetAddress) {
         this.responseType = Objects.requireNonNull(responseType);
         this.result = null;
         this.routeType = Objects.requireNonNull(routeType);
+        this.targetAddress = Objects.requireNonNull(targetAddress);
     }
 
     /**
      * 实例化FeignClientUtil
-     * @param responseType 响应类型
-     * @param routeType 路由类型
-     * @param <T> T
+     *
+     * @param responseType  响应类型
+     * @param routeType     路由类型
+     * @param <T>           T
+     * @param targetAddress 目标地址:可以是: http://服务名/ 或者 http://127.0.0.1:8090/
      * @return FeignClientUtil
      */
-    public static <T> FeignClientUtil<T> of(Class<T> responseType,RouteType routeType) {
-        return new FeignClientUtil<>(responseType,routeType);
+    public static <T> FeignClientUtil<T> of(Class<T> responseType, RouteType routeType, String targetAddress) {
+        return new FeignClientUtil<>(responseType, routeType, UriUtil.checkUrl(targetAddress));
+    }
+
+    /**
+     * 默认使用服务名路由,返回值为String
+     * @param targetAddress 目标地址,例如: http://服务名/
+     * @return FeignClientUtil
+     */
+    public static FeignClientUtil<String> defaultByName(String targetAddress) {
+        return new FeignClientUtil<>(String.class, RouteType.NAME, UriUtil.checkUrl(targetAddress));
+    }
+
+    /**
+     * 默认使用URL路由,返回值为String
+     * @param targetAddress 目标地址,例如: http://127.0.0.1:8090/
+     * @return FeignClientUtil
+     */
+    public static FeignClientUtil<String> defaultByUrl(String targetAddress) {
+        return new FeignClientUtil<>(String.class, RouteType.URL, UriUtil.checkUrl(targetAddress));
     }
 
     /**
      * 执行
+     *
      * @param requestType 请求类型
-     * @param queryMap 参数，不需要传null
-     * @param body body参数，如果不需要传null
-     * @param url 请求地址，如果是服务名类型：http://name/methodName
+     * @param queryMap    参数，不需要传null
+     * @param body        body参数，如果不需要传null
+     * @param methodPath  接口路径, /test/method
      * @return FeignClientUtil
      * @throws URISyntaxException uri转换异常
      */
-    public FeignClientUtil<T> execute(RequestType requestType, Map<String, ?> queryMap, Object body, String url,FeignBean feignBean) throws URISyntaxException {
-        if (url == null || requestType == null) {
-            throw new NullPointerException("Target or url or requestType cannot be null");
-        }
-        request(requestType, queryMap, body, url, feignBean);
+    public FeignClientUtil<T> execute(RequestType requestType, Map<String, ?> queryMap, Object body, String methodPath) throws URISyntaxException {
+        Objects.requireNonNull(requestType);
+        FeignBean feignBean = routeType.equals(RouteType.URL) ? FEIGN_PROCESS.getByUrl(targetAddress) : FEIGN_PROCESS.getByName(targetAddress);
+        request(requestType, queryMap, body, targetAddress + methodPath, feignBean);
         return this;
     }
 
     /**
      * 获取结果
+     *
      * @return result
      */
     public T getResult() {
@@ -74,6 +100,11 @@ public class FeignClientUtil<T> {
         return this.result;
     }
 
+    /**
+     * 数据转换
+     *
+     * @param s 字符串
+     */
     @SuppressWarnings("unchecked")
     private void cast(String s) {
         try {
@@ -85,17 +116,18 @@ public class FeignClientUtil<T> {
 
     /**
      * 发起请求
-     * @param requestType
-     * @param queryMap
-     * @param body
-     * @param url
-     * @param feignBean
-     * @throws URISyntaxException
+     *
+     * @param requestType 请求类型
+     * @param queryMap    参数
+     * @param body        body
+     * @param url         请求url
+     * @param feignBean   feignBean
+     * @throws URISyntaxException uri转换异常
      */
     private void request(RequestType requestType, Map<String, ?> queryMap, Object body, String url, FeignBean feignBean) throws URISyntaxException {
         switch (requestType) {
             case POST:
-                if (queryMap==null) {
+                if (queryMap == null) {
                     if (body == null) {
                         cast(feignBean.post(new URI(url)));
                         break;

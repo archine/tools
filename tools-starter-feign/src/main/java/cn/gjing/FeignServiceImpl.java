@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 @Import(FeignClientsConfiguration.class)
-class FeignClientImpl implements FeignService {
+class FeignServiceImpl implements FeignService {
     private final Feign.Builder urlBuilder;
 
     private final Feign.Builder nameBuilder;
 
     @Autowired
-    public FeignClientImpl(Decoder decoder, Encoder encoder, Client client, Contract contract) {
+    public FeignServiceImpl(Decoder decoder, Encoder encoder, Client client, Contract contract) {
         // nameBuilder直接使用client，它会使用负载均衡
         nameBuilder = Feign.builder()
                 .client(client)
@@ -40,7 +40,7 @@ class FeignClientImpl implements FeignService {
                 .contract(contract);
     }
     @Override
-    public FeignBean  newInstanceByUrl(String targetServeUrl) {
+    public FeignBean newInstanceByUrl(String targetServeUrl) {
         return urlBuilder.target(FeignBean.class, targetServeUrl);
     }
 
