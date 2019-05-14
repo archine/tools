@@ -14,7 +14,7 @@
         <module>all</module>
         <module>tools-starter-swagger</module>
         <module>httpclient</module>
-        <module>feign</module>
+        <module>tools-starter-feign</module>
     </modules>
     <description>develop tool</description>
     <properties>
@@ -98,7 +98,7 @@
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
-                <artifactId>feign</artifactId>
+                <artifactId>tools-starter-feign</artifactId>
                 <version>1.0.0</version>
             </dependency>
         </dependencies>
