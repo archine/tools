@@ -1,6 +1,7 @@
 package cn.gjing;
 
 import com.google.gson.Gson;
+import org.springframework.http.HttpMethod;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,10 +13,6 @@ import java.util.Objects;
  **/
 public class FeignClientUtil<T> {
 
-
-    private static final FeignProcess FEIGN_PROCESS = (FeignProcess) BeanUtil.getBean("feignProcess");
-
-    private static final Gson GSON = new Gson();
     /**
      * 响应类型
      */
@@ -27,13 +24,17 @@ public class FeignClientUtil<T> {
     private final RouteType routeType;
 
     /**
-     * 服务名或url
+     * 目标地址，可以是服务名型:http://name/ 也可以是url型：http://127.0.0.1:8080/
      */
     private final String targetAddress;
     /**
      * 请求结果
      */
     private T result;
+
+    private static final FeignProcess FEIGN_PROCESS = (FeignProcess) BeanUtil.getBean(Bean.FEIGN_PROCESS.getBeanName());
+
+    private static final Gson GSON = new Gson();
 
     private FeignClientUtil(Class<T> responseType, RouteType routeType, String targetAddress) {
         this.responseType = Objects.requireNonNull(responseType);
@@ -76,17 +77,20 @@ public class FeignClientUtil<T> {
     /**
      * 执行
      *
-     * @param requestType 请求类型
+     * @param httpMethod 请求类型
      * @param queryMap    参数，不需要传null
      * @param body        body参数，如果不需要传null
      * @param methodPath  接口路径, /test/method
      * @return FeignClientUtil
      * @throws URISyntaxException uri转换异常
      */
-    public FeignClientUtil<T> execute(RequestType requestType, Map<String, ?> queryMap, Object body, String methodPath) throws URISyntaxException {
-        Objects.requireNonNull(requestType);
-        FeignBean feignBean = routeType.equals(RouteType.URL) ? FEIGN_PROCESS.getByUrl(targetAddress) : FEIGN_PROCESS.getByName(targetAddress);
-        request(requestType, queryMap, body, targetAddress + methodPath, feignBean);
+    public FeignClientUtil<T> execute(HttpMethod httpMethod, Map<String, ?> queryMap, Object body,
+                                      String methodPath) throws URISyntaxException {
+        Objects.requireNonNull(httpMethod);
+        FeignBean feignBean = routeType.equals(RouteType.URL) ?
+                FEIGN_PROCESS.getByUrl(targetAddress) :
+                FEIGN_PROCESS.getByName(targetAddress);
+        request(httpMethod, queryMap, body, UriUtil.buildUrl(targetAddress,methodPath), feignBean);
         return this;
     }
 
@@ -117,15 +121,16 @@ public class FeignClientUtil<T> {
     /**
      * 发起请求
      *
-     * @param requestType 请求类型
+     * @param httpMethod 请求类型
      * @param queryMap    参数
      * @param body        body
      * @param url         请求url
      * @param feignBean   feignBean
      * @throws URISyntaxException uri转换异常
      */
-    private void request(RequestType requestType, Map<String, ?> queryMap, Object body, String url, FeignBean feignBean) throws URISyntaxException {
-        switch (requestType) {
+    private void request(HttpMethod httpMethod, Map<String, ?> queryMap, Object body, String url,
+                         FeignBean feignBean) throws URISyntaxException {
+        switch (httpMethod) {
             case POST:
                 if (queryMap == null) {
                     if (body == null) {
@@ -166,6 +171,7 @@ public class FeignClientUtil<T> {
                 cast(feignBean.patch(new URI(url), queryMap));
                 break;
             default:
+                throw new IllegalStateException("This type is not supported");
         }
     }
 }

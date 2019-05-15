@@ -5,15 +5,15 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <name>tools</name>
     <modules>
-        <module>common</module>
-        <module>alibaba</module>
-        <module>tengxun</module>
-        <module>all</module>
+        <module>tools-common</module>
+        <module>tools-ali</module>
+        <module>tools-tx</module>
+        <module>tools-all</module>
         <module>tools-starter-swagger</module>
-        <module>httpclient</module>
+        <module>tools-httpclient</module>
         <module>tools-starter-feign</module>
     </modules>
     <description>develop tool</description>
@@ -73,28 +73,28 @@
         <dependencies>
             <dependency>
                 <groupId>cn.gjing</groupId>
-                <artifactId>common</artifactId>
-                <version>1.1.8</version>
+                <artifactId>tools-common</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
-                <artifactId>alibaba</artifactId>
-                <version>1.0.2</version>
+                <artifactId>tools-ali</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
-                <artifactId>tengxun</artifactId>
-                <version>1.0.1</version>
+                <artifactId>tools-tx</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>tools-starter-swagger</artifactId>
-                <version>1.0.3</version>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>1.1.6</version>
+                <artifactId>tools-httpclient</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>cn.gjing</groupId>

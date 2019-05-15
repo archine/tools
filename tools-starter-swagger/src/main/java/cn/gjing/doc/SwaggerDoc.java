@@ -25,10 +25,10 @@ class SwaggerDoc {
     /**
      * 目标swagger地址集合
      */
-    private List<Map<String,SwaggerDoc.detail>> docList = new ArrayList<>();
+    private List<Map<String,SwaggerDoc.Detail>> docList = new ArrayList<>();
 
     @Data
-    static class detail{
+    static class Detail{
 
         /**
          * 目标swagger地址

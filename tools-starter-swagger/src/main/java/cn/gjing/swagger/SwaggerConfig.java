@@ -23,7 +23,7 @@ public class SwaggerConfig {
     private SwaggerBean swaggerBean;
     @Bean
     public Docket createRestApi(ApiInfo apiInfo) {
-        if (verifyParam.verify(swaggerBean.getBasePackage())) {
+        if (VerifyParam.verify(swaggerBean.getBasePackage())) {
             return new Docket(DocumentationType.SWAGGER_2)
                     .apiInfo(apiInfo)
                     .select()

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Gjing
  **/
 @Configuration
-public class FeignConfig {
+class FeignConfig {
 
     @Bean
     public FeignProcess feignProcess() {

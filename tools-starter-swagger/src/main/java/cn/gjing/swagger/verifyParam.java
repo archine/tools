@@ -7,10 +7,10 @@ import org.springframework.util.StringUtils;
  * @author Gjing
  **/
 @Slf4j
-class verifyParam {
+class VerifyParam {
     static boolean verify(String param) {
         if (StringUtils.isEmpty(param)) {
-            log.error("Swagger basePackage value is default , Please set your own project interface path");
+            log.warn("Swagger basePackage value is default , Please set your own project interface path");
             return true;
         }
         return false;

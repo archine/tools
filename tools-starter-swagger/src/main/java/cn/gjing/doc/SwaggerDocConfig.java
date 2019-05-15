@@ -24,7 +24,7 @@ public class SwaggerDocConfig implements SwaggerResourcesProvider {
 
     @Override
     public List<SwaggerResource> get() {
-        List<Map<String, SwaggerDoc.detail>> docList = swaggerDoc.getDocList();
+        List<Map<String, SwaggerDoc.Detail>> docList = swaggerDoc.getDocList();
         boolean isEmpty = docList.isEmpty();
         List resources = new ArrayList<>();
         if (swaggerDoc.isRegisterMe()) {
@@ -35,7 +35,7 @@ public class SwaggerDocConfig implements SwaggerResourcesProvider {
             }
         }
         if (!isEmpty) {
-            for (Map<String, SwaggerDoc.detail> map : docList) {
+            for (Map<String, SwaggerDoc.Detail> map : docList) {
                 for (String name : map.keySet()) {
                     if (StringUtils.isEmpty(name) || StringUtils.isEmpty(map.get(name).getLocation())) {
                         continue;
