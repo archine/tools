@@ -1,8 +1,5 @@
 package cn.gjing;
 
-import cn.gjing.annotation.ExcludeParam;
-import cn.gjing.annotation.NotNull;
-import cn.gjing.ex.ParamException;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
 import com.aliyuncs.DefaultAcsClient;
@@ -11,6 +8,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.google.gson.Gson;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
@@ -52,8 +50,7 @@ public class AliSms {
      * @return 发送结果, 返回内容中含有ok表示发送成功 BizId:回执id；code，状态码；message：状态吗的描述；RequestId：请求id
      * @see <a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.14.633f56e06vZoyq"></a>
      */
-    @NotNull
-    public static String send(AliSmsModel smsModel, String phoneNumbers, String smsTemplateCode,@ExcludeParam Map<String, String> smsTemplateParam,
+    public static String send(AliSmsModel smsModel, String phoneNumbers, String smsTemplateCode, Map<String, String> smsTemplateParam,
                                            String smsSignName) {
         DefaultProfile profile = DefaultProfile.getProfile("default", smsModel.getAccessKeyId(), smsModel.getAccessKeySecret());
         IAcsClient client = getInstance(profile);
@@ -64,7 +61,7 @@ public class AliSms {
         request.setVersion(Sms.SMS.getVersion());
         request.putQueryParameter("PhoneNumbers", phoneNumbers);
         request.putQueryParameter("TemplateCode", smsTemplateCode);
-        if (ParamUtil.isNotEmpty(smsTemplateParam)) {
+        if (!StringUtils.isEmpty(smsTemplateParam)) {
             request.putQueryParameter("TemplateParam", gson.toJson(smsTemplateParam));
         }
         request.putQueryParameter("SignName", smsSignName);
@@ -86,11 +83,7 @@ public class AliSms {
      * @return 响应结果，返回OK代表请求成功,其他响应信息请查看下面链接
      * @see <a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.13.450fbc454bQfCJ"></a>
      */
-    @NotNull
     public static synchronized String querySendDetails(AliSmsModel smsModel, String phoneNumber, String sendData, String pageSize, String currentPage) {
-        if (!ParamUtil.isMobileNumber(phoneNumber)) {
-            throw new ParamException("Specified parameter phoneNumber is not valid");
-        }
         DefaultProfile profile = DefaultProfile.getProfile("default", smsModel.getAccessKeyId(),smsModel.getAccessKeySecret());
         IAcsClient client = getInstance(profile);
         CommonRequest request = new CommonRequest();
@@ -99,7 +92,7 @@ public class AliSms {
         request.setVersion(Sms.QUERY.getVersion());
         request.setAction(Sms.QUERY.getAction());
         request.putQueryParameter("PhoneNumber", phoneNumber);
-        request.putQueryParameter("SendDate", ParamUtil.removeAllSymbol(sendData, "-"));
+        request.putQueryParameter("SendDate", sendData.replaceAll("-", ""));
         request.putQueryParameter("PageSize", pageSize);
         request.putQueryParameter("CurrentPage", currentPage);
         try {

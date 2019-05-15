@@ -18,7 +18,7 @@ import javax.annotation.Resource;
  **/
 @EnableSwagger2
 @Slf4j
-public class SwaggerConfig {
+class SwaggerConfig {
     @Resource
     private SwaggerBean swaggerBean;
     @Bean

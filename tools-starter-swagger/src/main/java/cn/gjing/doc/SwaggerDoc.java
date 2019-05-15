@@ -1,13 +1,15 @@
 package cn.gjing.doc;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Gjing
@@ -16,28 +18,19 @@ import java.util.Map;
 @ConfigurationProperties("cn.gjing.swagger-doc")
 @EnableConfigurationProperties
 @Data
-class SwaggerDoc {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SwaggerDoc {
 
     /**
      * 是否注册本服务,默认true
      */
     private boolean registerMe = true;
     /**
-     * 目标swagger地址集合
+     * 服务名
      */
-    private List<Map<String,SwaggerDoc.Detail>> docList = new ArrayList<>();
+    private List<String> serveList = new ArrayList<>();
 
-    @Data
-    static class Detail{
-
-        /**
-         * 目标swagger地址
-         */
-        private String location="";
-
-        /**
-         * 目标swagger版本号
-         */
-        private String version="1.0";
-    }
 }
+

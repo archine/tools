@@ -9,14 +9,13 @@ import springfox.documentation.swagger.web.SwaggerResourcesProvider;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Gjing
  **/
 @SuppressWarnings("unchecked")
 @Primary
-public class SwaggerDocConfig implements SwaggerResourcesProvider {
+class SwaggerDocConfig implements SwaggerResourcesProvider {
     @Value("${spring.application.name:default}")
     private String applicationName;
     @Resource
@@ -24,35 +23,37 @@ public class SwaggerDocConfig implements SwaggerResourcesProvider {
 
     @Override
     public List<SwaggerResource> get() {
-        List<Map<String, SwaggerDoc.Detail>> docList = swaggerDoc.getDocList();
-        boolean isEmpty = docList.isEmpty();
+        List<String> serveNameList = swaggerDoc.getServeList();
+        boolean isEmpty = serveNameList.isEmpty();
         List resources = new ArrayList<>();
         if (swaggerDoc.isRegisterMe()) {
-            resources.add(swaggerResource(applicationName, "/v2/api-docs", "1.0"));
+            resources.add(swaggerResource(applicationName,"/v2/api-docs"));
         } else {
             if (isEmpty) {
-                throw new IllegalArgumentException("Swagger service list cannot be empty, please set register-me to true or add other services swagger path");
+                throw new IllegalArgumentException("Swagger serve list cannot be empty, please set register-me to true or add other serve name");
             }
         }
         if (!isEmpty) {
-            for (Map<String, SwaggerDoc.Detail> map : docList) {
-                for (String name : map.keySet()) {
-                    if (StringUtils.isEmpty(name) || StringUtils.isEmpty(map.get(name).getLocation())) {
-                        continue;
-                    }
-                    resources.add(swaggerResource(name, map.get(name).getLocation(), map.get(name).getVersion()));
+            for (String name : serveNameList) {
+                if (StringUtils.isEmpty(name)) {
+                    continue;
                 }
+                resources.add(swaggerResource(name,buildLocation(name)));
             }
         }
 
         return resources;
     }
 
-    private SwaggerResource swaggerResource(String name, String location, String version) {
+    private SwaggerResource swaggerResource(String name,String location) {
         SwaggerResource swaggerResource = new SwaggerResource();
         swaggerResource.setName(name);
-        swaggerResource.setSwaggerVersion(version);
+        swaggerResource.setSwaggerVersion("1.0");
         swaggerResource.setLocation(location);
         return swaggerResource;
+    }
+
+    private static String buildLocation(String name) {
+        return "/" + name + "/v2/api-docs";
     }
 }

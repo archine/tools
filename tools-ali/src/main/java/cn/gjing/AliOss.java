@@ -4,16 +4,12 @@ import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.OSSObject;
-import com.aliyun.oss.model.ObjectMetadata;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
@@ -110,18 +106,12 @@ public class AliOss {
      */
     private static String uploadFile(MultipartFile file, OssModel ossModel) {
         String fileName = String.format("%s.%s", UUID.randomUUID().toString(), FilenameUtils.getExtension(file.getOriginalFilename()));
-        try (InputStream inputStream = file.getInputStream()) {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(inputStream.available());
-            objectMetadata.setCacheControl("no-cache");
-            objectMetadata.setHeader("Pragma", "no-cache");
-            objectMetadata.setContentType(FilenameUtils.getExtension("." + file.getOriginalFilename()));
-            objectMetadata.setContentDisposition("inline;filename=" + fileName);
-            AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), fileName, inputStream, objectMetadata);
-            return fileName;
-        } catch (Exception oe) {
-            throw new IllegalStateException(oe.getMessage());
+        try {
+            AliOss.getOssClient(ossModel).putObject(ossModel.getBucketName(), fileName, new ByteArrayInputStream(file.getBytes()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return fileName;
     }
 
 

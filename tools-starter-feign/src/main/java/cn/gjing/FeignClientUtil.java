@@ -100,7 +100,6 @@ public class FeignClientUtil<T> {
      * @return result
      */
     public T getResult() {
-        Objects.requireNonNull(this.result);
         return this.result;
     }
 
