@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.0.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  提供参数校验与处理，excel导出，时间转换，数据加密,线程池,验证码,发送邮件等功能...
  > **推荐使用最新版本**    
