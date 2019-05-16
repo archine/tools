@@ -1,5 +1,6 @@
 package cn.gjing.doc;
 
+import cn.gjing.swagger.Resources;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -9,6 +10,6 @@ import org.springframework.core.type.AnnotationMetadata;
 class SwaggerDocSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
-        return new String[]{SwaggerDoc.class.getName(), SwaggerDocConfig.class.getName()};
+        return new String[]{Resources.class.getName(), SwaggerDocConfig.class.getName()};
     }
 }

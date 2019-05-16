@@ -1,5 +1,6 @@
 package cn.gjing.doc;
 
+import cn.gjing.swagger.Resources;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.util.StringUtils;
@@ -19,14 +20,14 @@ class SwaggerDocConfig implements SwaggerResourcesProvider {
     @Value("${spring.application.name:default}")
     private String applicationName;
     @Resource
-    private SwaggerDoc swaggerDoc;
+    private Resources resources;
 
     @Override
     public List<SwaggerResource> get() {
-        List<String> serveNameList = swaggerDoc.getServeList();
+        List<String> serveNameList = resources.getServeList();
         boolean isEmpty = serveNameList.isEmpty();
         List resources = new ArrayList<>();
-        if (swaggerDoc.isRegisterMe()) {
+        if (this.resources.isRegisterMe()) {
             resources.add(swaggerResource(applicationName,"/v2/api-docs"));
         } else {
             if (isEmpty) {
@@ -41,7 +42,6 @@ class SwaggerDocConfig implements SwaggerResourcesProvider {
                 resources.add(swaggerResource(name,buildLocation(name)));
             }
         }
-
         return resources;
     }
 
