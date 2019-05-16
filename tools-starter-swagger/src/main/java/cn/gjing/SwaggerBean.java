@@ -1,4 +1,4 @@
-package cn.gjing.swagger;
+package cn.gjing;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties("swagger")
 @EnableConfigurationProperties
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
 public class SwaggerBean {
     /**
@@ -25,7 +25,7 @@ public class SwaggerBean {
     private String basePackage = "";
 
     /**
-     * 接口选择规则,ALL(所有),NONE(不选择),ANT(路径选择)，REGEX（正则选择）
+     * 接口选择规则, ALL (默认,所有接口), ANT (符合指定路径的接口)，REGEX（符合正则表达式的接口）
      */
     private PathType pathType = PathType.ALL;
 
@@ -45,12 +45,7 @@ public class SwaggerBean {
     /**
      * swagger版本号
      */
-    private String version = "1.0";
-
-    /**
-     * 联系方式
-     */
-    private Contact contact = new Contact();
+    private String version = "2.0";
     /**
      * 许可证
      */
@@ -66,3 +61,5 @@ public class SwaggerBean {
      */
     private String termsOfServiceUrl = "";
 }
+
+

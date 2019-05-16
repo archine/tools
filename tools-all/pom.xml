@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.2.3</version>
+        <version>1.2.4</version>
     </parent>
     <artifactId>tools-all</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>tools-all</name>
     <description>include all tool</description>
 
@@ -40,12 +40,16 @@
             <artifactId>tools-ali</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>cn.gjing</groupId>
-                    <artifactId>tools-common</artifactId>
-                </exclusion>
-                <exclusion>
                     <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>gson</artifactId>
+                    <groupId>com.google.code.gson</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -56,16 +60,20 @@
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>tools-starter-feign</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-boot-autoconfigure</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>tools-httpclient</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>cn.gjing</groupId>
-                    <artifactId>tools-common</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>cn.gjing</groupId>

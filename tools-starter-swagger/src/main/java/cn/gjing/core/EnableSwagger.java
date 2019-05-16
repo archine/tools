@@ -1,4 +1,4 @@
-package cn.gjing.swagger;
+package cn.gjing.core;
 
 import org.springframework.context.annotation.Import;
 
@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(SwaggerSelector.class)
+@Import({SwaggerSelector.class})
 public @interface EnableSwagger {
 }

@@ -1,8 +1,8 @@
-package cn.gjing.swagger;
+package cn.gjing.core;
 
+import cn.gjing.SwaggerBean;
 import com.google.common.base.Predicate;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -19,28 +19,35 @@ import javax.annotation.Resource;
  * @author Gjing
  **/
 @EnableSwagger2
-@Slf4j
 class SwaggerConfig {
     @Resource
     private SwaggerBean swaggerBean;
+    @Resource
+    private cn.gjing.Contact contact;
 
     @Bean
+    @SuppressWarnings("all")
     public Docket createRestApi(ApiInfo apiInfo) {
-        Predicate<String> predicate = PathSelectors.any();
-        if (swaggerBean.getPathType().equals(PathType.NONE)) {
-            predicate = PathSelectors.none();
-        }
-        if (swaggerBean.getPathType().equals(PathType.ANT)) {
-            if (swaggerBean.getPathPattern() == null) {
-                throw new IllegalArgumentException("Swagger PathType is ANT,So pathPattern is no null");
+        Predicate<String> predicate;
+        if (swaggerBean.getPathType() == null) {
+            predicate = PathSelectors.any();
+        } else {
+            switch (swaggerBean.getPathType()) {
+                case ANT:
+                    if (swaggerBean.getPathPattern() == null) {
+                        throw new IllegalArgumentException("Swagger PathType is ANT,So pathPattern is cannot be null");
+                    }
+                    predicate = PathSelectors.ant(swaggerBean.getPathPattern());
+                    break;
+                case REGEX:
+                    if (swaggerBean.getPathPattern() == null) {
+                        throw new IllegalArgumentException("Swagger PathType is REGEX,So pathPattern is cannot be null");
+                    }
+                    predicate = PathSelectors.regex(swaggerBean.getPathPattern());
+                    break;
+                default:
+                    predicate = PathSelectors.any();
             }
-            predicate = PathSelectors.ant(swaggerBean.getPathPattern());
-        }
-        if (swaggerBean.getPathType().equals(PathType.REGEX)) {
-            if (swaggerBean.getPathPattern() == null) {
-                throw new IllegalArgumentException("Swagger PathType is REGEX,So pathPattern is no null");
-            }
-            predicate = PathSelectors.regex(swaggerBean.getPathPattern());
         }
         if (VerifyParam.verify(swaggerBean.getBasePackage())) {
             return new Docket(DocumentationType.SWAGGER_2)
@@ -61,7 +68,6 @@ class SwaggerConfig {
 
     @Bean
     public ApiInfo apiInfo() {
-        cn.gjing.swagger.Contact contact = swaggerBean.getContact();
         return new ApiInfoBuilder()
                 .title(swaggerBean.getTitle())
                 .description(swaggerBean.getDescription())

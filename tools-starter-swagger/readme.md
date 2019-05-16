@@ -1,8 +1,8 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.0.4-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.0.5-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
-##### 快速集成Swagger，只需一个注解，即可开启默认配置并使用它,也可以自定义去配置它
+##### 快速集成Swagger，只需一个注解，即可开启默认配置并使用它, 也可以自定义去配置它.
 > **推荐使用最新版本**  
      
 **安装**
@@ -10,58 +10,75 @@
 * <a href="https://mvnrepository.com/artifact/cn.gjing/tools-starter-swagger/" title="swagger包">tools-starter-swagger</a>
 ---
 ### 注解
-* @EnableSwagger: 启动类标注该注解既可开启Swagger文档或者创建Configuration类进行标注.
+* @EnableSwagger: 标注在启动类或其他配置类即可.
+### 自定义配置(皆非必填)
 ```
-可以使用默认配置 , 如果需要自定义配置 , 那么请根据下方 : 
-> 配置如下( SpringBoot下yml格式 ):
-cn:
-  gjing:
-    swagger:
-      base-package: controller所在的包完整路径,例如: com.example.web (非必填,不填情况下默认寻找所有带有@ApiOpertaion注解的方法)
-      title: api文档标题 (可以不配置,默认"")
-      version: 版本号 (可以不配置,默认1.0)
-      description: api文档描述 (可以不配置,默认"")
+> yml文件格式: 
 
-> 使用java方式进行配置( Spring或者SpringBoot):
+swagger:
+  contact:
+    email: (联系邮箱)
+    name: (联系人昵称)
+    url: (联系人地址)
+  title: (标题)
+  description: (描述)
+  base-package: (接口所在包路径)
+  path-type: (接口选择规则类型, 共分为: ALL(所有接口), REGEX(符合正则), ANT(符合路径)三个类型, 默认为ALL类型)
+  path-pattern: (接口匹配规则,在path-type类型不为 "ALL" 的情况下必须设置,否则抛非法参数异常)
+  terms-of-service-url: (服务条款)
+  license: (许可证)
+  license-url: (许可证地址)
 
-@EnableSwagger
+> JavaBean方式:
+
 @Configuration
-public class SwaggerConfiguration {
+public class DemoConfig {
     @Bean
     public SwaggerBean swaggerBean() {
         return SwaggerBean.builder()
                 .basePackage("com.xxx.xxx")
-                .version("1.0")
-                .title("title")
-                .description("lalalalall")
+                .pathType(PathType.ALL)
+                .title("标题")
+                .termsOfServiceUrl("http://127.0.0.1")
+                .license("XXXX")
+                .licenseUrl("http://xxx.xx.xx")
+                .description("描述")
                 .build();
     }
-}        
+}     
 ```
-* @EnableSwaggerDoc: 启动类标注或创建Configuration类标注,开启路由同Eureka注册中心下的其他服务的Swagger文档     
+### 如若要开启多资源模式,可在基础配置上增加以下配置, 需搭配zuul使用, 并且在同一个Eureka注册中心下
+:exclamation: 如果register-me设置为false,并且serve-list为空,则会抛出无效参数异常
 ```
-可以使用默认配置 , 如果需要自定义配置 , 那么请根据下方 : 
-> 配置如下(SpringBoot下使用yml格式) :
-cn:
-  gjing:
-    swagger-doc:
-      register-me: true (是否注册当前服务swagger文档, 默认true)
-      serve-list:
-          - demo(服务名)
-          - demo2(服务名)
+> yml格式:
 
-> 使用java方式配置(Spring或者SpringBoot)
-@EnableSwagger
+swagger:
+  resources:
+    serve-list:
+      - demo: (此处demo为目标项目的服务名)
+          name: (对应资源文档展示昵称,默认为对应服务的服务名)
+          location: (目标项目文档路径, 可以传目标项目的服务名或者完整路径 服务名+ /v2/api-docs , 如: /demo/v2/api-docs)
+      - demo2:
+          name: 服务2
+          location: demo2   
+    enable: (是否开启多资源模式,默认false)
+    register-me: (是否需要把当前项目的swagger文档也加入,默认为true)
+    
+> JavaBean格式
+
 @Configuration
-public class SwaggerConfiguration {
+@EnableSwagger
+public class GatewayConfig {
+
     @Bean
-    public SwaggerDoc swaggerDoc() {
-        return SwaggerDoc.builder()
-                .serveList(Arrays.asList("服务名","服务名"))
+    public Resources resources() {
+        Map<String, Serve> map = new HashMap<>();
+        map.put("demo", Serve.builder().name("xxx").location("demo").build());
+        return Resources.builder()
                 .registerMe(true)
-                .build();
-    }         
-} 
+                .enable(true)
+                .serveList(Collections.singletonList(map)).build();
+    }
+}
+    
 ```
-## 注意: 
-* @EnableSwaggerDoc注解需要在SpringCloud环境下使用,搭配路由工具(比如zuul,gateway)使用,凡是能提供通过服务名访问皆可,不然会导致访问其他服务文档加载失败
