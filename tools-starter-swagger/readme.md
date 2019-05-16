@@ -24,7 +24,7 @@ cn:
 
 > 使用java方式进行配置( Spring或者SpringBoot):
 
-@EnableSwaggerDoc
+@EnableSwagger
 @Configuration
 public class SwaggerConfiguration {
     @Bean
@@ -51,14 +51,17 @@ cn:
           - demo2(服务名)
 
 > 使用java方式配置(Spring或者SpringBoot)
-
-@Bean
-public SwaggerDoc swaggerDoc() {
-    return SwaggerDoc.builder()
-            .serveList(Arrays.asList("服务名","服务名"))
-            .registerMe(true)
-            .build();
-}          
+@EnableSwagger
+@Configuration
+public class SwaggerConfiguration {
+    @Bean
+    public SwaggerDoc swaggerDoc() {
+        return SwaggerDoc.builder()
+                .serveList(Arrays.asList("服务名","服务名"))
+                .registerMe(true)
+                .build();
+    }         
+} 
 ```
 ## 注意: 
 * @EnableSwaggerDoc注解需要在SpringCloud环境下使用,搭配路由工具(比如zuul,gateway)使用,凡是能提供通过服务名访问皆可,不然会导致访问其他服务文档加载失败

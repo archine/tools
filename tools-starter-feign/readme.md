@@ -10,7 +10,7 @@
 * <a href="https://mvnrepository.com/artifact/cn.gjing/tools-starter-feign/" title="fast-feign">tools-starter-feign</a>
 ---
 ### 注解
-* @EnableFeignUtil: 启动类标注该注解,即可启用Feign工具
+* @EnableFeignUtil: 启动类标注该注解,即可启用Feign工具,使用SpringCloud环境，否则会出现加载失败
 
 > 使用案例
 * 使用服务名访问(同一个Eureka中心下的服务,带负载均衡功能),可以自定义返回值类型
@@ -62,7 +62,7 @@ public ResponseEntity test() throws URISyntaxException {
 * 生成实例
     * of (responseType, routeType, targetAddress): 生成自定义返回类型和路由类型的FeignClientUtil实例
     * defaultByName (targetAddress): 生成默认返回类型的服务名路由FeignClientUtil实例
-    * defaultByUrl (targetAddress): 生成默认返回类型的URL路由FeignClientUtil实例
+    * defaultByUrl (targetAddress): 生成默认返回类型的URL路由FeignClientUtil实例，可以访问非同一个注册中心下的其他非Cloud项目
 * 发起请求    
     * execute (method, queryMap, body, methodPath): 发起请求
 * 获取请求结果
