@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.0.5-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.0.6-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 ##### 快速集成Swagger，只需一个注解，即可开启默认配置并使用它, 也可以自定义去配置它.
@@ -25,6 +25,7 @@ swagger:
   base-package: (接口所在包路径)
   path-type: (接口选择规则类型, 共分为: ALL(所有接口), REGEX(符合正则), ANT(符合路径)三个类型, 默认为ALL类型)
   path-pattern: (接口匹配规则,在path-type类型不为 "ALL" 的情况下必须设置,否则抛非法参数异常)
+  exclude-pattern: (排除路径，默认使用正则表达式方式，可在pathType设置为其他类型（pathType类型为ALL时默认走正则）)
   terms-of-service-url: (服务条款)
   license: (许可证)
   license-url: (许可证地址)

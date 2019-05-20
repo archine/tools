@@ -1,5 +1,6 @@
 package cn.gjing;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,19 +40,8 @@ interface FeignBean {
      * @param queryBody body参数
      * @return string
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     String postBody(URI uri, @RequestBody Object queryBody);
-
-    /**
-     * postBody
-     *
-     * @param uri       请求url
-     * @param queryMap  参数
-     * @param queryBody body
-     * @return string
-     */
-    @RequestMapping(method = RequestMethod.POST)
-    String postBody(URI uri, @RequestBody Object queryBody, @RequestParam Map<String, ?> queryMap);
 
     /**
      * get
