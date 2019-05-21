@@ -32,8 +32,12 @@ public class SwaggerBean {
     /**
      * 接口选则表达式，如果是路径选择，则如：/test/** 即选择test路径下的所有接口，正则选择为满足正则表达式的所有接口
      */
-    private String pathPattern;
+    private String pathPattern="/**";
 
+    /**
+     * 排除路径，默认使用正则表达式方式，可在pathType设置为其他类型（pathType类型为ALL时默认走正则）
+     */
+    private String[] excludePattern = new String[]{};
     /**
      * swagger文档标题
      */

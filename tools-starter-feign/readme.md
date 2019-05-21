@@ -1,5 +1,5 @@
 # tools-starter-feign
-![](https://img.shields.io/badge/version-1.0.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
     快速使用Feign,不在需要每次调用目标服务的某个方法就得在当前服务写个一样的接口
@@ -30,10 +30,10 @@ public ResponseEntity test() throws URISyntaxException {
 ```
 @GetMapping("/test")
 public ResponseEntity test() throws URISyntaxException {
-    String web = FeignClientUtil.defaultByName("http://web")
-            .execute(HttpMethod.GET, null, null, "/web/123")
+    String result = FeignClientUtil.ofByName("http://web")
+            .execute(HttpMethod.GET, null, null, "/method/123")
             .getResult();
-    return ResponseEntity.ok(web);
+    return ResponseEntity.ok(result);
 }
 ```
 * 使用URL访问(可以不在同一个注册中心下,不带负载均衡功能),可以自定义返回值类型
@@ -42,29 +42,44 @@ public ResponseEntity test() throws URISyntaxException {
 public ResponseEntity test() throws URISyntaxException {
     Map<String, String> map = new HashMap<>(16);
     map.put("a", "参数a");
-    String web = FeignClientUtil.of(String.class, RouteType.URL, "http://127.0.0.1:8080/")
-            .execute(HttpMethod.POST, map, null, "/web1")
+    String result = FeignClientUtil.of(String.class, RouteType.URL, "http://127.0.0.1:8080/")
+            .execute(HttpMethod.POST, map, "/method")
             .getResult();
-    return ResponseEntity.ok(web);
+    return ResponseEntity.ok(result);
 }
 ```
 * 使用URL访问(可以不在同一个注册中心下,不带负载均衡功能),默认返回值类型(String)
 ```
 @GetMapping("/test")
 public ResponseEntity test() throws URISyntaxException {
-    String web = FeignClientUtil.defaultByUrl("http://127.0.0.1:8080")
-            .execute(HttpMethod.GET, null, null, "/web")
+    String result = FeignClientUtil.ofByUrl("http://127.0.0.1:8080")
+            .execute(HttpMethod.GET, null, "/test")
             .getResult();
-    return ResponseEntity.ok(web);
+    return ResponseEntity.ok(result);
 }
 ```
+* 发起参数为json类型
+```
+@GetMapping("/test")
+public ResponseEntity test() throws URISyntaxException {
+    PageResult result = FeignClientUtil.of(PageResult.class, RouteType.NAME, "http://demo")
+            .executeByBody(new Gson().toJson(PageResult.of("xxx", 1)), "/method")
+            .getResult();
+    return ResponseEntity.ok(result.toString());
+}
+```
+
 > 方法:
 * 生成实例
     * of (responseType, routeType, targetAddress): 生成自定义返回类型和路由类型的FeignClientUtil实例
-    * defaultByName (targetAddress): 生成默认返回类型的服务名路由FeignClientUtil实例
-    * defaultByUrl (targetAddress): 生成默认返回类型的URL路由FeignClientUtil实例，可以访问非同一个注册中心下的其他非Cloud项目
+    * defaultByName(targetAddress): 生成默认返回类型的服务名路由FeignClientUtil实例 (废弃)
+    * ofByName (targetAddress): 生成默认返回类型（String）的服务名路由FeignClientUtil实例
+    * defaultByUrl(targetAddress): 生成默认返回类型的URL路由FeignClientUtil实例，可以访问非同一个注册中心下的其他非Cloud项目 (废弃)
+    * ofByUrl (targetAddress): 生成默认返回类型（String）的URL路由FeignClientUtil实例，可以访问非同一个注册中心下的其他非Cloud项目
 * 发起请求    
-    * execute (method, queryMap, body, methodPath): 发起请求
+    * execute (method, queryMap, requestBody, methodPath): 发起请求（废弃）
+    * execute (method, queryMap,methodPath): 发起请求
+    * executeByBody(requestBody, methodPath): 发起POST携带requestBody参数请求
 * 获取请求结果
     * getResult (): 获取返回结果
 > 参数:
@@ -73,4 +88,4 @@ public ResponseEntity test() throws URISyntaxException {
 * queryMap: 参数,无参可传null
 * targetAddress: 目标地址(必填),如果是NAME路由:则需要协议和服务名: http://serve , 如果为URL路由,需要协议+IP+端口: http://127.0.0.1:8080
 * methodPath: 接口路径(必填): /method/test
-* body: post发送json时使用,目标方法使用@RequestBody接收,无需可传null
+* requestBody: json字符串或者json对象

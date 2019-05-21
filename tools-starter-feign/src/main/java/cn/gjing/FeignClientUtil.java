@@ -58,18 +58,30 @@ public class FeignClientUtil<T> {
 
     /**
      * 默认使用服务名路由,返回值为String
+     *
      * @param targetAddress 目标地址,例如: http://服务名/
      * @return FeignClientUtil
      */
+    public static FeignClientUtil<String> ofByName(String targetAddress) {
+        return new FeignClientUtil<>(String.class, RouteType.NAME, UriUtil.checkUrl(targetAddress));
+    }
+
+    @Deprecated
     public static FeignClientUtil<String> defaultByName(String targetAddress) {
         return new FeignClientUtil<>(String.class, RouteType.NAME, UriUtil.checkUrl(targetAddress));
     }
 
     /**
      * 默认使用URL路由,返回值为String
+     *
      * @param targetAddress 目标地址,例如: http://127.0.0.1:8090/
      * @return FeignClientUtil
      */
+    public static FeignClientUtil<String> ofByUrl(String targetAddress) {
+        return new FeignClientUtil<>(String.class, RouteType.URL, UriUtil.checkUrl(targetAddress));
+    }
+
+    @Deprecated
     public static FeignClientUtil<String> defaultByUrl(String targetAddress) {
         return new FeignClientUtil<>(String.class, RouteType.URL, UriUtil.checkUrl(targetAddress));
     }
@@ -77,20 +89,56 @@ public class FeignClientUtil<T> {
     /**
      * 执行
      *
-     * @param httpMethod 请求类型
+     * @param httpMethod  请求类型
      * @param queryMap    参数，不需要传null
-     * @param body        body参数，如果不需要传null
+     * @param requestBody json对象或者json字符串
      * @param methodPath  接口路径, /test/method
      * @return FeignClientUtil
      * @throws URISyntaxException uri转换异常
      */
-    public FeignClientUtil<T> execute(HttpMethod httpMethod, Map<String, ?> queryMap, Object body,
+    @Deprecated
+    public FeignClientUtil<T> execute(HttpMethod httpMethod, Map<String, ?> queryMap, Object requestBody,
                                       String methodPath) throws URISyntaxException {
         Objects.requireNonNull(httpMethod);
         FeignBean feignBean = routeType.equals(RouteType.URL) ?
                 FEIGN_PROCESS.getByUrl(targetAddress) :
                 FEIGN_PROCESS.getByName(targetAddress);
-        request(httpMethod, queryMap, body, UriUtil.buildUrl(targetAddress,methodPath), feignBean);
+        request(httpMethod, queryMap, requestBody, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
+        return this;
+    }
+
+    /**
+     * 执行
+     *
+     * @param httpMethod 请求类型
+     * @param queryMap   参数，不需要传null
+     * @param methodPath 接口路径, /test/method
+     * @return FeignClientUtil
+     * @throws URISyntaxException uri转换异常
+     */
+    public FeignClientUtil<T> execute(HttpMethod httpMethod, Map<String, ?> queryMap,
+                                      String methodPath) throws URISyntaxException {
+        Objects.requireNonNull(httpMethod);
+        FeignBean feignBean = routeType.equals(RouteType.URL) ?
+                FEIGN_PROCESS.getByUrl(targetAddress) :
+                FEIGN_PROCESS.getByName(targetAddress);
+        request(httpMethod, queryMap, null, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
+        return this;
+    }
+
+    /**
+     * 执行post请求
+     *
+     * @param requestBody json对象或者json字符串
+     * @param methodPath  接口路径, /test/method
+     * @return FeignClientUtil
+     * @throws URISyntaxException uri转换异常
+     */
+    public FeignClientUtil<T> executeByBody(Object requestBody, String methodPath) throws URISyntaxException {
+        FeignBean feignBean = routeType.equals(RouteType.URL) ?
+                FEIGN_PROCESS.getByUrl(targetAddress) :
+                FEIGN_PROCESS.getByName(targetAddress);
+        request(HttpMethod.POST, null, requestBody, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
         return this;
     }
 
@@ -121,10 +169,10 @@ public class FeignClientUtil<T> {
      * 发起请求
      *
      * @param httpMethod 请求类型
-     * @param queryMap    参数
-     * @param body        body
-     * @param url         请求url
-     * @param feignBean   feignBean
+     * @param queryMap   参数
+     * @param body       body
+     * @param url        请求url
+     * @param feignBean  feignBean
      * @throws URISyntaxException uri转换异常
      */
     private void request(HttpMethod httpMethod, Map<String, ?> queryMap, Object body, String url,

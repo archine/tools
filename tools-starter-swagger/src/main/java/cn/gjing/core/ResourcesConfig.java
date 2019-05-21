@@ -30,11 +30,10 @@ class ResourcesConfig implements SwaggerResourcesProvider {
         if (resources.isEnable()) {
             if (resources.isRegisterMe()) {
                 registerMe(resourceList);
-            } else {
-                if (serveList.isEmpty()) {
-                    throw new IllegalArgumentException("Swagger resources serveList cannot be empty, " +
-                            "Please set register-me to true or add other serve name");
-                }
+            }
+            if (resources.isRegisterMe() && serveList.isEmpty()) {
+                throw new IllegalArgumentException("Swagger resources serveList cannot be empty, " +
+                        "Please set register-me to true or add other serve name");
             }
             for (Map<String, Serve> serveMap : serveList) {
                 for (String serveName : serveMap.keySet()) {
@@ -46,12 +45,11 @@ class ResourcesConfig implements SwaggerResourcesProvider {
                             buildLocation(serveMap.get(serveName).getLocation())));
                 }
             }
-        } else {
-            registerMe(resourceList);
+            return resourceList;
         }
+        registerMe(resourceList);
         return resourceList;
     }
-
 
     private SwaggerResource swaggerResource(String name, String location) {
         SwaggerResource swaggerResource = new SwaggerResource();
