@@ -68,13 +68,26 @@ public class HttpClient {
      * post发送body请求
      *
      * @param url          请求url
-     * @param body         body内容
+     * @param requestBody  body内容
      * @param responseType 响应类型
      * @param <T>          T
      * @return T
      */
-    public static <T> T post(String url, Object body, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, null, body, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
+    public static <T> T postByBody(String url, Object requestBody, Class<T> responseType) {
+        return HttpHandle.of(responseType, null).invokeUrl(url, null, requestBody, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param requestBody  json字符串
+     * @param responseType 响应类型
+     * @param <T>          T
+     * @return T
+     */
+    public static <T> T postByBody(String url, String requestBody, Class<T> responseType) {
+        return HttpHandle.of(responseType, null).invokeUrl(url, null, requestBody, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
     }
 
     /**

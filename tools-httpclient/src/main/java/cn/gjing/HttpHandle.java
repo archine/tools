@@ -1,6 +1,7 @@
 package cn.gjing;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.StringUtils;
 
@@ -49,7 +50,7 @@ class HttpHandle<T> {
         Objects.requireNonNull(connectTimeout);
         Objects.requireNonNull(readTimeout);
         if (StringUtils.isEmpty(url)) {
-            throw new NullPointerException("Url is not null");
+            throw new NullPointerException("Url is cannot be null");
         }
         String paramsStr = null;
         if (!StringUtils.isEmpty(params)) {
@@ -87,26 +88,27 @@ class HttpHandle<T> {
                 }
                 if (body != null) {
                     bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), Charset.defaultCharset()));
-                    bw.write(GSON.toJson(body));
+                    bw.write(body instanceof String ? body.toString() : GSON.toJson(body));
                     bw.flush();
                 }
             }
-            StringBuilder result = null;
-            br = new BufferedReader(new InputStreamReader(conn.getInputStream(), Charset.defaultCharset()));
+            StringBuilder result = new StringBuilder();
+            String line;
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                result = new StringBuilder();
-                String line;
+                br = new BufferedReader(new InputStreamReader(conn.getInputStream(), Charset.defaultCharset()));
                 while ((line = br.readLine()) != null) {
                     result.append(line);
                 }
-            }
-            if (result != null) {
                 return cast(result);
-            } else {
-                return null;
             }
+            br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), Charset.defaultCharset()));
+            while ((line = br.readLine()) != null) {
+                result.append(line);
+            }
+            throw new HttpException(responseError(result.toString()));
         } catch (Exception e) {
-            throw new HttpException(e.getMessage());
+            e.printStackTrace();
+            return null;
         } finally {
             closeStream(conn, bw, br);
         }
@@ -114,9 +116,10 @@ class HttpHandle<T> {
 
     /**
      * 关闭流
+     *
      * @param conn HttpURLConnection
-     * @param bw BufferedWriter
-     * @param br BufferedReader
+     * @param bw   BufferedWriter
+     * @param br   BufferedReader
      */
     private void closeStream(HttpURLConnection conn, BufferedWriter bw, BufferedReader br) {
         try {
@@ -149,6 +152,10 @@ class HttpHandle<T> {
         }
     }
 
+    private String responseError(String str) {
+        String s = str.substring(str.lastIndexOf("<div>")).replaceAll("<div>", "");
+        return StringEscapeUtils.unescapeHtml(s.substring(0, s.lastIndexOf("</div>")));
+    }
     /**
      * 增加请求头
      *
@@ -175,7 +182,7 @@ class HttpHandle<T> {
      */
     private void setProperty(int connectTimeout, int readTimeout, HttpMethod method, HttpURLConnection conn, Object body) throws ProtocolException {
         conn.setRequestProperty("Content-type", body == null ? "application/x-www-form-urlencoded" : "application/json");
-        conn.setRequestProperty("Charset", "utf-8");
+        conn.setRequestProperty("Charset", "UTF-8");
         conn.setRequestMethod(method.toString());
         conn.setDoOutput(true);
         conn.setDoInput(true);

@@ -8,7 +8,7 @@
         <version>1.2.2</version>
     </parent>
     <artifactId>tools-httpclient</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>tools-httpclient</name>
     <description>http request tool</description>
 
@@ -20,6 +20,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
         </dependency>
     </dependencies>
     <build>
