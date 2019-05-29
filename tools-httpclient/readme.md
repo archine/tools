@@ -15,14 +15,17 @@
 4. connectTimeout：请求超时时间，默认5s
 5. readTimeout：读超时时间，默认10秒
 6. responseType：响应结果返回类型（必填）
-7. body：对象， 一般用于目标方法使用@RequestBody接收参数
+7. jsonEntity：Json对象,可以是json字符串对应的对象也可使用map
+8. jsonStr: Json字符串
 ``` 
-使用中可以使用 HttpClient.post(参数....)或者其他请求方式直接请求,返回结果为你指定的返回类型;
-public static void main(String[] args) {
-   Map<String, String> map = new HashMap<>(16);
-   map.put("a", "参数a");
-   map.put("b", "参数b");
-   System.out.println(HttpClient.post("http://127.0.0.1:8090/web", map, String.class));
+@GetMapping("/test")
+public ResponseEntity http() {
+    HttpClient client = new HttpClient();
+    ResultBean resultBean = new ResultBean();
+    resultBean.setMessage("ok");
+    resultBean.setData("哈哈哈");
+    Map result = client.postByJsonEntity("http://127.0.0.1:8080/test",resultBean, Map.class);
+    return ResponseEntity.ok(result);
 }
 ```
 ---

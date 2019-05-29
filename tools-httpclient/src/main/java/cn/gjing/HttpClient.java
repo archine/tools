@@ -18,6 +18,7 @@ public class HttpClient {
      * 默认读超时10秒
      */
     private static final int READ_TIMEOUT = 10000;
+    
 
     /**
      * post请求
@@ -28,12 +29,11 @@ public class HttpClient {
      * @param connectTimeout 连接超时时间
      * @param readTimeout    读超时
      * @param responseType   返回类型
-     * @param <T>            T
      * @return responseType
      */
 
-    public static <T> T post(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.POST);
+    public <T> T post(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, connectTimeout, readTimeout, HttpMethod.POST, responseType);
     }
 
     /**
@@ -44,11 +44,10 @@ public class HttpClient {
      * @param connectTimeout 超时时间
      * @param readTimeout    读超时
      * @param responseType   返回类型
-     * @param <T>            T
      * @return responseType
      */
-    public static <T> T post(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.POST);
+    public <T> T post(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, null, null, connectTimeout, readTimeout, HttpMethod.POST, responseType);
     }
 
     /**
@@ -57,37 +56,60 @@ public class HttpClient {
      * @param url          请求url
      * @param queryMap     参数
      * @param responseType 返回类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T post(String url, Map<String, ?> queryMap, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, queryMap, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
+    public <T> T post(String url, Map<String, ?> queryMap, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
     }
 
     /**
      * post发送body请求
      *
      * @param url          请求url
-     * @param requestBody  body内容
+     * @param jsonEntity  json对象,可以是json字符串对应的对象也可以是map
      * @param responseType 响应类型
-     * @param <T>          T
      * @return T
      */
-    public static <T> T postByBody(String url, Object requestBody, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, null, requestBody, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
+    public <T> T postByJsonEntity(String url, Object jsonEntity, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonEntity, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
     }
 
     /**
      * post发送body请求
      *
      * @param url          请求url
-     * @param requestBody  json字符串
+     * @param jsonEntity  json对象,可以是json字符串对应的对象也可以是map
      * @param responseType 响应类型
-     * @param <T>          T
+     * @param headers 请求头
      * @return T
      */
-    public static <T> T postByBody(String url, String requestBody, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, null, requestBody, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
+    public <T> T postByJsonEntity(String url, Object jsonEntity,Map<String,?>headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonEntity, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonStr   json字符串
+     * @param responseType 响应类型
+     * @return T
+     */
+    public <T> T postByJson(String url, String jsonStr, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonStr, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonStr  json字符串
+     * @param responseType 响应类型
+     * @param headers 请求头
+     * @return T
+     */
+    public <T> T postByJson(String url, String jsonStr,Map<String,?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonStr, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
     }
 
     /**
@@ -97,11 +119,10 @@ public class HttpClient {
      * @param body         body内容
      * @param headers      请求头
      * @param responseType 响应类型
-     * @param <T>          T
      * @return T
      */
-    public static <T> T post(String url, Object body, Map<String, ?> headers, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, null, body, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
+    public <T> T post(String url, Object body, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, body, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
     }
 
     /**
@@ -109,12 +130,11 @@ public class HttpClient {
      *
      * @param url          请求url
      * @param responseType 返回类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T post(String url, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
-                HttpMethod.POST);
+    public <T> T post(String url, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.POST, responseType);
     }
 
     /**
@@ -124,11 +144,10 @@ public class HttpClient {
      * @param queryMap     参数
      * @param headers      请求头
      * @param responseType 返回类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T post(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST);
+    public <T> T post(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
     }
 
     /**
@@ -140,11 +159,10 @@ public class HttpClient {
      * @param connectTimeout 连接超时时间
      * @param readTimeout    读超时
      * @param responseType   返回类型
-     * @param <T>            T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.GET);
+    public <T> T get(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, connectTimeout, readTimeout, HttpMethod.GET, responseType);
     }
 
     /**
@@ -155,11 +173,10 @@ public class HttpClient {
      * @param connectTimeout 连接超时时间
      * @param readTimeout    读超时
      * @param responseType   返回类型
-     * @param <T>            T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.GET);
+    public <T> T get(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, null, null, connectTimeout, readTimeout, HttpMethod.GET, responseType);
     }
 
     /**
@@ -168,11 +185,10 @@ public class HttpClient {
      * @param url          请求url
      * @param queryMap     参数
      * @param responseType 响应类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, ?> queryMap, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, queryMap, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET);
+    public <T> T get(String url, Map<String, ?> queryMap, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET, responseType);
     }
 
     /**
@@ -182,11 +198,10 @@ public class HttpClient {
      * @param queryMap     参数
      * @param headers      请求头
      * @param responseType 响应类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T get(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET);
+    public <T> T get(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET, responseType);
     }
 
     /**
@@ -195,12 +210,11 @@ public class HttpClient {
      * @param url          请求url
      * @param responseType 响应类型
      * @param queryMap     参数
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T get(String url, Class<T> responseType, Object... queryMap) {
-        return HttpHandle.of(responseType, null).invokeUrl(UrlUtil.urlAppend(url, queryMap), null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
-                HttpMethod.GET);
+    public <T> T get(String url, Class<T> responseType, Object... queryMap) {
+        return HttpHandle.getInstance().invokeUrl(UrlUtil.urlAppend(url, queryMap), null, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.GET, responseType);
     }
 
     /**
@@ -208,11 +222,10 @@ public class HttpClient {
      *
      * @param url          请求url
      * @param responseType 响应类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T get(String url, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET);
+    public <T> T get(String url, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.GET, responseType);
     }
 
     /**
@@ -223,11 +236,10 @@ public class HttpClient {
      * @param connectTimeout 连接超时时间
      * @param readTimeout    读超时
      * @param responseType   响应类型
-     * @param <T>            T
      * @return responseType
      */
-    public static <T> T put(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.PUT);
+    public <T> T put(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, null, null, connectTimeout, readTimeout, HttpMethod.PUT, responseType);
     }
 
     /**
@@ -239,11 +251,10 @@ public class HttpClient {
      * @param connectTimeout 超时时间
      * @param readTimeout    读超时
      * @param responseType   响应类型
-     * @param <T>            T
      * @return responseType
      */
-    public static <T> T put(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.PUT);
+    public <T> T put(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, connectTimeout, readTimeout, HttpMethod.PUT, responseType);
     }
 
     /**
@@ -252,11 +263,10 @@ public class HttpClient {
      * @param url          请求url
      * @param queryMap     请求头
      * @param responseType 响应类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T put(String url, Map<String, ?> queryMap, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, queryMap, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT);
+    public <T> T put(String url, Map<String, ?> queryMap, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT, responseType);
     }
 
     /**
@@ -264,12 +274,11 @@ public class HttpClient {
      *
      * @param url          请求url
      * @param responseType 响应类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T put(String url, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
-                HttpMethod.PUT);
+    public <T> T put(String url, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.PUT, responseType);
     }
 
     /**
@@ -279,11 +288,10 @@ public class HttpClient {
      * @param queryMap     参数
      * @param headers      请求头
      * @param responseType 响应类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T put(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT);
+    public <T> T put(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.PUT, responseType);
     }
 
     /**
@@ -292,12 +300,11 @@ public class HttpClient {
      * @param url          请求url
      * @param queryMap     参数
      * @param responseType 响应类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T put(String url, Class<T> responseType, Object... queryMap) {
-        return HttpHandle.of(responseType, null).invokeUrl(UrlUtil.urlAppend(url, queryMap), null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
-                HttpMethod.PUT);
+    public <T> T put(String url, Class<T> responseType, Object... queryMap) {
+        return HttpHandle.getInstance().invokeUrl(UrlUtil.urlAppend(url, queryMap), null, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.PUT, responseType);
     }
 
     /**
@@ -308,11 +315,10 @@ public class HttpClient {
      * @param connectTimeout 超时时间
      * @param readTimeout    参数
      * @param responseType   返回类型
-     * @param <T>            T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, null).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.DELETE);
+    public <T> T delete(String url, Map<String, ?> queryMap, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, null, null, connectTimeout, readTimeout, HttpMethod.DELETE, responseType);
     }
 
     /**
@@ -324,11 +330,10 @@ public class HttpClient {
      * @param connectTimeout 超时时间
      * @param readTimeout    参数
      * @param responseType   返回类型
-     * @param <T>            T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, connectTimeout, readTimeout, HttpMethod.DELETE);
+    public <T> T delete(String url, Map<String, ?> queryMap, Map<String, ?> headers, Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, connectTimeout, readTimeout, HttpMethod.DELETE, responseType);
     }
 
     /**
@@ -338,11 +343,10 @@ public class HttpClient {
      * @param queryMap     参数
      * @param headers      请求头
      * @param responseType 返回类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, queryMap, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE);
+    public <T> T delete(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE, responseType);
     }
 
     /**
@@ -351,11 +355,10 @@ public class HttpClient {
      * @param url          请求URl
      * @param responseType 返回类型
      * @param headers      请求头
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T delete(String url, Map<String, ?> headers, Class<T> responseType) {
-        return HttpHandle.of(responseType, headers).invokeUrl(url, null, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE);
+    public <T> T delete(String url, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.DELETE, responseType);
     }
 
     /**
@@ -364,11 +367,10 @@ public class HttpClient {
      * @param url          请求URl
      * @param queryMap     参数
      * @param responseType 返回类型
-     * @param <T>          T
      * @return responseType
      */
-    public static <T> T delete(String url, Class<T> responseType, Object... queryMap) {
-        return HttpHandle.of(responseType, null).invokeUrl(UrlUtil.urlAppend(url, queryMap), null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
-                HttpMethod.DELETE);
+    public <T> T delete(String url, Class<T> responseType, Object... queryMap) {
+        return HttpHandle.getInstance().invokeUrl(UrlUtil.urlAppend(url, queryMap), null, null, null, CONNECT_TIMEOUT, READ_TIMEOUT,
+                HttpMethod.DELETE, responseType);
     }
 }
