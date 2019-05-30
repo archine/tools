@@ -47,22 +47,21 @@ class NotNull2Processor {
         List<String> needCheckParamList = new ArrayList();
         //方法的参数
         Parameter[] parameters = method.getParameters();
-        if (exclude.isEmpty()) {
-            for (Parameter parameter : parameters) {
-                if (!parameter.getType().isPrimitive()&&parameter.getAnnotation(PathVariable.class)==null) {
-                    needCheckParamList.add(parameter.getName());
-                }
-            }
-        } else {
-            for (Parameter parameter : parameters) {
-                if (!exclude.contains(parameter.getName()) && !parameter.getType().isPrimitive()&&parameter.getAnnotation(PathVariable.class)==null) {
-                    needCheckParamList.add(parameter.getName());
-                }
+        for (Parameter parameter : parameters) {
+            if (!exclude.contains(parameter.getName()) && !parameter.getType().isPrimitive() && parameter.getAnnotation(PathVariable.class) == null) {
+                needCheckParamList.add(parameter.getName());
             }
         }
+
+        verifyParam(request, annotation, needCheckParamList);
+    }
+
+    private void verifyParam(HttpServletRequest request, NotNull2 annotation, List<String> needCheckParamList) {
         for (String paramName : needCheckParamList) {
             if (ParamUtil.isEmpty(request.getParameter(paramName))) {
-                throw new NullPointerException("The parameter '"+paramName+"' has been used @NotNull2, so it cannot be null.");
+                throw new NullPointerException(annotation.message().equals("")
+                        ? "The parameter '" + paramName + "' has been used @NotNull2, so it cannot be null."
+                        : annotation.message());
             }
         }
     }

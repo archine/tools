@@ -17,12 +17,14 @@ import java.util.Properties;
  **/
 public class EmailUtil {
 
-    private static EmailUtil emailUtil = null;
     private String host;
     private String password;
     private String from;
 
     private EmailUtil(String host, String password, String from) {
+        if (ParamUtil.multiEmpty(host, password, from)) {
+            throw new NullPointerException("Instantiation exception, Parameters cannot be null");
+        }
         this.host = host;
         this.password = password;
         this.from = from;
@@ -36,17 +38,8 @@ public class EmailUtil {
      * @param from     发送者邮箱地址
      * @return e
      */
-    public static EmailUtil getInstance(String host, String password, String from) {
-        if (emailUtil != null) {
-            return emailUtil;
-        } else {
-            synchronized (EmailUtil.class) {
-                if (emailUtil == null) {
-                    emailUtil = new EmailUtil(host, password, from);
-                }
-            }
-        }
-        return emailUtil;
+    public static EmailUtil of(String host, String password, String from) {
+        return new EmailUtil(host, password, from);
     }
 
     /**
@@ -88,9 +81,6 @@ public class EmailUtil {
      * @return true为发送成功
      */
     public boolean sendEmail(String subject, String body, String[] files, String tos, String copyTo) {
-        if (ParamUtil.isEmpty(files)) {
-            sendEmail(subject, body, tos, copyTo);
-        }
         if (ParamUtil.isEmpty(tos)) {
             throw new ParamException("The parameter tos cannot be null");
         }

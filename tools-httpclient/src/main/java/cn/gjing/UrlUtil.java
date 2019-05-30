@@ -1,11 +1,15 @@
 package cn.gjing;
 
-import org.springframework.util.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -19,7 +23,7 @@ public class UrlUtil {
      * @param params 参数
      * @return string
      */
-    public static String urlAppend(String url,Object[] params) {
+    public static String urlAppend(String url,Object...params) {
         StringBuilder builder = new StringBuilder(url);
         if (url.indexOf("/", url.length() - 1) == -1) {
             builder.append("/");
@@ -53,6 +57,7 @@ public class UrlUtil {
                     String val = String.valueOf(item.getValue());
                     if (urlEncode) {
                         val = URLEncoder.encode(val, "utf-8");
+                        key = URLEncoder.encode(key, "UTF-8");
                     }
                     if (keyToLower) {
                         buf.append(key.toLowerCase()).append("=").append(val);
@@ -63,7 +68,7 @@ public class UrlUtil {
                 }
             }
             buff = buf.toString();
-            if (!StringUtils.isEmpty(buf)) {
+            if (!StringUtils.isEmpty(buff)) {
                 buff = buff.substring(0, buff.length() - 1);
             }
         } catch (Exception e) {
@@ -82,11 +87,11 @@ public class UrlUtil {
     public static Map<String, String> urlParamToMap(String url) {
         final Map<String, String> queryPairs = new ConcurrentHashMap<>(16);
         final String[] param = url.split("\\?");
-        if (StringUtils.isEmpty(param) || param.length < 1) {
+        if (param.length<1) {
             return null;
         }
         final String[] pairs = param[1].split("&");
-        if (StringUtils.isEmpty(pairs)) {
+        if (pairs.length<1) {
             return null;
         }
         for (String pair : pairs) {

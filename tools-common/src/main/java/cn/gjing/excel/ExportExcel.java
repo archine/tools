@@ -18,17 +18,41 @@ import java.util.List;
 class ExportExcel {
 
     /**
-     * @param response 响应头
-     * @param list     excel单元格内容集合,导出空白excel时传null
-     * @param headers  excel列表头
-     * @param title    excel文件名
-     * @param info     excel额外的内容,如果不需要直接传null或者空字符串
+     * excel单元格内容集合,导出空白excel时传null
      */
-    static void generateHaveExcelName(HttpServletResponse response, List<Object[]> list, String[] headers, String title, String info) {
+    private List<Object[]> valueList;
+    /**
+     * excel列表头
+     */
+    private String[] headers;
+    /**
+     * excel文件名
+     */
+    private String title;
+    /**
+     * excel额外的内容,如果不需要直接传null或者空字符串
+     */
+    private String info;
+
+    private ExportExcel(List<Object[]> valueList, String[] headers, String title, String info) {
+        this.valueList = valueList;
+        this.headers = headers;
+        this.title = title;
+        this.info = info;
+    }
+
+    static ExportExcel of(List<Object[]> valueLis, String[] headers, String title, String info) {
+        return new ExportExcel(valueLis, headers, title, info);
+    }
+
+    /**
+     * @param response 响应头
+     */
+    void generateHaveExcelName(HttpServletResponse response) {
         if (ParamUtil.multiEmpty(response,headers,title)) {
             throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
         }
-        HSSFWorkbook wb = export(list, headers, title, info);
+        HSSFWorkbook wb = this.export();
         try {
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
@@ -44,13 +68,9 @@ class ExportExcel {
 
     /**
      * 生成excel
-     * @param list    单元格内容集合
-     * @param headers excel列表头
-     * @param title   excel标题
-     * @param info    excel额外的内容,如果不需要直接传null或者空字符串
      * @return excel
      */
-    private static HSSFWorkbook export(List<Object[]> list, String[] headers, String title, String info) {
+    private HSSFWorkbook export() {
         //获取excel的样式
         HSSFWorkbook wb = new HSSFWorkbook();
         HSSFSheet sheet = wb.createSheet(title);
@@ -85,18 +105,18 @@ class ExportExcel {
             // 合并单元格CellRangeAddress构造参数依次表示起始行，截至行，起始列， 截至列. ========(合并4行)
             sheet.addMergedRegion(new CellRangeAddress(1, 4, 0, headers.length - 1));
             cell.setCellValue(info);
-            if (list != null) {
-                for (int i = 0; i < list.size(); i++) {
-                    Object[] obj = list.get(i);
+            if (valueList != null) {
+                for (int i = 0; i < valueList.size(); i++) {
+                    Object[] obj = valueList.get(i);
                     HSSFRow row1 = sheet.createRow(i + 5);
                     row1.setHeight((short) (25 * 30));
                     addCellValue(style2, obj, row1);
                 }
             }
         } else {
-            if (list != null) {
-                for (int i = 0; i < list.size(); i++) {
-                    Object[] obj = list.get(i);
+            if (valueList != null) {
+                for (int i = 0; i < valueList.size(); i++) {
+                    Object[] obj = valueList.get(i);
                     HSSFRow row1 = sheet.createRow(i + 1);
                     row1.setHeight((short) (25 * 30));
                     addCellValue(style2, obj, row1);
@@ -110,7 +130,7 @@ class ExportExcel {
      * 设置单元格样式
      * @param style 样式
      */
-    private static void setStyle(HSSFCellStyle style) {
+    private void setStyle(HSSFCellStyle style) {
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setBorderBottom(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
@@ -124,7 +144,7 @@ class ExportExcel {
      * @param obj    内容集
      * @param row    excel列
      */
-    private static void addCellValue(HSSFCellStyle style2, Object[] obj, HSSFRow row) {
+    private void addCellValue(HSSFCellStyle style2, Object[] obj, HSSFRow row) {
         for (int j = 0; j < obj.length; j++) {
             HSSFCell cell;
             cell = row.createCell(j);

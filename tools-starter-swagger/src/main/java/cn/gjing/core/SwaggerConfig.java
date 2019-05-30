@@ -36,7 +36,7 @@ class SwaggerConfig {
                 .apiInfo(apiInfo())
                 .select();
         builder.paths(pathSelectContext.getPredicate(swaggerBean, swaggerBean.getPathPattern())).build();
-        if (VerifyParam.verify(swaggerBean.getBasePackage())) {
+        if (VerifyParam.isDefault(swaggerBean.getBasePackage())) {
             builder.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class));
         } else {
             builder.apis(RequestHandlerSelectors.basePackage(swaggerBean.getBasePackage()));

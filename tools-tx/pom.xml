@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.2.2</version>
+        <version>1.2.6</version>
     </parent>
     <artifactId>tools-tx</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>tools-tx</name>
     <description>tengxun tool</description>
 

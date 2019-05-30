@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.2.5</version>
+        <version>1.2.6</version>
     </parent>
     <artifactId>tools-starter-feign</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>tools-starter-feign</name>
     <description>fast feign</description>
 
@@ -33,10 +33,6 @@
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-web</artifactId>
-                    <groupId>org.springframework</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -2,7 +2,6 @@ package cn.gjing;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.springframework.http.HttpMethod;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -41,7 +40,7 @@ class HttpHandle {
                           HttpMethod method, Class<T> responseType) {
         String paramsStr = null;
         if (params != null) {
-            paramsStr = UrlUtil.paramUnicodeSort(params, false, false);
+            paramsStr = UrlUtil.paramUnicodeSort(params, true, false);
             if (method != HttpMethod.POST) {
                 assert paramsStr != null;
                 url += "?" + paramsStr;
@@ -74,9 +73,7 @@ class HttpHandle {
                 }
                 if (body != null) {
                     bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), Charset.defaultCharset()));
-                    long start = System.currentTimeMillis();
                     bw.write(body instanceof String ? body.toString() : GSON.toJson(body));
-                    System.out.println(System.currentTimeMillis() - start);
                     bw.flush();
                 }
             }
@@ -95,8 +92,7 @@ class HttpHandle {
             }
             throw new HttpException(responseError(result.toString()));
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new HttpException(e.getMessage());
         } finally {
             disConnect(conn, bw, br);
         }
@@ -184,6 +180,10 @@ class HttpHandle {
         conn.setReadTimeout(readTimeout);
     }
 
+    /**
+     * 获取实例
+     * @return HttpHandle
+     */
     static HttpHandle getInstance() {
         return Handle.httpHandle;
     }

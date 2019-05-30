@@ -37,11 +37,11 @@ interface FeignBean {
      * post
      *
      * @param uri       请求url
-     * @param queryBody body参数
+     * @param jsonEntity json对象
      * @return string
      */
     @RequestMapping(method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    String postBody(URI uri, @RequestBody Object queryBody);
+    String postByJsonEntity(URI uri, @RequestBody Object jsonEntity);
 
     /**
      * get

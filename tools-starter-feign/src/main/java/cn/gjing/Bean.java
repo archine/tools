@@ -1,16 +1,17 @@
 package cn.gjing;
 
-import lombok.Getter;
-
 /**
  * @author Gjing
  **/
-@Getter
  enum Bean {
     /**
      *
      */
     FEIGN_PROCESS("feignProcess");
+
+    public String getBeanName() {
+        return beanName;
+    }
 
     private String beanName;
 

@@ -18,6 +18,8 @@ import java.util.Map;
  **/
 @Primary
 class ResourcesConfig implements SwaggerResourcesProvider {
+
+    private final static String SWAGGER_PATH = "/v2/api-docs";
     @Value("${spring.application.name:default}")
     private String applicationName;
     @Resource
@@ -30,18 +32,19 @@ class ResourcesConfig implements SwaggerResourcesProvider {
         if (resources.isEnable()) {
             if (resources.isRegisterMe()) {
                 registerMe(resourceList);
-            }
-            if (resources.isRegisterMe() && serveList.isEmpty()) {
-                throw new IllegalArgumentException("Swagger resources serveList cannot be empty, " +
-                        "Please set register-me to true or add other serve name");
+            } else {
+                if (serveList.isEmpty()) {
+                    throw new IllegalArgumentException("Swagger resources serveList cannot be empty, " +
+                            "Please set register-me to true or add other serve name");
+                }
             }
             for (Map<String, Serve> serveMap : serveList) {
                 for (String serveName : serveMap.keySet()) {
                     if (StringUtils.isEmpty(serveName) || serveMap.get(serveName).getLocation() == null) {
                         continue;
                     }
-                    resourceList.add(swaggerResource(serveMap.get(serveName).getName() == null ?
-                                    serveName : serveMap.get(serveName).getName(),
+                    resourceList.add(swaggerResource(serveMap.get(serveName).getName() == null
+                                    ? serveName : serveMap.get(serveName).getName(),
                             buildLocation(serveMap.get(serveName).getLocation())));
                 }
             }
@@ -60,13 +63,13 @@ class ResourcesConfig implements SwaggerResourcesProvider {
     }
 
     private void registerMe(List<SwaggerResource> resourceList) {
-        resourceList.add(swaggerResource(applicationName, "/v2/api-docs"));
+        resourceList.add(swaggerResource(applicationName, SWAGGER_PATH));
     }
 
     private static String buildLocation(String name) {
-        if (name.endsWith("/v2/api-docs")) {
+        if (name.endsWith(SWAGGER_PATH)) {
             return name;
         }
-        return "/" + name + "/v2/api-docs";
+        return "/" + name + SWAGGER_PATH;
     }
 }

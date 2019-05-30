@@ -1,78 +1,50 @@
 package cn.gjing.result;
 
-import com.google.common.collect.Maps;
+import cn.gjing.enums.HttpStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 错误时返回
+ *
  * @author Gjing
  **/
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ErrorResult {
+@AllArgsConstructor
+public class ErrorResult implements Serializable {
 
     private Integer code;
     private String message;
 
     /**
      * 错误请求时使用,包含code和message
-     * @return ErrorResult
-     */
-    public static ErrorResult failure() {
-        return ErrorResult.builder()
-                .code(HttpStatus.BAD_REQUEST.value())
-                .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .build();
-    }
-
-    /**
-     * 错误请求时使用,包含code和message
-     * @param code 状态码
-     * @param message 提示信息
+     *
      * @return ErrorResult
      */
     public static ErrorResult failure(Integer code, String message) {
         return ErrorResult.builder()
-                .code(code)
-                .message(message)
-                .build();
-    }
-
-    /**
-     * 错误请求时使用,包含code和message
-     * @param message 提示信息
-     * @return ErrorResult
-     */
-    public static ErrorResult failure(String message) {
-        return ErrorResult.builder()
-                .code(HttpStatus.BAD_REQUEST.value())
-                .message(message)
+                .code(code == null ? HttpStatus.BAD_REQUEST.getCode() : code)
+                .message(message == null ? HttpStatus.BAD_REQUEST.getMsg() : message)
                 .build();
     }
 
     /**
      * 服务器错误使用,只包含错误信息
-     * @param message 错误信息
+     *
      * @return map
      */
-    public static Map.Entry<String, String> error(String message) {
-        return Maps.immutableEntry("message", message);
-    }
-
-    /**
-     * 服务器错误使用,只包含错误信息
-     * @return map
-     */
-    public static Map.Entry<String, String> error() {
-        return Maps.immutableEntry("message", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+    public static Map<String, String> error(String message) {
+        Map<String, String> map = new HashMap<>(16);
+        map.put("message", message == null ? HttpStatus.INTERNAL_SERVER_ERROR.getMsg() : message);
+        return map;
     }
 
 }

@@ -4,7 +4,6 @@ import com.github.qcloudsms.SmsMultiSender;
 import com.github.qcloudsms.SmsMultiSenderResult;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Gjing
@@ -13,55 +12,53 @@ import org.springframework.util.StringUtils;
 public class TxSms {
 
     /**
-     * 实例
+     * 短信应用Id
      */
-    private static SmsSingleSender singleSender = null;
-    private static SmsMultiSender multiSender = null;
-
+    private Integer appId;
     /**
-     * 实例化
-     *
-     * @return 实例
+     * 短信应用appKey
      */
-    private static SmsSingleSender getSingleSender(Integer appId,String appKey) {
-        if (singleSender == null) {
-            synchronized (TxSms.class) {
-                if (singleSender == null) {
-                    singleSender = new SmsSingleSender(appId,appKey);
-                }
-            }
-        }
-        return singleSender;
+    private String appKey;
+
+    private SmsSingleSender smsSingleSender;
+
+    private SmsMultiSender smsMultiSender;
+
+    private TxSms(Integer appId, String appKey) {
+        this.appId = appId;
+        this.appKey = appKey;
     }
 
-    private static SmsMultiSender getMultiSender(Integer appId,String appKey) {
-        if (multiSender == null) {
-            synchronized (TxSms.class) {
-                if (multiSender == null) {
-                    multiSender = new SmsMultiSender(appId,appKey);
-                }
-            }
-        }
-        return multiSender;
+    public static TxSms of(Integer appId, String appKey) {
+        return new TxSms(appId, appKey);
     }
 
+    private TxSms getSmsSingleSender() {
+        this.smsSingleSender = new SmsSingleSender(this.appId, this.appKey);
+        return this;
+    }
 
+    private TxSms getSmsMultiSender() {
+        this.smsMultiSender = new SmsMultiSender(appId, appKey);
+        return this;
+    }
 
     /**
      * 指定模板 ID 单发短信
-     *
-     * @param txSmsModel 腾讯短信model
+     * @param params 数组具体的元素个数和模板中变量个数必须一致，例如事例中templateId:5678对应一个变量，参数数组中元素个数也必须是一个
+     * @param phoneNumber 需要发送短信的手机号码 {"21212313123", "12345678902", "12345678903"}
+     * @param smsSign  短信签名
+     * @param smsTemplateId 短信模板ID，需要在短信应用中申请
      * @return 发送结果 0 表示成功(计费依据)，非 0 表示失败 更多状态吗请看下方链接
      * @see <a href="https://cloud.tencent.com/document/product/382/3771"></a>
      */
-    public static String send(TxSmsModel txSmsModel) {
-        if (StringUtils.isEmpty(txSmsModel.getPhoneNumbers())||txSmsModel.getPhoneNumbers().length>1) {
-            throw new IllegalArgumentException("PhoneNumbers cannot be empty and must have a length of one");
+    public String send(String phoneNumber, String[] params, Integer smsTemplateId, String smsSign) {
+        if (phoneNumber==null||phoneNumber.length()<1) {
+            throw new IllegalArgumentException("PhoneNumbers cannot be null");
         }
         try {
-            SmsSingleSender sender = getSingleSender(txSmsModel.getAppId(), txSmsModel.getAppKey());
-            SmsSingleSenderResult result = sender.sendWithParam("86", txSmsModel.getPhoneNumbers()[0],
-                    txSmsModel.getSmsTemplateId(), txSmsModel.getParams(), txSmsModel.getSmsSign(), "", "");
+            SmsSingleSenderResult result = this.getSmsSingleSender().smsSingleSender.sendWithParam("86", phoneNumber,
+                    smsTemplateId, params, smsSign, "", "");
             return result.toString();
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage());
@@ -70,23 +67,22 @@ public class TxSms {
 
     /**
      * 指定模板 ID 群发短信,群发一次请求最多支持200个号码。
-     *
-     * @param txSmsModel tx短信模块
+     * @param params 数组具体的元素个数和模板中变量个数必须一致，例如事例中templateId:5678对应一个变量，参数数组中元素个数也必须是一个
+     * @param phoneNumbers 需要发送短信的手机号码 {"21212313123", "12345678902", "12345678903"}
+     * @param smsSign  短信签名
+     * @param smsTemplateId 短信模板ID，需要在短信应用中申请
      * @return 发送结果 0 表示成功(计费依据)，非 0 表示失败
      * @see <a href="https://cloud.tencent.com/document/product/382/3771"></a>
      */
-    public static String multiSend(TxSmsModel txSmsModel) {
-        if (StringUtils.isEmpty(txSmsModel.getPhoneNumbers())) {
+    public String multiSend(String[] phoneNumbers, String[] params, Integer smsTemplateId, String smsSign) {
+        if (phoneNumbers==null||phoneNumbers.length<1) {
             throw new IllegalArgumentException("PhoneNumbers cannot be empty");
         }
-        if (txSmsModel.getPhoneNumbers().length > 200) {
-            throw new IllegalArgumentException("Currently only 200 Numbers are supported");
-        }
         try {
-            SmsMultiSender multiSender = getMultiSender(txSmsModel.getAppId(), txSmsModel.getAppKey());
+            SmsMultiSender multiSender = this.getSmsMultiSender().smsMultiSender;
             // 签名参数未提供或者为空时，会使用默认签名发送短信
-            SmsMultiSenderResult result = multiSender.sendWithParam("86", txSmsModel.getPhoneNumbers(),
-                    txSmsModel.getSmsTemplateId(), txSmsModel.getParams(), txSmsModel.getSmsSign(), "", "");
+            SmsMultiSenderResult result = multiSender.sendWithParam("86", phoneNumbers,
+                    smsTemplateId, params, smsSign, "", "");
             return result.toString();
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage());

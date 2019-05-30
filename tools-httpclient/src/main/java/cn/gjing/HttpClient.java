@@ -1,6 +1,5 @@
 package cn.gjing;
 
-import org.springframework.http.HttpMethod;
 
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public class HttpClient {
      * 默认读超时10秒
      */
     private static final int READ_TIMEOUT = 10000;
-    
+
 
     /**
      * post请求
@@ -63,69 +62,6 @@ public class HttpClient {
     }
 
     /**
-     * post发送body请求
-     *
-     * @param url          请求url
-     * @param jsonEntity  json对象,可以是json字符串对应的对象也可以是map
-     * @param responseType 响应类型
-     * @return T
-     */
-    public <T> T postByJsonEntity(String url, Object jsonEntity, Class<T> responseType) {
-        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonEntity, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
-    }
-
-    /**
-     * post发送body请求
-     *
-     * @param url          请求url
-     * @param jsonEntity  json对象,可以是json字符串对应的对象也可以是map
-     * @param responseType 响应类型
-     * @param headers 请求头
-     * @return T
-     */
-    public <T> T postByJsonEntity(String url, Object jsonEntity,Map<String,?>headers, Class<T> responseType) {
-        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonEntity, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
-    }
-
-    /**
-     * post发送body请求
-     *
-     * @param url          请求url
-     * @param jsonStr   json字符串
-     * @param responseType 响应类型
-     * @return T
-     */
-    public <T> T postByJson(String url, String jsonStr, Class<T> responseType) {
-        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonStr, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
-    }
-
-    /**
-     * post发送body请求
-     *
-     * @param url          请求url
-     * @param jsonStr  json字符串
-     * @param responseType 响应类型
-     * @param headers 请求头
-     * @return T
-     */
-    public <T> T postByJson(String url, String jsonStr,Map<String,?> headers, Class<T> responseType) {
-        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonStr, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
-    }
-
-    /**
-     * post发送body请求
-     *
-     * @param url          请求url
-     * @param body         body内容
-     * @param headers      请求头
-     * @param responseType 响应类型
-     * @return T
-     */
-    public <T> T post(String url, Object body, Map<String, ?> headers, Class<T> responseType) {
-        return HttpHandle.getInstance().invokeUrl(url, null, headers, body, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
-    }
-
-    /**
      * post请求
      *
      * @param url          请求url
@@ -148,6 +84,115 @@ public class HttpClient {
      */
     public <T> T post(String url, Map<String, ?> queryMap, Map<String, ?> headers, Class<T> responseType) {
         return HttpHandle.getInstance().invokeUrl(url, queryMap, headers, null, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+    }
+
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonEntity   json对象,可以是json字符串对应的对象也可以是map
+     * @param responseType 响应类型
+     * @return T
+     */
+    public <T> T postByJsonEntity(String url, Object jsonEntity, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonEntity, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonEntity   json对象,可以是json字符串对应的对象也可以是map
+     * @param responseType 响应类型
+     * @param connectTimeout 连接超时时间
+     * @param readTimeout 读超时时间
+     * @return T
+     */
+    public <T> T postByJsonEntity(String url, Object jsonEntity,Integer connectTimeout, Integer readTimeout,  Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonEntity, connectTimeout, readTimeout, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonEntity   json对象,可以是json字符串对应的对象也可以是map
+     * @param responseType 响应类型
+     * @param headers      请求头
+     * @return T
+     */
+    public <T> T postByJsonEntity(String url, Object jsonEntity, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonEntity, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonEntity   json对象,可以是json字符串对应的对象也可以是map
+     * @param responseType 响应类型
+     * @param headers      请求头
+     * @param connectTimeout 连接超时时间
+     * @param readTimeout 读超时时间
+     * @return T
+     */
+    public <T> T postByJsonEntity(String url, Object jsonEntity, Map<String, ?> headers,Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonEntity, connectTimeout, readTimeout, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonStr      json字符串
+     * @param responseType 响应类型
+     * @return T
+     */
+    public <T> T postByJson(String url, String jsonStr, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonStr, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonStr      json字符串
+     * @param responseType 响应类型
+     * @param connectTimeout 连接超时时间
+     * @param readTimeout 读超时时间
+     * @return T
+     */
+    public <T> T postByJson(String url, String jsonStr,Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, null, jsonStr, connectTimeout, readTimeout, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonStr      json字符串
+     * @param responseType 响应类型
+     * @param headers      请求头
+     * @return T
+     */
+    public <T> T postByJson(String url, String jsonStr, Map<String, ?> headers, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonStr, CONNECT_TIMEOUT, READ_TIMEOUT, HttpMethod.POST, responseType);
+    }
+
+    /**
+     * post发送body请求
+     *
+     * @param url          请求url
+     * @param jsonStr      json字符串
+     * @param responseType 响应类型
+     * @param headers      请求头
+     * @param connectTimeout 连接超时时间
+     * @param readTimeout 读超时时间
+     * @return T
+     */
+    public <T> T postByJson(String url, String jsonStr, Map<String, ?> headers,Integer connectTimeout, Integer readTimeout, Class<T> responseType) {
+        return HttpHandle.getInstance().invokeUrl(url, null, headers, jsonStr, connectTimeout, readTimeout, HttpMethod.POST, responseType);
     }
 
     /**

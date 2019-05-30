@@ -1,9 +1,9 @@
 # tools-ali
-![](https://img.shields.io/badge/version-1.0.0-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp;
  ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
  ![](https://img.shields.io/badge/builder-success-green.svg)    
  提供阿里oss和短信功能
- > **推荐使用最新版本**
+ > **推荐使用最新版本,由于该项目使用了lombok插件，请确保本地安装了lombok**
  **安装**
  ---
  * <a href="https://mvnrepository.com/artifact/cn.gjing/tools-ali/" title="阿里巴巴工具包">tools-ali</a>
