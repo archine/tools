@@ -57,13 +57,12 @@ public class AliOss {
      * 文件删除
      *
      * @param fileOssUrls 文件地址集合
-     * @return 返回true为删除成功
+     * @return 返回删除文件列表
      */
-    public boolean delete(List<String> fileOssUrls) {
-        List<String> urlList = fileOssUrls.stream().map(this::getFileUrl).collect(Collectors.toList());
+    public List<String> delete(List<String> fileOssUrls) {
+        List<String> urlList = fileOssUrls.stream().map(this::getPathUrl).collect(Collectors.toList());
         try {
-            instance.deleteObjects(new DeleteObjectsRequest(this.bucketName).withKeys(urlList));
-            return true;
+            return instance.deleteObjects(new DeleteObjectsRequest(this.bucketName).withKeys(urlList)).getDeletedObjects();
         } catch (RuntimeException e) {
             throw new IllegalStateException(e.getMessage());
         }
@@ -233,7 +232,7 @@ public class AliOss {
         String[] split = fileUrl.split("/");
         URL url = instance.generatePresignedUrl(this.bucketName, split[split.length - 1], addDay(new Date()));
         if (url == null) {
-            throw new IllegalStateException("get oss file url error");
+            throw new IllegalStateException("Get oss file url error");
         }
         return url.toString();
     }
