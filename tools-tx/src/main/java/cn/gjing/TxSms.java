@@ -5,6 +5,8 @@ import com.github.qcloudsms.SmsMultiSenderResult;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 
+import java.util.Objects;
+
 /**
  * @author Gjing
  * 无论单发/群发短信还是指定模板 ID 单发/群发短信都需要从控制台中申请模板并且模板已经审核通过，才可能下发成功，否则返回失败
@@ -30,6 +32,8 @@ public class TxSms {
     }
 
     public static TxSms of(Integer appId, String appKey) {
+        Objects.requireNonNull(appId, "appId cannot be null");
+        Objects.requireNonNull(appKey, "appKey cannot be null");
         return new TxSms(appId, appKey);
     }
 
@@ -46,7 +50,7 @@ public class TxSms {
     /**
      * 指定模板 ID 单发短信
      * @param params 数组具体的元素个数和模板中变量个数必须一致，例如事例中templateId:5678对应一个变量，参数数组中元素个数也必须是一个
-     * @param phoneNumber 需要发送短信的手机号码 {"21212313123", "12345678902", "12345678903"}
+     * @param phoneNumber 需要发送短信的手机号码 157*******
      * @param smsSign  短信签名
      * @param smsTemplateId 短信模板ID，需要在短信应用中申请
      * @return 发送结果 0 表示成功(计费依据)，非 0 表示失败 更多状态吗请看下方链接

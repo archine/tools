@@ -23,12 +23,13 @@ public class PageResult<T> implements Serializable {
 
     /**
      * 构建分页结果
-     * @param data page数据
-     * @param totalPage 总页数
+     *
+     * @param data        page数据
+     * @param totalPage   总页数
      * @param currentPage 当前页数
      * @return PageResult
      */
-    public static PageResult of(Object data, Integer totalPage,Integer currentPage) {
+    public static <T> PageResult of(T data, Integer totalPage, Integer currentPage) {
         return PageResult.builder()
                 .data(data)
                 .totalPage(totalPage)
@@ -38,11 +39,12 @@ public class PageResult<T> implements Serializable {
 
     /**
      * 构建分页结果
-     * @param data page数据
+     *
+     * @param data      page数据
      * @param totalPage 总页数
      * @return PageResult
      */
-    public static PageResult of(Object data, Integer totalPage) {
+    public static <T> PageResult of(T data, Integer totalPage) {
         return PageResult.builder()
                 .data(data)
                 .totalPage(totalPage)

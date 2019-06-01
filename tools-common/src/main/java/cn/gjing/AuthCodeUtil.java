@@ -77,11 +77,12 @@ public class AuthCodeUtil {
      * @param localPath 本地目录
      * @throws IOException IOException
      */
-    public void writeToLocal(String localPath) throws IOException {
+    public AuthCodeUtil writeToLocal(String localPath) throws IOException {
         OutputStream outputStream = new FileOutputStream(localPath);
-        this.write(outputStream);
+        AuthCodeUtil write = this.write(outputStream);
         outputStream.flush();
         outputStream.close();
+        return write;
     }
 
     /**
@@ -89,8 +90,9 @@ public class AuthCodeUtil {
      * @param outputStream 输出流
      * @throws IOException IOException
      */
-    public void write(OutputStream outputStream) throws IOException {
+    public AuthCodeUtil write(OutputStream outputStream) throws IOException {
         ImageIO.write(bufferedImage, "png", outputStream);
+        return this;
     }
 
     /**

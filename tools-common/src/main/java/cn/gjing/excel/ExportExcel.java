@@ -85,7 +85,7 @@ class ExportExcel {
         setStyle(style);
         //内容背景
         HSSFCellStyle style2 = wb.createCellStyle();
-        style2.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        style2.setFillForegroundColor(IndexedColors.WHITE.getIndex());
         style2.setAlignment(HorizontalAlignment.CENTER);
         style2.setVerticalAlignment(VerticalAlignment.CENTER);
         setStyle(style2);

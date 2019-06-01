@@ -9,8 +9,9 @@ class UriUtil {
         if (targetAddress.endsWith("/")) {
             targetAddress = targetAddress.substring(0, targetAddress.length() - 1);
         }
-        return "http://" + targetAddress;
+        return targetAddress.startsWith("http://") ? targetAddress : "http://" + targetAddress;
     }
+
     static String buildUrl(String targetAddress, String methodPath) {
         StringBuilder builder = new StringBuilder();
         builder.append(targetAddress);

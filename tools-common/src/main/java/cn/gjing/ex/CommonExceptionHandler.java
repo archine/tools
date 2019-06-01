@@ -26,15 +26,8 @@ public class CommonExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorResult.error(e.getMessage()));
     }
 
-    @Deprecated
-    @ExceptionHandler(GjingException.class)
-    public ResponseEntity gjingException(GjingException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.getCode()).body(ErrorResult.error(e.getMessage()));
-    }
-
-    @ExceptionHandler(NoAuthException.class)
-    public ResponseEntity noAuth(NoAuthException e) {
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity noAuth(AuthException e) {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED.getCode()).body(ErrorResult.error(e.getMessage()));
     }

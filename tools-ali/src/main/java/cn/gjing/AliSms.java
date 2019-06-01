@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Gjing
@@ -33,6 +34,8 @@ public class AliSms {
      * @return 实例
      */
     public static AliSms of(String accessKeyId, String accessKeySecret) {
+        Objects.requireNonNull(accessKeyId, "accessKeyId cannot be null");
+        Objects.requireNonNull(accessKeySecret, "accessKeySecret cannot be null");
         return new AliSms(accessKeyId, accessKeySecret);
     }
 
@@ -76,6 +79,12 @@ public class AliSms {
      * @see <a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.13.450fbc454bQfCJ"></a>
      */
     public String querySendDetails(String phoneNumber, String sendData, String pageSize, String currentPage) {
+        if (Integer.parseInt(pageSize) < 1 || Integer.parseInt(pageSize) > 50) {
+            throw new IllegalArgumentException("PageSize is not valid, It can't be less than 1 or more than 50");
+        }
+        if (Integer.parseInt(currentPage) < 1) {
+            throw new IllegalArgumentException("currentPage is not valid, No less than 1");
+        }
         CommonRequest request = new CommonRequest();
         request.setMethod(MethodType.POST);
         request.setDomain(Sms.QUERY.getApi());

@@ -18,7 +18,6 @@ public class ToolsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnClass(CommonExceptionHandler.class)
     public CommonExceptionHandler commonExceptionHandler() {
         return new CommonExceptionHandler();
     }

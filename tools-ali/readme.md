@@ -59,17 +59,20 @@ public ResponseEntity streamDown(String fileOssUrl, HttpServletResponse response
  阿里短信:
  * 发送短信: 返回内容中Code为ok表示发送成功 ,更多状态码请前往<a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.14.633f56e06vZoyq">状态码</a>
  ```
- public static void main(String[] args) {
-     AliSmsModel model = new AliSmsModel("您的accessKeyId","您的accessKey秘钥");
+ @PostMapping("/send-ali")
+ @ApiOperation(value = "阿里短信", httpMethod = "POST")
+ public ResponseEntity sendAli() {
      //参数,必须与对应的短信模板参数对应,如果没有参数,可以传null或者空map
      Map<String, String> param = new HashMap<>(16);
-     //返回发送结果
-     String result = AliSms.of("accessKeyId","accessKeySecret")
-        .send("接收的短信的手机号,支持多个,英文逗号隔开", "短信模板code", param, "短信签名");
-     System.out.println(result);
+     map.put("code", "123123");
+     //接收的短信的手机号,支持多个,英文逗号隔开
+     String send = AliSms.of("accessKeyId", "accessKeySecret")
+             .send("157********", "短信模板Code", param, "短信签名");
+     return ResponseEntity.ok(send);
  }
  ```
- * 查询短信, :exclamation: 日期必须为yyyyMMdd格式(20181207),仅支持最近30天;返回内容中Code为OK代表请求成功,更多状态码前往: <a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.13.450fbc454bQfCJ">状态码</a>
+ * 查询短信, :exclamation: 日期必须为yyyyMMdd格式(20181207),仅支持最近30天;返回内容中Code为OK代表请求成功,每页显示的短信数量取值范围为1-50,指定发送记录要查看的页码(最小为1),
+    更多状态码前往: <a href="https://help.aliyun.com/document_detail/101346.html?spm=a2c4g.11186623.2.13.450fbc454bQfCJ">状态码</a>
  ```
  public static void main(String[] args) {
      AliSmsModel model = new AliSmsModel("您的accessKeyId","您的accessKey秘钥");
@@ -77,5 +80,12 @@ public ResponseEntity streamDown(String fileOssUrl, HttpServletResponse response
         .querySendDetails("查询的手机号", "查询日期","每页显示的短信数量取值范围1-50",
      "指定发送记录要查看的页码(最小为1)");
      System.out.println(result);
+ }
+ @GetMapping("query-ali")
+ @ApiOperation(value = "查询阿里短信发送记录", httpMethod = "GET")
+ public ResponseEntity queryAli() {
+     String result = AliSms.of("您的accessKeyId", "您的accessKey秘钥")
+             .querySendDetails("157********", "查询日期(年月日)", "每页数量", "当前页数");
+     return ResponseEntity.ok(result);
  }
  ```

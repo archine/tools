@@ -12,10 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -50,6 +47,10 @@ public class AliOss {
      * @return 实例
      */
     public static AliOss of(String endPoint, String accessKeyId, String accessKeySecret, String bucketName) {
+        Objects.requireNonNull(endPoint, "endPoint cannot be null");
+        Objects.requireNonNull(accessKeyId, "accessKeyId cannot be null");
+        Objects.requireNonNull(accessKeySecret, "accessKeySecret cannot be null");
+        Objects.requireNonNull(bucketName, "bucketName cannot be null");
         return new AliOss(endPoint, accessKeyId, accessKeySecret, bucketName);
     }
 

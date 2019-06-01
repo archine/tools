@@ -11,25 +11,26 @@
 > **使用方法**
 ---
 腾讯短信:   
-1. 构建sms模板;   
-2. 调用方法 
-* 指定模板ID单发短信, :exclamation: 手机号必须为单个,否则抛出号码长度异常,参数必须与你选择的模板参数对应和顺序对应;发送结果 0 表示成功(计费依据)，非 0 表示失败 ,
+* 指定模板ID与手机号发送短信, **参数必须与你选择的模板参数对应和顺序对应,如果没有参数可以传空数组**, 发送结果 0 表示成功(计费依据)，非 0 表示失败 ,
   更多错误码请前往: <a href="https://cloud.tencent.com/document/product/382/3771">错误码</a>
 ```
-public static void main(String[] args) {
-    TxSmsModel smsModel = TxSmsModel.builder().appId("您的appid").appKey("您的appid对应的key").smsTemplateId("短信模板id")
-            .smsSign("短信签名").params("短信模板中对应的参数").phoneNumbers("接收短信的手机号").build();
-    String result = TxSms.send(smsModel);
-    System.out.println("result: "+result);
+@PostMapping("/send-tx")
+@ApiOperation(value = "腾讯短信", httpMethod = "POST")
+public ResponseEntity sendTx() {
+    String send = TxSms.of(appid, "appkey")
+            .send("157******", new String[]{"参数1".....}, 模板id, "短信签名");
+    return ResponseEntity.ok(send);
 }
 ```
-* 指定模板ID群发短信, :exclamation: 群发一次请求最多支持200个号码。发送结果 0 表示成功(计费依据)，非 0 表示失败,   
+* 指定模板ID群发短信, 群发一次请求**最多支持200个号码**。发送结果 result为0 表示成功(计费依据)，非 0 表示失败,   
   更多错误码请前往: <a href="https://cloud.tencent.com/document/product/382/3771">错误码</a>
 ```
-public static void main(String[] args) {
-    TxSmsModel smsModel = TxSmsModel.builder().appId("您的appid").appKey("您的appid对应的key").smsTemplateId("短信模板id")
-           .smsSign("短信签名").params("短信模板中对应的参数").phoneNumbers("接收短信的手机号").build();
-    String result = TxSms.multiSend(smsModel);
-    System.out.println("result: "+result);
+@PostMapping("/send-tx-multi")
+@ApiOperation(value = "腾讯群发短信", httpMethod = "POST")
+public ResponseEntity sendTxMulti() {
+    String send = TxSms.of(appid, "appkey")
+            .multiSend(new String[]{"157****","168*******"}, new String[]{"参数", "参数"....}, 模板id, "短信签名");
+    return ResponseEntity.ok(send);
 }
+
 ```

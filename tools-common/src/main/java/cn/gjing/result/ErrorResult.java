@@ -31,8 +31,20 @@ public class ErrorResult implements Serializable {
      */
     public static ErrorResult failure(Integer code, String message) {
         return ErrorResult.builder()
-                .code(code == null ? HttpStatus.BAD_REQUEST.getCode() : code)
-                .message(message == null ? HttpStatus.BAD_REQUEST.getMsg() : message)
+                .code(code)
+                .message(message)
+                .build();
+    }
+
+    /**
+     * 错误请求时使用,包含code和message
+     *
+     * @return ErrorResult
+     */
+    public static ErrorResult failure() {
+        return ErrorResult.builder()
+                .code(HttpStatus.BAD_REQUEST.getCode())
+                .message(HttpStatus.BAD_REQUEST.getMsg())
                 .build();
     }
 

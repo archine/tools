@@ -25,9 +25,35 @@ Excel:
 * 导出: :exclamation: response, headers,title不能为空 
 ```
 @RequestMapping("/excel")
-@ApiOperation(value = "excel导出", httpMethod = "GET", response = ApiResponse.class)
-public void zsyProductTemplate(HttpServletResponse response) {
-    ExcelUtil.excelExport(response, "要导出的数据(没有数据可以传null)", "excel表头", "excel文件名", "excel额外的内容(不需要可以传null,一般用于介绍或者总概括excel)");
+public void excel(HttpServletResponse response) {
+    String[] headers = {"标题1", "标题2"};
+    ExcelUtil.excelExport(response, null, headers, "测试无内容excel", null);
+}
+
+@RequestMapping("/excel2")
+public void excelContainsValue(HttpServletResponse response) {
+    String[] headers = {"标题1", "标题2"};
+    List<Object[]> data = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+        Object[] objects = new Object[headers.length];
+        objects[0] = i;
+        objects[1] = i+1;
+        data.add(objects);
+    }
+    ExcelUtil.excelExport(response, data, headers, "测试含有内容excel", null);
+}
+
+@RequestMapping("/excel3")
+public void excelContainsInfo(HttpServletResponse response) {
+    String[] headers = {"标题1", "标题2"};
+    List<Object[]> data = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+        Object[] objects = new Object[headers.length];
+        objects[0] = i;
+        objects[1] = i+1;
+        data.add(objects);
+    }
+    ExcelUtil.excelExport(response, data, headers, "测试含有详情的excel", "详情");
 }
 ```
 实用工具类:   
@@ -55,15 +81,16 @@ public void zsyProductTemplate(HttpServletResponse response) {
 public static void main(String[] args) {
     AuthCodeUtil authCodeUtil = new AuthCodeUtil(160,40,5,150);
     try {
-        String path="指定的路径/文件名/".png";
-        System.out.println(vCode.getCode()+" >"+path);
-        authCodeUtil.write(path);
+        String path="/Users/colin/Desktop/q/code2.png";
+        //写入到本地时可以通过getCode()方法获取生成的验证码
+        String code = authCodeUtil.writeToLocal(path).getCode();
+        System.out.println(code);
     } catch (IOException e) {
         e.printStackTrace();
     }
 }
 //第二种情况: 以流的方式返回给前端
-@RequestMapping("/code")
+@GetMapping("/code")
 public void getCode(HttpServletResponse response, HttpServletRequest request) throws IOException {
     AuthCodeUtil authCodeUtil = new AuthCodeUtil(100, 50, 4, 50);
     response.setContentType("image/jpeg");
@@ -75,27 +102,28 @@ public void getCode(HttpServletResponse response, HttpServletRequest request) th
     session.setAttribute("code", authCodeUtil.getCode());
     authCodeUtil.write(response.getOutputStream());
 }
+
 /**
  * 验证码验证,由于示例为服务端session存储,所以下面为session方式验证,具体根据个人存储条件相应更改
  * @param code 前端传来的验证码
  * @param request request
  * @return .
  */
-@RequestMapping("/verifyCode")
-@NotNull(exclude = {"request"})
-public ResultVo verifyCode(String code,HttpServletRequest request) {
+@PostMapping("/verifyCode")
+@NotNull2(exclude = {"request"})
+public ResultVo verifyCode(String code, HttpServletRequest request) {
     HttpSession httpSession = request.getSession();
     String sessionCode = (String) httpSession.getAttribute("code");
-    if (ParamUtil.paramIsEmpty(sessionCode)) {
-        return ResultVo.error(HttpStatus.BAD_REQUEST.getMsg());
+    if (ParamUtil.isEmpty(sessionCode)) {
+        return ResultVo.error(null, "code不存在");
     }
     if (sessionCode.toLowerCase().equals(code.toLowerCase())) {
         return ResultVo.success();
     }
-    return ResultVo.error("invalid code");
+    return ResultVo.error(null,"invalid code");
 }
 ```
-* EmailUtil: 邮件工具类,支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功,否则抛出GjingException.
+* EmailUtil: 邮件工具类,支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功
 ```
 里面参数主要包括: host(smtp服务器地址,比如qq邮箱:smtp.qq.com);password(发送者邮箱密码,有些邮箱需要用授权码代替密码);from(发送人邮箱地址);subject(邮件主题);body(邮件内容,支持html);   
 files(要发送的附件物理地址,不要可以传null或者空数组);tos(收件人邮箱账号,多个逗号隔开);copyTo(抄送人邮箱地址,多个逗号隔开,不抄送可以传null或者空字符串"");

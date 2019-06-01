@@ -56,7 +56,7 @@ public class UrlUtil {
                     String key = item.getKey();
                     String val = String.valueOf(item.getValue());
                     if (urlEncode) {
-                        val = URLEncoder.encode(val, "utf-8");
+                        val = URLEncoder.encode(val, "UTF-8");
                         key = URLEncoder.encode(key, "UTF-8");
                     }
                     if (keyToLower) {

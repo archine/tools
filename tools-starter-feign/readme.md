@@ -52,7 +52,7 @@ public ResponseEntity test() throws URISyntaxException {
 ```
 @GetMapping("/test")
 public ResponseEntity test() throws URISyntaxException {
-    String result = FeignClientUtil.ofByUrl("127.0.0.1:8080")
+    String result = FeignClientUtil.ofByUrl("http://127.0.0.1:8080")
             .execute(HttpMethod.GET, null, "/test")
             .getResult();
     return ResponseEntity.ok(result);
