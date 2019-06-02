@@ -22,6 +22,6 @@ public class ExcelUtil {
      */
     @NotNull
     public static void excelExport(HttpServletResponse response, @ExcludeParam List<Object[]> list, String[] headers, String title, @ExcludeParam String info) {
-        ExportExcel.generateHaveExcelName(response, list, headers, title, info);
+        ExportExcel.of(list, headers, title, info).generateHaveExcelName(response);
     }
 }

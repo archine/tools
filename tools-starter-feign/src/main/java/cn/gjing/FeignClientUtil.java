@@ -40,7 +40,7 @@ public class FeignClientUtil<T> {
         this.responseType = Objects.requireNonNull(responseType);
         this.result = null;
         this.routeType = Objects.requireNonNull(routeType);
-        this.targetAddress = Objects.requireNonNull(targetAddress);
+        this.targetAddress = Objects.requireNonNull(UriUtil.buildUrl(targetAddress));
     }
 
     /**
@@ -49,11 +49,11 @@ public class FeignClientUtil<T> {
      * @param responseType  响应类型
      * @param routeType     路由类型
      * @param <T>           T
-     * @param targetAddress 目标地址:可以是: http://服务名/ 或者 http://127.0.0.1:8090/
+     * @param targetAddress 目标地址:可以是: 服务名 或者 127.0.0.1:8090
      * @return FeignClientUtil
      */
     public static <T> FeignClientUtil<T> of(Class<T> responseType, RouteType routeType, String targetAddress) {
-        return new FeignClientUtil<>(responseType, routeType, UriUtil.checkUrl(targetAddress));
+        return new FeignClientUtil<>(responseType, routeType, targetAddress);
     }
 
     /**
@@ -63,48 +63,17 @@ public class FeignClientUtil<T> {
      * @return FeignClientUtil
      */
     public static FeignClientUtil<String> ofByName(String targetAddress) {
-        return new FeignClientUtil<>(String.class, RouteType.NAME, UriUtil.checkUrl(targetAddress));
-    }
-
-    @Deprecated
-    public static FeignClientUtil<String> defaultByName(String targetAddress) {
-        return new FeignClientUtil<>(String.class, RouteType.NAME, UriUtil.checkUrl(targetAddress));
+        return new FeignClientUtil<>(String.class, RouteType.NAME, targetAddress);
     }
 
     /**
      * 默认使用URL路由,返回值为String
      *
-     * @param targetAddress 目标地址,例如: http://127.0.0.1:8090/
+     * @param targetAddress 目标地址,例如: 127.0.0.1:8090
      * @return FeignClientUtil
      */
     public static FeignClientUtil<String> ofByUrl(String targetAddress) {
-        return new FeignClientUtil<>(String.class, RouteType.URL, UriUtil.checkUrl(targetAddress));
-    }
-
-    @Deprecated
-    public static FeignClientUtil<String> defaultByUrl(String targetAddress) {
-        return new FeignClientUtil<>(String.class, RouteType.URL, UriUtil.checkUrl(targetAddress));
-    }
-
-    /**
-     * 执行
-     *
-     * @param httpMethod  请求类型
-     * @param queryMap    参数，不需要传null
-     * @param requestBody json对象或者json字符串
-     * @param methodPath  接口路径, /test/method
-     * @return FeignClientUtil
-     * @throws URISyntaxException uri转换异常
-     */
-    @Deprecated
-    public FeignClientUtil<T> execute(HttpMethod httpMethod, Map<String, ?> queryMap, Object requestBody,
-                                      String methodPath) throws URISyntaxException {
-        Objects.requireNonNull(httpMethod);
-        FeignBean feignBean = routeType.equals(RouteType.URL) ?
-                FEIGN_PROCESS.getByUrl(targetAddress) :
-                FEIGN_PROCESS.getByName(targetAddress);
-        request(httpMethod, queryMap, requestBody, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
-        return this;
+        return new FeignClientUtil<>(String.class, RouteType.URL, targetAddress);
     }
 
     /**
@@ -114,31 +83,37 @@ public class FeignClientUtil<T> {
      * @param queryMap   参数，不需要传null
      * @param methodPath 接口路径, /test/method
      * @return FeignClientUtil
-     * @throws URISyntaxException uri转换异常
      */
     public FeignClientUtil<T> execute(HttpMethod httpMethod, Map<String, ?> queryMap,
-                                      String methodPath) throws URISyntaxException {
+                                      String methodPath) {
         Objects.requireNonNull(httpMethod);
         FeignBean feignBean = routeType.equals(RouteType.URL) ?
                 FEIGN_PROCESS.getByUrl(targetAddress) :
                 FEIGN_PROCESS.getByName(targetAddress);
-        request(httpMethod, queryMap, null, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
+        try {
+            request(httpMethod, queryMap, null, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
     /**
      * 执行post请求
      *
-     * @param requestBody json对象或者json字符串
-     * @param methodPath  接口路径, /test/method
+     * @param jsonEntity json对象或者json字符串
+     * @param methodPath 接口路径, /test/method
      * @return FeignClientUtil
-     * @throws URISyntaxException uri转换异常
      */
-    public FeignClientUtil<T> executeByBody(Object requestBody, String methodPath) throws URISyntaxException {
+    public FeignClientUtil<T> executeByJsonEntity(Object jsonEntity, String methodPath) {
         FeignBean feignBean = routeType.equals(RouteType.URL) ?
                 FEIGN_PROCESS.getByUrl(targetAddress) :
                 FEIGN_PROCESS.getByName(targetAddress);
-        request(HttpMethod.POST, null, requestBody, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
+        try {
+            request(HttpMethod.POST, null, jsonEntity, UriUtil.buildUrl(targetAddress, methodPath), feignBean);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
@@ -184,7 +159,7 @@ public class FeignClientUtil<T> {
                         cast(feignBean.post(new URI(url)));
                         break;
                     }
-                    cast(feignBean.postBody(new URI(url), body));
+                    cast(feignBean.postByJsonEntity(new URI(url), body));
                     break;
                 }
                 cast(feignBean.post(new URI(url), queryMap));

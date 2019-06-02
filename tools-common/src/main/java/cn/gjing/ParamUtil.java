@@ -100,26 +100,6 @@ public final class ParamUtil {
     }
 
     /**
-     * 大写
-     *
-     * @param str 字符串
-     * @return 大写
-     */
-    public static String toUpperCase(String str) {
-        return isEmpty(str) ? null : str.toUpperCase();
-    }
-
-    /**
-     * 小写
-     *
-     * @param str 字符串
-     * @return 小写字符串
-     */
-    public static String toLowerCase(String str) {
-        return isEmpty(str) ? null : str.toLowerCase();
-    }
-
-    /**
      * 移除字符串的符号
      *
      * @param str    字符串

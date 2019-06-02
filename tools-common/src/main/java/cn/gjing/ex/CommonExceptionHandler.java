@@ -17,26 +17,19 @@ public class CommonExceptionHandler {
     @ExceptionHandler(ParamException.class)
     public ResponseEntity paramException(ParamException e) {
         e.printStackTrace();
-        return ResponseEntity.badRequest().body(ErrorResult.error(HttpStatus.INVALID_PARAMETER.getMsg()));
+        return ResponseEntity.badRequest().body(ErrorResult.error( e.getMessage()));
     }
 
     @ExceptionHandler(HttpException.class)
     public ResponseEntity httpException(HttpException e) {
         e.printStackTrace();
-        return ResponseEntity.badRequest().body(ErrorResult.failure());
+        return ResponseEntity.badRequest().body(ErrorResult.error(e.getMessage()));
     }
 
-    @Deprecated
-    @ExceptionHandler(GjingException.class)
-    public ResponseEntity gjingException(GjingException e) {
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity noAuth(AuthException e) {
         e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.getCode()).body(ErrorResult.failure());
-    }
-
-    @ExceptionHandler(NoAuthException.class)
-    public ResponseEntity noAuth(NoAuthException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.getCode()).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.getCode()).body(ErrorResult.error(e.getMessage()));
     }
     
 }

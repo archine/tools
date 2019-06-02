@@ -5,23 +5,16 @@ package cn.gjing;
  **/
 class UriUtil {
 
-    private static boolean isAbsolute(String url) {
-        return url != null && !url.isEmpty() && url.startsWith("http");
-    }
-
-     static String checkUrl(String url) {
-        if (isAbsolute(url)) {
-            if (url.endsWith("/")) {
-                url = url.substring(0, url.length() - 1);
-            }
-            return url;
+    static String buildUrl(String targetAddress) {
+        if (targetAddress.endsWith("/")) {
+            targetAddress = targetAddress.substring(0, targetAddress.length() - 1);
         }
-        throw new IllegalArgumentException("The url is no absolute");
+        return targetAddress.startsWith("http://") ? targetAddress : "http://" + targetAddress;
     }
 
-    static String buildUrl(String url, String methodPath) {
+    static String buildUrl(String targetAddress, String methodPath) {
         StringBuilder builder = new StringBuilder();
-        builder.append(url);
+        builder.append(targetAddress);
         if (!methodPath.startsWith("/")) {
             builder.append("/").append(methodPath);
         }

@@ -11,13 +11,14 @@ import java.util.Date;
  * @author Gjing
  **/
 public class TimeUtil {
+
     /**
      * 获取文本格式时间
      *
      * @param date date
      * @return 文本时间
      */
-    public static String getDateAsString(Date date) {
+    public static String dateToString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(date);
     }
@@ -135,7 +136,7 @@ public class TimeUtil {
      * @param format 格式("yyyy-MM-dd")
      * @return string 文本
      */
-    public static String getDateAsString(Date date, String format) {
+    public static String dateToString(Date date, String format) {
         SimpleDateFormat format1 = new SimpleDateFormat(format);
         return format1.format(date);
     }
@@ -147,7 +148,7 @@ public class TimeUtil {
      * @return 时间对象
      * @throws ParseException format exception
      */
-    public static Date getDate(String date) throws ParseException {
+    public static Date stringToDate(String date) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.parse(date);
     }
@@ -188,7 +189,7 @@ public class TimeUtil {
      * @return 时间
      */
     public static Date calendarToDate(Calendar calendar, String format) throws ParseException {
-        return getDate(calendarToStringDate(calendar, format));
+        return stringToDate(calendarToStringDate(calendar, format));
     }
 
     /**
@@ -199,7 +200,7 @@ public class TimeUtil {
      * @return 文本时间
      */
     public static String calendarToStringDate(Calendar calendar, String format) {
-        return getDateAsString(calendar.getTime(), format);
+        return dateToString(calendar.getTime(), format);
     }
 
     /**
@@ -285,7 +286,7 @@ public class TimeUtil {
      * @return 时间戳
      */
     public static Long stringDateToStamp(String stringDate) throws ParseException {
-        return TimeUtil.getDate(stringDate).getTime();
+        return TimeUtil.stringToDate(stringDate).getTime();
     }
 
     /**
@@ -296,7 +297,7 @@ public class TimeUtil {
      */
     public static String stampToStringDate(Long timeStamp) {
         long l = timeStamp;
-        return TimeUtil.getDateAsString(new Date(l));
+        return TimeUtil.dateToString(new Date(l));
     }
 
     /**

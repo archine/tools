@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 public @interface NotNull2 {
     String[] exclude()default {};
 
-    String message() default "Parameter cannot be null";
+    String message() default "";
 }
