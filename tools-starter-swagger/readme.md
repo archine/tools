@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.0.7-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.0.8-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 ##### 快速集成Swagger，只需一个注解，即可开启默认配置并使用它, 也可以自定义去配置它.
