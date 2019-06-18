@@ -1,8 +1,8 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.0.2-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
- 提供参数校验与处理，excel导出，时间转换，数据加密,线程池,验证码,发送邮件等功能...
- > **推荐使用最新版本**    
+ 提供参数校验与处理，excel导出，时间转换，数据加密,线程池,验证码,发送邮件,开启跨域等功能...
+ > **推荐使用最新版本，由于项目使用了lombok，请确保本地开发工具安装了lombok插件**    
  
 **安装**
 ---
@@ -10,12 +10,18 @@
 > **使用方式**
 ---
 注解:
-```
 * @NotNull: 可以在普通程序和web程序中使用,适用于方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到指定参数上;
 * @NotNull2: 只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull(exclude={"参数名1","参数名2"}),:exclamation: 参数名必须与方法的参数名相同,   
                          默认异常信息为参数不能为空,可以自定义异常信息@NotNull(message="您要使用的异常异常");   
 * @EnableCors: 允许跨域,标注在启动类上
-```  
+```yaml
+cors:
+  allowed-methods: POST,GET,DELETE,PUT
+  allowed-headers:
+  allowed-origins:
+  path: /**
+  max-age: 1800
+```
 返回结果模板:   
 * ResultVo: 通用返回结果模板,包含code(状态码),message(提示信息),data(数据)三个参数
 * PageResult: 分页查询返回结果模板,包含data(数据)和totalPage(总页数)以及CurrentPage(当前页数),使用时可以直接使用builder构造,也可以调用其中of方法.
