@@ -13,19 +13,19 @@ import java.util.Arrays;
  * @author Gjing
  **/
 @Configuration
-public class CorsConfig {
+class CorsAdapter {
     @Resource
-    private CorsBean corsBean;
+    private Cors cors;
 
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowCredentials(corsBean.getAllowCredentials());
-        corsConfiguration.setAllowedHeaders(Arrays.asList(corsBean.getAllowedHeaders()));
-        corsConfiguration.setAllowedOrigins(Arrays.asList(corsBean.getAllowedOrigins()));
-        corsConfiguration.setAllowedMethods(Arrays.asList(corsBean.getAllowedMethods()));
-        source.registerCorsConfiguration(corsBean.getPath(), corsConfiguration);
+        corsConfiguration.setAllowCredentials(cors.getAllowCredentials());
+        corsConfiguration.setAllowedHeaders(Arrays.asList(cors.getAllowedHeaders()));
+        corsConfiguration.setAllowedOrigins(Arrays.asList(cors.getAllowedOrigins()));
+        corsConfiguration.setAllowedMethods(Arrays.asList(cors.getAllowedMethods()));
+        source.registerCorsConfiguration(cors.getPath(), corsConfiguration);
         return new CorsFilter(source);
     }
 }

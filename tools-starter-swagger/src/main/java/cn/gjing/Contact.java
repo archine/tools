@@ -18,8 +18,11 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("swagger.contact")
 public class Contact {
 
+    @Builder.Default
     private String name = "";
+    @Builder.Default
     private String url = "";
+    @Builder.Default
     private String email = "";
 
 }

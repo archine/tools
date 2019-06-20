@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.0.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  提供参数校验与处理，excel导出，时间转换，数据加密,线程池,验证码,发送邮件,开启跨域等功能...
  > **推荐使用最新版本，由于项目使用了lombok，请确保本地开发工具安装了lombok插件**    
@@ -11,9 +11,9 @@
 ---
 注解:
 * @NotNull: 可以在普通程序和web程序中使用,适用于方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到指定参数上;
-* @NotNull2: 只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull(exclude={"参数名1","参数名2"}),:exclamation: 参数名必须与方法的参数名相同,   
-                         默认异常信息为参数不能为空,可以自定义异常信息@NotNull(message="您要使用的异常异常");   
-* @EnableCors: 允许跨域,标注在启动类上
+* @NotNull2: 只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull2(exclude={"参数名1","参数名2"}),:exclamation: 参数名必须与方法的参数名相同,   
+                         默认异常信息为参数不能为空,可以自定义异常信息@NotNull2(message="您要使用的异常异常");   
+* @EnableCors（SpringBoot环境使用）: 允许跨域,标注在启动类上
 ```yaml
 cors:
   allowed-methods: POST,GET,DELETE,PUT
@@ -80,7 +80,7 @@ public void excelContainsInfo(HttpServletResponse response) {
     19: stringToLocalDate: String格式日期转LocalDate; 20: localDateTimeToStamp: localDateTime转时间戳; 21: getYearsByStartTime: 查询指定日期距离当前多少年;   
     22: stampToLocalDateTime: 时间戳转LocalDateTime.......
 ```
-* EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64;
+* EncryptionUtil: 主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64、Aes;
 * AuthCodeUtil: 简单验证码工具类, 目前只支持英文和数字混合验证码,后期会加上拼图等类型验证码;
 ```
 //第一种情况: 生成验证码到本地指定路径,以下为简单测试,具体逻辑根据业务需求自行设计
