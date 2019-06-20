@@ -3,12 +3,10 @@ package cn.gjing;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Gjing
  **/
-@Component
 class BeanUtil implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
     @Override

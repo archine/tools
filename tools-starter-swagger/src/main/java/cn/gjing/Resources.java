@@ -25,14 +25,17 @@ public class Resources {
     /**
      * 是否开启Swagger资源列表
      */
+    @Builder.Default
     private boolean enable = false;
     /**
      * 是否注册本服务,默认true
      */
+    @Builder.Default
     private boolean registerMe = true;
     /**
      * 服务名和地址以及列表展示名
      */
+    @Builder.Default
     private List<Map<String,Serve>> serveList = new ArrayList<>();
 
 }

@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.2.7</version>
+        <version>1.2.9</version>
     </parent>
     <artifactId>tools-starter-swagger</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <name>tools-starter-swagger</name>
     <description>swagger starter</description>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>2.1.4.RELEASE</version>
+            <version>2.1.6.RELEASE</version>
             <optional>true</optional>
         </dependency>
         <dependency>

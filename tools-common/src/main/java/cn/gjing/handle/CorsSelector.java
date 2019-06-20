@@ -9,6 +9,6 @@ import org.springframework.core.type.AnnotationMetadata;
 public class CorsSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
-        return new String[]{CrosConfig.class.getName()};
+        return new String[]{CorsAdapter.class.getName(), Cors.class.getName()};
     }
 }
