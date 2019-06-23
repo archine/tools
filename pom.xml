@@ -15,6 +15,7 @@
         <module>tools-starter-swagger</module>
         <module>tools-httpclient</module>
         <module>tools-starter-feign</module>
+        <module>tools-redis</module>
     </modules>
     <description>develop tool</description>
     <properties>
@@ -86,6 +87,11 @@
                 <groupId>cn.gjing</groupId>
                 <artifactId>tools-starter-feign</artifactId>
                 <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.gjing</groupId>
+                <artifactId>tools-redis</artifactId>
+                <version>1.0.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
