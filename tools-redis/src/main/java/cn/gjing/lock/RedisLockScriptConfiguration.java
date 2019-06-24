@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
  * @author Gjing
  **/
 @Configuration
-class ToolsRedisLockConfiguration {
+class RedisLockScriptConfiguration {
 
     @Bean
     @ConditionalOnClass(StringRedisTemplate.class)

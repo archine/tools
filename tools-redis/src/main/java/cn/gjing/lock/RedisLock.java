@@ -3,6 +3,7 @@ package cn.gjing.lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -40,7 +41,7 @@ class RedisLock extends AbstractLock {
             log.warn("锁被占用，进入阻塞,线程：{}", Thread.currentThread().getName());
             //判断该请求是否超时
             if (System.currentTimeMillis() - lockTime > timeout) {
-                throw new TimeOutException("The request time out, val=" + val);
+                throw new TimeoutException(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
             }
             try {
                 Thread.sleep(retry);

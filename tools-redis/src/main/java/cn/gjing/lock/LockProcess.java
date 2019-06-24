@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author Gjing
@@ -35,7 +34,7 @@ class LockProcess {
         Method method = methodSignature.getMethod();
         Lock lock = method.getAnnotation(Lock.class);
         if (StringUtils.isEmpty(lock.key())) {
-            throw new NullPointerException("Key cannot be null");
+            throw new NullPointerException("Lock key cannot be null");
         }
         return this.proceed(joinPoint, lock.key(), this.lock(lock));
     }
@@ -64,9 +63,8 @@ class LockProcess {
      *
      * @param lock lock注解
      * @return 锁结果
-     * @throws TimeoutException 超时异常
      */
-    private String lock(Lock lock) throws TimeoutException {
+    private String lock(Lock lock) {
         return this.abstractLock.lock(lock.key(), UUID.randomUUID().toString().replaceAll("-", ""),
                 lock.expire(), lock.timeout(), lock.retry());
     }
