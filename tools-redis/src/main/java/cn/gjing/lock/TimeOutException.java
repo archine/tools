@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.lock;
 
 /**
  * @author Gjing

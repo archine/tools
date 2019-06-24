@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.lock;
 
 import org.springframework.context.annotation.Import;
 
@@ -9,9 +9,10 @@ import java.lang.annotation.Target;
 
 /**
  * @author Gjing
+ * 开启redis分布式锁
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Import(ToolsRedisInject.class)
-public @interface EnableRedis {
+@Import(ToolsRedisLockSelector.class)
+public @interface EnableRedisLock {
 }

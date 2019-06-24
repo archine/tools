@@ -1,21 +1,27 @@
 package cn.gjing.lock;
 
-import org.springframework.data.redis.core.script.DefaultRedisScript;
-
 /**
  * @author Gjing
  **/
-public interface AbstractLock {
+public abstract class AbstractLock {
     /**
      * 加锁
-     * 锁成功返回key, 否则返回null
+     *
+     * @param expire      超时时间
+     * @param val         value
+     * @param key         key
+     * @param retry 从新获取锁得间隔
+     * @param timeout 超时时间
+     * @return 锁成功返回val, 否则返回null
      */
-    String lock(DefaultRedisScript<String> redisScript, String key, String val, int expire);
+    public abstract String lock(String key, String val, int expire,int timeout,int retry);
 
     /**
      * 释放锁
-     * 释放成功返回key,否则返回null
+     *
+     * @param key         key
+     * @param val         value
+     * @return 释放成功返回释放的锁对应的key值, 否则返回null
      */
-    String release(DefaultRedisScript<String> redisScript, String key);
-
+    public abstract String release(String key, String val);
 }
