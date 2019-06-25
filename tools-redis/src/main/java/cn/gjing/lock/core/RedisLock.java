@@ -1,9 +1,9 @@
-package cn.gjing.lock;
+package cn.gjing.lock.core;
 
+import cn.gjing.lock.AbstractLock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -22,6 +22,8 @@ class RedisLock extends AbstractLock {
     private DefaultRedisScript<String> lockScript;
     @Resource
     private DefaultRedisScript<String> releaseScript;
+    @Resource
+    private ToolsLockTimeoutHandler toolsLockTimeoutHandler;
 
     @Override
     public String lock(String key, String val, int expire, int timeout, int retry) {
@@ -41,7 +43,7 @@ class RedisLock extends AbstractLock {
             log.warn("锁被占用，进入阻塞,线程：{}", Thread.currentThread().getName());
             //判断该请求是否超时
             if (System.currentTimeMillis() - lockTime > timeout) {
-                throw new TimeoutException(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
+                this.toolsLockTimeoutHandler.timeoutAfter();
             }
             try {
                 Thread.sleep(retry);
@@ -53,7 +55,7 @@ class RedisLock extends AbstractLock {
             if (value == null) {
                 lockResult = stringRedisTemplate.execute(lockScript, keys,"");
             }
-        }
+    }
         log.info("阻塞结束，当前线程：{}", Thread.currentThread().getName());
         return lockResult;
     }

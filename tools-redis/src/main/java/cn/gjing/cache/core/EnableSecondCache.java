@@ -1,5 +1,6 @@
-package cn.gjing.lock;
+package cn.gjing.cache.core;
 
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -9,10 +10,10 @@ import java.lang.annotation.Target;
 
 /**
  * @author Gjing
- * 开启redis分布式锁
  **/
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Import(ToolsRedisLockSelector.class)
-public @interface EnableRedisLock {
+@Retention(RetentionPolicy.RUNTIME)
+@Import(ToolsSecondCacheSelector.class)
+@EnableCaching
+public @interface EnableSecondCache {
 }

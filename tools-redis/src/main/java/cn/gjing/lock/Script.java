@@ -6,7 +6,7 @@ import lombok.Getter;
  * @author Gjing
  **/
 @Getter
-enum Script {
+public enum Script {
     /**
      * 脚本
      */

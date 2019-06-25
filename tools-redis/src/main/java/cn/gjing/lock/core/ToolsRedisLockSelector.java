@@ -1,4 +1,4 @@
-package cn.gjing.lock;
+package cn.gjing.lock.core;
 
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
@@ -6,13 +6,14 @@ import org.springframework.core.type.AnnotationMetadata;
 /**
  * @author Gjing
  **/
-public class ToolsRedisLockSelector implements ImportSelector {
+class ToolsRedisLockSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
         return new String[]{
                 LockProcess.class.getName(),
                 RedisLockScriptConfiguration.class.getName(),
                 RedisLock.class.getName(),
-                RedisLockTimeoutHandler.class.getName()};
+                ToolsLockTimeoutHandler.class.getName(),
+                LockTimeoutHandler.class.getName()};
     }
 }

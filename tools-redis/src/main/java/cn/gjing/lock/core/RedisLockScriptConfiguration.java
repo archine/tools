@@ -1,5 +1,6 @@
-package cn.gjing.lock;
+package cn.gjing.lock.core;
 
+import cn.gjing.lock.Script;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

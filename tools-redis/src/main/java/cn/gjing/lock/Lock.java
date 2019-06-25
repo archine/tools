@@ -30,5 +30,5 @@ public @interface Lock {
     /**
      * 重新获取锁的时间，单位ms
      */
-    int retry() default 50;
+    int retry() default 10;
 }
