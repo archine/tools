@@ -1,6 +1,7 @@
 package cn.gjing.cache.core;
 
 import cn.gjing.cache.Message;
+import cn.gjing.cache.RedisCache;
 import cn.gjing.cache.SecondCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
@@ -28,16 +29,16 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
         super(allowNullValues);
     }
 
-    SecondCacheAdapter(String name, RedisTemplate<Object, Object> redisTemplate, Cache<Object, Object> caffeineCache,
-                       SecondCache secondCache, DefaultRedisScript<Boolean> setScript, DefaultRedisScript<Boolean> setNxScript) {
+    SecondCacheAdapter(String name, RedisTemplate<Object, Object> redisTemplate, Cache<Object, Object> caffeineCache, SecondCache secondCache,
+                       DefaultRedisScript<Boolean> setScript, DefaultRedisScript<Boolean> setNxScript,RedisCache redisCache) {
         super(secondCache.isCacheValueNullable());
         this.name = name;
         this.redisTemplate = redisTemplate;
         this.caffeineCache = caffeineCache;
         this.cachePrefix = secondCache.getCachePrefix();
-        this.expire = secondCache.getRedisCache().getDefaultExpiration();
-        this.everyCacheExpire = secondCache.getRedisCache().getEveryCacheExpire();
-        this.topic = secondCache.getRedisCache().getTopic();
+        this.expire = redisCache.getDefaultExpiration();
+        this.everyCacheExpire = redisCache.getEveryCacheExpire();
+        this.topic = redisCache.getTopic();
         this.setScript = setScript;
         this.setNxScript = setNxScript;
     }

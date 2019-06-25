@@ -1,5 +1,7 @@
 package cn.gjing.cache.core;
 
+import cn.gjing.cache.CaffeineCache;
+import cn.gjing.cache.RedisCache;
 import cn.gjing.cache.SecondCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.Cache;
@@ -25,8 +27,11 @@ class SecondCacheManager implements CacheManager {
     private Set<String> cacheNames;
     private DefaultRedisScript<Boolean> setNxScript;
     private DefaultRedisScript<Boolean> setScript;
+    private RedisCache redisCache;
+    private CaffeineCache caffeineCache;
 
-    SecondCacheManager(SecondCache secondCache, RedisTemplate<Object, Object> redisTemplate, DefaultRedisScript<Boolean> setNxScript, DefaultRedisScript<Boolean> setScript) {
+    SecondCacheManager(SecondCache secondCache, RedisTemplate<Object, Object> redisTemplate, DefaultRedisScript<Boolean> setNxScript, DefaultRedisScript<Boolean> setScript,
+                       RedisCache redisCache,CaffeineCache caffeineCache) {
         super();
         this.secondCache = secondCache;
         this.redisTemplate = redisTemplate;
@@ -34,6 +39,8 @@ class SecondCacheManager implements CacheManager {
         this.cacheNames = secondCache.getCacheNames();
         this.setNxScript = setNxScript;
         this.setScript = setScript;
+        this.redisCache = redisCache;
+        this.caffeineCache = caffeineCache;
     }
 
     @Override
@@ -45,7 +52,7 @@ class SecondCacheManager implements CacheManager {
         if (!dynamic && cacheNames.contains(s)) {
             return null;
         }
-        cache = new SecondCacheAdapter(s, redisTemplate, caffeineCache(), secondCache, setScript, setNxScript);
+        cache = new SecondCacheAdapter(s, redisTemplate, caffeineCache(), secondCache, setScript, setNxScript,redisCache);
         Cache newCache = cacheMap.putIfAbsent(s, cache);
         return newCache == null ? cache : newCache;
     }
@@ -76,20 +83,20 @@ class SecondCacheManager implements CacheManager {
      */
     private com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache() {
         com.github.benmanes.caffeine.cache.Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder();
-        if (secondCache.getCaffeineCache().getExpireAfterAccess() > 0) {
-            cacheBuilder.expireAfterAccess(secondCache.getCaffeineCache().getExpireAfterAccess(), TimeUnit.MILLISECONDS);
+        if (caffeineCache.getExpireAfterAccess() > 0) {
+            cacheBuilder.expireAfterAccess(caffeineCache.getExpireAfterAccess(), TimeUnit.MILLISECONDS);
         }
-        if (secondCache.getCaffeineCache().getExpireAfterWrite() > 0) {
-            cacheBuilder.expireAfterWrite(secondCache.getCaffeineCache().getExpireAfterWrite(), TimeUnit.MILLISECONDS);
+        if (caffeineCache.getExpireAfterWrite() > 0) {
+            cacheBuilder.expireAfterWrite(caffeineCache.getExpireAfterWrite(), TimeUnit.MILLISECONDS);
         }
-        if (secondCache.getCaffeineCache().getInitialCapacity() > 0) {
-            cacheBuilder.initialCapacity(secondCache.getCaffeineCache().getInitialCapacity());
+        if (caffeineCache.getInitialCapacity() > 0) {
+            cacheBuilder.initialCapacity(caffeineCache.getInitialCapacity());
         }
-        if (secondCache.getCaffeineCache().getMaximumSize() > 0) {
-            cacheBuilder.maximumSize(secondCache.getCaffeineCache().getMaximumSize());
+        if (caffeineCache.getMaximumSize() > 0) {
+            cacheBuilder.maximumSize(caffeineCache.getMaximumSize());
         }
-        if (secondCache.getCaffeineCache().getRefreshAfterWrite() > 0) {
-            cacheBuilder.refreshAfterWrite(secondCache.getCaffeineCache().getRefreshAfterWrite(), TimeUnit.MILLISECONDS);
+        if (caffeineCache.getRefreshAfterWrite() > 0) {
+            cacheBuilder.refreshAfterWrite(caffeineCache.getRefreshAfterWrite(), TimeUnit.MILLISECONDS);
         }
         return cacheBuilder.build();
     }

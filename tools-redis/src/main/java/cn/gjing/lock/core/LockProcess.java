@@ -11,7 +11,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
@@ -22,8 +21,12 @@ import java.util.UUID;
 @Component
 @Slf4j
 class LockProcess {
-    @Resource
+
     private AbstractLock abstractLock;
+
+    LockProcess(AbstractLock abstractLock) {
+        this.abstractLock = abstractLock;
+    }
 
     @Pointcut("@annotation(cn.gjing.lock.Lock))")
     public void cut() {
@@ -52,9 +55,7 @@ class LockProcess {
      */
     private Object proceed(ProceedingJoinPoint joinPoint, String key, String val) throws Throwable {
         String release = this.release(key, val);
-        if (release != null) {
-            log.info("锁被释放，当前线程：{}", Thread.currentThread().getName());
-        } else {
+        if (release == null) {
             log.error("锁释放失败，{}", val);
         }
         return joinPoint.proceed();

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @author Gjing
  **/
 @RestControllerAdvice
-class LockTimeoutHandler {
+class LockTimeoutExceptionHandler {
     @ExceptionHandler(TimeoutException.class)
     public ResponseEntity timeoutException(TimeoutException e){
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT.value()).body(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());

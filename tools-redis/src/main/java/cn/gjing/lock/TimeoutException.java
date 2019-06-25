@@ -5,6 +5,7 @@ package cn.gjing.lock;
  **/
 public class TimeoutException extends RuntimeException {
     private static final long serialVersionUID = -2055408728917203161L;
+
     public TimeoutException(String message) {
         super(message);
     }

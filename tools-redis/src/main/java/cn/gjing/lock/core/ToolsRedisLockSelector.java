@@ -10,10 +10,8 @@ class ToolsRedisLockSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
         return new String[]{
-                LockProcess.class.getName(),
-                RedisLockScriptConfiguration.class.getName(),
-                RedisLock.class.getName(),
-                ToolsLockTimeoutHandler.class.getName(),
-                LockTimeoutHandler.class.getName()};
+                RedisLockConfiguration.class.getName(),
+                LockTimeoutExceptionHandler.class.getName()
+        };
     }
 }

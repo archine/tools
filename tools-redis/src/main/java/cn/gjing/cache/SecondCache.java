@@ -44,10 +44,4 @@ public class SecondCache {
     @Builder.Default
     private String cachePrefix = "";
 
-    @Builder.Default
-    private RedisCache redisCache = new RedisCache();
-
-    @Builder.Default
-    private CaffeineCache caffeineCache = new CaffeineCache();
-
 }
