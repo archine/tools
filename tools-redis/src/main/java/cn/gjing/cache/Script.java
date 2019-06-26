@@ -10,26 +10,26 @@ public enum Script {
     /**
      * 缓存脚本
      */
-    SET_NX("local key1 = KEYS[1] local val = KEYS[2] local expire = ARGV[1] local data = redis.call(\"get\", key1) " +
-            "if " +
-            "data == false " +
-            "then local setVal = redis.call(\"setNx\",key1,val) " +
-            "if setVal == 1 " +
-            "then     " +
-            "redis.call(\"expire\",key1,expire)     " +
+    SET_NX("local key = KEYS[1] local val = ARGV[1] local expire = ARGV[2] local data = redis.call(\"get\", key) " +
+            "if data == false then " +
+            "local setVal = redis.call(\"set\", key, val) " +
+            "if setVal == 1 then     " +
+            "if tonumber(expire) > 0 then     " +
+            "redis.call(\"expire\", key, expire) " +
+            "end     " +
             "return true " +
             "end " +
             "return false " +
             "else " +
             "return false " +
             "end"),
-    SET("local key1 = KEYS[1] local val = KEYS[2] local expire = ARGV[1] local data = redis.call(\"get\", key1) " +
-            "if " +
-            "data == false " +
-            "then local setVal = redis.call(\"set\",key1,val) " +
-            "if setVal " +
-            "then     " +
-            "redis.call(\"expire\",key1,expire)     " +
+    SET("local key = KEYS[1] local val = ARGV[1] local expire = ARGV[2] local data = redis.call(\"get\", key) " +
+            "if data == false then " +
+            "local setVal = redis.call(\"set\", key, val) " +
+            "if setVal then     " +
+            "if tonumber(expire) > 0 then     " +
+            "redis.call(\"expire\", key, expire) " +
+            "end     " +
             "return true " +
             "end " +
             "return false " +

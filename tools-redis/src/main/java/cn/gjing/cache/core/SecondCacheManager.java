@@ -4,11 +4,13 @@ import cn.gjing.cache.CaffeineCache;
 import cn.gjing.cache.RedisCache;
 import cn.gjing.cache.SecondCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,11 +20,14 @@ import java.util.concurrent.TimeUnit;
  * @author Gjing
  * 二级缓存管理
  **/
+@Slf4j
 class SecondCacheManager implements CacheManager {
+
+    @Resource
+    private RedisTemplate<Object, Object> redisTemplate;
 
     private ConcurrentHashMap<String, Cache> cacheMap = new ConcurrentHashMap<>();
     private SecondCache secondCache;
-    private RedisTemplate<Object, Object> redisTemplate;
     private boolean dynamic;
     private Set<String> cacheNames;
     private DefaultRedisScript<Boolean> setNxScript;
@@ -30,11 +35,10 @@ class SecondCacheManager implements CacheManager {
     private RedisCache redisCache;
     private CaffeineCache caffeineCache;
 
-    SecondCacheManager(SecondCache secondCache, RedisTemplate<Object, Object> redisTemplate, DefaultRedisScript<Boolean> setNxScript, DefaultRedisScript<Boolean> setScript,
+    SecondCacheManager(SecondCache secondCache,DefaultRedisScript<Boolean> setNxScript, DefaultRedisScript<Boolean> setScript,
                        RedisCache redisCache,CaffeineCache caffeineCache) {
         super();
         this.secondCache = secondCache;
-        this.redisTemplate = redisTemplate;
         this.dynamic = secondCache.isDynamic();
         this.cacheNames = secondCache.getCacheNames();
         this.setNxScript = setNxScript;
@@ -72,6 +76,7 @@ class SecondCacheManager implements CacheManager {
         if (cache == null) {
             return;
         }
+        log.warn("收到消息，清除本地缓存，key：{}", key);
         SecondCacheAdapter secondCacheAdapter = (SecondCacheAdapter) cache;
         secondCacheAdapter.clearLocal(key);
     }

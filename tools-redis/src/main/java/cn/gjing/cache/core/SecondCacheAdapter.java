@@ -4,6 +4,7 @@ import cn.gjing.cache.Message;
 import cn.gjing.cache.RedisCache;
 import cn.gjing.cache.SecondCache;
 import com.github.benmanes.caffeine.cache.Cache;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -14,29 +15,26 @@ import java.util.concurrent.Callable;
 /**
  * @author Gjing
  **/
+@Slf4j
 class SecondCacheAdapter extends AbstractValueAdaptingCache {
     private String name;
     private RedisTemplate<Object, Object> redisTemplate;
     private Cache<Object, Object> caffeineCache;
     private String cachePrefix;
-    private long expire;
-    private Map<String, Long> everyCacheExpire;
+    private Integer expire;
+    private Map<String, Integer> everyCacheExpire;
     private String topic;
     private DefaultRedisScript<Boolean> setNxScript;
     private DefaultRedisScript<Boolean> setScript;
 
-    public SecondCacheAdapter(boolean allowNullValues) {
-        super(allowNullValues);
-    }
-
     SecondCacheAdapter(String name, RedisTemplate<Object, Object> redisTemplate, Cache<Object, Object> caffeineCache, SecondCache secondCache,
-                       DefaultRedisScript<Boolean> setScript, DefaultRedisScript<Boolean> setNxScript,RedisCache redisCache) {
+                       DefaultRedisScript<Boolean> setScript, DefaultRedisScript<Boolean> setNxScript, RedisCache redisCache) {
         super(secondCache.isCacheValueNullable());
         this.name = name;
         this.redisTemplate = redisTemplate;
         this.caffeineCache = caffeineCache;
         this.cachePrefix = secondCache.getCachePrefix();
-        this.expire = redisCache.getDefaultExpiration();
+        this.expire = redisCache.getExpire();
         this.everyCacheExpire = redisCache.getEveryCacheExpire();
         this.topic = redisCache.getTopic();
         this.setScript = setScript;
@@ -49,14 +47,16 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      */
     @Override
     protected Object lookup(Object key) {
-        String key1 = key.toString();
-        Object value = caffeineCache.getIfPresent(key1);
+        key = getKey(key);
+        Object value = caffeineCache.getIfPresent(key);
         if (value != null) {
+            log.info("读取本地缓存：{}", key);
             return value;
         }
-        value = redisTemplate.opsForValue().get(key1);
+        value = redisTemplate.opsForValue().get(key);
         if (value != null) {
-            caffeineCache.put(key1, value);
+            log.info("读取Redis缓存，存入本地缓存：{}", key);
+            caffeineCache.put(key, value);
         }
         return value;
     }
@@ -87,6 +87,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(Object key, Callable<T> callable) {
+        key = getKey(key);
         Object value = this.lookup(key);
         if (value != null) {
             return (T) value;
@@ -109,13 +110,14 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      */
     @Override
     public void put(Object key, Object val) {
+        key = getKey(key);
         if (!super.isAllowNullValues() && val == null) {
             this.evict(key);
             return;
         }
-        List<Object> keys = Arrays.asList(cachePrefix + key, val);
-        this.redisTemplate.execute(this.setScript, keys, this.getExpire());
-        this.caffeineCache.put(key.toString(), val);
+        List<Object> keys = Collections.singletonList(key);
+        this.redisTemplate.execute(this.setScript, keys, val, this.getExpire());
+        this.caffeineCache.put(key, val);
     }
 
     /**
@@ -126,13 +128,13 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      * @return ValueWrapper
      */
     @Override
-    @SuppressWarnings("all")
     public ValueWrapper putIfAbsent(Object key, Object val) {
-        long expire = this.getExpire();
-        List<Object> keys = Arrays.asList(cachePrefix + key, val);
-        Boolean execute = this.redisTemplate.execute(this.setNxScript, keys, expire);
+        key = getKey(key);
+        List<Object> keys = Collections.singletonList(key);
+        Boolean execute = this.redisTemplate.execute(this.setNxScript, keys, val, this.getExpire());
+        assert execute != null;
         if (execute) {
-            caffeineCache.put(key.toString(), toStoreValue(val));
+            caffeineCache.put(key, toStoreValue(val));
         }
         return toValueWrapper(val);
     }
@@ -144,6 +146,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      */
     @Override
     public void evict(Object key) {
+        key = getKey(key);
         this.redisTemplate.delete(key);
         this.publish(Message.builder().cacheName(this.name).key(key).build());
         caffeineCache.invalidate(key);
@@ -158,7 +161,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
         if (keys == null) {
             return;
         }
-        keys.forEach(e -> redisTemplate.delete(e));
+        keys.forEach(e -> redisTemplate.delete(e.toString()));
         this.publish(new Message(this.name, null));
         caffeineCache.invalidateAll();
     }
@@ -175,12 +178,16 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
     /**
      * 获取指定缓存的过期时间
      *
-     * @return long
+     * @return int
      */
-    private long getExpire() {
-        long expire = this.expire;
-        Long cacheNameExpire = everyCacheExpire.get(this.name);
-        return cacheNameExpire == null ? expire : cacheNameExpire;
+    private int getExpire() {
+        Integer expire = this.expire;
+        Integer cacheNameExpire = everyCacheExpire.get(this.name);
+        return cacheNameExpire == null ? expire : cacheNameExpire.intValue();
+    }
+
+    private String getKey(Object key) {
+        return key == null ? "" : this.cachePrefix + key.toString();
     }
 
     /**
@@ -188,11 +195,11 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      *
      * @param key key
      */
-    public void clearLocal(Object key) {
+    void clearLocal(Object key) {
         if (key == null) {
             this.caffeineCache.invalidateAll();
             return;
         }
-        caffeineCache.invalidate(key);
+        caffeineCache.invalidate(key.toString());
     }
 }

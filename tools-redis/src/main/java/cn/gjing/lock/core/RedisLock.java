@@ -12,13 +12,13 @@ import java.util.List;
 
 /**
  * @author Gjing
+ * redis锁
  **/
 @Component
 class RedisLock extends AbstractLock {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
     private DefaultRedisScript<String> lockScript;
     private DefaultRedisScript<String> releaseScript;
 
@@ -28,10 +28,10 @@ class RedisLock extends AbstractLock {
     }
 
     @Override
-    public String lock(String key, String val, int expire, int timeout, int retry) {
+    public String lock(String key, String value, int expire, int timeout, int retry) {
         long lockTime = System.currentTimeMillis();
         String lockResult = null;
-        List<String> keys = Arrays.asList(key, val, String.valueOf(expire));
+        List<String> keys = Arrays.asList(key, value, String.valueOf(expire));
         try {
             lockResult = stringRedisTemplate.execute(lockScript, keys,"");
         } catch (Exception e) {
@@ -50,9 +50,9 @@ class RedisLock extends AbstractLock {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            String value = stringRedisTemplate.opsForValue().get(key);
+            String val = stringRedisTemplate.opsForValue().get(key);
             //锁被释放
-            if (value == null) {
+            if (val == null) {
                 lockResult = stringRedisTemplate.execute(lockScript, keys,"");
             }
     }
@@ -60,9 +60,9 @@ class RedisLock extends AbstractLock {
     }
 
     @Override
-    public String release(String key, String val) {
+    public String release(String key, String value) {
         String lockResult = null;
-        List<String> keys = Arrays.asList(key, val);
+        List<String> keys = Arrays.asList(key, value);
         try {
             lockResult = stringRedisTemplate.execute(releaseScript, keys, "");
         } catch (Exception e) {

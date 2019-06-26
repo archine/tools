@@ -41,7 +41,7 @@ class LockProcess {
         if (StringUtils.isEmpty(lock.key())) {
             throw new NullPointerException("Lock key cannot be null");
         }
-        return this.proceed(joinPoint, lock.key(), this.lock(lock));
+        return this.proceed(joinPoint, lock.key(), this.getLock(lock));
     }
 
     /**
@@ -54,10 +54,7 @@ class LockProcess {
      * @throws Throwable Throwable
      */
     private Object proceed(ProceedingJoinPoint joinPoint, String key, String val) throws Throwable {
-        String release = this.release(key, val);
-        if (release == null) {
-            log.error("锁释放失败，{}", val);
-        }
+        this.release(key, val);
         return joinPoint.proceed();
     }
 
@@ -67,7 +64,7 @@ class LockProcess {
      * @param lock lock注解
      * @return 锁结果
      */
-    private String lock(Lock lock) {
+    private String getLock(Lock lock) {
         return this.abstractLock.lock(lock.key(), UUID.randomUUID().toString().replaceAll("-", ""),
                 lock.expire(), lock.timeout(), lock.retry());
     }
