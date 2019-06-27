@@ -1,7 +1,6 @@
 package cn.gjing;
 
 import com.google.gson.Gson;
-import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -90,7 +89,7 @@ class HttpHandle {
             while ((line = br.readLine()) != null) {
                 result.append(line);
             }
-            throw new HttpException(responseError(result.toString()));
+            throw new HttpException(result.toString());
         } catch (Exception e) {
             throw new HttpException(e.getMessage());
         } finally {
@@ -134,16 +133,6 @@ class HttpHandle {
         } catch (RuntimeException e) {
             return (T) result.toString();
         }
-    }
-
-    /**
-     * 错误信息返回
-     * @param str str
-     * @return String
-     */
-    private String responseError(String str) {
-        String s = str.substring(str.lastIndexOf("<div>")).replaceAll("<div>", "");
-        return StringEscapeUtils.unescapeHtml(s.substring(0, s.lastIndexOf("</div>")));
     }
 
     /**
