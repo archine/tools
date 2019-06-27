@@ -11,9 +11,11 @@ public enum Script {
      * 脚本
      */
     LOCK("local key = KEYS[1] local val = KEYS[2] local expire = KEYS[3] " +
-            "if redis.call(\"setNx\", key, val) == 1 " +
-            "then " +
-            "redis.call(\"expire\", key, expire) " +
+            "if redis.call(\"setNx\", key, val) == 1 then " +
+            "if redis.call(\"expire\", key, expire) ~=1 then     " +
+            "redis.call(\"del\",key)     " +
+            "return nil " +
+            "end " +
             "return val " +
             "else " +
             "return nil " +

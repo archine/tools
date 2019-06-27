@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author Gjing
  **/
 @Slf4j
-public class CacheMessageListener implements MessageListener {
+class CacheMessageListener implements MessageListener {
     private RedisTemplate<Object, Object> redisTemplate;
     private SecondCacheManager secondCacheManager;
 
@@ -21,7 +21,6 @@ public class CacheMessageListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] bytes) {
         cn.gjing.cache.Message message1 = (cn.gjing.cache.Message) this.redisTemplate.getValueSerializer().deserialize(message.getBody());
-        log.info("收到消息：message:{}", message1);
         if (message1 == null) {
             return;
         }

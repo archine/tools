@@ -2,7 +2,6 @@ package cn.gjing.lock.core;
 
 import cn.gjing.lock.AbstractLock;
 import cn.gjing.lock.Lock;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,7 +18,6 @@ import java.util.UUID;
  **/
 @Aspect
 @Component
-@Slf4j
 class LockProcess {
 
     private AbstractLock abstractLock;

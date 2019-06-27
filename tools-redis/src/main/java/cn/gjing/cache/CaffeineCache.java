@@ -27,7 +27,7 @@ public class CaffeineCache {
      * 写入后过期时间，单位毫秒
      */
     @Builder.Default
-    private int expireAfterWrite = -1;
+    private Integer expireAfterWrite = -1;
 
     /**
      * 写入后刷新时间，单位毫秒

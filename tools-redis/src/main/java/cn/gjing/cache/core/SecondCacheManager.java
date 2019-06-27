@@ -4,7 +4,6 @@ import cn.gjing.cache.CaffeineCache;
 import cn.gjing.cache.RedisCache;
 import cn.gjing.cache.SecondCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,7 +19,6 @@ import java.util.concurrent.TimeUnit;
  * @author Gjing
  * 二级缓存管理
  **/
-@Slf4j
 class SecondCacheManager implements CacheManager {
 
     @Resource
@@ -76,7 +74,6 @@ class SecondCacheManager implements CacheManager {
         if (cache == null) {
             return;
         }
-        log.warn("收到消息，清除本地缓存，key：{}", key);
         SecondCacheAdapter secondCacheAdapter = (SecondCacheAdapter) cache;
         secondCacheAdapter.clearLocal(key);
     }

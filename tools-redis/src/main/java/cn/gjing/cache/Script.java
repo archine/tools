@@ -12,10 +12,14 @@ public enum Script {
      */
     SET_NX("local key = KEYS[1] local val = ARGV[1] local expire = ARGV[2] local data = redis.call(\"get\", key) " +
             "if data == false then " +
-            "local setVal = redis.call(\"set\", key, val) " +
+            "local setVal = redis.call(\"setNx\", key, val) " +
             "if setVal == 1 then     " +
             "if tonumber(expire) > 0 then     " +
-            "redis.call(\"expire\", key, expire) " +
+            "if redis.call(\"expire\", key, expire) ~= 1 then     " +
+            "redis.call(\"del\",key)     " +
+            "return false " +
+            "end     " +
+            "return true " +
             "end     " +
             "return true " +
             "end " +
@@ -28,7 +32,11 @@ public enum Script {
             "local setVal = redis.call(\"set\", key, val) " +
             "if setVal then     " +
             "if tonumber(expire) > 0 then     " +
-            "redis.call(\"expire\", key, expire) " +
+            "if redis.call(\"expire\", key, expire) ~= 1 then     " +
+            "redis.call(\"del\",key)     " +
+            "return false " +
+            "end     " +
+            "return true " +
             "end     " +
             "return true " +
             "end " +

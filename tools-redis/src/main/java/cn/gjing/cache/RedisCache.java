@@ -21,12 +21,12 @@ import java.util.Map;
 @ConfigurationProperties("second.cache.redis")
 public class RedisCache {
     /**
-     * 全局过期时间，单位毫秒，默认不过期
+     * 全局过期时间，单位秒，默认不过期
      */
     @Builder.Default
     private Integer expire = -1;
     /**
-     * 每个cacheName的过期时间，单位毫秒，优先级比defaultExpiration高
+     * 每个cacheName的过期时间，单位秒，优先级比defaultExpiration高
      */
     @Builder.Default
     private Map<String, Integer> everyCacheExpire = new HashMap<>();
