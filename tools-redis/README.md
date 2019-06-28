@@ -1,5 +1,5 @@
 ### SpringBoot分布式锁和缓存
-![](https://img.shields.io/badge/version-1.0.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)      
 ### 分布式锁的使用
@@ -114,6 +114,7 @@ public class LockExceptionHandler extends AbstractLockTimeoutHandler {
 /**
  * @author Gjing
  **/
+@Component
 public class DemoLock extends AbstractLock {
     @Override
     public String lock(String s, String s1, int i, int i1, int i2) {

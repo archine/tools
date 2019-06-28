@@ -88,3 +88,5 @@ public ResponseEntity test() throws URISyntaxException {
 * targetAddress: 目标地址(必填),如果是NAME路由:则需要服务名: serve , 如果为URL路由,需要IP+端口: 127.0.0.1:8080
 * methodPath: 接口路径(必填): /method/test
 * jsonEntity: Json字符串、Json对应的实体对象、Map
+---
+**更详细教程请前往博客: [SpringCloud使用Feign](https://yq.aliyun.com/articles/703131?spm=a2c4e.11155435.0.0.c26c33125jAgU6)**

@@ -42,3 +42,5 @@ public ResponseEntity demo4() {
 * urlAppend：url和参数拼接,用于URL地址直接带参,结果为http://127.0.0.1/test/param1/param2
 * paramUnicodeSort：将需要转化的参数构建成map后使用方法转成字符串,结果如: 参数a=a&参数b=a
 * urlParamToMap：将url中的参数转成map
+---
+**更多教程可前往博客查看: [Java http请求工具](https://yq.aliyun.com/articles/703132?spm=a2c4e.11155435.0.0.73393312Egko4y)**

@@ -89,3 +89,5 @@ public ResponseEntity streamDown(String fileOssUrl, HttpServletResponse response
      return ResponseEntity.ok(result);
  }
  ```
+ ---
+ **更多教程可前往博客查看: [JAVA使用阿里OSS和短信](https://yq.aliyun.com/articles/704400?spm=a2c4e.11155435.0.0.7a2f3312buXQzX)**
