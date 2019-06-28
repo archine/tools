@@ -1,7 +1,9 @@
 package cn.gjing.lock.core;
 
 import cn.gjing.lock.AbstractLock;
+import cn.gjing.lock.AbstractLockTimeoutHandler;
 import cn.gjing.lock.Script;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -29,11 +31,13 @@ class RedisLockConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(AbstractLockTimeoutHandler.class)
     public ToolsLockTimeoutHandler toolsLockTimeoutHandler() {
         return new ToolsLockTimeoutHandler();
     }
 
     @Bean
+    @ConditionalOnMissingBean(AbstractLock.class)
     public RedisLock redisLock() {
         return new RedisLock(lockScript(), releaseScript());
     }

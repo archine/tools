@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>tools-redis</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>tools-redis</name>
     <description>redis common</description>
 
