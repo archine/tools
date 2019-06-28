@@ -83,3 +83,5 @@ public class GatewayConfig {
 }
     
 ```
+---
+**更多教程可前往查看博客: [SpringBoot使用swagger](https://yq.aliyun.com/articles/703133?spm=a2c4e.11155435.0.0.68153312Yeo5xN)**
