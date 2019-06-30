@@ -1,5 +1,5 @@
 ### SpringBoot分布式锁和缓存
-![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.0.2-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)      
 ### 分布式锁的使用
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-redis</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 ### 二. 启动类标注注解
@@ -95,15 +95,15 @@ public class LockController {
 #### 注意！！！
 **锁对应的key最好唯一，否则会造成多个方法在同时共享一个锁，造成不好的结果，解锁时传入的value，一定要是获取锁得到的value，否则会解锁失败，避免造成解锁其他人的锁**
 #### 3. 重写异常处理
-> 某个请求获取锁超时后，默认会返回超时异常信息，如果要自定义返回，可以继承AbstractLockTimeoutHandler超时异常处理类
+> 某个请求获取锁超时后，默认会返回超时异常信息，如果要自定义返回，可以继承AbstractLockTimeoutHandler超时异常处理类,支持自定义返回类型
 ```java
 /**
  * @author Gjing
  **/
 @Component
-public class LockExceptionHandler extends AbstractLockTimeoutHandler {
+public class LockExceptionHandler extends AbstractLockTimeoutHandler<T> {
     @Override
-    public ResponseEntity timeoutAfter(TimeoutException e) {
+    public T timeoutAfter(TimeoutException e) {
         // TODO: 实现自定义处理的逻辑  
     }
 }

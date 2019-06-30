@@ -1,6 +1,5 @@
 package cn.gjing.cache.core;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -8,7 +7,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 /**
  * @author Gjing
  **/
-@Slf4j
 class CacheMessageListener implements MessageListener {
     private RedisTemplate<Object, Object> redisTemplate;
     private SecondCacheManager secondCacheManager;

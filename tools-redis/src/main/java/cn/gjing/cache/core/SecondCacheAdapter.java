@@ -4,18 +4,19 @@ import cn.gjing.cache.Message;
 import cn.gjing.cache.RedisCache;
 import cn.gjing.cache.SecondCache;
 import com.github.benmanes.caffeine.cache.Cache;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
  * @author Gjing
  **/
-@Slf4j
 class SecondCacheAdapter extends AbstractValueAdaptingCache {
     private String name;
     private RedisTemplate<Object, Object> redisTemplate;
@@ -50,12 +51,10 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
         key = getKey(key);
         Object value = caffeineCache.getIfPresent(key);
         if (value != null) {
-            log.info("读取本地缓存：{}", key);
             return value;
         }
         value = redisTemplate.opsForValue().get(key);
         if (value != null) {
-            log.info("读取Redis缓存，存入本地缓存：{}", key);
             caffeineCache.put(key, value);
         }
         return value;
@@ -187,7 +186,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
     }
 
     private String getKey(Object key) {
-        return key == null ? "" : this.cachePrefix + key.toString();
+        return key == null ? this.cachePrefix + "" : this.cachePrefix + key.toString();
     }
 
     /**
@@ -200,6 +199,6 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
             this.caffeineCache.invalidateAll();
             return;
         }
-        caffeineCache.invalidate(key.toString());
+        caffeineCache.invalidate(this.getKey(key));
     }
 }
