@@ -1,6 +1,6 @@
 package cn.gjing.excel;
 
-import cn.gjing.ex.ParamException;
+import cn.gjing.exceptions.ParamException;
 import cn.gjing.enums.HttpStatus;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;

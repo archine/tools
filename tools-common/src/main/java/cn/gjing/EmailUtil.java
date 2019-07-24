@@ -1,7 +1,7 @@
 package cn.gjing;
 
-import cn.gjing.ex.HttpException;
-import cn.gjing.ex.ParamException;
+import cn.gjing.exceptions.HttpException;
+import cn.gjing.exceptions.ParamException;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;

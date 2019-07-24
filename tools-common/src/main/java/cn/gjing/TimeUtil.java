@@ -57,27 +57,26 @@ public class TimeUtil {
      * LocalDate转化为指定格式字符串
      *
      * @param localDate localDate
-     * @param format    format
      * @return .
      */
-    public static String localDateToString(LocalDate localDate, String format) {
-        return localDate.format(DateTimeFormatter.ofPattern(format));
+    public static String localDateToString(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
-    public static String localDateTimeToString(LocalDateTime localDateTime, String format) {
-        return localDateTime.format(DateTimeFormatter.ofPattern(format));
+    public static String localDateTimeToString(LocalDateTime localDateTime) {
+        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
-    public static String localTimeToString(LocalTime localTime, String format) {
-        return localTime.format(DateTimeFormatter.ofPattern(format));
+    public static String localTimeToString(LocalTime localTime) {
+        return localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
-    public static LocalDate stringToLocalDate(String time, String format) {
-        return LocalDate.parse(time, DateTimeFormatter.ofPattern(format));
+    public static LocalDate stringToLocalDate(String time) {
+        return LocalDate.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
-    public static LocalDateTime stringToLocalDateTime(String time, String format) {
-        return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(format));
+    public static LocalDateTime stringToLocalDateTime(String time) {
+        return LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     /**
@@ -109,7 +108,7 @@ public class TimeUtil {
      * @return 相差数量
      */
     public static Integer getYearsByStartTime(String startTime) {
-        LocalDate startDate = stringToLocalDate(startTime, "yyyy-MM-dd");
+        LocalDate startDate = stringToLocalDate(startTime);
         LocalDate currentDate = LocalDate.now();
         if (currentDate.isBefore(startDate)) {
             return 0;
@@ -160,9 +159,9 @@ public class TimeUtil {
      * @param date   文本时间
      * @param format format 转化格式
      * @return 时间对象
-     * @throws ParseException format ex
+     * @throws ParseException format exceptions
      */
-    public static Date getDate(String date, String format) throws ParseException {
+    public static Date stringToDate(String date, String format) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.parse(date);
     }
@@ -309,8 +308,8 @@ public class TimeUtil {
      * @throws ParseException 转换异常
      */
     public static int dateBetween(String startDate, String endDate) throws ParseException {
-        Date dateStart = getDate(startDate, "yyyy-MM-dd");
-        Date dateEnd = getDate(endDate, "yyyy-MM-dd");
+        Date dateStart = stringToDate(startDate, "yyyy-MM-dd");
+        Date dateEnd = stringToDate(endDate, "yyyy-MM-dd");
         return (int) ((dateEnd.getTime() - dateStart.getTime()) / 1000 / 60 / 60 / 24);
     }
 

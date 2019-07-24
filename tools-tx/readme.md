@@ -13,7 +13,7 @@
 腾讯短信:   
 * 指定模板ID与手机号发送短信, **参数必须与你选择的模板参数对应和顺序对应,如果没有参数可以传空数组**, 发送结果 0 表示成功(计费依据)，非 0 表示失败 ,
   更多错误码请前往: <a href="https://cloud.tencent.com/document/product/382/3771">错误码</a>
-```
+```java
 @PostMapping("/send-tx")
 @ApiOperation(value = "腾讯短信", httpMethod = "POST")
 public ResponseEntity sendTx() {
@@ -24,7 +24,7 @@ public ResponseEntity sendTx() {
 ```
 * 指定模板ID群发短信, 群发一次请求**最多支持200个号码**。发送结果 result为0 表示成功(计费依据)，非 0 表示失败,   
   更多错误码请前往: <a href="https://cloud.tencent.com/document/product/382/3771">错误码</a>
-```
+```java
 @PostMapping("/send-tx-multi")
 @ApiOperation(value = "腾讯群发短信", httpMethod = "POST")
 public ResponseEntity sendTxMulti() {

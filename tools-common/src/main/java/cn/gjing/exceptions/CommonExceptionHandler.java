@@ -1,4 +1,4 @@
-package cn.gjing.ex;
+package cn.gjing.exceptions;
 
 import cn.gjing.enums.HttpStatus;
 import cn.gjing.result.ErrorResult;

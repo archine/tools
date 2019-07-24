@@ -2,19 +2,38 @@
 ![](https://img.shields.io/badge/version-1.0.9-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
-##### 快速集成Swagger，只需一个注解，即可开启默认配置并使用它, 也可以自定义去配置它.
-> **推荐使用最新版本,由于该项目使用了lombok插件，请确保本地安装了lombok**  
-     
-**安装**
----
-* <a href="https://mvnrepository.com/artifact/cn.gjing/tools-starter-swagger/" title="swagger包">tools-starter-swagger</a>
----
-### 注解
-* @EnableSwagger: 标注在启动类或其他配置类即可.
-### 自定义配置(皆非必填)
+**SpringBoot环境快速集成Swagger，只需一个注解，即可开启默认配置并使用它, 也可以自定义去配置它**
+### 使用方法
+**1.添加依赖**
+```xml
+<dependency>
+     <groupId>cn.gjing</groupId>
+     <artifactId>tools-starter-swagger</artifactId>
+     <version>1.0.9</version>
+</dependency>
 ```
-> yml文件格式: 
+**2. 在启动类标注@EnableSwagger注解开启Swagger文档并启用默认配置**
+```java
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableSwagger
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+```
+或者在配置类标注
+```java
+@Configuration
+@EnableSwagger
+public class DemoConfig {
 
+}
+```
+**3. 如果需要自定义配置，可参考如下自行选择需要进行自定义配置的参数**
+* yml格式
+```yaml
 swagger:
   contact:
     email: (联系邮箱)
@@ -29,9 +48,9 @@ swagger:
   terms-of-service-url: (服务条款)
   license: (许可证)
   license-url: (许可证地址)
-
-> JavaBean方式:
-
+```
+*  JavaBean方式
+```java
 @Configuration
 public class DemoConfig {
     @Bean
@@ -48,11 +67,10 @@ public class DemoConfig {
     }
 }     
 ```
-### 如若要开启多资源模式,可在基础配置上增加以下配置, 需搭配zuul使用, 并且在同一个Eureka注册中心下
-:exclamation: 如果register-me设置为false,并且serve-list为空,则会抛出无效参数异常
-```
-> yml格式:
-
+**4. 如果需要将其他项目swagger文档加入，可增加如下配置，需要搭配路由使用，并在同一个Eureka注册中心下**
+**tip：**如果register-me设置为false,并且serve-list为空,则会抛出无效参数异常
+* yml格式
+```yaml
 swagger:
   resources:
     serve-list:
@@ -64,13 +82,11 @@ swagger:
           location: demo2   
     enable: (是否开启多资源模式,默认false)
     register-me: (是否需要把当前项目的swagger文档也加入,默认为true)
-    
-> JavaBean格式
-
+```
+* JavaBean方式
+```java
 @Configuration
-@EnableSwagger
-public class GatewayConfig {
-
+public class DemoConfig {
     @Bean
     public Resources resources() {
         Map<String, Serve> map = new HashMap<>();
@@ -81,7 +97,6 @@ public class GatewayConfig {
                 .serveList(Collections.singletonList(map)).build();
     }
 }
-    
 ```
 ---
 **更多教程可前往查看博客: [SpringBoot使用swagger](https://yq.aliyun.com/articles/703133?spm=a2c4e.11155435.0.0.68153312Yeo5xN)**

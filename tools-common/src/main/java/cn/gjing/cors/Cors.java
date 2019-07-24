@@ -1,4 +1,4 @@
-package cn.gjing.handle;
+package cn.gjing.cors;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

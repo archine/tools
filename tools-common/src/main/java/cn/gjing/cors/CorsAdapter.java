@@ -1,4 +1,4 @@
-package cn.gjing.handle;
+package cn.gjing.cors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

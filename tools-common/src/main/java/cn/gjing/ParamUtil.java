@@ -36,6 +36,9 @@ public final class ParamUtil {
      * @return 原参数
      */
     public static <T> T requireNotNull(T str) {
+        if (str == null) {
+            throw new NullPointerException("Parameter cannot be null");
+        }
         return str;
     }
 

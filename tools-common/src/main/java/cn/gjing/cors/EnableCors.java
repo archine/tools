@@ -1,6 +1,5 @@
-package cn.gjing.annotation;
+package cn.gjing.cors;
 
-import cn.gjing.handle.CorsSelector;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

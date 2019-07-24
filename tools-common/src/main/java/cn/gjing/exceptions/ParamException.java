@@ -1,4 +1,4 @@
-package cn.gjing.ex;
+package cn.gjing.exceptions;
 
 /**
  * @author Gjing

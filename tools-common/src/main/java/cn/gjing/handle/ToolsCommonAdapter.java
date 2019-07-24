@@ -1,7 +1,7 @@
 package cn.gjing.handle;
 
 import cn.gjing.SpringBeanUtil;
-import cn.gjing.ex.CommonExceptionHandler;
+import cn.gjing.exceptions.CommonExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
