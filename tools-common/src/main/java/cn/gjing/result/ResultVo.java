@@ -58,5 +58,4 @@ public class ResultVo<T> implements Serializable {
                 .message(HttpStatus.BAD_REQUEST.getMsg())
                 .build();
     }
-
 }
