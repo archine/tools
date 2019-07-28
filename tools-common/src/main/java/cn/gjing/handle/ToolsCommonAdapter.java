@@ -1,7 +1,7 @@
 package cn.gjing.handle;
 
-import cn.gjing.SpringBeanUtil;
-import cn.gjing.exceptions.CommonExceptionHandler;
+import cn.gjing.BeanUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,17 +12,13 @@ import org.springframework.context.annotation.Configuration;
 public class ToolsCommonAdapter {
 
     @Bean
+    @ConditionalOnClass(NotNull2Processor.class)
     public NotNull2Processor notNullProxy() {
         return new NotNull2Processor();
     }
 
     @Bean
-    public CommonExceptionHandler commonExceptionHandler() {
-        return new CommonExceptionHandler();
-    }
-
-    @Bean
-    public SpringBeanUtil springBeanUtil() {
-        return new SpringBeanUtil();
+    public BeanUtil commonBeanUtil() {
+        return new BeanUtil();
     }
 }

@@ -17,7 +17,7 @@ public final class ParamUtil {
      * @return True 为空,false不为空
      */
     public static <T> boolean isEmpty(T str) {
-        if (str == null||"".equals(str)) {
+        if (str == null || "".equals(str)) {
             return true;
         } else if (str instanceof Collection) {
             return ((Collection) str).isEmpty();
@@ -31,6 +31,7 @@ public final class ParamUtil {
 
     /**
      * 不为空返回原对象值,为空跑出NPE
+     *
      * @param str 参数
      * @param <T> 泛型
      * @return 原参数
@@ -44,8 +45,9 @@ public final class ParamUtil {
 
     /**
      * 判断集合里是否含有空值
+     *
      * @param list 参数集合
-     * @param <T> 泛型
+     * @param <T>  泛型
      * @return true为包含
      */
     public static <T> boolean ListHasEmpty(Collection<? extends T> list) {
@@ -54,10 +56,11 @@ public final class ParamUtil {
 
     /**
      * 检查多参数里面是否有空值
+     *
      * @param params 多个参数集合
      * @return true为包括, false不包括
      */
-    public static boolean multiEmpty(Object...params) {
+    public static boolean multiEmpty(Object... params) {
         return Arrays.stream(params).anyMatch(ParamUtil::isEmpty);
     }
 
@@ -67,12 +70,13 @@ public final class ParamUtil {
      * @param str 参数
      * @return true为不含有, false为含有
      */
-    public static<T> boolean isNotEmpty(T str) {
+    public static <T> boolean isNotEmpty(T str) {
         return !isEmpty(str);
     }
 
     /**
      * 判断两个参数是否相等
+     *
      * @param t 参数1
      * @param u 参数2
      * @return true为相等
@@ -221,11 +225,11 @@ public final class ParamUtil {
      * @return 返回true为包含
      */
     public static boolean contains(Object[] t, Object u) {
-        if (multiEmpty(t,u)) {
+        if (multiEmpty(t, u)) {
             return false;
         }
         for (Object o : t) {
-            if (equals(o,u)) {
+            if (equals(o, u)) {
                 return true;
             }
         }

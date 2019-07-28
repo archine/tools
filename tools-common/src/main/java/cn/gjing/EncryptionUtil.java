@@ -167,7 +167,7 @@ public class EncryptionUtil {
      * @param b 字节数组
      * @return 字符串
      */
-    public static String byteArrayToHexString(byte[] b) {
+    private String byteArrayToHexString(byte[] b) {
         StringBuilder hs = new StringBuilder();
         String stmp;
         for (int n = 0; b != null && n < b.length; n++) {

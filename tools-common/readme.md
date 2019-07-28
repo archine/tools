@@ -1,24 +1,22 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.0.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  提供参数校验与处理，excel导出，时间转换，数据加密,线程池,验证码,发送邮件,开启跨域等功能...
- > **推荐使用最新版本，由于项目使用了lombok，请确保本地开发工具安装了lombok插件**      
-### **安装**
+### 引入依赖
 ```xml
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.0.5</version>
+  <version>1.1.0</version>
 </dependency>
 ```
----
 > **工具介绍**
 ### 一. 注解:
 #### **1. @NotNull**: 
-可以在普通程序和web程序中使用,适用于方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到指定参数上;
+方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到指定参数上;
 #### **2. @NotNull2**: 
-只在web程序中使用,适用于方法,如若要排除方法中的某个参数不检验,可进行@NotNull2(exclude={"参数名1","参数名2"}),**参数名必须与方法的参数名相同**,   默认异常信息为参数不能为空,可以自定义异常信息@NotNull2(message="您要使用的异常异常"); 
-**如果是Spring环境，需要手动在xml文件中进行如下配置，如果此处配置了，使用SpringBeanUtil时无需再配置，SpringBoot环境无需配置**
+方法参数校验,如若要排除方法中的某个参数不检验,可进行@NotNull2(exclude={"参数名1","参数名2"}),**参数名必须与方法的参数名相同**,   默认异常信息为参数不能为空,可以自定义异常信息@NotNull2(message="您要使用的异常异常"); 
+**如果是Spring环境，需要手动在xml文件中进行如下配置，如果此处配置了，使用BeanUtil时无需再配置，SpringBoot环境无需配置**
 ```xml
 <bean id="toolsCommon" class="cn.gjing.handle.ToolsCommonAdapter"/>
 ```
@@ -60,7 +58,7 @@ public class CorsConfiguration {
 * **PageResult**: 分页查询返回结果模板,包含data(数据)和totalPage(总页数)以及CurrentPage(当前页数),使用时可以直接使用builder构造,也可以调用其中of方法.
 * **ErrorResult**: 错误返回模板, 里面包含failure(状态码400时使用,里包含code和message,code用于进一步确定错误),error(服务器型异常,一般用于500等,只包含message)
 ### 三. Excel:   
-* **导出: response, headers, title不能为空 **
+**导出: response, headers, title不能为空**
 ```java
 @RequestMapping("/excel")
 public void excel(HttpServletResponse response) {
@@ -214,11 +212,37 @@ public void excelContainsInfo(HttpServletResponse response) {
   * **uuid**：获取uuid随机字符串（去除里面的-）
 #### SpringBeanUtil：
 SpringBean工具类，如果是Spring环境，需要在XML文件作如下配置，如果@NotNull2注解那块进行了配置，则无需再配置,SpringBoot环境无需配置
-  ```xml
-  <bean id="toolsCommon" class="cn.gjing.handle.toolsCommonAdapter"/>
-  ```
-  * **getApplicationContext**：获取ApplicationContext实例
-  * **getBean**：通过bean名称获取bean类对象获取bean
+```xml
+<bean id="toolsCommon" class="cn.gjing.handle.toolsCommonAdapter"/>
+```
+##### 1. getApplicationContext
+获取ApplicationContext实例       
+
+``ApplicationContext getApplicationContext()``
+##### 2. getBean
+通过bean名称获取bean类对象获取bean     
+
+``T getBean(Class<T> beanClass)``
+##### 3. copyProperties
+复制属性值,用于将一个对象的属性值复制到另一个对象,``两个对象间属性的数据类型和属性名要相同``     
+
+``T copyProperties(Object source, Class<T> target, String... ignores)``
+**参数说明**    
+
+|参数|描述|
+|-----|-----|
+|source|原对象|
+|target|目标对象|
+|ignores|字段名|     
+
+##### 4. toMap
+将bean转为map     
+
+``Map<String,Object> toMap(Object bean)``
+##### 5. toBean
+将Map转为bean     
+
+``T toBean(Map<String, ?> map, Class<T> bean)``
 #### AuthCodeUtil: 
 简单验证码工具类, 目前只支持英文和数字混合验证码,后期会加上拼图等类型验证码;
 ```java

@@ -1,5 +1,5 @@
 # Gjing tools for java :smile:
-![](https://img.shields.io/badge/version-1.3.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
+![](https://img.shields.io/badge/version-1.3.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)   
 项目开发常用工具包整合   
 :exclamation: **推荐使用最新版本**   
 ---
@@ -13,9 +13,8 @@
 * <a href="https://github.com/archine/tools/tree/master/tools-starter-feign" title="http工具包">tools-starter-feign</a> （快速集成并使用Feign)   
 * <a href="https://github.com/archine/tools/tree/master/tools-redis" title="redis分布式锁和分布式缓存">tools-redis</a> (redis分布式锁和缓存)
 
- :exclamation: 请注意，项目JDK版本支持1.8+
+:exclamation: 请注意，项目JDK版本支持1.8+
 ---
-
 #### **作者**
 * Gjing   
 :sunny:使用中出现任何BUG和有任何疑问可以联系我邮箱: me@gjing.cn      
