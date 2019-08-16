@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.util;
 
 import cn.gjing.exceptions.CastException;
 import org.springframework.beans.BeanUtils;

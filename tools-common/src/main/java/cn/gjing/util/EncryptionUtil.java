@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.util;
 
 import cn.gjing.exceptions.ParamException;
 import org.apache.commons.codec.binary.Base64;

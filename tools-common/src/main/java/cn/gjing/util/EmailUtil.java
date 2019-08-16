@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.util;
 
 import cn.gjing.exceptions.HttpException;
 import cn.gjing.exceptions.ParamException;

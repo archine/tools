@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

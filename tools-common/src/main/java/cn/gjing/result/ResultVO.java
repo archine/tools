@@ -16,46 +16,54 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResultVo<T> implements Serializable {
+public class ResultVO<T> implements Serializable {
 
     private Integer code;
     private String message;
     private T data;
 
-    public static<T> ResultVo success(Integer code,String message,T data) {
-        return ResultVo.builder()
+    public static<T> ResultVO success(Integer code, String message, T data) {
+        return ResultVO.builder()
                 .code(code == null ? HttpStatus.OK.getCode() : code)
                 .message(message == null ? HttpStatus.OK.getMsg() : message)
                 .data(data)
                 .build();
     }
 
-    public static <T> ResultVo success(T data) {
-        return ResultVo.builder()
+    public static <T> ResultVO success(T data) {
+        return ResultVO.builder()
                 .code(HttpStatus.OK.getCode())
                 .message(HttpStatus.OK.getMsg())
                 .data(data)
                 .build();
     }
 
-    public static ResultVo success() {
-        return ResultVo.builder()
+    public static ResultVO success() {
+        return ResultVO.builder()
                 .code(HttpStatus.OK.getCode())
                 .message(HttpStatus.OK.getMsg())
                 .build();
     }
 
-    public static ResultVo error(Integer code,String message) {
-        return ResultVo.builder()
+    public static ResultVO error(Integer code, String message) {
+        return ResultVO.builder()
                 .code(code == null ? HttpStatus.BAD_REQUEST.getCode() : code)
                 .message(message == null ? HttpStatus.BAD_REQUEST.getMsg() : message)
                 .build();
     }
 
-    public static ResultVo error() {
-        return ResultVo.builder()
+    public static ResultVO error() {
+        return ResultVO.builder()
                 .code(HttpStatus.BAD_REQUEST.getCode())
                 .message(HttpStatus.BAD_REQUEST.getMsg())
                 .build();
     }
+
+    public static ResultVO error(String message) {
+        return ResultVO.builder()
+                .code(HttpStatus.BAD_REQUEST.getCode())
+                .message(message)
+                .build();
+    }
+
 }

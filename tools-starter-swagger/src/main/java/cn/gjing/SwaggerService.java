@@ -12,15 +12,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Serve {
+public class SwaggerService {
 
     /**
      * 目标文档展示的提示名
      */
-    private String name;
+    private String view;
 
     /**
-     * 目标地址: 如/demo/v2/api-docs,也可以直接传服务名
+     * 目标服务名
      */
-    private String location;
+    private String service;
 }

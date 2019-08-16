@@ -1,36 +1,36 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
-提供参数校验与处理，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数等功能... 
-### 一、安装
+提供参数校验与处理，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
+## 一、导入依赖
 ```xml
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
 </dependency>
 ```     
-### 二、注解:
+## 二、注解:
 #### 1、@NotNull 
-方法参数校验,如若要排除方法中的某个参数,搭配使用@ExcludeParam注解到指定参数上;
+方法参数校验,如若要排除方法中的某个参数,搭配使用``@ExcludeParam``注解到指定参数上;
 #### 2、@NotNull2
-方法参数校验,如若要排除方法中的某个参数不检验,可进行@NotNull2(exclude={"参数名1","参数名2"}),**参数名必须与方法的参数名相同**,默认异常信息为参数不能为空,可以自定义异常信息@NotNull2(message="您要使用的异常异常"); 
-**如果是Spring环境，需要手动在xml文件中进行如下配置，如果此处配置了，使用BeanUtil时无需再配置，SpringBoot环境无需配置**
+方法参数校验, 可对null和空字符串进行校验, 如果要排除某些参数, 可将这些参数的名称设置到注解的参数``exclude``里, 如果需要自定义异常提示信息, 可设置``message`` 
+, ``如果是Spring环境，需要手动在xml文件中进行如下配置，如果此处配置了，使用BeanUtil时无需再配置，SpringBoot环境无需配置``
 ```xml
 <bean id="toolsCommon" class="cn.gjing.handle.ToolsCommonAdapter"/>
 ```
 #### 3、@EnableCors
-全局允许跨域,标注在启动类或者配置类上,默认允许开启所有跨域，也可以自定义配置
+开启允许跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：
 * **yml方式**
 ```yaml
 cors:
   # 支持的方法类型
-  allowed-methods: POST,GET,DELETE,PUT
+  allowed-methods: POST,GET,DELETE,PUT...
   # 支持的请求头
-  allowed-headers:
+  allowed-headers: xxx
   # 支持的域名
-  allowed-origins:
+  allowed-origins: xxx
   # 方法路径
   path: /**
   max-age: 1800
@@ -52,25 +52,24 @@ public class CorsConfiguration {
     }
 }
 ```
-### 三、返回结果模板
-#### 1、ResultVo
-通用返回结果模板,包含code(状态码),message(提示信息),data(数据)三个参数
+## 三、返回结果模板
+#### 1、ResultVO
+通用返回结果模板,包含``code(状态码)``和``message(提示信息)``以及``data(数据)``
 ```java
-ResultVo resultVo = ResultVo.success();
+ResultVO resultVo = ResultVO.success();
 ```
 #### 2、PageResult
-分页查询返回结果模板,包含data(数据)和totalPage(总页数)以及CurrentPage(当前页数),使用时可以直接使用builder构造,也可以调用其中of方法
+分页查询返回结果集, 包含``data(数据)``和``totalPage(总页数)``以及``CurrentPage(当前页数)``, 使用时可以直接使用builder构造, 也可以调用其中``of()``方法
 ```java
 PageResult pageResult = PageResult.of("data", 1);
 ```
 #### 3、ErrorResult
-错误返回模板, 里面包含failure(状态码400时使用,里包含code和message,code用于进一步确定错误),error(服务器型异常,一般用于500
-等,只包含message)
+错误返回模板, 里面包含``failure``(``状态码400``时使用,包含``code``和``message``, ``code``用于进一步确定错误), ``error``(服务器型异常,一般``用于500``等, 只包含message)
 ```java
 ErrorResult.error(HttpStatus.BAD_REQUEST.getMsg());
 ```
-### 四、Excel导出
-**导出: response, headers, title不能为空**
+## 四、Excel导出
+**Excel文件导出**
 ```java
 @RequestMapping("/excel")
 public void excel(HttpServletResponse response) {
@@ -104,9 +103,9 @@ public void excelContainsInfo(HttpServletResponse response) {
     ExcelUtil.excelExport(response, data, headers, "测试含有详情的excel", "详情");
 }
 ```
-### 五、实用工具类:   
-#### 1、ParamUtil： 
-主要提供参数校验、处理,匹配等等;
+## 五、实用工具类:   
+### 1、ParamUtil： 
+**主要提供参数校验、处理,匹配等等**
 * **isEmpty**：判断给定参数是否为空，可以是字符串、包装类型、数组、集合等
 ```java
 boolean isEmpty(T str)
@@ -179,8 +178,8 @@ boolean isTelPhone(String tel)
 ```java
 boolean isPostCode(String postCode)
 ```
-#### 2、TimeUtil： 
-主要用于操作时间和日期;
+### 2、TimeUtil： 
+**操作时间和日期**
 * **dateToString**：获取文本格式时间
 ```java
 String dateToString(Date date)
@@ -297,64 +296,102 @@ int dateBetween(String startDate, String endDate)
 ```java
 int dateBetween(String startDate, String endDate)
 ```
-#### 3、EncryptionUtil
-主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64;
-  * **of**：生成加密实例
-  * **encodeMd5**：MD5加密
-  * **encodeBase64**：Base64加密
-  * **decodeBase64**：Base64解密
-  * **encodeSha256Hmac**：Sha356Hmac加密
-  * **sha1Hmac**：sha1Hmac加密
-  * **encodeAes**：AES加密
-  * **decodeAes**：AES解密
-  * **byteArrayToHexString**：二进制数组转16进制
-#### 4、RandomUtil
-随机数工具类
-  * **randomInt**：获取随机整数，可设置最大值和最小值
-  * **getRandom**：获取一个Random实例
-  * **generateMixString**：生成混合指定长度字符串（数字、字母大小写）
-  * **generateString**：获取指定长度纯字符串（字母大小写）
-  * **generateNumber**：获取指定长度数字字符串
-  * **uuid**：获取uuid随机字符串（去除里面的-）
-#### SpringBeanUtil：
-SpringBean工具类，如果是Spring环境，需要在XML文件作如下配置，如果@NotNull2注解那块进行了配置，则无需再配置,SpringBoot环境无需配置
+### 3、EncryptionUtil
+**主要用于加密,目前含有MD5、sha256Hmac、sha1Hmac、base64**
+* **of**：生成加密实例
+```java
+EncryptionUtil of()
+```
+* **encodeMd5**：MD5加密
+```java
+String encodeMd5(String body)
+```
+* **encodeBase64**：Base64加密
+```java
+encodeBase64(String content)
+```
+* **decodeBase64**：Base64解密
+```java
+String decodeBase64(String content)
+```
+* **encodeSha256Hmac**：sha566 hmac加密
+```java
+String encodeSha256Hmac(String str, String secret)
+```
+* **sha1Hmac**：sha1Hmac加密
+```java
+String sha1Hmac(String str, String secret)
+```
+* **encodeAes**：AES加密
+```java
+String encodeAes(String content, String password)
+```
+* **decodeAes**：AES解密
+```java
+String decodeAes(String content, String password)
+```
+### 4、RandomUtil
+**随机数工具类**
+* **randomInt**：获取随机整数，可设置最大值和最小值
+```java
+int randomInt(int min, int max)
+```
+* **getRandom**：获取一个Random实例
+```java
+Random getRandom()
+```
+* **generateMixString**：生成混合指定长度字符串（数字、字母大小写）
+```java
+String generateMixString(int length)
+```
+* **generateString**：获取指定长度纯字符串（字母大小写）
+```java
+String generateString(int length)
+```
+* **generateNumber**：获取指定长度数字字符串
+```java
+String generateNumber(int length)
+```
+### 5、BeanUtil：
+**SpringBean工具类，如果是Spring环境，需要在XML文件作如下配置，如果@NotNull2注解那块进行了配置，则无需再配置,SpringBoot环境无需配置**
 ```xml
 <bean id="toolsCommon" class="cn.gjing.handle.toolsCommonAdapter"/>
 ```
-##### 1. getApplicationContext
+#### a. getApplicationContext
 获取ApplicationContext实例       
 ```java
-ApplicationContext getApplicationContext()
+BeanUtil.getApplicationContext()
 ```
-##### 2. getBean
+#### b. getBean
 通过bean名称获取bean类对象获取bean     
 ```java
-T getBean(Class<T> beanClass)
+BeanUtil.getBean(Class<T> beanClass)
 ```
-##### 3. copyProperties
+#### c. copyProperties
 复制属性值,用于将一个对象的属性值复制到另一个对象,``两个对象间属性的数据类型和属性名要相同``     
 ```java
-T copyProperties(Object source, Class<T> target, String... ignores)
-```
-**参数说明**    
+BeanUtil.copyProperties(Object source, Class<T> target, String... ignores)
+```    
+**参数说明**      
+    
 |参数|描述|
 |-----|-----|
 |source|原对象|
 |target|目标对象|
 |ignores|字段名|     
 
-##### 4. toMap
+#### d. toMap
 将bean转为map     
 ```java
-Map<String,Object> toMap(Object bean)
+BeanUtil.toMap(Object bean)
 ```
-##### 5. toBean
+#### e. toBean
 将Map转为bean     
 ```java
-T toBean(Map<String, ?> map, Class<T> bean)
+BeanUtil.toBean(Map<String, ?> map, Class<T> bean)
 ```
-#### 5、AuthCodeUtil
-简单验证码工具类, 目前只支持英文和数字混合验证码,后期会加上拼图等类型验证码;
+### 5、AuthCodeUtil
+**简单验证码工具类, 支持英文和数字混合验证码**
 ```java
 //第一种情况: 生成验证码到本地指定路径,以下为简单测试,具体逻辑根据业务需求自行设计
 public static void main(String[] args) {
@@ -402,8 +439,26 @@ public ResultVo verifyCode(String code, HttpServletRequest request) {
     return ResultVo.error(null,"invalid code");
 }
 ```
-#### 6、EmailUtil
-邮件工具类,支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功
+### 6、IdUtil
+**Id生成工具类,提供生成UUID和分布式ID, 项目中使用通过``@Resource``注入**
+#### a. uuid
+获取去除``-``符号的uuid
+```java
+idUtil.uuid();
+```
+#### b. snowId
+**获取分布式Id, 通过雪花算法生成, 在多服务需要操作同一个数据表的情况下, 需要保证每个服务的``centerId``和``machineId``唯一**   
+```java
+idUtil.snowId();
+```
+**配置如下**    
+```yaml
+snow:
+  center-id: 数据中心id, 范围0-30, 默认0
+  machine-id: 机器id, 范围0-30, 默认0
+```   
+### 7、EmailUtil
+**邮件工具类,支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功**
 ```java
 public static void main(String[] args) {
     boolean b = EmailUtil.of("smtp.qq.com", "发送人密码或者授权码", "发送人邮箱")

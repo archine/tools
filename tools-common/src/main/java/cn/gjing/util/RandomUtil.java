@@ -1,7 +1,6 @@
-package cn.gjing;
+package cn.gjing.util;
 
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * @author Gjing
@@ -62,9 +61,4 @@ public class RandomUtil {
         }
         return builder.toString();
     }
-
-    public static String uuid() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
-    }
-
 }

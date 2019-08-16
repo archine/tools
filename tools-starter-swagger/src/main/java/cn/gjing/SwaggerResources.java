@@ -14,13 +14,13 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-@Component
-@ConfigurationProperties("swagger.resources")
 @Data
 @Builder
+@Component
 @NoArgsConstructor
 @AllArgsConstructor
-public class Resources {
+@ConfigurationProperties("swagger.resources")
+public class SwaggerResources {
 
     /**
      * 是否开启Swagger资源列表
@@ -33,10 +33,10 @@ public class Resources {
     @Builder.Default
     private boolean registerMe = true;
     /**
-     * 服务名和地址以及列表展示名
+     * 服务列表
      */
     @Builder.Default
-    private List<Map<String,Serve>> serveList = new ArrayList<>();
+    private List<Map<String, SwaggerService>> serviceList = new ArrayList<>();
 
 }
 

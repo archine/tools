@@ -1,21 +1,21 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.0.9-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
-**SpringBoot环境快速集成Swagger，只需一个注解，即可开启默认配置并使用它, 也可以自定义去配置它**
+**快速在SpringBoot项目中集成Swagger**
 ### 使用方法
-**1.添加依赖**
+#### 1. 导入依赖
 ```xml
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>1.0.9</version>
+     <version>1.1.0</version>
 </dependency>
 ```
-**2. 在启动类标注@EnableSwagger注解开启Swagger文档并启用默认配置**
+#### 2. 使用注解
+**该注解可以用在``任何类``上, 案例中将其用在启动类上**
 ```java
 @SpringBootApplication
-@EnableDiscoveryClient
 @EnableSwagger
 public class DemoApplication {
     public static void main(String[] args) {
@@ -23,31 +23,24 @@ public class DemoApplication {
     }
 }
 ```
-或者在配置类标注
-```java
-@Configuration
-@EnableSwagger
-public class DemoConfig {
-
-}
-```
-**3. 如果需要自定义配置，可参考如下自行选择需要进行自定义配置的参数**
+#### 3. 配置
+**在进行了第二步之后, 已经可以正常使用Swagger, 各个属性都提供了默认值, 当然如果需要自己设置一些属性也可以, 所有属性如下:**
 * yml格式
 ```yaml
 swagger:
   contact:
-    email: (联系邮箱)
-    name: (联系人昵称)
-    url: (联系人地址)
-  title: (标题)
-  description: (描述)
-  base-package: (接口所在包路径)
-  path-type: (接口选择规则类型, 共分为: ALL(所有接口), REGEX(符合正则), ANT(符合路径)三个类型, 默认为ALL类型)
-  path-pattern: (接口匹配规则,在path-type类型不为 "ALL" 的情况下必须设置,否则抛非法参数异常)
-  exclude-pattern: (排除路径，默认使用正则表达式方式，可在pathType设置为其他类型（pathType类型为ALL时默认走正则）)
-  terms-of-service-url: (服务条款)
-  license: (许可证)
-  license-url: (许可证地址)
+    email: 联系邮箱
+    name: 联系人昵称
+    url: 联系人地址
+  title: 标题
+  description: 描述
+  base-package: 接口所在包路径
+  path-type: 接口选择规则类型, 共分为: ALL(所有接口), REGEX(符合正则), ANT(符合路径)三个类型, 默认为ALL类型
+  path-pattern: 接口匹配规则,在path-type类型不为 "ALL" 的情况下必须设置,否则抛非法参数异常
+  exclude-pattern: 排除路径，默认使用正则表达式方式，可在pathType设置为其他类型(pathType类型为ALL时默认走正则)
+  terms-of-service-url: 服务条款
+  license: 许可证
+  license-url: 许可证地址
 ```
 *  JavaBean方式
 ```java
@@ -67,34 +60,42 @@ public class DemoConfig {
     }
 }     
 ```
-**4. 如果需要将其他项目swagger文档加入，可增加如下配置，需要搭配路由使用，并在同一个Eureka注册中心下**
-**tip：**如果register-me设置为false,并且serve-list为空,则会抛出无效参数异常
+#### 4. 聚合文档
+**在实际工作中, 往往是多个服务的, 这样前端需要记住每个服务的地址, 显然太麻烦, 所以可以采用聚合文档模式, 将多个项目都聚合在一个服务里, 通常聚合在网关里, 毕竟
+每个服务都是走网关过得, 该模式``限于SpringCloud环境``, 且每个服务都在``同一个注册中心下``, 参考配置如下:**
 * yml格式
 ```yaml
 swagger:
   resources:
-    serve-list:
-      - demo: (此处demo为目标项目的服务名)
-          name: (对应资源文档展示昵称,默认为对应服务的服务名)
-          location: (目标项目文档路径, 可以传目标项目的服务名或者完整路径 服务名+ /v2/api-docs , 如: /demo/v2/api-docs)
-      - demo2:
-          name: 服务2
-          location: demo2   
-    enable: (是否开启多资源模式,默认false)
-    register-me: (是否需要把当前项目的swagger文档也加入,默认为true)
+    enable: 是否开启聚合模式, 默认 False
+    register-me: 当前项目的文档是否也要加入聚合, 默认 true
+    # 服务列表
+    service-list:
+      - projectA: 这里可以随便定义
+          view: 下拉选择时展示的名字, 一般用于标识对应文档的名字
+          service: 服务名
+      - projectB:
+          view: 项目b
+          service: demo2   
 ```
 * JavaBean方式
 ```java
+/**
+ * @author Gjing
+ **/
 @Configuration
-public class DemoConfig {
+public class GatewayConfig {
     @Bean
-    public Resources resources() {
-        Map<String, Serve> map = new HashMap<>();
-        map.put("demo", Serve.builder().name("xxx").location("demo").build());
-        return Resources.builder()
-                .registerMe(true)
+    public SwaggerResources swaggerResources() {
+        List<Map<String, SwaggerService>> serviceList = new ArrayList<>();
+        Map<String, SwaggerService> service = new HashMap<>();
+        service.put("projectA", SwaggerService.builder().view("项目A").service("demo").build());
+        serviceList.add(service);
+        return SwaggerResources.builder()
                 .enable(true)
-                .serveList(Collections.singletonList(map)).build();
+                .registerMe(true)
+                .serviceList(serviceList)
+                .build();
     }
 }
 ```

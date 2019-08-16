@@ -1,6 +1,6 @@
 package cn.gjing.handle;
 
-import cn.gjing.ParamUtil;
+import cn.gjing.util.ParamUtil;
 import cn.gjing.annotation.NotNull2;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

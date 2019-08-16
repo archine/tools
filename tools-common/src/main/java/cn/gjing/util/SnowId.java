@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,17 +12,20 @@ import org.springframework.stereotype.Component;
  **/
 @Data
 @Builder
-@Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("swagger.contact")
-public class Contact {
+@Component
+@ConfigurationProperties("snow")
+public class SnowId {
 
+    /**
+     * 数据中心Id, 范围(0-31)
+     */
     @Builder.Default
-    private String name = "";
+    private Long centerId = 0L;
+    /**
+     * 机器标识符, 范围(0-31)
+     */
     @Builder.Default
-    private String url = "";
-    @Builder.Default
-    private String email = "";
-
+    private Long machineId = 0L;
 }

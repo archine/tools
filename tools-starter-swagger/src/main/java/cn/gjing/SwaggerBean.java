@@ -5,19 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Gjing
  **/
-@Component
-@ConfigurationProperties("swagger")
-@EnableConfigurationProperties
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Builder
+@Component
+@NoArgsConstructor
+@AllArgsConstructor
+@ConfigurationProperties("swagger")
 public class SwaggerBean {
     /**
      * 要扫描的包路径(controller包路径)

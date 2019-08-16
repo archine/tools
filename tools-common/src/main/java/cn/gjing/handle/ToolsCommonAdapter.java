@@ -1,7 +1,11 @@
 package cn.gjing.handle;
 
-import cn.gjing.BeanUtil;
+import cn.gjing.util.BeanUtil;
+import cn.gjing.util.IdUtil;
+import cn.gjing.util.SnowId;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,7 +22,21 @@ public class ToolsCommonAdapter {
     }
 
     @Bean
-    public BeanUtil commonBeanUtil() {
+    @ConditionalOnMissingBean(BeanUtil.class)
+    public BeanUtil beanUtil() {
         return new BeanUtil();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(SnowId.class)
+    public SnowId snowId() {
+        return new SnowId();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(value = {IdUtil.class})
+    @ConditionalOnBean(SnowId.class)
+    public IdUtil idUtil() {
+        return new IdUtil(snowId());
     }
 }

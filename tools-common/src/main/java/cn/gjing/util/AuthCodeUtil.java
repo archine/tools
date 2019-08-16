@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.util;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

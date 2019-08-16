@@ -74,7 +74,7 @@ public class NonNullProcessor extends AbstractProcessor {
                                                                 treeMaker.NewClass(
                                                                         null,
                                                                         List.nil(),
-                                                                        buildExceptionClassExpression("java.lang.NullPointerException", treeMaker, names),
+                                                                        buildExceptionClassExpression(treeMaker, names),
                                                                         List.of(treeMaker.Literal(
                                                                                 "The parameter '"+parameter.getName().toString()+"' has been used @NotNull, so it cannot be null.")),
                                                                         null
@@ -96,8 +96,8 @@ public class NonNullProcessor extends AbstractProcessor {
         return true;
     }
 
-    private static JCTree.JCExpression buildExceptionClassExpression(String exceptionClass, TreeMaker factory, Names symbolsTable) {
-        String[] parts = exceptionClass.split("\\.");
+    private static JCTree.JCExpression buildExceptionClassExpression(TreeMaker factory, Names symbolsTable) {
+        String[] parts = "java.lang.NullPointerException".split("\\.");
         JCTree.JCIdent identifier = factory.Ident(symbolsTable.fromString(parts[0]));
         JCTree.JCFieldAccess selector = null;
         for (int i = 1; i < parts.length; i++) {
