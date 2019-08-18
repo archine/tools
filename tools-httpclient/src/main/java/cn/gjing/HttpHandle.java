@@ -93,7 +93,7 @@ class HttpHandle {
         } catch (Exception e) {
             throw new HttpException(e.getMessage());
         } finally {
-            disConnect(conn, bw, br);
+            this.disConnect(conn, bw, br);
         }
     }
 

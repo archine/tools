@@ -378,7 +378,7 @@ BeanUtil.copyProperties(Object source, Class<T> target, String... ignores)
 |-----|-----|
 |source|原对象|
 |target|目标对象|
-|ignores|字段名|     
+|ignores|要忽略的字段名|     
 
 #### d. toMap
 将bean转为map     
@@ -454,8 +454,8 @@ idUtil.snowId();
 **配置如下**    
 ```yaml
 snow:
-  center-id: 数据中心id, 范围0-30, 默认0
-  machine-id: 机器id, 范围0-30, 默认0
+  center-id: 数据中心id, 范围0-31, 默认0
+  machine-id: 机器id, 范围0-31, 默认0
 ```   
 ### 7、EmailUtil
 **邮件工具类,支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功**
