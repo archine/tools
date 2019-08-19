@@ -141,8 +141,8 @@ public class DemoLock extends AbstractLock {
     }
 }
 ```
-### 分布式缓存的使用
-#### 一. 启动类标上注解
+## 分布式缓存的使用
+### 一. 启动类标上注解
 ```java
 /**
  * @author Gjing
@@ -155,20 +155,25 @@ public class TestRedisApplication {
     }
 }
 ```
-#### 二. 配置
-* **配置参数**
-    * **Set<String> cacheNames**：缓存key名称
-    * **boolean cacheValueNullable**：是否存储控制，默认true，防止缓存穿透
-    * **boolean dynamic**：是否动态根据cacheName创建Cache实现
-    * **String cachePrefix**：默认无
-    * **Integer expire**：redis缓存过期时间，单位秒
-    * **Map<String, Integer> everyCacheExpire**：每个cacheName的过期时间，单位秒，优先级比defaultExpiration高
-    * **String topic**：缓存更新时通知其他节点的topic名称
-    * **Integer expireAfterAccess**：访问后过期时间，默认不过期，单位毫秒
-    * **Integer expireAfterWrite**：写入后过期时间，默认不过期，单位毫秒
-    * **Integer refreshAfterWrite**：写入后刷新时间，默认不过期，单位毫秒
-    * **Integer initialCapacity**：初始化大小
-    * **Integer maximumSize**：最大缓存对象个数，超过此数量时之前放入的缓存将失效
+### 二. 配置
+#### 1. 配置介绍
+**以下为所有配置信息, 使用时可自定义设置, 皆以``second.cache``开头**      
+   
+|配置项|描述|
+|------|------|
+|cache-names|缓存key名|
+|cache-value-nullable|是否存储控制，``默认true``，防止缓存穿透|
+|dynamic|是否动态根据cacheName创建Cache实现, 默认``true``|
+|cache-prefix|缓存key的前缀|
+|caffeine.initial-capacity|初始化大小|
+|caffeine.expire-after-access|访问后过期时间，单位毫秒|
+|caffeine.expire-after-write|写入后过期时间，单位毫秒|
+|caffeine.maximum-size|最大缓存对象个数，超过此数量时之前放入的缓存将失效|
+|caffeine.refresh-after-write|写入后刷新时间，单位毫秒|
+|redis.every-cache-expire|每个cacheName的过期时间，单位秒，优先级比``expire``高|
+|redis.expire|全局过期时间，单位秒，默认不过期|
+|redis.topic|缓存更新时通知其他节点的topic名称|
+#### 2. 配置示例
 * **yml方式**
 ```yml
 second:
@@ -210,7 +215,7 @@ public class CacheConfiguration {
     }
 }
 ```
-#### 三. 简单使用
+### 三. 简单使用
 ```java
 /**
  * @author Gjing
@@ -244,7 +249,7 @@ public class CustomService {
     }
 }
 ```
-#### 四. 定义接口调用
+### 四. 定义接口调用
 ```java
 /**
  * @author Gjing
