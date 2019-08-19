@@ -2,17 +2,16 @@ package cn.gjing.lock.core;
 
 import cn.gjing.lock.AbstractLockTimeoutHandler;
 import cn.gjing.lock.TimeoutException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Gjing
  **/
 @Component
-class ToolsLockTimeoutHandler extends AbstractLockTimeoutHandler<ResponseEntity> {
+class ToolsLockTimeoutHandler extends AbstractLockTimeoutHandler {
+
     @Override
-    public ResponseEntity timeoutAfter(TimeoutException e) {
-        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT.value()).body(HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
+    public void getLockTimeoutFallback(String key, int expire, int timeout, int retry) {
+        throw new TimeoutException("Try to get a lock timeout, with key: " + key);
     }
 }

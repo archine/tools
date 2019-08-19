@@ -1,14 +1,14 @@
 ### SpringBoot分布式锁和缓存
-![](https://img.shields.io/badge/version-1.0.2-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.0.3-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)      
-### 分布式锁的使用
+## 分布式锁的使用
 ### 一. 导入依赖
 ```xml
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-redis</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 ### 二. 启动类标注注解
@@ -25,14 +25,8 @@ public class TestRedisApplication {
 }
 ```
 ### 三. 具体使用
-#### 参数信息
-* **key：锁对应的key**
-* **value：随机字符串**
-* **expire：锁过期时间，单位秒**
-* **timeout：获取锁超时时间，单位毫秒**
-* **retry：重新获取锁间隔时间，单位毫秒**
-#### 1. 注解方式
-  * **@Lock(String key, int expire , int timeout, int retry)**
+#### 1、注解方式
+在需要加锁的方法上使用``@Lock``注解即可
 ```java
 /**
  * @author Gjing
@@ -40,6 +34,7 @@ public class TestRedisApplication {
 @RestController
 public class TestController {
     private static int num = 20;
+    
     @GetMapping("/test1")
     @Lock(key = "test1")
     public void test1() {
@@ -53,17 +48,37 @@ public class TestController {
     }
 }
 ```
-#### 2. 手动控制方式
-* **注入AbstractLock依赖**
-```
-@Resource
-private AbstractLock abstractLock;
-```
-* **在要锁住的地方加入abstractLock.lock()，获取锁成功返回一个解锁的值, 失败返回null**
-> **String lock(String key, String value, int expire, int timeout, int retry)**
-* **需要释放的地方使用abstractLock.release(), 释放锁成功返回当前被解锁的key，失败返回null**
-> **String release(String key, String value)**
-* **使用案例**
+**参数信息**    
+
+|参数|描述|
+|---|---|
+|key|锁的key，每个方法最好``唯一``|
+|expire|锁过期时间，单位``秒``，默认``5``|
+|timeout|尝试获取锁超时时间，单位``毫秒``，默认``500``|
+|retry|重新获取锁的间隔时间，单位``毫秒``，默认10|
+#### 2、手动控制方式
+在需要使用的方法的类中通过``@Resource``注入
+##### a、lock(): 加锁
+获取锁成功后会返回一个用于解锁的值，失败返回null   
+
+``abstractLock.lock(key, expire, timeout, retry)``   
+**参数说明**    
+
+|参数|描述|
+|---|---|
+|key|锁的key，每个方法保证``唯一``|
+|expire|锁过期时间，单位``秒``，默认``5``|
+|timeout|尝试获取锁超时时间，单位``毫秒``，默认``500``|
+|retry|重新获取锁的间隔时间，单位``毫秒``，默认10|
+##### b、release()：解锁
+释放锁成功返回当前被解锁的key，失败返回null    
+``abstractLock.release(key, value)``   
+**参数说明**     
+|参数|描述|
+|---|---|
+|key|加锁时对应的key|
+|value|获取锁成功后得到的值|       
+##### 使用案例
 ```java
 /**
  * @author Gjing
@@ -72,13 +87,14 @@ private AbstractLock abstractLock;
 public class LockController {
     @Resource
     private AbstractLock abstractLock;
+    
     private static int num = 10;
     
     @GetMapping("/test2")
     public void test2() {
         String lock = null;
         try {
-            lock = this.abstractLock.lock("testLock", RandomUtil.generateMixString(5), 20, 10000, 50);
+            lock = this.abstractLock.lock("testLock", 20, 10000, 50);
             System.out.println("当前线程:" + Thread.currentThread().getName());
             if (num == 0) {
                 System.out.println("卖完了");
@@ -92,19 +108,17 @@ public class LockController {
     }
 }
 ```
-#### 注意！！！
-**锁对应的key最好唯一，否则会造成多个方法在同时共享一个锁，造成不好的结果，解锁时传入的value，一定要是获取锁得到的value，否则会解锁失败，避免造成解锁其他人的锁**
-#### 3. 重写异常处理
-> 某个请求获取锁超时后，默认会返回超时异常信息，如果要自定义返回，可以继承AbstractLockTimeoutHandler超时异常处理类,支持自定义返回类型
+### 3. 重写异常处理
+在获取锁时往往会出现长时间未获取锁，达到我们加锁设置的超时时间后会抛出超时异常，如果要走自己的逻辑，可以重写异常处理
 ```java
 /**
  * @author Gjing
  **/
 @Component
-public class LockExceptionHandler extends AbstractLockTimeoutHandler<T> {
+public class TimeoutHandler extends AbstractLockTimeoutHandler {
     @Override
-    public T timeoutAfter(TimeoutException e) {
-        // TODO: 实现自定义处理的逻辑  
+    public void getLockTimeoutFallback(String s, int i, int i1, int i2) {
+        // TODO: 2019/8/19 自定义逻辑 
     }
 }
 ```

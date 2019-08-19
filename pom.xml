@@ -5,7 +5,7 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.7</version>
+    <version>1.3.8</version>
     <name>tools</name>
     <modules>
         <module>tools-common</module>
@@ -92,7 +92,7 @@
             <dependency>
                 <groupId>cn.gjing</groupId>
                 <artifactId>tools-redis</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

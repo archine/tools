@@ -9,13 +9,12 @@ public abstract class AbstractLock {
      * 加锁
      *
      * @param expire      超时时间
-     * @param value         value
      * @param key         key
      * @param retry 从新获取锁得间隔
      * @param timeout 超时时间
      * @return 锁成功返回val, 否则返回null
      */
-    public abstract String lock(String key, String value, int expire,int timeout,int retry);
+    public abstract String lock(String key, int expire,int timeout,int retry);
 
     /**
      * 释放锁

@@ -1,16 +1,16 @@
 package cn.gjing.lock;
 
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 /**
  * @author Gjing
  **/
-@RestControllerAdvice
-public abstract class AbstractLockTimeoutHandler<T> {
+public abstract class AbstractLockTimeoutHandler {
     /**
-     * 超时后处理逻辑
+     * 获取超时后处理逻辑
+     *
+     * @param key 加锁的key
+     * @param expire 锁过期时间
+     * @param retry 重新尝试获取锁的间隔
+     * @param timeout 超时时间
      */
-    @ExceptionHandler(TimeoutException.class)
-    public abstract T timeoutAfter(TimeoutException e);
+    public abstract void getLockTimeoutFallback(String key, int expire, int timeout, int retry);
 }

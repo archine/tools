@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.util.UUID;
 
 /**
  * @author Gjing
@@ -63,8 +62,7 @@ class LockProcess {
      * @return 锁结果
      */
     private String getLock(Lock lock) {
-        return this.abstractLock.lock(lock.key(), UUID.randomUUID().toString().replaceAll("-", ""),
-                lock.expire(), lock.timeout(), lock.retry());
+        return this.abstractLock.lock(lock.key(), lock.expire(), lock.timeout(), lock.retry());
     }
 
     /**
