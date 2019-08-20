@@ -60,86 +60,116 @@ public class FileUtil {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            this.close(fos, br, null, null, inputStream);
         }
     }
 
     /**
      * 将指定文件通过流下载
+     *
      * @param response response
-     * @param fileName 完整的文件名(目录, 文件名, 后缀)
+     * @param file     完整的文件名(目录, 文件名, 后缀)
      */
-    public void downloadByStream(HttpServletResponse response, String fileName) {
+    public void downloadByStream(HttpServletResponse response, String file) {
+        InputStream is = null;
+        OutputStream os = null;
         try {
             // path是指欲下载的文件的路径。
-            File file = new File(fileName);
-            InputStream is = new BufferedInputStream(new FileInputStream(file));
-            OutputStream os = new BufferedOutputStream(response.getOutputStream());
+            File file1 = new File(file);
+            if (!file1.exists()) {
+                throw new FileNotFoundException("This file not found: " + file);
+            }
+            is = new BufferedInputStream(new FileInputStream(file1));
+            os = new BufferedOutputStream(response.getOutputStream());
             response.setCharacterEncoding("utf-8");
             // 设置返回类型
             response.setContentType("multipart/form-data");
             // 文件名转码一下，不然会出现中文乱码
-            response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(file.getName(), "UTF-8"));
+            response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(file1.getName(), "UTF-8"));
             // 设置返回的文件的大小
-            response.setContentLength((int) file.length());
+            response.setContentLength(file.length());
             byte[] b = new byte[1024];
             int len;
             while (-1 != (len = is.read(b))) {
                 os.write(b, 0, len);
             }
-            os.flush();
-            os.close();
-            is.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                if (os != null) {
+                    os.flush();
+                    os.close();
+                }
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /**
      * 获取指定路径下的文件的Byte数组
      *
-     * @param filePath 文件路径
+     * @param file 文件名，包括存放目录、文件名、拓展名
      * @return byte数组
      */
-    public byte[] getBytes(String filePath) {
+    public byte[] getBytes(String file) {
         byte[] buffer = null;
+        FileInputStream fis = null;
+        ByteArrayOutputStream bos = null;
         try {
-            File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
+            File file1 = new File(file);
+            if (!file1.exists()) {
+                return null;
+            }
+            fis = new FileInputStream(file1);
+            bos = new ByteArrayOutputStream(1024);
             byte[] b = new byte[1000];
             int n;
             while ((n = fis.read(b)) != -1) {
                 bos.write(b, 0, n);
             }
-            fis.close();
-            bos.close();
             buffer = bos.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            this.close(null, null, fis, bos,null);
         }
         return buffer;
     }
+
+    /**
+     * 将字节数组写入文件
+     *
+     * @param bytes    要写入的字节数组
+     * @param path     存放的目录
+     * @param fileName 文件名+扩展名
+     * @return true为写入成功，false写入失败
+     */
+    public boolean writeFile(byte[] bytes, String path, String fileName) {
+        File mkdirPath = new File(path);
+        if (!mkdirPath.exists()) {
+            mkdirPath.mkdirs();
+        }
+        FileOutputStream fileOutputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+        File file = new File(mkdirPath + File.separator + fileName);
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            bufferedOutputStream.write(bytes);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            this.close(fileOutputStream, bufferedOutputStream, null,null,null);
+        }
+    }
+
 
     /**
      * 从输入流中获取字节数组
@@ -173,9 +203,38 @@ public class FileUtil {
      * @param fileName 文件名
      * @return 拓展名
      */
-    public String getExtention(String fileName) {
+    public String getExtension(String fileName) {
         int pos = fileName.lastIndexOf(".");
         return fileName.substring(pos);
     }
 
+    /**
+     * 关闭流
+     *
+     * @param fileOutputStream     文件输出流
+     * @param bufferedOutputStream 输出缓冲流
+     * @param fileInputStream      输入流
+     */
+    private void close(FileOutputStream fileOutputStream, BufferedOutputStream bufferedOutputStream, FileInputStream fileInputStream,
+                       ByteArrayOutputStream byteArrayOutputStream, InputStream inputStream) {
+        try {
+            if (bufferedOutputStream != null) {
+                bufferedOutputStream.close();
+            }
+            if (fileOutputStream != null) {
+                fileOutputStream.close();
+            }
+            if (fileInputStream != null) {
+                fileInputStream.close();
+            }
+            if (byteArrayOutputStream != null) {
+                byteArrayOutputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
