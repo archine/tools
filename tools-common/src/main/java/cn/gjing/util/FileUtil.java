@@ -68,26 +68,21 @@ public class FileUtil {
      * 将指定文件通过流下载
      *
      * @param response response
-     * @param file     完整的文件名(目录, 文件名, 后缀)
+     * @param file 文件
      */
-    public void downloadByStream(HttpServletResponse response, String file) {
+    public void downloadByStream(HttpServletResponse response, File file) {
         InputStream is = null;
         OutputStream os = null;
         try {
-            // path是指欲下载的文件的路径。
-            File file1 = new File(file);
-            if (!file1.exists()) {
-                throw new FileNotFoundException("This file not found: " + file);
-            }
-            is = new BufferedInputStream(new FileInputStream(file1));
+            is = new BufferedInputStream(new FileInputStream(file));
             os = new BufferedOutputStream(response.getOutputStream());
             response.setCharacterEncoding("utf-8");
             // 设置返回类型
             response.setContentType("multipart/form-data");
             // 文件名转码一下，不然会出现中文乱码
-            response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(file1.getName(), "UTF-8"));
+            response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(file.getName(), "UTF-8"));
             // 设置返回的文件的大小
-            response.setContentLength(file.length());
+            response.setContentLength((int)file.length());
             byte[] b = new byte[1024];
             int len;
             while (-1 != (len = is.read(b))) {
@@ -111,21 +106,17 @@ public class FileUtil {
     }
 
     /**
-     * 获取指定路径下的文件的Byte数组
+     * 获取文件的Byte数组
      *
-     * @param file 文件名，包括存放目录、文件名、拓展名
+     * @param file 文件
      * @return byte数组
      */
-    public byte[] getBytes(String file) {
+    public byte[] getBytes(File file) {
         byte[] buffer = null;
         FileInputStream fis = null;
         ByteArrayOutputStream bos = null;
         try {
-            File file1 = new File(file);
-            if (!file1.exists()) {
-                return null;
-            }
-            fis = new FileInputStream(file1);
+            fis = new FileInputStream(file);
             bos = new ByteArrayOutputStream(1024);
             byte[] b = new byte[1000];
             int n;
@@ -145,18 +136,12 @@ public class FileUtil {
      * 将字节数组写入文件
      *
      * @param bytes    要写入的字节数组
-     * @param path     存放的目录
-     * @param fileName 文件名+扩展名
+     * @param file 文件
      * @return true为写入成功，false写入失败
      */
-    public boolean writeFile(byte[] bytes, String path, String fileName) {
-        File mkdirPath = new File(path);
-        if (!mkdirPath.exists()) {
-            mkdirPath.mkdirs();
-        }
+    public boolean writeFile(byte[] bytes, File file) {
         FileOutputStream fileOutputStream = null;
         BufferedOutputStream bufferedOutputStream = null;
-        File file = new File(mkdirPath + File.separator + fileName);
         try {
             fileOutputStream = new FileOutputStream(file);
             bufferedOutputStream = new BufferedOutputStream(fileOutputStream);

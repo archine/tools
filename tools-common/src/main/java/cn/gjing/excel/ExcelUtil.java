@@ -15,13 +15,14 @@ public class ExcelUtil {
      * Excel export
      *
      * @param response response
-     * @param list     Data that needs to be exported
+     * @param data     Data that needs to be exported
      * @param headers  excel headers
-     * @param title    Excel file name
-     * @param info     Excel introduction, Pass null or "" if you don't need it
+     * @param fileName 文件名
+     * @param outline  概要
      */
     @NotNull
-    public static void excelExport(HttpServletResponse response, @ExcludeParam List<Object[]> list, String[] headers, String title, @ExcludeParam String info) {
-        ExportExcel.of(list, headers, title, info).generateHaveExcelName(response);
+    public static void excelExport(HttpServletResponse response, @ExcludeParam List<Object[]> data, String[] headers,
+                                   String fileName, @ExcludeParam String outline) {
+        ExportExcel.of(data, headers, fileName, outline).generateHaveExcelName(response);
     }
 }

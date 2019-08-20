@@ -28,35 +28,35 @@ class ExportExcel {
     /**
      * excel文件名
      */
-    private String title;
+    private String fileName;
     /**
      * excel额外的内容,如果不需要直接传null或者空字符串
      */
-    private String info;
+    private String outline;
 
-    private ExportExcel(List<Object[]> valueList, String[] headers, String title, String info) {
+    private ExportExcel(List<Object[]> valueList, String[] headers, String fileName, String outline) {
         this.valueList = valueList;
         this.headers = headers;
-        this.title = title;
-        this.info = info;
+        this.fileName = fileName;
+        this.outline = outline;
     }
 
-    static ExportExcel of(List<Object[]> valueLis, String[] headers, String title, String info) {
-        return new ExportExcel(valueLis, headers, title, info);
+    static ExportExcel of(List<Object[]> valueList, String[] headers, String fileName, String outline) {
+        return new ExportExcel(valueList, headers, fileName, outline);
     }
 
     /**
      * @param response 响应头
      */
     void generateHaveExcelName(HttpServletResponse response) {
-        if (ParamUtil.multiEmpty(response,headers,title)) {
+        if (ParamUtil.multiEmpty(response,headers,fileName)) {
             throw new ParamException(HttpStatus.PARAM_EMPTY.getMsg());
         }
         HSSFWorkbook wb = this.export();
         try {
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
-                    "attachment;filename=" + new String(title.getBytes(), "ISO8859-1") + ".xlsx");
+                    "attachment;filename=" + new String(fileName.getBytes(), "ISO8859-1") + ".xlsx");
             OutputStream outputStream = response.getOutputStream();
             wb.write(outputStream);
             outputStream.flush();
@@ -73,7 +73,7 @@ class ExportExcel {
     private HSSFWorkbook export() {
         //获取excel的样式
         HSSFWorkbook wb = new HSSFWorkbook();
-        HSSFSheet sheet = wb.createSheet(title);
+        HSSFSheet sheet = wb.createSheet(fileName);
         sheet.setDefaultColumnWidth(15);
         HSSFRow row = sheet.createRow(0);
         //标题背景
@@ -96,7 +96,7 @@ class ExportExcel {
             cell.setCellValue(headers[i]);
         }
         //如果含有excel的简介
-        if (ParamUtil.isNotEmpty(info)) {
+        if (ParamUtil.isNotEmpty(outline)) {
             //添加额外的excel内容
             row = sheet.createRow(1);
             HSSFCell cell;
@@ -104,7 +104,7 @@ class ExportExcel {
             cell.setCellStyle(style2);
             // 合并单元格CellRangeAddress构造参数依次表示起始行，截至行，起始列， 截至列. ========(合并4行)
             sheet.addMergedRegion(new CellRangeAddress(1, 4, 0, headers.length - 1));
-            cell.setCellValue(info);
+            cell.setCellValue(outline);
             if (valueList != null) {
                 for (int i = 0; i < valueList.size(); i++) {
                     Object[] obj = valueList.get(i);
