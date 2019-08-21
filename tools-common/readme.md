@@ -526,7 +526,7 @@ public class ExcelController {
     public void excelContainsInfo(HttpServletResponse response) {
         String[] headers = {"标题1", "标题2"};
         List<Object[]> data = new ArrayList<>();
-        # 将数据写入添加到data里
+        // 将数据写入添加到data里
         for (int i = 0; i < 10; i++) {
             Object[] objects = new Object[headers.length];
             objects[0] = i;
