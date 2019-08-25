@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.2-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 提供参数校验，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
@@ -8,7 +8,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 </dependency>
 ```     
 ## 二、常用注解:
@@ -513,7 +513,8 @@ public static void main(String[] args) {
 |data|数据|
 |headers|excel表头|
 |fileName|Excel文件名| 
-|outline|Excel概要|  
+|description|Excel描述|
+|cellAddresses|描述的格式|  
 
 **使用示例如下 :**
 ```java

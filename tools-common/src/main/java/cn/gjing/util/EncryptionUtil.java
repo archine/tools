@@ -1,6 +1,6 @@
 package cn.gjing.util;
 
-import cn.gjing.exceptions.ParamException;
+import cn.gjing.exception.ParamException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 

@@ -1,6 +1,6 @@
 package cn.gjing.util;
 
-import cn.gjing.exceptions.CastException;
+import cn.gjing.exception.CastException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
