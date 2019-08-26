@@ -1,8 +1,8 @@
 package cn.gjing.handle;
 
 import cn.gjing.util.BeanUtil;
-import cn.gjing.util.IdUtil;
-import cn.gjing.util.SnowId;
+import cn.gjing.util.id.IdUtil;
+import cn.gjing.util.id.SnowId;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

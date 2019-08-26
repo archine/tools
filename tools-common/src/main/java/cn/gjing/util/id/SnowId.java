@@ -1,4 +1,4 @@
-package cn.gjing.util;
+package cn.gjing.util.id;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
