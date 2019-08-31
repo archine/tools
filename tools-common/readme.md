@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 提供参数校验，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
@@ -8,17 +8,19 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.3</version>
+  <version>1.1.4</version>
 </dependency>
-```     
+```
+### 使用须知
+> 如果是**Spring**环境，确保一些工具的可用, 需要手动在xml文件中进行如下配置，**SpringBoot**环境无需配置
+```xml
+<bean id="toolsCommon" class="cn.gjing.handle.ToolsCommonAdapter"/>
+```
 ## 二、常用注解:
 ### 1、@NotNull 
 方法参数校验,如若要排除方法中的某个参数,搭配使用``@ExcludeParam``注解到指定参数上;
 ### 2、@NotNull2
-方法参数校验, 可对null和空字符串进行校验, 如果要排除某些参数, 可将这些参数的名称设置到注解的参数``exclude``里, 如果需要自定义异常提示信息, 可设置``message``, ``如果是Spring环境，需要手动在xml文件中进行如下配置，如果此处配置了，使用BeanUtil时无需再配置，SpringBoot环境无需配置``
-```xml
-<bean id="toolsCommon" class="cn.gjing.handle.ToolsCommonAdapter"/>
-```
+方法参数校验, 可对null和空字符串进行校验, 如果要排除某些参数, 可将这些参数的名称设置到注解的参数``exclude``里, 如果需要自定义异常提示信息, 可设置``message``
 ### 3、@EnableCors
 开启允许跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：
 * **yml方式**
@@ -67,8 +69,7 @@ PageResult pageResult = PageResult.of("data", 1);
 ```java
 ErrorResult.error(HttpStatus.BAD_REQUEST.getMsg());
 ```
-## 四、实用工具类:   
-### 1、参数校验工具类： 
+## 四、参数校验工具类： 
 **主要提供参数校验、处理,匹配等等， 使用时通过``ParamUtil.xxx()``使用，以下为该工具的所有方法介绍 :**
 * **isEmpty**：判断给定参数是否为空，可以是字符串、包装类型、数组、集合等
 ```java
@@ -142,7 +143,7 @@ boolean isTelPhone(String tel)
 ```java
 boolean isPostCode(String postCode)
 ```
-### 2、时间工具类： 
+## 五、时间工具类： 
 **对时间进行操作，使用时通过``TimeUtil.xxx()``调用，该工具的所有方法介绍如下 :**
 * **dateToString**：获取文本格式时间
 ```java
@@ -260,7 +261,7 @@ int dateBetween(String startDate, String endDate)
 ```java
 int dateBetween(String startDate, String endDate)
 ```
-### 3、加密工具类
+## 六、加密工具类
 **主要用于数据加密，使用时通过``EncryptionUtil.xxx()``调用，该工具包含的所有方法如下:**
 * **of**：生成加密实例
 ```java
@@ -294,7 +295,7 @@ String encodeAes(String content, String password)
 ```java
 String decodeAes(String content, String password)
 ```
-### 4、随机数工具类
+## 七、随机数工具类
 **用于随机生成数字或字符串，使用时通过``RandomUtil.xxx()``调用，该工具包含的所有方法如下 :**
 * **randomInt**：获取随机整数，可设置最大值和最小值
 ```java
@@ -316,23 +317,20 @@ String generateString(int length)
 ```java
 String generateNumber(int length)
 ```
-### 5、Bean工具类：
-**对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用，如果是Spring环境，需要在XML文件作如下配置，如果@NotNull2注解那块进行了配置，则无需再配置，``SpringBoot环境无需配置``**
-```xml
-<bean id="toolsCommon" class="cn.gjing.handle.toolsCommonAdapter"/>
-```
+## 八、Bean工具类：
+**对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用**
 **该工具包含的方法如下 :**
-#### I、getApplicationContext
+### 1、getApplicationContext
 获取ApplicationContext实例       
 ```java
 BeanUtil.getApplicationContext()
 ```
-#### II、getBean
+### 2、getBean
 通过bean名称获取bean类对象获取bean     
 ```java
 BeanUtil.getBean(Class<T> beanClass)
 ```
-#### III、copyProperties
+### 3、copyProperties
 复制属性值,用于将一个对象的属性值复制到另一个对象,``两个对象间属性的数据类型和属性名要相同``     
 ```java
 BeanUtil.copyProperties(Object source, Class<T> target, String... ignores)
@@ -345,17 +343,17 @@ BeanUtil.copyProperties(Object source, Class<T> target, String... ignores)
 |target|目标对象|
 |ignores|要忽略的字段名|     
 
-#### V、toMap
+### 4、toMap
 将bean转为map     
 ```java
 BeanUtil.toMap(Object bean)
 ```
-#### VI、toBean
+### 5、toBean
 将Map转为bean     
 ```java
 BeanUtil.toBean(Map<String, ?> map, Class<T> bean)
 ```
-### 6、验证码工具类
+## 九、验证码工具类
 **用于生成英文和数字混合的验证码，使用时通过构造``AuthCodeUtil``在进行调用其中的方法，构造时参数如下 :**    
 
 |参数|描述|
@@ -366,7 +364,7 @@ BeanUtil.toBean(Map<String, ?> map, Class<T> bean)
 |lineCount|验证码干扰线数|     
 
 **该工具下的所有方法如下:**
-#### I、writeToLocal
+### 1、writeToLocal
 生成验证码到本地，案例如下
 ```java
 public static void main(String[] args) {
@@ -381,12 +379,12 @@ public static void main(String[] args) {
     }
 }
 ```
-#### II、getCode
+### 2、getCode
 获取生成的验证码字符
 ```java
 String code = authCodeUtil.writeToLocal(xxx).getCode;
 ```
-#### III、write
+### 3、write
 以流的方式返回给前端，案例如下
 ```java
 @GetMapping("/code")
@@ -399,14 +397,14 @@ public void getCode(HttpServletResponse response, HttpServletRequest request) th
     authCodeUtil.write(response.getOutputStream());
 }
 ```
-### 7、Id生成工具类
+## 十、Id生成工具类
 **生成无符号的UUID和通过雪花算法生成一个唯一ID，在项目使用时，先通过``@Resource``注入，然后通过``idUtil.xxx()``生成，该工具包含的方法如下 :**
-#### I、uuid 
+### 1、uuid 
 获取去除``-``符号的uuid
 ```java
 idUtil.uuid();
 ```
-#### II、snowId
+### 2、snowId
 得到一个唯一的ID，在多服务需要操作同一个数据表的情况下, 需要保证每个服务的``centerId``和``machineId``唯一   
 ```java
 idUtil.snowId();
@@ -417,9 +415,9 @@ snow:
   center-id: 数据中心id, 范围0-31, 默认0
   machine-id: 机器id, 范围0-31, 默认0
 ```   
-### 8、文件工具类
+## 十一、文件工具类
 **对文件的一些操作，使用时通过``FileUtil.of()``生成实例之后再调用其中的方法，包含的所有方法如下 :**
-#### I、downloadByUrl
+### 1、downloadByUrl
 从远程URL地址下载文件到本地
 ```java
 FileUtil.of().downloadByUrl(fileUrl, fileName, savePath);
@@ -432,7 +430,7 @@ FileUtil.of().downloadByUrl(fileUrl, fileName, savePath);
 |fileName|保存到本地的文件名, ``需要加后缀``|
 |savePath|保存到本地的目录|    
 
-#### II、downloadByStream
+### 2、downloadByStream
 将本地的指定地址文件通过流下载
 ```java
 FileUtil.of().downlocdByStream(response, file);
@@ -444,12 +442,12 @@ FileUtil.of().downlocdByStream(response, file);
 |response|HttpServletResponse|
 |file|文件对象|   
 
-#### III、getBytes
+### 3、getBytes
 将指定路径下的文件转为byte数组
 ```java
 byte[] data = FileUtil.of().getBytes(file);
 ```
-#### IV、writeFile
+### 4、writeFile
 将字节数组写入到指定文件, 写入成功返回true
 ```java
 boolean b = FileUtil.of().writeFile(bytes, file);
@@ -461,17 +459,17 @@ boolean b = FileUtil.of().writeFile(bytes, file);
 |bytes|byte数组|
 |file|文件对象|   
 
-#### V、readInputStream
+### 5、readInputStream
 从输入流读取内容并返回字节数组
 ```java
 byte[] b = FileUtil.of().readInputStream(inputStream);
 ```
-#### VI、getExtension
+### 6、getExtension
 获取文件扩展名
 ```java
 String name = FileUtil.of().getExtension(fileName);
 ```
-### 9、邮件工具类
+## 十二、邮件工具类
 **用于发送邮件，支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功，使用时通过``EmailUtil.of()``生成实例之后在进行其中的方法，``of()``方法参数如下 :**     
 
 |参数|描述|
@@ -481,7 +479,7 @@ String name = FileUtil.of().getExtension(fileName);
 |from|发送人邮箱|    
 
 **该工具包含的所有方法如下 :**
-#### I、sendEmail
+### 1、sendEmail
 发送邮件，参数如下：   
 
 |参数|描述|
@@ -502,20 +500,45 @@ public static void main(String[] args) {
     }
 }
 ```
-### 10、Excel工具类
-**对Excel进行操作，使用时通过``ExcelUtil.xxx()``调用，所有方法如下 :**
-#### I、excelExport
-将数据导出到Excel，参数如下：    
+## 十三、Excel工具类
+### 1、ExcelWrite2(已废弃)
+**Excel导出，使用时通过``ExcelWrite2.of().doWrite()``调用，调用时所有参数如下所示**
 
 |参数|描述|
 |-----|-----|
 |response|HttpServletResponse|
-|data|数据|
+|data|要导出数据|
 |headers|excel表头|
 |fileName|Excel文件名| 
 |description|Excel描述|
-|cellAddresses|描述的格式|  
+|cellAddresses|描述区域的样式|  
+ 
+**定义一个Service，模拟数据**
+```java
+/**
+ * @author Gjing
+ **/
+@Service
+public class UserService {
 
+    @Resource
+    private IdUtil idUtil;
+
+    public List<User> listUser() {
+        List<User> data = new LinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            User u = User.builder()
+                    .birthday(new Date())
+                    .userAddress("中国厦门")
+                    .userId(idUtil.snowId())
+                    .userName("用户" + (i + 1))
+                    .build();
+            data.add(u);
+        }
+        return data;
+    }
+}
+```
 **使用示例如下 :**
 ```java
 /**
@@ -523,18 +546,96 @@ public static void main(String[] args) {
  **/
 @RestController
 public class ExcelController {
-    @RequestMapping("/excel3")
-    public void excelContainsInfo(HttpServletResponse response) {
-        String[] headers = {"标题1", "标题2"};
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/excel1")
+    public void downExcel1(HttpServletResponse response) {
+        List<User> users = userService.listUser();
+        String[] headers = {"用户id", "用户名", "用户地址", "出生日期"};
         List<Object[]> data = new ArrayList<>();
-        // 将数据写入添加到data里
-        for (int i = 0; i < 10; i++) {
+        users.forEach(e->{
             Object[] objects = new Object[headers.length];
-            objects[0] = i;
-            objects[1] = i+1;
+            objects[0] = e.getUserId();
+            objects[1] = e.getUserName();
+            objects[2] = e.getUserAddress();
+            objects[3] = e.getBirthday();
             data.add(objects);
-        }
-        ExcelUtil.excelExport(response, data, headers, "学生信息", "xxx届学生信息");
+        });
+        ExcelWrite2.of(data, headers, "用户列表").doWrite(response);
+    }
+}
+```
+### 2、ExcelWrite
+**Excel导出，使用时通过``ExcelWrite.of().doWrite()``调用，调用时传递的所有参数如下**    
+
+|参数|描述|
+|-----|-----|
+|excelEntity|关联的实体|
+|entityList|要导出的Excel关联实体集合|
+|response|HttpServletResponse|
+#### I、@Excel注解
+在实体类上使用，表明这个类是与Excel关联的，里面的参数包括：    
+
+|参数|描述|
+|-----|-----|
+|name|导出的Excel文件名称|
+|type|文档类型：``XLS``或者``XLSX``，默认``XLS``|
+|description|Excel文件描述，出现在Excel的列表头之前，``可空``|
+|firstRow|Excel文件描述区域的开始行，默认``0``|
+|lastRow|Excel文件描述区域的截止行，默认``3``|
+|firstCell|Excel文件描述区域的开始单元格，默认``0``|
+|lastCell|Excel文件描述区域的截止单元格，默认``列表头的长度``|
+|autoWrap|单元格内容是否自动换行，默认``false``|    
+#### II、@ExcelField注解
+在Excel实体类的字段上使用，表明这是一个列表头对应的字段，参数包括      
+
+|参数|描述|
+|-----|-----|
+|name|列表头名称|
+|pattern|如果是时间类型, 需要指定转换的时间格式, 如``yyyy-MM-dd``, 目前仅支持字段类型为``java.util.Date``|
+|width|该列的宽度, 默认20*256|
+#### III、使用案例
+**定义实体，其中前四个注解是lombok用来生成get、set、toString等一些方法的, 不使用lombok可以忽略**
+```java
+/**
+ * @author Gjing
+ **/
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Excel(name = "用户列表")
+public class User {
+
+    @ExcelField(name = "用户id")
+    private Long userId;
+
+    @ExcelField(name = "用户名")
+    private String userName;
+
+    @ExcelField(name = "用户地址")
+    private String userAddress;
+
+    @ExcelField(name = "出生日期",pattern = "yyyy-MM-dd",width = 30*256)
+    private Date birthday;
+}
+```
+**定义个API接口,用来导出**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class TestController {
+
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/excel")
+    public void downExcel(HttpServletResponse response) {
+        List<User> userList = userService.listUser();
+        ExcelWrite.of(User.class, userList).doWrite(response);
     }
 }
 ```

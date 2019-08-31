@@ -15,6 +15,7 @@ import java.util.Properties;
 /**
  * @author Gjing
  **/
+@SuppressWarnings("unused")
 public class EmailUtil {
 
     private String host;
@@ -53,7 +54,7 @@ public class EmailUtil {
      */
     public boolean sendEmail(String subject, String body, String tos, String copyTo) {
         if (ParamUtil.isEmpty(tos)) {
-            throw new ParamException("The parameter tos cannot be null");
+            throw new ParamException("The parameter 'tos' cannot be null");
         }
         try {
             Properties props = getProperties();
@@ -82,7 +83,7 @@ public class EmailUtil {
      */
     public boolean sendEmail(String subject, String body, String[] files, String tos, String copyTo) {
         if (ParamUtil.isEmpty(tos)) {
-            throw new ParamException("The parameter tos cannot be null");
+            throw new ParamException("The parameter 'tos' cannot be null");
         }
         try {
             Properties props = getProperties();

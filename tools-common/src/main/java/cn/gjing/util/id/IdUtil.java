@@ -5,6 +5,7 @@ import java.util.UUID;
 /**
  * @author Gjing
  **/
+@SuppressWarnings("unused")
 public class IdUtil {
 
     private SnowFlake snowFlake;

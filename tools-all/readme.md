@@ -1,5 +1,5 @@
 # all
-![](https://img.shields.io/badge/version-1.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.1.9-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)     
 提供tools下所有工具包
 ### 导入依赖
@@ -7,6 +7,6 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-all</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
 </dependency>
 ```

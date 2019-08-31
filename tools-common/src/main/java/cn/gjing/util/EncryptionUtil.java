@@ -14,6 +14,7 @@ import java.security.SecureRandom;
 /**
  * @author Gjing
  **/
+@SuppressWarnings("unused")
 public class EncryptionUtil {
 
     private EncryptionUtil() {

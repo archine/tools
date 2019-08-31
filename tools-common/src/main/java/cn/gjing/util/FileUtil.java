@@ -78,7 +78,7 @@ public class FileUtil {
             os = new BufferedOutputStream(response.getOutputStream());
             response.setCharacterEncoding("utf-8");
             // 设置返回类型
-            response.setContentType("multipart/form-data");
+            response.setContentType("text/html");
             // 文件名转码一下，不然会出现中文乱码
             response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(file.getName(), "UTF-8"));
             // 设置返回的文件的大小
