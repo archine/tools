@@ -10,15 +10,17 @@
   <artifactId>tools-common</artifactId>
   <version>1.1.4</version>
 </dependency>
-```     
+```
+### 使用须知
+> 如果是**Spring**环境，确保一些工具的可用, 需要手动在xml文件中进行如下配置，**SpringBoot**环境无需配置
+```xml
+<bean id="toolsCommon" class="cn.gjing.handle.ToolsCommonAdapter"/>
+```
 ## 二、常用注解:
 ### 1、@NotNull 
 方法参数校验,如若要排除方法中的某个参数,搭配使用``@ExcludeParam``注解到指定参数上;
 ### 2、@NotNull2
-方法参数校验, 可对null和空字符串进行校验, 如果要排除某些参数, 可将这些参数的名称设置到注解的参数``exclude``里, 如果需要自定义异常提示信息, 可设置``message``, ``如果是Spring环境，需要手动在xml文件中进行如下配置，如果此处配置了，使用BeanUtil时无需再配置，SpringBoot环境无需配置``
-```xml
-<bean id="toolsCommon" class="cn.gjing.handle.ToolsCommonAdapter"/>
-```
+方法参数校验, 可对null和空字符串进行校验, 如果要排除某些参数, 可将这些参数的名称设置到注解的参数``exclude``里, 如果需要自定义异常提示信息, 可设置``message``
 ### 3、@EnableCors
 开启允许跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：
 * **yml方式**
@@ -502,7 +504,7 @@ public static void main(String[] args) {
 }
 ```
 ## 十三、Excel工具类
-### 1、ExcelWrite2
+### 1、ExcelWrite2(已废弃)
 **Excel导出，使用时通过``ExcelWrite2.of().doWrite()``调用，调用时所有参数如下所示**
 
 |参数|描述|
@@ -512,8 +514,34 @@ public static void main(String[] args) {
 |headers|excel表头|
 |fileName|Excel文件名| 
 |description|Excel描述|
-|cellAddresses|描述的格式|  
+|cellAddresses|描述区域的样式|  
+ 
+**定义一个Service，模拟数据**
+```java
+/**
+ * @author Gjing
+ **/
+@Service
+public class UserService {
 
+    @Resource
+    private IdUtil idUtil;
+
+    public List<User> listUser() {
+        List<User> data = new LinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            User u = User.builder()
+                    .birthday(new Date())
+                    .userAddress("中国厦门")
+                    .userId(idUtil.snowId())
+                    .userName("用户" + (i + 1))
+                    .build();
+            data.add(u);
+        }
+        return data;
+    }
+}
+```
 **使用示例如下 :**
 ```java
 /**
@@ -521,32 +549,23 @@ public static void main(String[] args) {
  **/
 @RestController
 public class ExcelController {
+    @Resource
+    private UserService userService;
 
-    @GetMapping("/excel")
-    @ApiOperation(value = "excel导出", httpMethod = "GET")
-    public void export(HttpServletResponse response) {
-        String[] headers = {"状态码", "信息"};
-        //模拟创建一些数据
-        List<Map<String, Object>> data = new LinkedList<>();
-        for (int i = 0; i < 8; i++) {
-            Map<String, Object> map = new HashMap<>(16);
-            map.put("code", i * 100);
-            map.put("message", "你好");
-            map.put("message2", "你好");
-            map.put("message3", "你好");
-            map.put("message4", "你好");
-            data.add(map);
-        }
-        //将数据进行构造
-        List<Object[]> objects = new ArrayList<>();
-        data.forEach(e -> {
-            Object[] objects1 = new Object[headers.length];
-            objects1[0] = e.get("code");
-            objects1[1] = e.get("message");
-            objects.add(objects1);
+    @GetMapping("/excel1")
+    public void downExcel1(HttpServletResponse response) {
+        List<User> users = userService.listUser();
+        String[] headers = {"用户id", "用户名", "用户地址", "出生日期"};
+        List<Object[]> data = new ArrayList<>();
+        users.forEach(e->{
+            Object[] objects = new Object[headers.length];
+            objects[0] = e.getUserId();
+            objects[1] = e.getUserName();
+            objects[2] = e.getUserAddress();
+            objects[3] = e.getBirthday();
+            data.add(objects);
         });
-        //导出
-        ExcelWrite2.of(objects, headers, "用户列表").doWrite(response);
+        ExcelWrite2.of(data, headers, "用户列表").doWrite(response);
     }
 }
 ```
@@ -577,55 +596,49 @@ public class ExcelController {
 |参数|描述|
 |-----|-----|
 |name|列表头名称|
+|pattern|如果是时间类型, 需要指定转换的时间格式, 如``yyyy-MM-dd``, 目前仅支持字段类型为``java.util.Date``|
+|width|该列的宽度, 默认20*256|
 #### III、使用案例
-**定义实体，其中``@Data``注解是lombok用来生成get、set、toString的**
+**定义实体，其中前四个注解是lombok用来生成get、set、toString等一些方法的, 不使用lombok可以忽略**
 ```java
 /**
  * @author Gjing
  **/
-@Excel(name = "用户",type = DocType.XLS)
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Excel(name = "用户列表")
 public class User {
+
+    @ExcelField(name = "用户id")
+    private Long userId;
+
     @ExcelField(name = "用户名")
     private String userName;
 
-    @ExcelField(name = "用户年龄")
-    private Integer age;
+    @ExcelField(name = "用户地址")
+    private String userAddress;
 
-    @ExcelField(name = "地址")
-    private String address;
-
-    @ExcelField(name = "性别")
-    private String gender;
-
-    @ExcelField(name = "出生时间")
-    private Date bothDate;
+    @ExcelField(name = "出生日期",pattern = "yyyy-MM-dd",width = 30*256)
+    private Date birthday;
 }
 ```
-**定义一个接口，模拟数据并导出**
+**定义个API接口,用来导出**
 ```java
 /**
  * @author Gjing
  **/
 @RestController
-public class ExcelController {
+public class TestController {
 
-    @GetMapping("/excel3")
-    @ApiOperation(value = "测试注解式的excel")
-    public void excel2(HttpServletResponse response) {
-        //模拟数据
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            User user = new User();
-            user.setAge(i + 2);
-            user.setUserName("用户" + i);
-            user.setAddress("中国");
-            user.setBothDate(new Date());
-            user.setGender("男");
-            users.add(user);
-        }
-        //导出
-        ExcelWrite.of(User.class, users).doWrite(response);
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/excel")
+    public void downExcel(HttpServletResponse response) {
+        List<User> userList = userService.listUser();
+        ExcelWrite.of(User.class, userList).doWrite(response);
     }
 }
 ```

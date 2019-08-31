@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
  * @author Gjing
  * param util
  **/
+@SuppressWarnings("unused")
 public final class ParamUtil {
     /**
      * 检查参数是否为空

@@ -15,9 +15,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * @author Gjing
  * Excel导出
+ * @author Gjing
  **/
+@Deprecated
+@SuppressWarnings("unused")
 public class ExcelWrite2 implements Closeable {
     /**
      * 要导出到excel的内容
@@ -118,6 +120,7 @@ public class ExcelWrite2 implements Closeable {
         HSSFWorkbook wb = new HSSFWorkbook();
         this.workbook = wb;
         HSSFSheet sheet = wb.createSheet(fileName);
+        sheet.setDefaultColumnWidth(20*256);
         // 列表头的样式
         HSSFCellStyle headerStyle = this.setHeaderStyle(wb);
         // 单元格内容的样式

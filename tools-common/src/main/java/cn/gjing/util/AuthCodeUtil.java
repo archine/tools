@@ -11,6 +11,7 @@ import java.util.Random;
 /**
  * @author Gjing
  **/
+@SuppressWarnings("unused")
 public class AuthCodeUtil {
     /**
      * 图片的宽度。

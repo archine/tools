@@ -50,5 +50,5 @@ public @interface Excel {
     /**
      * 是否自动换行
      */
-    boolean autoWrap() default false;
+    boolean autoWrap() default true;
 }

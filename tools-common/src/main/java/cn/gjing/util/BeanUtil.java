@@ -18,6 +18,7 @@ import java.util.Map;
  * @author Gjing
  **/
 @Component
+@SuppressWarnings("unused")
 public class BeanUtil implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
@@ -58,16 +59,6 @@ public class BeanUtil implements ApplicationContextAware {
         return applicationContext.getBean(beanClass);
     }
 
-
-    /**
-     * 复制属性
-     *
-     * @param source  原对象
-     * @param target  目标对象
-     */
-    public static void copyProperties(Object source, Object target) {
-        BeanUtils.copyProperties(source, target);
-    }
     /**
      * 复制属性
      *
@@ -77,24 +68,6 @@ public class BeanUtil implements ApplicationContextAware {
      */
     public static void copyProperties(Object source, Object target, String... ignores) {
         BeanUtils.copyProperties(source, target, ignores);
-    }
-
-    /**
-     * 复制属性
-     *
-     * @param source  原对象
-     * @param target  目标对象
-     * @param <T>     T
-     * @return T
-     */
-    public static <T> T copyProperties(Object source, Class<T> target) {
-        try {
-            T t = target.newInstance();
-            BeanUtil.copyProperties(source, t);
-            return t;
-        } catch (Exception e) {
-            throw new CastException(e.getMessage());
-        }
     }
 
     /**

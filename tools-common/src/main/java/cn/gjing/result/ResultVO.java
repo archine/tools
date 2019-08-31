@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public class ResultVO<T> implements Serializable {
 
     private Integer code;
