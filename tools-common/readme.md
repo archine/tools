@@ -14,7 +14,7 @@
 ### 使用须知
 > 如果是**Spring**环境，确保一些工具的可用, 需要手动在xml文件中进行如下配置，**SpringBoot**环境无需配置
 ```xml
-<bean id="toolsCommon" class="cn.gjing.handle.ToolsCommonAdapter"/>
+<bean id="xxx" class="cn.gjing.handle.ToolsCommonAdapter"/>
 ```
 ## 二、常用注解:
 ### 1、@NotNull 
@@ -318,8 +318,7 @@ String generateString(int length)
 String generateNumber(int length)
 ```
 ## 八、Bean工具类：
-**对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用**
-**该工具包含的方法如下 :**
+**对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用, 该工具包含的方法如下 :**
 ### 1、getApplicationContext
 获取ApplicationContext实例       
 ```java
@@ -583,10 +582,10 @@ public class ExcelController {
 |type|文档类型：``XLS``或者``XLSX``，默认``XLS``|
 |description|Excel文件描述，出现在Excel的列表头之前，``可空``|
 |firstRow|Excel文件描述区域的开始行，默认``0``|
-|lastRow|Excel文件描述区域的截止行，默认``3``|
+|lastRow|Excel文件描述区域的截止行，默认``2``|
 |firstCell|Excel文件描述区域的开始单元格，默认``0``|
 |lastCell|Excel文件描述区域的截止单元格，默认``列表头的长度``|
-|autoWrap|单元格内容是否自动换行，默认``false``|    
+|autoWrap|单元格内容是否自动换行，默认``true``|    
 #### II、@ExcelField注解
 在Excel实体类的字段上使用，表明这是一个列表头对应的字段，参数包括      
 
