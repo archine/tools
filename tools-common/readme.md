@@ -318,10 +318,7 @@ String generateString(int length)
 String generateNumber(int length)
 ```
 ## 八、Bean工具类：
-**对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用，如果是Spring环境，需要在XML文件作如下配置，如果@NotNull2注解那块进行了配置，则无需再配置，``SpringBoot环境无需配置``**
-```xml
-<bean id="toolsCommon" class="cn.gjing.handle.toolsCommonAdapter"/>
-```
+**对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用**
 **该工具包含的方法如下 :**
 ### 1、getApplicationContext
 获取ApplicationContext实例       
