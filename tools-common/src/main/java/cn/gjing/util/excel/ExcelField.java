@@ -26,4 +26,9 @@ public @interface ExcelField {
      * 单元格宽
      */
     int width() default 20*256;
+
+    /**
+     * 生成id的策略, 支持UUID和分布式唯一ID
+     */
+    Generate strategy() default Generate.NONE;
 }

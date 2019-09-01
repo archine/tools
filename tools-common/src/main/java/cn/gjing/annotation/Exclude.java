@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
  **/
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.SOURCE)
-public @interface ExcludeParam {
+public @interface Exclude {
 }
