@@ -59,7 +59,7 @@ public class NonNullProcessor extends AbstractProcessor {
                                 }
                                 //拿到这个参数上的所有注解
                                 java.util.List<String> collect = parameter.mods.annotations.stream().map(JCTree::toString).collect(Collectors.toList());
-                                if (collect.contains("@ExcludeParam()")) {
+                                if (collect.contains("@Exclude()")) {
                                     continue;
                                 }
                                 statements.append(

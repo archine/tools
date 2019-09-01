@@ -146,11 +146,15 @@ public class TimeUtil {
      *
      * @param date 文本格式时间
      * @return 时间对象
-     * @throws ParseException format exception
      */
-    public static Date stringToDate(String date) throws ParseException {
+    public static Date stringToDate(String date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return format.parse(date);
+        try {
+            return format.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
     }
 
 
@@ -160,11 +164,15 @@ public class TimeUtil {
      * @param date   文本时间
      * @param format format 转化格式
      * @return 时间对象
-     * @throws ParseException format exceptions
      */
-    public static Date stringToDate(String date, String format) throws ParseException {
+    public static Date stringToDate(String date, String format) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-        return dateFormat.parse(date);
+        try {
+            return dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
     }
 
     /**
@@ -172,12 +180,15 @@ public class TimeUtil {
      *
      * @param str 文本时间
      * @return 日期
-     * @throws ParseException format EX
      */
-    public static Calendar stringDateToCalendar(String str) throws ParseException {
+    public static Calendar stringDateToCalendar(String str) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(simpleDateFormat.parse(str));
+        try {
+            calendar.setTime(simpleDateFormat.parse(str));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return calendar;
     }
 
@@ -188,7 +199,7 @@ public class TimeUtil {
      * @param format   格式
      * @return 时间
      */
-    public static Date calendarToDate(Calendar calendar, String format) throws ParseException {
+    public static Date calendarToDate(Calendar calendar, String format) {
         return stringToDate(calendarToStringDate(calendar, format));
     }
 
@@ -285,7 +296,7 @@ public class TimeUtil {
      * @param stringDate 文本时间
      * @return 时间戳
      */
-    public static Long stringDateToStamp(String stringDate) throws ParseException {
+    public static Long stringDateToStamp(String stringDate) {
         return TimeUtil.stringToDate(stringDate).getTime();
     }
 
@@ -306,9 +317,8 @@ public class TimeUtil {
      * @param startDate 开始时间
      * @param endDate   结束时间
      * @return 相差的天数
-     * @throws ParseException 转换异常
      */
-    public static int dateBetween(String startDate, String endDate) throws ParseException {
+    public static int dateBetween(String startDate, String endDate) {
         Date dateStart = stringToDate(startDate, "yyyy-MM-dd");
         Date dateEnd = stringToDate(endDate, "yyyy-MM-dd");
         return (int) ((dateEnd.getTime() - dateStart.getTime()) / 1000 / 60 / 60 / 24);
@@ -320,9 +330,8 @@ public class TimeUtil {
      * @param startDate 开始时间
      * @param endDate   结束时间
      * @return 相差的天数
-     * @throws ParseException 转换异常
      */
-    public static int dateBetweenIncludeToday(String startDate, String endDate) throws ParseException {
+    public static int dateBetweenIncludeToday(String startDate, String endDate) {
         return dateBetween(startDate, endDate) + 1;
     }
 

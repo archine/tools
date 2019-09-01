@@ -1,6 +1,6 @@
 package cn.gjing.util.excel;
 
-import cn.gjing.annotation.ExcludeParam;
+import cn.gjing.annotation.Exclude;
 import cn.gjing.annotation.NotNull;
 import cn.gjing.util.ParamUtil;
 import cn.gjing.util.TimeUtil;
@@ -14,12 +14,11 @@ import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -27,15 +26,16 @@ import java.util.stream.Collectors;
 
 /**
  * Excel导出
+ *
  * @author Gjing
  **/
 @SuppressWarnings("unused")
-public class ExcelWrite implements Closeable {
+public class ExcelWriter implements AutoCloseable {
 
     /**
      * excel关联的实体
      */
-    private Class<?> excelEntity;
+    private Class<?> excelClass;
     /**
      * 关联的实体集合
      */
@@ -76,33 +76,41 @@ public class ExcelWrite implements Closeable {
     /**
      * 存放列表头
      */
-    private List<String> headers = new ArrayList<>();
+    private List<String> headers;
 
     /**
      * 带有@ExcelField注解的所有字段
      */
-    private List<Field> hasExcelFieldList = new ArrayList<>();
+    private List<Field> hasExcelFieldList;
 
-    private ExcelWrite() {
+    /**
+     * 忽略导出的字段
+     */
+    private String[] ignores;
+
+    private ExcelWriter() {
 
     }
 
-    private ExcelWrite(Class<?> excelEntity, List<?> entityList) {
-        this.excelEntity = excelEntity;
+    private ExcelWriter(Class<?> excelClass, List<?> entityList, String... ignores) {
+        this.excelClass = excelClass;
         this.entityList = entityList;
+        this.ignores = ignores;
     }
 
     /**
      * 生成excel读实例
      *
-     * @param excelEntity 实体
-     * @param entityList  实体列表
-     * @param <T>         t
+     * @param excelClass 实体
+     * @param entityList 实体列表
+     * @param ignores    忽略的字段
+     * @param <T>        t
      * @return ExcelWrite
      */
     @NotNull
-    public static <T> ExcelWrite of(Class<T> excelEntity, @ExcludeParam List<T> entityList) {
-        return new ExcelWrite(excelEntity, entityList);
+    public static <T> ExcelWriter of(Class<T> excelClass, @Exclude List<T> entityList, @Exclude String... ignores) {
+
+        return new ExcelWriter(excelClass, entityList, ignores);
     }
 
     /**
@@ -110,19 +118,23 @@ public class ExcelWrite implements Closeable {
      */
     @NotNull
     public void doWrite(HttpServletResponse response) {
-        Excel excelAnnotation = excelEntity.getAnnotation(Excel.class);
+        // 拿到实体class的注解, 没有的话说明没有与excel关联, 不进行导出
+        Excel excelAnnotation = excelClass.getAnnotation(Excel.class);
         if (excelAnnotation == null) {
-            throw new NullPointerException("@Excel was not found on the excelEntity");
+            throw new NullPointerException("@Excel was not found on the excelClass");
         }
         this.response = response;
         this.excel = excelAnnotation;
-        //得到所有声明字段
-        Field[] declaredFields = excelEntity.getDeclaredFields();
-        //找到所有带@ExcelField注解的字段
-        this.hasExcelFieldList = Arrays.stream(declaredFields).filter(e -> e.getAnnotation(ExcelField.class) != null)
+        // 得到所有声明字段
+        Field[] declaredFields = excelClass.getDeclaredFields();
+        // 找到所有带@ExcelField注解的字段
+        this.hasExcelFieldList = Arrays.stream(declaredFields)
+                .filter(e -> e.isAnnotationPresent(ExcelField.class))
+                .filter(e -> !ParamUtil.contains(ignores, e.getName()))
                 .collect(Collectors.toList());
         //获取列表头
-        this.headers = this.hasExcelFieldList.stream().map(e -> e.getAnnotation(ExcelField.class).name())
+        this.headers = this.hasExcelFieldList.stream()
+                .map(e -> e.getAnnotation(ExcelField.class).name())
                 .collect(Collectors.toList());
         switch (excelAnnotation.type()) {
             case XLS:
@@ -130,14 +142,14 @@ public class ExcelWrite implements Closeable {
                 this.sheet = workbook.createSheet();
                 this.headerStyle = setHeaderStyle(this.workbook);
                 this.valueStyle = setValueStyle(this.workbook);
-                this.writeXls();
+                this.writeXLS();
                 break;
             case XLSX:
                 this.workbook = new SXSSFWorkbook();
                 this.sheet = workbook.createSheet();
                 this.headerStyle = setHeaderStyle(this.workbook);
                 this.valueStyle = setValueStyle(this.workbook);
-                this.writeXlsx();
+                this.writeXLSX();
                 break;
             default:
                 throw new NullPointerException("Doc type was not found");
@@ -147,19 +159,21 @@ public class ExcelWrite implements Closeable {
     /**
      * 写xlx格式
      */
-    private void writeXls() {
+    private void writeXLS() {
         if (!ParamUtil.equals("", excel.description())) {
-            HSSFRow row = (HSSFRow) sheet.createRow(0);
-            HSSFCell cell = row.createCell(0);
+            HSSFRow row = (HSSFRow) sheet.createRow(excel.firstRow());
+            HSSFCell cell = row.createCell(excel.firstCell());
             cell.setCellStyle(this.setDescriptionStyle(workbook));
-            //合并单元格
+            // 添加描述
             sheet.addMergedRegion(new CellRangeAddress(excel.firstRow(), excel.lastRow(),
-                    excel.firstCell(), excel.lastCell() == 0 ? headers.size() - 1 : excel.lastCell()));
+                    excel.firstCell(), excel.lastCell() == 0
+                    ? headers.size() - 1
+                    : excel.lastCell()));
             cell.setCellValue(excel.description());
-            //添加列表头
-            HSSFRow row1 = (HSSFRow) sheet.createRow(excel.lastRow() + 1);
-            this.setHeader(headers, headerStyle, row1);
-            //添加单元格内容
+            // 添加列表头
+            HSSFRow headerRow = (HSSFRow) sheet.createRow(excel.lastRow() + 1);
+            this.setHeader(headers, headerStyle, headerRow);
+            // 添加单元格内容
             if (this.entityList != null) {
                 int hasRow = excel.lastRow() + 2;
                 for (int i = 0; i < entityList.size(); i++) {
@@ -169,10 +183,10 @@ public class ExcelWrite implements Closeable {
                 }
             }
         } else {
-            //设置列表头
+            // 设置列表头
             HSSFRow row = (HSSFRow) sheet.createRow(0);
             this.setHeader(headers, headerStyle, row);
-            //设置单元格内容
+            // 设置单元格内容
             if (this.entityList != null) {
                 for (int i = 0; i < entityList.size(); i++) {
                     Object t = entityList.get(i);
@@ -183,7 +197,8 @@ public class ExcelWrite implements Closeable {
         }
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-disposition",
-                "attachment;filename=" + new String(excel.name().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1) + ".xls");
+                "attachment;filename=" + new String(excel.name().getBytes(StandardCharsets.UTF_8),
+                        StandardCharsets.ISO_8859_1) + ".xls");
         try {
             outputStream = response.getOutputStream();
             workbook.write(outputStream);
@@ -193,20 +208,20 @@ public class ExcelWrite implements Closeable {
     }
 
     /**
-     * 写xlxs格式
+     * 写xlsx格式
      */
-    private void writeXlsx() {
+    private void writeXLSX() {
         if (!ParamUtil.equals("", this.excel.description())) {
-            SXSSFRow row = (SXSSFRow) sheet.createRow(0);
-            SXSSFCell cell = row.createCell(0);
+            SXSSFRow row = (SXSSFRow) sheet.createRow(excel.firstRow());
+            SXSSFCell cell = row.createCell(excel.firstCell());
             cell.setCellStyle(this.setDescriptionStyle(workbook));
-            //合并单元格
+            // 添加描述
             this.sheet.addMergedRegion(new CellRangeAddress(excel.firstRow(), excel.lastRow(),
                     excel.firstCell(), excel.lastCell() == 0 ? headers.size() - 1 : excel.lastCell()));
             cell.setCellValue(excel.description());
-            //添加列表头
+            // 添加列表头
             this.setHeader(headers, headerStyle, sheet.createRow(excel.lastRow() + 1));
-            //添加单元格内容
+            // 添加单元格内容
             if (this.entityList != null) {
                 int hasRow = excel.lastRow() + 2;
                 for (int i = 0; i < entityList.size(); i++) {
@@ -216,9 +231,9 @@ public class ExcelWrite implements Closeable {
                 }
             }
         } else {
-            //设置列表头
+            // 设置列表头
             this.setHeader(headers, headerStyle, sheet.createRow(0));
-            //设置单元格内容
+            // 设置单元格内容
             if (this.entityList != null) {
                 for (int i = 0; i < entityList.size(); i++) {
                     Object t = entityList.get(i);
@@ -229,7 +244,8 @@ public class ExcelWrite implements Closeable {
         }
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-disposition",
-                "attachment;filename=" + new String(excel.name().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1) + ".xlsx");
+                "attachment;filename=" + new String(excel.name().getBytes(StandardCharsets.UTF_8),
+                        StandardCharsets.ISO_8859_1) + ".xlsx");
         try {
             outputStream = response.getOutputStream();
             workbook.write(outputStream);
@@ -247,7 +263,7 @@ public class ExcelWrite implements Closeable {
      */
     private void setHeader(List<String> headers, CellStyle headerStyle, Row row) {
         for (int i = 0; i < headers.size(); i++) {
-            //设置每列的宽度
+            // 设置每列的宽度
             this.sheet.setColumnWidth(i, hasExcelFieldList.get(i).getAnnotation(ExcelField.class).width());
             row.setHeight((short) 300);
             Cell cell1 = row.createCell(i);
@@ -280,7 +296,18 @@ public class ExcelWrite implements Closeable {
                 cell.setCellValue("");
             } else {
                 if (ParamUtil.equals("", excelField.pattern())) {
-                    cell.setCellValue(value.toString());
+                    if (field.getType().isEnum()) {
+                        try {
+                            Method method = field.getType().getDeclaredMethod("from", field.getType());
+                            Object data = field.get(t);
+                            cell.setCellValue(method.invoke(data, data).toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return;
+                    } else {
+                        cell.setCellValue(value.toString());
+                    }
                 } else {
                     cell.setCellValue(TimeUtil.dateToString((Date) value, excelField.pattern()));
                 }
@@ -345,6 +372,7 @@ public class ExcelWrite implements Closeable {
 
     /**
      * 关闭流
+     *
      * @throws IOException io
      */
     @Override

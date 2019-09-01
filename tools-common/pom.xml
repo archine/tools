@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.2</version>
     </parent>
     <artifactId>tools-common</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
     <name>tools-common</name>
     <description>common tool</description>
 
@@ -27,15 +27,11 @@
         </dependency>
         <!--poi-->
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>4.1.0</version>
+            <groupId>com.monitorjbl</groupId>
+            <artifactId>xlsx-streamer</artifactId>
+            <version>2.1.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>4.1.0</version>
-        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

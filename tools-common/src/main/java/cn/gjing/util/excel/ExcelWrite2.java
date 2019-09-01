@@ -1,6 +1,6 @@
 package cn.gjing.util.excel;
 
-import cn.gjing.annotation.ExcludeParam;
+import cn.gjing.annotation.Exclude;
 import cn.gjing.annotation.NotNull;
 import cn.gjing.util.ParamUtil;
 import org.apache.poi.hssf.usermodel.*;
@@ -76,7 +76,7 @@ public class ExcelWrite2 implements Closeable {
      * @return ExcelWrite2
      */
     @NotNull
-    public static ExcelWrite2 of(@ExcludeParam List<Object[]> data, String[] headers, String fileName, String description,
+    public static ExcelWrite2 of(@Exclude List<Object[]> data, String[] headers, String fileName, String description,
                                  CellRangeAddress cellAddresses) {
         return new ExcelWrite2(data, headers, fileName, description, cellAddresses);
     }
@@ -90,7 +90,7 @@ public class ExcelWrite2 implements Closeable {
      * @return ExcelWrite2
      */
     @NotNull
-    public static ExcelWrite2 of(@ExcludeParam List<Object[]> data, String[] headers, String fileName) {
+    public static ExcelWrite2 of(@Exclude List<Object[]> data, String[] headers, String fileName) {
         return new ExcelWrite2(data, headers, fileName, null, null);
     }
 
@@ -120,7 +120,6 @@ public class ExcelWrite2 implements Closeable {
         HSSFWorkbook wb = new HSSFWorkbook();
         this.workbook = wb;
         HSSFSheet sheet = wb.createSheet(fileName);
-        sheet.setDefaultColumnWidth(20*256);
         // 列表头的样式
         HSSFCellStyle headerStyle = this.setHeaderStyle(wb);
         // 单元格内容的样式
@@ -137,6 +136,7 @@ public class ExcelWrite2 implements Closeable {
             for (int i = 0; i < headers.length; i++) {
                 //设置列表头
                 row1.setHeight((short) 300);
+                sheet.setColumnWidth(0,20*256);
                 HSSFCell cell1 = row1.createCell(i);
                 cell1.setCellStyle(headerStyle);
                 cell1.setCellValue(headers[i]);
@@ -156,6 +156,7 @@ public class ExcelWrite2 implements Closeable {
             for (int i = 0; i < headers.length; i++) {
                 //设置列表头
                 row.setHeight((short) 300);
+                sheet.setColumnWidth(0,20*256);
                 HSSFCell cell = row.createCell(i);
                 cell.setCellStyle(headerStyle);
                 cell.setCellValue(headers[i]);
