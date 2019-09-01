@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 提供参数校验，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
@@ -8,7 +8,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
 </dependency>
 ```
 ### 使用须知
@@ -548,8 +548,8 @@ public class ExcelController {
     @Resource
     private UserService userService;
 
-    @GetMapping("/excel1")
-    public void downExcel1(HttpServletResponse response) {
+    @GetMapping("/excel")
+    public void downExcel(HttpServletResponse response) {
         List<User> users = userService.listUser();
         String[] headers = {"用户id", "用户名", "用户地址", "出生日期"};
         List<Object[]> data = new ArrayList<>();
@@ -565,14 +565,15 @@ public class ExcelController {
     }
 }
 ```
-### 2、ExcelWrite
-**Excel导出，使用时通过``ExcelWrite.of().doWrite()``调用，调用时传递的所有参数如下**    
+### 2、ExcelWriter
+**Excel导出，使用时通过``ExcelWriter.of().doWrite()``调用，调用时传递的所有参数如下**    
 
 |参数|描述|
 |-----|-----|
-|excelEntity|关联的实体|
+|excelClass|关联的实体Class|
 |entityList|要导出的Excel关联实体集合|
 |response|HttpServletResponse|
+|ignores|忽略要导出的实体的字段名, 设置后该字段将不会导出到excel表格内|
 #### I、@Excel注解
 在实体类上使用，表明这个类是与Excel关联的，里面的参数包括：    
 
@@ -594,49 +595,99 @@ public class ExcelController {
 |name|列表头名称|
 |pattern|如果是时间类型, 需要指定转换的时间格式, 如``yyyy-MM-dd``, 目前仅支持字段类型为``java.util.Date``|
 |width|该列的宽度, 默认20*256|
-#### III、使用案例
-**定义实体，其中前四个注解是lombok用来生成get、set、toString等一些方法的, 不使用lombok可以忽略**
+|strategy|导入excel时自动生成ID, 具体说明请在下文中查看第四小节|
+#### III、实体类字段支持枚举类型
+很多时候, 为了方便数据库和代码层的可读性, 实体类中常常会设置枚举类型的字段, 这时候只需要在您定义的枚举类中实现``EnumConvert<T extends Enum,E extends Object>``接口即可, 该接口中含有两个方法
+值转枚举: ``T to(E e)``和枚举转值: ``E from(T t)``, 在这里, ``T``代表枚举类, ``E``代表要转的值类型, 例子如下: 
 ```java
 /**
  * @author Gjing
  **/
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Excel(name = "用户列表")
+public enum Gender implements EnumConvert<Gender,String> {
+    MAN("男"),WOMAN("女");
+
+    private String type;
+
+    Gender(String type) {
+        this.type = type;
+    }
+
+    public static Gender of(String type) {
+        for (Gender gender : Gender.values()) {
+            if (gender.type.equals(type)) {
+                return gender;
+            }
+        }
+        throw new NullPointerException("没有你的枚举类型");
+    }
+
+    @Override
+    public Gender to(String type) {
+        return of(type);
+    }
+
+    @Override
+    public String from(Gender gender) {
+        return gender.type;
+    }
+}
+``` 
+#### IV、Id生成策略
+有时候在``导入Excel数据``时, 并不会让用户写每个数据的ID, 然后当碰上数据库ID不是自增的时候, 这时候就需要在导入时自动生成了, 目前支持UUID和SnowId(分布式唯一Id), 
+, 使用的话只需要在实体类中对应的字段设置下策略即可, 默认``none``, 一旦设置, 手动设置将无效, 会设置自动生成的值. 设置完策略之后, 在构造``ExcelReader``时传入``IdUtil``实例,
+ 使用例子如下:     
+ 
+**实体**
+```java
+@Excel(name = "用户列表", type = DocType.XLSX, description = "这是用户列表", lastRow = 4,firstCell = 1)
 public class User {
 
-    @ExcelField(name = "用户id")
+    @Id
+    @ExcelField(name = "用户id", strategy = Generate.SNOW_ID)
     private Long userId;
-
-    @ExcelField(name = "用户名")
-    private String userName;
-
-    @ExcelField(name = "用户地址")
-    private String userAddress;
-
-    @ExcelField(name = "出生日期",pattern = "yyyy-MM-dd",width = 30*256)
-    private Date birthday;
 }
 ```
-**定义个API接口,用来导出**
+**构造ExcelReader**
 ```java
 /**
  * @author Gjing
  **/
-@RestController
-public class TestController {
+@Service
+public class UserService {
 
     @Resource
-    private UserService userService;
+    private UserRepository userRepository;
+    @Resource
+    private IdUtil idUtil;
 
-    @GetMapping("/excel")
-    public void downExcel(HttpServletResponse response) {
-        List<User> userList = userService.listUser();
-        ExcelWrite.of(User.class, userList).doWrite(response);
+    /**
+     * 导入用户并存入数据库
+     *
+     * @param file excel文件
+     */
+    public void saveUser(MultipartFile file) {
+        try {
+            List<User> users = ExcelReader.of(User.class, file.getInputStream(), idUtil).doRead();
+            if (users.isEmpty()) {
+                throw new NullPointerException("数据是空的,读失败了");
+            }
+            userRepository.saveAll(users);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 ```
+### 3、ExcelReader
+**Excel导入, 使用时通过``ExcelReader.of().doRead()``调用, 涉及到的参数如下:**    
+
+|参数|描述|
+|-----|-----|
+|excelClass|excel关联的实体class|
+|inputStream|文件输入流|
+|idUtil|id生成器, 如果有字段``选择了自动生成id的策略则必须传``|
+#### I、@Excel注解、@ExcelField注解
+与Excel导入相同, 这里不过多介绍
+
 ---
 **详细教程可前往博客查看: [JAVA开发常用工具](https://yq.aliyun.com/articles/704350?spm=a2c4e.11155435.0.0.68153312Yeo5xN)**

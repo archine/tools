@@ -11,10 +11,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
  *
  * @author Gjing
  **/
-//@SuppressWarnings("unused")
-public class ExcelReader<T> implements Closeable {
+@SuppressWarnings("unused")
+public class ExcelReader<T> implements AutoCloseable {
     /**
      * id生成器
      */
@@ -129,6 +129,8 @@ public class ExcelReader<T> implements Closeable {
         int rowIndex = ParamUtil.equals("", this.excel.description()) ? 1 : this.excel.lastRow() + 2;
         //获取excel列表头这行, 并设置总列数和列表头名称
         int totalCell = 0;
+        //创建个新实例
+        T o = null;
         for (Row row : sheet) {
             if (row.getRowNum() == rowIndex - 1) {
                 //增加列表头名称和总列数
@@ -136,12 +138,8 @@ public class ExcelReader<T> implements Closeable {
                     totalCell++;
                     headNameList.add(cell.getStringCellValue());
                 }
-                break;
+                continue;
             }
-        }
-        //创建个新实例
-        T o = null;
-        for (Row row : sheet) {
             if (row.getRowNum() < rowIndex) {
                 continue;
             }
@@ -154,18 +152,14 @@ public class ExcelReader<T> implements Closeable {
             Field idField = hasAnnotationFieldMap.get("id");
             if (idField != null) {
                 idField.setAccessible(true);
-                try {
-                    switch (idField.getAnnotation(ExcelField.class).strategy()) {
-                        case UUID:
-                            idField.set(o, this.idUtil.uuid());
-                            break;
-                        case SNOW_ID:
-                            idField.set(o, this.idUtil.snowId());
-                            break;
-                        default:
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                switch (idField.getAnnotation(ExcelField.class).strategy()) {
+                    case UUID:
+                        this.setField(idField, o, this.idUtil.uuid());
+                        break;
+                    case SNOW_ID:
+                        this.setField(idField,o,this.idUtil.snowId());
+                        break;
+                    default:
                 }
             }
             for (int c = 0; c < totalCell; c++) {
@@ -178,7 +172,6 @@ public class ExcelReader<T> implements Closeable {
             }
             this.data.add(o);
         }
-
     }
 
     /**
@@ -225,57 +218,74 @@ public class ExcelReader<T> implements Closeable {
     @SuppressWarnings("unchecked")
     private void setValue(Object o, Field field, String value, ExcelField excelField) {
         field.setAccessible(true);
-        try {
-            //只要为空, 都不插入
-            if (value == null) {
-                return;
-            }
-            if (field.getType() == String.class) {
-                field.set(o, value);
-                return;
-            }
-            if (field.getType() == int.class || field.getType() == Integer.class) {
-                field.set(o, Double.valueOf(value).intValue());
-                return;
-            }
-            if (field.getType() == long.class || field.getType() == Long.class) {
-                field.set(o, Double.valueOf(value).longValue());
-                return;
-            }
-            if (field.getType() == boolean.class || field.getType() == Boolean.class) {
-                field.set(o, Boolean.parseBoolean(value));
-                return;
-            }
-            if (field.getType() == Date.class) {
-                field.set(o, TimeUtil.stringToDate(value, excelField.pattern()));
-                return;
-            }
-            if (field.getType().isEnum()) {
-                Method[] methods = field.getType().getDeclaredMethods();
-                for (Method method : methods) {
-                    if (method.getName().equals("to")) {
-                        Class<? extends Enum> type = (Class<? extends Enum>) field.getType();
-                        field.set(o, method.invoke(Enum.valueOf(type, type.getEnumConstants()[0].toString()), value));
-                        break;
+        //只要为空, 都不插入
+        if (value == null) {
+            return;
+        }
+        if (field.getType() == String.class) {
+            this.setField(field, o, value);
+            return;
+        }
+        if (field.getType() == int.class || field.getType() == Integer.class) {
+            this.setField(field, o, Double.valueOf(value).intValue());
+            return;
+        }
+        if (field.getType() == long.class || field.getType() == Long.class) {
+            this.setField(field, o, Double.valueOf(value).longValue());
+            return;
+        }
+        if (field.getType() == boolean.class || field.getType() == Boolean.class) {
+            this.setField(field, o, Boolean.parseBoolean(value));
+            return;
+        }
+        if (field.getType() == Date.class) {
+            this.setField(field, o, TimeUtil.stringToDate(value, excelField.pattern()));
+            return;
+        }
+        if (field.getType().isEnum()) {
+            Method[] methods = field.getType().getDeclaredMethods();
+            for (Method method : methods) {
+                if (method.getName().equals("to")) {
+                    Class<? extends Enum> type = (Class<? extends Enum>) field.getType();
+                    Object invoke = null;
+                    try {
+                        invoke = method.invoke(Enum.valueOf(type, type.getEnumConstants()[0].toString()), value);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
                     }
+                    this.setField(field, o, invoke);
+                    break;
                 }
-                return;
             }
-            if (field.getType() == double.class || field.getType() == Double.class) {
-                field.set(o, Double.parseDouble(value));
-                return;
-            }
-            if (field.getType() == float.class || field.getType() == Float.class) {
-                field.set(o, Float.parseFloat(value));
-                return;
-            }
-            if (field.getType() == byte.class || field.getType() == Byte.class) {
-                field.set(o, Byte.parseByte(value));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            return;
+        }
+        if (field.getType() == double.class || field.getType() == Double.class) {
+            this.setField(field, o, Double.parseDouble(value));
+            return;
+        }
+        if (field.getType() == float.class || field.getType() == Float.class) {
+            this.setField(field, o, Float.parseFloat(value));
+            return;
+        }
+        if (field.getType() == byte.class || field.getType() == Byte.class) {
+            this.setField(field, o, Byte.parseByte(value));
         }
 
+    }
+
+    /**
+     * 字段set值
+     *
+     * @param field 字段
+     * @param o     字段所在对象
+     * @param value 值
+     */
+    private void setField(Field field, Object o, Object value) {
+        try {
+            field.set(o, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

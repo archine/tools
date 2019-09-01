@@ -14,7 +14,6 @@ import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
  * @author Gjing
  **/
 @SuppressWarnings("unused")
-public class ExcelWriter implements Closeable {
+public class ExcelWriter implements AutoCloseable {
 
     /**
      * excel关联的实体
@@ -162,12 +161,14 @@ public class ExcelWriter implements Closeable {
      */
     private void writeXLS() {
         if (!ParamUtil.equals("", excel.description())) {
-            HSSFRow row = (HSSFRow) sheet.createRow(0);
-            HSSFCell cell = row.createCell(0);
+            HSSFRow row = (HSSFRow) sheet.createRow(excel.firstRow());
+            HSSFCell cell = row.createCell(excel.firstCell());
             cell.setCellStyle(this.setDescriptionStyle(workbook));
             // 添加描述
             sheet.addMergedRegion(new CellRangeAddress(excel.firstRow(), excel.lastRow(),
-                    excel.firstCell(), excel.lastCell() == 0 ? headers.size() - 1 : excel.lastCell()));
+                    excel.firstCell(), excel.lastCell() == 0
+                    ? headers.size() - 1
+                    : excel.lastCell()));
             cell.setCellValue(excel.description());
             // 添加列表头
             HSSFRow headerRow = (HSSFRow) sheet.createRow(excel.lastRow() + 1);
@@ -211,8 +212,8 @@ public class ExcelWriter implements Closeable {
      */
     private void writeXLSX() {
         if (!ParamUtil.equals("", this.excel.description())) {
-            SXSSFRow row = (SXSSFRow) sheet.createRow(0);
-            SXSSFCell cell = row.createCell(0);
+            SXSSFRow row = (SXSSFRow) sheet.createRow(excel.firstRow());
+            SXSSFCell cell = row.createCell(excel.firstCell());
             cell.setCellStyle(this.setDescriptionStyle(workbook));
             // 添加描述
             this.sheet.addMergedRegion(new CellRangeAddress(excel.firstRow(), excel.lastRow(),
