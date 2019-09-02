@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 提供参数校验，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
@@ -8,7 +8,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.5</version>
+  <version>1.1.6</version>
 </dependency>
 ```
 ### 使用须知
@@ -319,17 +319,7 @@ String generateNumber(int length)
 ```
 ## 八、Bean工具类：
 **对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用, 该工具包含的方法如下 :**
-### 1、getApplicationContext
-获取ApplicationContext实例       
-```java
-BeanUtil.getApplicationContext()
-```
-### 2、getBean
-通过bean名称获取bean类对象获取bean     
-```java
-BeanUtil.getBean(Class<T> beanClass)
-```
-### 3、copyProperties
+### 1、copyProperties
 复制属性值,用于将一个对象的属性值复制到另一个对象,``两个对象间属性的数据类型和属性名要相同``     
 ```java
 BeanUtil.copyProperties(Object source, Class<T> target, String... ignores)
@@ -342,12 +332,12 @@ BeanUtil.copyProperties(Object source, Class<T> target, String... ignores)
 |target|目标对象|
 |ignores|要忽略的字段名|     
 
-### 4、toMap
+### 2、toMap
 将bean转为map     
 ```java
 BeanUtil.toMap(Object bean)
 ```
-### 5、toBean
+### 3、toBean
 将Map转为bean     
 ```java
 BeanUtil.toBean(Map<String, ?> map, Class<T> bean)
@@ -581,12 +571,15 @@ public class ExcelController {
 |-----|-----|
 |name|导出的Excel文件名称|
 |type|文档类型：``XLS``或者``XLSX``，默认``XLS``|
-|description|Excel文件描述，出现在Excel的列表头之前，``可空``|
-|firstRow|Excel文件描述区域的开始行，默认``0``|
-|lastRow|Excel文件描述区域的截止行，默认``2``|
-|firstCell|Excel文件描述区域的开始单元格，默认``0``|
-|lastCell|Excel文件描述区域的截止单元格，默认``列表头的长度``|
-|autoWrap|单元格内容是否自动换行，默认``true``|    
+|valueColor|单元格内容背景色，默认白色|
+|headerColor|excel列表头背景色，默认蓝色|
+|descriptionColor|excel大标题颜色，默认黄色|
+|description|Excel大标题，出现在Excel的列表头之前，``可空``|
+|firstRow|Excel大标题区域的开始行，默认``0``|
+|lastRow|Excel大标题区域的截止行，默认``2``|
+|firstCell|Excel大标题区域的开始单元格，默认``0``|
+|lastCell|Excel大标题区域的截止单元格，默认``列表头的长度``|
+|autoWrap|内容是否自动换行，默认``true``|
 #### II、@ExcelField注解
 在Excel实体类的字段上使用，表明这是一个列表头对应的字段，参数包括      
 

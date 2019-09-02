@@ -1,5 +1,7 @@
 package cn.gjing.util.excel;
 
+import org.apache.poi.ss.usermodel.IndexedColors;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -7,6 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * 标记实体类上，说明这是excel的文件名
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
@@ -23,9 +26,24 @@ public @interface Excel {
     DocType type() default DocType.XLS;
 
     /**
+     * excel主题内容颜色
+     */
+    IndexedColors valueColor() default IndexedColors.WHITE;
+
+    /**
+     * excel列表头颜色
+     */
+    IndexedColors headerColor() default IndexedColors.SKY_BLUE;
+
+    /**
      * excel描述
      */
     String description() default "";
+
+    /**
+     * excel描述的颜色
+     */
+    IndexedColors descriptionColor() default IndexedColors.YELLOW;
 
     /**
      * 描述起始行

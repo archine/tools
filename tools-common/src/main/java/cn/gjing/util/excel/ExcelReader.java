@@ -94,9 +94,7 @@ public class ExcelReader<T> implements AutoCloseable {
         this.hasAnnotationFieldMap = Arrays.stream(this.excelClass.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(ExcelField.class))
                 .collect(
-                        Collectors.toMap(field -> field.getAnnotation(ExcelField.class).strategy() == Generate.NONE
-                                ? field.getAnnotation(ExcelField.class).name()
-                                : "id", field -> field)
+                        Collectors.toMap(field -> field.getAnnotation(ExcelField.class).name(), field -> field)
                 );
         switch (excel.type()) {
             case XLS:
@@ -125,22 +123,23 @@ public class ExcelReader<T> implements AutoCloseable {
     private void reader() {
         //excel列表头名称
         List<String> headNameList = new ArrayList<>();
-        //excel内容的行数
+        //excel内容开始的下标
         int rowIndex = ParamUtil.equals("", this.excel.description()) ? 1 : this.excel.lastRow() + 2;
+        //列表头的下标
+        int headerIndex = rowIndex - 1;
         //获取excel列表头这行, 并设置总列数和列表头名称
         int totalCell = 0;
         //创建个新实例
         T o = null;
         for (Row row : sheet) {
-            if (row.getRowNum() == rowIndex - 1) {
-                //增加列表头名称和总列数
-                for (Cell cell : row) {
-                    totalCell++;
-                    headNameList.add(cell.getStringCellValue());
-                }
-                continue;
-            }
             if (row.getRowNum() < rowIndex) {
+                if (row.getRowNum() == headerIndex) {
+                    //增加列表头名称和总列数
+                    for (Cell cell : row) {
+                        totalCell++;
+                        headNameList.add(cell.getStringCellValue());
+                    }
+                }
                 continue;
             }
             try {
@@ -148,24 +147,26 @@ public class ExcelReader<T> implements AutoCloseable {
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
-            //拿到id字段
-            Field idField = hasAnnotationFieldMap.get("id");
-            if (idField != null) {
-                idField.setAccessible(true);
-                switch (idField.getAnnotation(ExcelField.class).strategy()) {
-                    case UUID:
-                        this.setField(idField, o, this.idUtil.uuid());
-                        break;
-                    case SNOW_ID:
-                        this.setField(idField,o,this.idUtil.snowId());
-                        break;
-                    default:
-                }
-            }
             for (int c = 0; c < totalCell; c++) {
-                Cell cell = row.getCell(c);
                 Field field = hasAnnotationFieldMap.get(headNameList.get(c));
+                if (field == null) {
+                    continue;
+                }
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
+                //如果设置了id生成策略，就走自动生成
+                if (excelField.strategy() != Generate.NONE) {
+                    switch (excelField.strategy()) {
+                        case UUID:
+                            this.setField(field, o, this.idUtil.uuid());
+                            break;
+                        case SNOW_ID:
+                            this.setField(field, o, this.idUtil.snowId());
+                            break;
+                        default:
+                    }
+                    continue;
+                }
+                Cell cell = row.getCell(c);
                 if (cell != null) {
                     this.setValue(o, field, this.getValue(cell), excelField);
                 }
@@ -218,10 +219,6 @@ public class ExcelReader<T> implements AutoCloseable {
     @SuppressWarnings("unchecked")
     private void setValue(Object o, Field field, String value, ExcelField excelField) {
         field.setAccessible(true);
-        //只要为空, 都不插入
-        if (value == null) {
-            return;
-        }
         if (field.getType() == String.class) {
             this.setField(field, o, value);
             return;

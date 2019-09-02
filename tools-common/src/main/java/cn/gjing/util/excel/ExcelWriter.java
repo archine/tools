@@ -172,36 +172,36 @@ public class ExcelWriter implements AutoCloseable {
             cell.setCellValue(excel.description());
             // 添加列表头
             HSSFRow headerRow = (HSSFRow) sheet.createRow(excel.lastRow() + 1);
-            this.setHeader(headers, headerStyle, headerRow);
+            this.setHeader(headers, headerRow);
             // 添加单元格内容
             if (this.entityList != null) {
                 int hasRow = excel.lastRow() + 2;
                 for (int i = 0; i < entityList.size(); i++) {
                     Object t = entityList.get(i);
                     row = (HSSFRow) sheet.createRow(hasRow + i);
-                    this.setValue(valueStyle, t, row);
+                    this.setValue(t, row);
                 }
             }
         } else {
             // 设置列表头
             HSSFRow row = (HSSFRow) sheet.createRow(0);
-            this.setHeader(headers, headerStyle, row);
+            this.setHeader(headers, row);
             // 设置单元格内容
             if (this.entityList != null) {
                 for (int i = 0; i < entityList.size(); i++) {
                     Object t = entityList.get(i);
                     row = (HSSFRow) sheet.createRow(i + 1);
-                    this.setValue(valueStyle, t, row);
+                    this.setValue(t, row);
                 }
             }
         }
-        response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-disposition",
+        this.response.setContentType("application/vnd.ms-excel");
+        this.response.setHeader("Content-disposition",
                 "attachment;filename=" + new String(excel.name().getBytes(StandardCharsets.UTF_8),
                         StandardCharsets.ISO_8859_1) + ".xls");
         try {
-            outputStream = response.getOutputStream();
-            workbook.write(outputStream);
+            this.outputStream = response.getOutputStream();
+            this.workbook.write(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -220,35 +220,35 @@ public class ExcelWriter implements AutoCloseable {
                     excel.firstCell(), excel.lastCell() == 0 ? headers.size() - 1 : excel.lastCell()));
             cell.setCellValue(excel.description());
             // 添加列表头
-            this.setHeader(headers, headerStyle, sheet.createRow(excel.lastRow() + 1));
+            this.setHeader(this.headers, this.sheet.createRow(excel.lastRow() + 1));
             // 添加单元格内容
             if (this.entityList != null) {
                 int hasRow = excel.lastRow() + 2;
                 for (int i = 0; i < entityList.size(); i++) {
                     Object t = entityList.get(i);
                     row = (SXSSFRow) sheet.createRow(hasRow + i);
-                    this.setValue(valueStyle, t, row);
+                    this.setValue( t, row);
                 }
             }
         } else {
             // 设置列表头
-            this.setHeader(headers, headerStyle, sheet.createRow(0));
+            this.setHeader(headers, sheet.createRow(0));
             // 设置单元格内容
             if (this.entityList != null) {
                 for (int i = 0; i < entityList.size(); i++) {
                     Object t = entityList.get(i);
                     Row row = sheet.createRow(i + 1);
-                    this.setValue(valueStyle, t, row);
+                    this.setValue(t, row);
                 }
             }
         }
-        response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-disposition",
+        this.response.setContentType("application/vnd.ms-excel");
+        this.response.setHeader("Content-disposition",
                 "attachment;filename=" + new String(excel.name().getBytes(StandardCharsets.UTF_8),
                         StandardCharsets.ISO_8859_1) + ".xlsx");
         try {
-            outputStream = response.getOutputStream();
-            workbook.write(outputStream);
+            this.outputStream = response.getOutputStream();
+            this.workbook.write(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -258,31 +258,28 @@ public class ExcelWriter implements AutoCloseable {
      * 设置列表头
      *
      * @param headers     excel表头数据
-     * @param headerStyle 列表头样式
      * @param row         列表行
      */
-    private void setHeader(List<String> headers, CellStyle headerStyle, Row row) {
+    private void setHeader(List<String> headers, Row row) {
         for (int i = 0; i < headers.size(); i++) {
             // 设置每列的宽度
             this.sheet.setColumnWidth(i, hasExcelFieldList.get(i).getAnnotation(ExcelField.class).width());
             row.setHeight((short) 300);
             Cell cell1 = row.createCell(i);
-            cell1.setCellStyle(headerStyle);
+            cell1.setCellStyle(this.headerStyle);
             cell1.setCellValue(headers.get(i));
         }
     }
 
     /**
      * 添加单元格内容
-     *
-     * @param style 单元格样式
      * @param t     对象
      * @param row   excel列
      */
-    private void setValue(CellStyle style, Object t, Row row) {
+    private void setValue(Object t, Row row) {
         for (int i = 0; i < this.hasExcelFieldList.size(); i++) {
             Cell cell = row.createCell(i);
-            cell.setCellStyle(style);
+            cell.setCellStyle(this.valueStyle);
             Field field = this.hasExcelFieldList.get(i);
             ExcelField excelField = field.getAnnotation(ExcelField.class);
             field.setAccessible(true);
@@ -324,7 +321,8 @@ public class ExcelWriter implements AutoCloseable {
     private CellStyle setHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         DataFormat format = workbook.createDataFormat();
-        style.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+        style.setFillForegroundColor(this.excel.headerColor().getIndex());
+        style.setWrapText(this.excel.autoWrap());
         style.setDataFormat(format.getFormat("@"));
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -342,7 +340,7 @@ public class ExcelWriter implements AutoCloseable {
      */
     private CellStyle setValueStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
-        style.setFillForegroundColor(IndexedColors.WHITE.getIndex());
+        style.setFillForegroundColor(this.excel.valueColor().getIndex());
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -363,7 +361,8 @@ public class ExcelWriter implements AutoCloseable {
      */
     private CellStyle setDescriptionStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
-        style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        style.setFillForegroundColor(this.excel.descriptionColor().getIndex());
+        style.setWrapText(true);
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -378,11 +377,11 @@ public class ExcelWriter implements AutoCloseable {
     @Override
     public void close() throws IOException {
         if (outputStream != null) {
-            outputStream.flush();
-            outputStream.close();
+            this.outputStream.flush();
+            this.outputStream.close();
         }
         if (workbook != null) {
-            workbook.close();
+            this.workbook.close();
         }
     }
 }

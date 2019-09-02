@@ -60,7 +60,7 @@ class NotNull2Processor {
         for (String paramName : needCheckParamList) {
             if (ParamUtil.isEmpty(request.getParameter(paramName))) {
                 throw new NullPointerException(annotation.message().equals("")
-                        ? "The parameter '" + paramName + "' has been used @NotNull2, so it cannot be null."
+                        ? "The parameter '" + paramName + "' has been used @NotNull2, so it cannot be empty."
                         : annotation.message());
             }
         }
