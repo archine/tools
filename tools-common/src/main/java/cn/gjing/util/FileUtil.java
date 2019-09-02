@@ -10,6 +10,7 @@ import java.net.URLEncoder;
  * @author Gjing
  * 文件工具类
  **/
+@SuppressWarnings("unused")
 public class FileUtil {
 
     private FileUtil() {

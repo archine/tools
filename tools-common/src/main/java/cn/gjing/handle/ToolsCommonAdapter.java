@@ -1,6 +1,5 @@
 package cn.gjing.handle;
 
-import cn.gjing.util.BeanUtil;
 import cn.gjing.util.id.IdUtil;
 import cn.gjing.util.id.SnowId;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -20,13 +19,6 @@ public class ToolsCommonAdapter {
     public NotNull2Processor notNullProxy() {
         return new NotNull2Processor();
     }
-
-    @Bean
-    @ConditionalOnMissingBean(BeanUtil.class)
-    public BeanUtil beanUtil() {
-        return new BeanUtil();
-    }
-
     @Bean
     @ConditionalOnMissingBean(SnowId.class)
     public SnowId snowId() {

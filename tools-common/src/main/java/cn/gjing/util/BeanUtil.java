@@ -2,9 +2,6 @@ package cn.gjing.util;
 
 import cn.gjing.exception.CastException;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.beans.BeanInfo;
@@ -19,46 +16,7 @@ import java.util.Map;
  **/
 @Component
 @SuppressWarnings("unused")
-public class BeanUtil implements ApplicationContextAware {
-    private static ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        if (BeanUtil.applicationContext == null) {
-            BeanUtil.applicationContext = applicationContext;
-        }
-    }
-
-    /**
-     * 获取ApplicationContext实例
-     *
-     * @return ApplicationContext
-     */
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    /**
-     * 获取bean
-     *
-     * @param beanName bean名称
-     * @return bean
-     */
-    public static Object getBean(String beanName) {
-        return applicationContext.getBean(beanName);
-    }
-
-    /**
-     * 获取一个bean
-     *
-     * @param beanClass bean的类对象
-     * @param <T>       T
-     * @return T
-     */
-    public static <T> T getBean(Class<T> beanClass) {
-        return applicationContext.getBean(beanClass);
-    }
-
+public class BeanUtil {
     /**
      * 复制属性
      *
