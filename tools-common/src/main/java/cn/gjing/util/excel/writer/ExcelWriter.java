@@ -138,11 +138,20 @@ public class ExcelWriter implements AutoCloseable {
         this.excel = excelAnnotation;
         // 得到所有声明字段
         Field[] declaredFields = excelClass.getDeclaredFields();
+        Field[] fields = excelClass.getSuperclass().getDeclaredFields();
         // 找到所有带@ExcelField注解的字段
         this.hasExcelFieldList = Arrays.stream(declaredFields)
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .filter(e -> !ParamUtil.contains(ignores, e.getName()))
                 .collect(Collectors.toList());
+        //看看是不是有父类，有的话就也加进去
+        Class<?> superclass = excelClass.getSuperclass();
+        if (superclass != Object.class) {
+            this.hasExcelFieldList.addAll(Arrays.stream(superclass.getDeclaredFields())
+                    .filter(e -> e.isAnnotationPresent(ExcelField.class))
+                    .filter(e -> !ParamUtil.contains(ignores, e.getName()))
+                    .collect(Collectors.toList()));
+        }
         //获取列表头
         this.headers = this.hasExcelFieldList.stream()
                 .map(e -> e.getAnnotation(ExcelField.class).name())

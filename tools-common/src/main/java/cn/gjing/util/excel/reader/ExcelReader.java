@@ -58,7 +58,7 @@ public class ExcelReader<T> implements AutoCloseable {
      */
     private Sheet sheet;
 
-    private Map<String, Field> hasAnnotationFieldMap = new HashMap<>();
+    private Map<String, Field> hasAnnotationFieldMap = new HashMap<>(16);
 
     /**
      * 读取到的数据
@@ -99,6 +99,16 @@ public class ExcelReader<T> implements AutoCloseable {
                 .collect(
                         Collectors.toMap(field -> field.getAnnotation(ExcelField.class).name(), field -> field)
                 );
+        //找找是否有父类，有就加进来
+        Class<? super T> superclass = excelClass.getSuperclass();
+        if (superclass != Object.class) {
+            Map<String, Field> supperFieldMap = Arrays.stream(superclass.getDeclaredFields())
+                    .filter(f -> f.isAnnotationPresent(ExcelField.class))
+                    .collect(
+                            Collectors.toMap(field -> field.getAnnotation(ExcelField.class).name(), field -> field)
+                    );
+            this.hasAnnotationFieldMap.putAll(supperFieldMap);
+        }
         switch (excel.type()) {
             case XLS:
                 try {

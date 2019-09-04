@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 提供参数校验，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
@@ -8,7 +8,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.7</version>
+  <version>1.1.8</version>
 </dependency>
 ```
 ### 使用须知
@@ -618,7 +618,7 @@ public class ExcelController {
 |lastCell|Excel文件描述区域的截止单元格，默认``列表头的长度``|
 |autoWrap|单元格内容是否自动换行，默认``true``|    
 #### II、@ExcelField注解
-在Excel实体类的字段上使用，表明这是一个列表头对应的字段，参数包括      
+在Excel实体类或者其父类的字段上使用，表明这是一个列表头对应的字段，参数包括      
 
 |参数|描述|
 |-----|-----|
