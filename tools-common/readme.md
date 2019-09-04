@@ -1,14 +1,15 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
-提供参数校验，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
+
+提供参数，Excel，时间，加密、验证码、邮件、跨域、随机数、Id生成等开发中常用到的工具。。。
 ## 一、导入依赖
 ```xml
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.6</version>
+  <version>1.1.8</version>
 </dependency>
 ```
 ### 使用须知
@@ -318,30 +319,67 @@ String generateString(int length)
 String generateNumber(int length)
 ```
 ## 八、Bean工具类：
-**对Bean和实体进行操作，使用时通过``BeanUtil.xxx()``调用, 该工具包含的方法如下 :**
+**使用时通过``BeanUtil.xxx()``调用**
 ### 1、copyProperties
-复制属性值,用于将一个对象的属性值复制到另一个对象,``两个对象间属性的数据类型和属性名要相同``     
-```java
-BeanUtil.copyProperties(Object source, Class<T> target, String... ignores)
-```    
-**参数说明**      
-    
+属性复制，用于将一个对象的属性赋值到另一个对象，两个对象间的``参数名和数据类型必须相同``      
+**参数说明**     
+
 |参数|描述|
 |-----|-----|
-|source|原对象|
+|source|源对象|
 |target|目标对象|
-|ignores|要忽略的字段名|     
+|ignores|忽略的字段，设置后不会进行复制|     
 
-### 2、toMap
-将bean转为map     
-```java
-BeanUtil.toMap(Object bean)
-```
-### 3、toBean
-将Map转为bean     
-```java
-BeanUtil.toBean(Map<String, ?> map, Class<T> bean)
-```
+### 2、toBean
+将map转为bean对象     
+**参数说明**      
+
+|参数|描述|
+|-----|-----|
+|map|需要转为Bean的map|
+|beanClass|目标Bean的class|
+### 3、findMethod
+查找类中的方法       
+**参数说明**     
+
+|参数|描述|
+|-----|-----|
+|clazz|目标类class|
+|methodName|方法名|
+|paramTypes|方法参数类型|
+### 4、findDeclaredMethod
+查找类中声明的方法       
+**参数说明**     
+
+|参数|描述|
+|---|---|
+|clazz|目标类class|
+|methodName|方法名|
+|paramTypes|方法参数类型|
+### 5、setFieldValue
+给类中的某个字段设置值     
+**参数说明**     
+
+|参数|描述|
+|-----|-----|
+|o|字段所在的对象|
+|field|字段|
+|value|值|
+### 6、getFieldValue
+获取某个字段的值    
+**参数说明**    
+
+|参数|描述|
+|-----|-----|
+|o|字段所在的对象|
+|field|字段|
+### 7、toMap
+将bean对象转为map         
+**参数说明**     
+
+|参数|描述|
+|-----|-----|
+|bean|需要转为map的bean对象|
 ## 九、验证码工具类
 **用于生成英文和数字混合的验证码，使用时通过构造``AuthCodeUtil``在进行调用其中的方法，构造时参数如下 :**    
 
@@ -403,7 +441,7 @@ idUtil.snowId();
 snow:
   center-id: 数据中心id, 范围0-31, 默认0
   machine-id: 机器id, 范围0-31, 默认0
-```   
+```
 ## 十一、文件工具类
 **对文件的一些操作，使用时通过``FileUtil.of()``生成实例之后再调用其中的方法，包含的所有方法如下 :**
 ### 1、downloadByUrl
@@ -563,7 +601,16 @@ public class ExcelController {
 |excelClass|关联的实体Class|
 |entityList|要导出的Excel关联实体集合|
 |response|HttpServletResponse|
-|ignores|忽略要导出的实体的字段名, 设置后该字段将不会导出到excel表格内|
+|ignores|忽略要导出的实体的字段名, 设置后该字段将不会导出到excel表格内|      
+**示例**：
+```java
+    @GetMapping("/excel")
+    @ApiOperation(value = "导出excel")
+    public void downExcel2(HttpServletResponse response) {
+        List<User> userList = userService.listUser();
+        ExcelWriter.of(User.class, userList).doWrite(response);
+    }
+```
 #### I、@Excel注解
 在实体类上使用，表明这个类是与Excel关联的，里面的参数包括：    
 
@@ -574,29 +621,124 @@ public class ExcelController {
 |valueColor|单元格内容背景色，默认白色|
 |headerColor|excel列表头背景色，默认蓝色|
 |descriptionColor|excel大标题颜色，默认黄色|
-|description|Excel大标题，出现在Excel的列表头之前，``可空``|
-|firstRow|Excel大标题区域的开始行，默认``0``|
-|lastRow|Excel大标题区域的截止行，默认``2``|
-|firstCell|Excel大标题区域的开始单元格，默认``0``|
-|lastCell|Excel大标题区域的截止单元格，默认``列表头的长度``|
-|autoWrap|内容是否自动换行，默认``true``|
+|description|Excel文件描述，出现在Excel的列表头之前，``可空``|
+|firstRow|Excel文件描述区域的开始行，默认``0``|
+|lastRow|Excel文件描述区域的截止行，默认``2``|
+|firstCell|Excel文件描述区域的开始单元格，默认``0``|
+|lastCell|Excel文件描述区域的截止单元格，默认``列表头的长度``|
+|autoWrap|单元格内容是否自动换行，默认``true``|    
 #### II、@ExcelField注解
-在Excel实体类的字段上使用，表明这是一个列表头对应的字段，参数包括      
+在Excel实体类或者其父类的字段上使用，表明这是一个列表头对应的字段，参数包括      
 
 |参数|描述|
 |-----|-----|
 |name|列表头名称|
 |pattern|如果是时间类型, 需要指定转换的时间格式, 如``yyyy-MM-dd``, 目前仅支持字段类型为``java.util.Date``|
 |width|该列的宽度, 默认20*256|
-|strategy|导入excel时自动生成ID, 具体说明请在下文中查看第四小节|
-#### III、实体类字段支持枚举类型
-很多时候, 为了方便数据库和代码层的可读性, 实体类中常常会设置枚举类型的字段, 这时候只需要在您定义的枚举类中实现``EnumConvert<T extends Enum,E extends Object>``接口即可, 该接口中含有两个方法
-值转枚举: ``T to(E e)``和枚举转值: ``E from(T t)``, 在这里, ``T``代表枚举类, ``E``代表要转的值类型, 例子如下: 
+|strategy|导入excel时自动生成ID, 具体说明请往下看|     
+**示例**：
+```java
+@Excel(name = "用户列表", type = DocType.XLSX, description = "这是用户列表", lastRow = 4,firstCell = 1)
+public class User {
+
+    @ExcelField(name = "用户id", strategy = Generate.SNOW_ID)
+    private Long userId;
+
+    @ExcelField(name = "用户名")
+    private String userName;
+
+    @ExcelField(name = "用户年龄")
+    private Integer age;
+
+    @ExcelField(name = "用户地址")
+    private String userAddress;
+
+    @ExcelField(name = "出生日期", pattern = "yyyy-MM-dd")
+    private Date birthday;
+}
+```
+#### III、@DateValidation
+时间格式校验，在字段使用后会在excel中对应的列表头下的内容进行时间格式校验，``XLXS类型文档不要使用，有未知BUG``，里面的参数包括       
+
+|参数|描述|
+|-----|-----|
+|boxLastRow|数据校验最多校验多少行，默认为``列表头下一行``|
+|operatorType|操作类型，默认``OperatorType.BETWEEN``|
+|expr1|表达式1|
+|expr2|表达式2|
+|showErrorBox|是否弹出错误框，默认``true``|
+|showPromptBox|是否立即弹出，默认``true``|
+|allowEmpty|是否允许空值，默认``true``|
+|rank|提示框级别，默认``Rank.WARING``警告级别|
+|errorTitle|错误框标题|
+|errorContent|详细错误内容|       
+**示例**：
+表明时间必须输入2010-12-01至2020-12-01范围内
+```java
+@Excel(name = "用户列表")
+public class User {
+
+    @ExcelField(name = "出生日期", pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateValidation(operatorType = BETWEEN,expr1 = "2010-12-01",expr2 = "2020-12-01")
+    private Date birthday;
+}
+```
+#### IV、@ExplicitValidation
+给定范围校验，使用后excel对应的列表头下的单元格内容只能选择这个范围内的数据，参数包括     
+
+|参数|描述|
+|-----|-----|
+|combobox|范围值，数组类型|
+|boxLastRow|数据校验最多校验多少行，默认为``列表头下一行``|
+|showErrorBox|是否弹出错误框，默认``true``|
+|showPromptBox|是否立即弹出，默认``true``|
+|rank|提示框级别，默认``Rank.WARING``警告级别|
+|errorTitle|错误框标题|
+|errorContent|详细错误内容|      
+**示例**：
+只能选上海和厦门两个地址，同时这两个会出现在excel下拉框中
+```java
+@Excel(name = "用户列表")
+public class User {
+    @ExcelField(name = "用户地址")
+    @ExplicitValidation(combobox = {"上海","厦门"})
+    private String userAddress;
+}
+```
+#### V、@NumericValidation
+数值类型校验，使用后会在excel中进行指定规则校验，里面的参数包括     
+
+|参数|描述|
+|-----|-----|
+|boxLastRow|数据校验最多校验多少行，默认为``列表头下一行``|
+|operatorType|操作类型，默认``OperatorType.BETWEEN``|
+|validationType|校验类型，``必填``|
+|expr1|表达式1，在表达式2前面，``必填``|
+|expr2|表达式2，在操作类型为``BETWEEN``和``NOT_BETWEEN``情况下必填|
+|showErrorBox|是否弹出错误框，默认``true``|
+|showPromptBox|是否立即弹出，默认``true``|
+|allowEmpty|是否允许空值，默认``true``|
+|rank|提示框级别，默认``Rank.WARING``警告级别|
+|errorTitle|错误框标题|
+|errorContent|详细错误内容|      
+**示例**：
+填写的数据必须小于10，且是整数
+```java
+@Excel(name = "用户列表")
+public class User {
+    @ExcelField(name = "用户年龄")
+    @NumericValidation(operatorType = LESS_THAN,validationType = INTEGER,expr1 = "10")
+    private Integer age;
+}
+```
+#### VI、实体类字段支持枚举类型
+很多时候, 为了方便数据库和代码层的可读性, 实体类中常常会设置枚举类型的字段, 这时候只需要在您定义的枚举类中实现``EnumConvert<T extends Enum>``接口即可, 该接口中含有两个方法
+值转枚举: ``T to(Object e)``和枚举转值: ``Object from(T t)``, 在这里, ``T``代表枚举类, 例子如下: 
 ```java
 /**
  * @author Gjing
  **/
-public enum Gender implements EnumConvert<Gender,String> {
+public enum Gender implements EnumConvert<Gender> {
     MAN("男"),WOMAN("女");
 
     private String type;
@@ -615,20 +757,19 @@ public enum Gender implements EnumConvert<Gender,String> {
     }
 
     @Override
-    public Gender to(String type) {
-        return of(type);
+    public Gender to(Object type) {
+        return of(type.toString());
     }
 
     @Override
-    public String from(Gender gender) {
+    public Object from(Gender gender) {
         return gender.type;
     }
 }
-``` 
-#### IV、Id生成策略
-有时候在``导入Excel数据``时, 并不会让用户写每个数据的ID, 然后当碰上数据库ID不是自增的时候, 这时候就需要在导入时自动生成了, 目前支持UUID和SnowId(分布式唯一Id), 
-, 使用的话只需要在实体类中对应的字段设置下策略即可, 默认``none``, 一旦设置, 手动设置将无效, 会设置自动生成的值. 设置完策略之后, 在构造``ExcelReader``时传入``IdUtil``实例,
- 使用例子如下:     
+```
+#### VII、Id生成策略
+有时候在``导入Excel数据``时, 并不会让用户写每个数据的ID, 然后当碰上数据库ID不是自增的时候, 这时候就需要在导入时自动生成了, 目前支持UUID和SnowId(分布式唯一Id), 使用的话只需要在实体类中对应的字段设置下策略即可, 默认``none``, 一旦设置, 手动设置将无效, 会设置自动生成的值. 设置完策略之后, 在构造``ExcelReader``时传入``IdUtil``实例,
+**使用例子如下**:     
  
 **实体**
 ```java
