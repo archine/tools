@@ -2,7 +2,8 @@
 ![](https://img.shields.io/badge/version-1.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
-提供参数校验，excel导出，时间转换，数据加密、验证码、发送邮件、开启跨域、随机数、Id生成等工具... 
+
+提供参数，Excel，时间，加密、验证码、邮件、跨域、随机数、Id生成等开发中常用到的工具。。。
 ## 一、导入依赖
 ```xml
 <dependency>
@@ -440,7 +441,7 @@ idUtil.snowId();
 snow:
   center-id: 数据中心id, 范围0-31, 默认0
   machine-id: 机器id, 范围0-31, 默认0
-```   
+```
 ## 十一、文件工具类
 **对文件的一些操作，使用时通过``FileUtil.of()``生成实例之后再调用其中的方法，包含的所有方法如下 :**
 ### 1、downloadByUrl
@@ -600,7 +601,16 @@ public class ExcelController {
 |excelClass|关联的实体Class|
 |entityList|要导出的Excel关联实体集合|
 |response|HttpServletResponse|
-|ignores|忽略要导出的实体的字段名, 设置后该字段将不会导出到excel表格内|
+|ignores|忽略要导出的实体的字段名, 设置后该字段将不会导出到excel表格内|      
+**示例**：
+```java
+    @GetMapping("/excel")
+    @ApiOperation(value = "导出excel")
+    public void downExcel2(HttpServletResponse response) {
+        List<User> userList = userService.listUser();
+        ExcelWriter.of(User.class, userList).doWrite(response);
+    }
+```
 #### I、@Excel注解
 在实体类上使用，表明这个类是与Excel关联的，里面的参数包括：    
 
@@ -625,7 +635,28 @@ public class ExcelController {
 |name|列表头名称|
 |pattern|如果是时间类型, 需要指定转换的时间格式, 如``yyyy-MM-dd``, 目前仅支持字段类型为``java.util.Date``|
 |width|该列的宽度, 默认20*256|
-|strategy|导入excel时自动生成ID, 具体说明请在下文中查看第四小节|
+|strategy|导入excel时自动生成ID, 具体说明请往下看|     
+**示例**：
+```java
+@Excel(name = "用户列表", type = DocType.XLSX, description = "这是用户列表", lastRow = 4,firstCell = 1)
+public class User {
+
+    @ExcelField(name = "用户id", strategy = Generate.SNOW_ID)
+    private Long userId;
+
+    @ExcelField(name = "用户名")
+    private String userName;
+
+    @ExcelField(name = "用户年龄")
+    private Integer age;
+
+    @ExcelField(name = "用户地址")
+    private String userAddress;
+
+    @ExcelField(name = "出生日期", pattern = "yyyy-MM-dd")
+    private Date birthday;
+}
+```
 #### III、@DateValidation
 时间格式校验，在字段使用后会在excel中对应的列表头下的内容进行时间格式校验，``XLXS类型文档不要使用，有未知BUG``，里面的参数包括       
 
@@ -640,7 +671,18 @@ public class ExcelController {
 |allowEmpty|是否允许空值，默认``true``|
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
-|errorContent|详细错误内容|
+|errorContent|详细错误内容|       
+**示例**：
+表明时间必须输入2010-12-01至2020-12-01范围内
+```java
+@Excel(name = "用户列表")
+public class User {
+
+    @ExcelField(name = "出生日期", pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateValidation(operatorType = BETWEEN,expr1 = "2010-12-01",expr2 = "2020-12-01")
+    private Date birthday;
+}
+```
 #### IV、@ExplicitValidation
 给定范围校验，使用后excel对应的列表头下的单元格内容只能选择这个范围内的数据，参数包括     
 
@@ -652,7 +694,17 @@ public class ExcelController {
 |showPromptBox|是否立即弹出，默认``true``|
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
-|errorContent|详细错误内容|
+|errorContent|详细错误内容|      
+**示例**：
+只能选上海和厦门两个地址，同时这两个会出现在excel下拉框中
+```java
+@Excel(name = "用户列表")
+public class User {
+    @ExcelField(name = "用户地址")
+    @ExplicitValidation(combobox = {"上海","厦门"})
+    private String userAddress;
+}
+```
 #### V、@NumericValidation
 数值类型校验，使用后会在excel中进行指定规则校验，里面的参数包括     
 
@@ -662,13 +714,23 @@ public class ExcelController {
 |operatorType|操作类型，默认``OperatorType.BETWEEN``|
 |validationType|校验类型，``必填``|
 |expr1|表达式1，在表达式2前面，``必填``|
-|expr2|表达式2，序号为2，在操作类型为``BETWEEN``和``NOT_BETWEEN``情况下必填|
+|expr2|表达式2，在操作类型为``BETWEEN``和``NOT_BETWEEN``情况下必填|
 |showErrorBox|是否弹出错误框，默认``true``|
 |showPromptBox|是否立即弹出，默认``true``|
 |allowEmpty|是否允许空值，默认``true``|
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
-|errorContent|详细错误内容|
+|errorContent|详细错误内容|      
+**示例**：
+填写的数据必须小于10，且是整数
+```java
+@Excel(name = "用户列表")
+public class User {
+    @ExcelField(name = "用户年龄")
+    @NumericValidation(operatorType = LESS_THAN,validationType = INTEGER,expr1 = "10")
+    private Integer age;
+}
+```
 #### VI、实体类字段支持枚举类型
 很多时候, 为了方便数据库和代码层的可读性, 实体类中常常会设置枚举类型的字段, 这时候只需要在您定义的枚举类中实现``EnumConvert<T extends Enum>``接口即可, 该接口中含有两个方法
 值转枚举: ``T to(Object e)``和枚举转值: ``Object from(T t)``, 在这里, ``T``代表枚举类, 例子如下: 
@@ -704,11 +766,10 @@ public enum Gender implements EnumConvert<Gender> {
         return gender.type;
     }
 }
-``` 
+```
 #### VII、Id生成策略
-有时候在``导入Excel数据``时, 并不会让用户写每个数据的ID, 然后当碰上数据库ID不是自增的时候, 这时候就需要在导入时自动生成了, 目前支持UUID和SnowId(分布式唯一Id), 
-, 使用的话只需要在实体类中对应的字段设置下策略即可, 默认``none``, 一旦设置, 手动设置将无效, 会设置自动生成的值. 设置完策略之后, 在构造``ExcelReader``时传入``IdUtil``实例,
- 使用例子如下:     
+有时候在``导入Excel数据``时, 并不会让用户写每个数据的ID, 然后当碰上数据库ID不是自增的时候, 这时候就需要在导入时自动生成了, 目前支持UUID和SnowId(分布式唯一Id), 使用的话只需要在实体类中对应的字段设置下策略即可, 默认``none``, 一旦设置, 手动设置将无效, 会设置自动生成的值. 设置完策略之后, 在构造``ExcelReader``时传入``IdUtil``实例,
+**使用例子如下**:     
  
 **实体**
 ```java
