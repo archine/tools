@@ -1,7 +1,10 @@
-package cn.gjing.util.excel;
+package cn.gjing.util.excel.reader;
 
+import cn.gjing.util.BeanUtil;
 import cn.gjing.util.ParamUtil;
 import cn.gjing.util.TimeUtil;
+import cn.gjing.util.excel.Excel;
+import cn.gjing.util.excel.ExcelField;
 import cn.gjing.util.id.IdUtil;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -14,7 +17,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,6 +93,7 @@ public class ExcelReader<T> implements AutoCloseable {
             throw new NullPointerException("@Excel was not found on the excelClass");
         }
         this.excel = excel;
+        //拿到所有带有注解的字段，放进map中
         this.hasAnnotationFieldMap = Arrays.stream(this.excelClass.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(ExcelField.class))
                 .collect(
@@ -123,9 +126,9 @@ public class ExcelReader<T> implements AutoCloseable {
     private void reader() {
         //excel列表头名称
         List<String> headNameList = new ArrayList<>();
-        //excel内容开始的下标
+        //excel内容的开始下标
         int rowIndex = ParamUtil.equals("", this.excel.description()) ? 1 : this.excel.lastRow() + 2;
-        //列表头的下标
+        //excel列表头下标
         int headerIndex = rowIndex - 1;
         //获取excel列表头这行, 并设置总列数和列表头名称
         int totalCell = 0;
@@ -218,12 +221,13 @@ public class ExcelReader<T> implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     private void setValue(Object o, Field field, String value, ExcelField excelField) {
-        field.setAccessible(true);
         if (field.getType() == String.class) {
             this.setField(field, o, value);
             return;
         }
         if (field.getType() == int.class || field.getType() == Integer.class) {
+            int i = Double.valueOf(value).intValue();
+            System.out.println(i);
             this.setField(field, o, Double.valueOf(value).intValue());
             return;
         }
@@ -236,24 +240,22 @@ public class ExcelReader<T> implements AutoCloseable {
             return;
         }
         if (field.getType() == Date.class) {
-            this.setField(field, o, TimeUtil.stringToDate(value, excelField.pattern()));
+            this.setField(field, o, ParamUtil.equals("",excelField.pattern())
+                    ? TimeUtil.stringToDate(value)
+                    : TimeUtil.stringToDate(value, excelField.pattern()));
             return;
         }
         if (field.getType().isEnum()) {
-            Method[] methods = field.getType().getDeclaredMethods();
-            for (Method method : methods) {
-                if (method.getName().equals("to")) {
-                    Class<? extends Enum> type = (Class<? extends Enum>) field.getType();
-                    Object invoke = null;
-                    try {
-                        invoke = method.invoke(Enum.valueOf(type, type.getEnumConstants()[0].toString()), value);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                    this.setField(field, o, invoke);
-                    break;
-                }
+            Class<? extends Enum> type = (Class<? extends Enum>) field.getType();
+            Object invoke = null;
+            try {
+                Method to = BeanUtil.findDeclaredMethod(field.getType(), "to", Object.class);
+                assert to != null;
+                invoke = to.invoke(Enum.valueOf(type, type.getEnumConstants()[0].toString()), value);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            this.setField(field, o, invoke);
             return;
         }
         if (field.getType() == double.class || field.getType() == Double.class) {
@@ -278,11 +280,7 @@ public class ExcelReader<T> implements AutoCloseable {
      * @param value 值
      */
     private void setField(Field field, Object o, Object value) {
-        try {
-            field.set(o, value);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        BeanUtil.setFieldValue(o, field, value);
     }
 
     /**

@@ -1,5 +1,7 @@
 package cn.gjing.util.excel;
 
+import cn.gjing.util.excel.reader.Generate;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
