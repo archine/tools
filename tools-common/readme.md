@@ -601,7 +601,8 @@ public class ExcelController {
 |excelClass|关联的实体Class|
 |entityList|要导出的Excel关联实体集合|
 |response|HttpServletResponse|
-|ignores|忽略要导出的实体的字段名, 设置后该字段将不会导出到excel表格内|      
+|ignores|忽略要导出的实体的字段名, 设置后该字段将不会导出到excel表格内|     
+ 
 **示例**：
 ```java
     @GetMapping("/excel")
@@ -636,9 +637,10 @@ public class ExcelController {
 |pattern|如果是时间类型, 需要指定转换的时间格式, 如``yyyy-MM-dd``, 目前仅支持字段类型为``java.util.Date``|
 |width|该列的宽度, 默认20*256|
 |strategy|导入excel时自动生成ID, 具体说明请往下看|     
+
 **示例**：
 ```java
-@Excel(name = "用户列表", type = DocType.XLSX, description = "这是用户列表", lastRow = 4,firstCell = 1)
+@Excel(name = "用户列表")
 public class User {
 
     @ExcelField(name = "用户id", strategy = Generate.SNOW_ID)
@@ -672,6 +674,7 @@ public class User {
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|       
+
 **示例**：
 表明时间必须输入2010-12-01至2020-12-01范围内
 ```java
@@ -694,7 +697,8 @@ public class User {
 |showPromptBox|是否立即弹出，默认``true``|
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
-|errorContent|详细错误内容|      
+|errorContent|详细错误内容|        
+ 
 **示例**：
 只能选上海和厦门两个地址，同时这两个会出现在excel下拉框中
 ```java
@@ -711,7 +715,7 @@ public class User {
 |参数|描述|
 |-----|-----|
 |boxLastRow|数据校验最多校验多少行，默认为``列表头下一行``|
-|operatorType|操作类型，默认``OperatorType.BETWEEN``|
+|operatorType|操作类型，默认``OperatorType.EQUAL``|
 |validationType|校验类型，``必填``|
 |expr1|表达式1，在表达式2前面，``必填``|
 |expr2|表达式2，在操作类型为``BETWEEN``和``NOT_BETWEEN``情况下必填|
@@ -720,7 +724,8 @@ public class User {
 |allowEmpty|是否允许空值，默认``true``|
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
-|errorContent|详细错误内容|      
+|errorContent|详细错误内容|       
+    
 **示例**：
 填写的数据必须小于10，且是整数
 ```java
@@ -773,7 +778,7 @@ public enum Gender implements EnumConvert<Gender> {
  
 **实体**
 ```java
-@Excel(name = "用户列表", type = DocType.XLSX, description = "这是用户列表", lastRow = 4,firstCell = 1)
+@Excel(name = "用户列表")
 public class User {
 
     @Id
