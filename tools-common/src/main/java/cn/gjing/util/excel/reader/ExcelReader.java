@@ -236,8 +236,6 @@ public class ExcelReader<T> implements AutoCloseable {
             return;
         }
         if (field.getType() == int.class || field.getType() == Integer.class) {
-            int i = Double.valueOf(value).intValue();
-            System.out.println(i);
             this.setField(field, o, Double.valueOf(value).intValue());
             return;
         }

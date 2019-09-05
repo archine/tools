@@ -336,7 +336,6 @@ public class ExcelWriter implements AutoCloseable {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        return;
                     } else {
                         cell.setCellValue(value.toString());
                     }
