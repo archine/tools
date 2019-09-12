@@ -90,11 +90,6 @@ public class ExcelWriter implements AutoCloseable {
     private List<Field> hasExcelFieldList;
 
     /**
-     * excel关联字段注解
-     */
-    private ExcelField excelField;
-
-    /**
      * 忽略导出的字段
      */
     private String[] ignores;
@@ -283,8 +278,7 @@ public class ExcelWriter implements AutoCloseable {
         for (int i = 0; i < headers.size(); i++) {
             // 设置每列的宽度
             Field field = hasExcelFieldList.get(i);
-            this.excelField = field.getAnnotation(ExcelField.class);
-            this.sheet.setColumnWidth(i, excelField.width());
+            this.sheet.setColumnWidth(i, field.getAnnotation(ExcelField.class).width());
             row.setHeight((short) 300);
             Cell cell1 = row.createCell(i);
             cell1.setCellStyle(this.headerStyle);
@@ -358,7 +352,9 @@ public class ExcelWriter implements AutoCloseable {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint dvConstraint = helper.createExplicitListConstraint(explicitValidation.combobox());
         // 四个参数分别是：起始行、终止行、起始列、终止列
-        CellRangeAddressList regions = new CellRangeAddressList(firstRow, explicitValidation.boxLastRow() == 0 ? firstRow : explicitValidation.boxLastRow(),
+        CellRangeAddressList regions = new CellRangeAddressList(firstRow, explicitValidation.boxLastRow() == 0
+                ? firstRow
+                : explicitValidation.boxLastRow(),
                 cellNum, cellNum);
         // 数据有效性对象
         DataValidation dataValidation = helper.createValidation(dvConstraint, regions);
@@ -409,7 +405,9 @@ public class ExcelWriter implements AutoCloseable {
         DataValidationConstraint dvConstraint = helper.createDateConstraint(validation.operatorType().getType(), validation.expr1(),
                 validation.expr2(), validation.pattern());
         // 四个参数分别是：起始行、终止行、起始列、终止列
-        CellRangeAddressList regions = new CellRangeAddressList(firstRow, validation.boxLastRow() == 0 ? firstRow : validation.boxLastRow(),
+        CellRangeAddressList regions = new CellRangeAddressList(firstRow, validation.boxLastRow() == 0
+                ? firstRow
+                : validation.boxLastRow(),
                 cellNum, cellNum);
         // 数据有效性对象
         DataValidation dataValidation = helper.createValidation(dvConstraint, regions);

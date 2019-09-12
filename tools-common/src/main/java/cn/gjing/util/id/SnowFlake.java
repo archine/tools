@@ -38,7 +38,7 @@ class SnowFlake {
     //上一次时间戳
     private long lastStamp = -1L;
 
-    public SnowFlake(long dataCenterId, long machineId) {
+    SnowFlake(long dataCenterId, long machineId) {
         if (dataCenterId > MAX_DATA_CENTER_NUM || dataCenterId < 0) {
             throw new IllegalArgumentException("dataCenterId can't greater than 31 or less than 0");
         }

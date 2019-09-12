@@ -65,6 +65,20 @@ public class DemoConfig {
 每个服务都是走网关过得, 该模式``限于SpringCloud环境``, 且每个服务都在``同一个注册中心下``, 参考配置如下:**
 * yml格式
 ```yaml
+server:
+  port: 8080
+spring:
+  application:
+    name: zuul-server
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+zuul:
+  routes:
+    projectA:
+      serviceId: web1
+      path: /demo/**
 swagger:
   resources:
     enable: 是否开启聚合模式, 默认 False
@@ -73,10 +87,10 @@ swagger:
     service-list:
       - projectA: 这里可以随便定义
           view: 下拉选择时展示的名字, 一般用于标识对应文档的名字
-          service: 服务名
+          service: 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
       - projectB:
           view: 项目b
-          service: demo2   
+          service: demo 
 ```
 * JavaBean方式
 ```java

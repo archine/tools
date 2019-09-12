@@ -22,7 +22,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class ErrorResult implements Serializable {
 
-    private Integer code;
+    private int code;
     private String message;
 
     /**
@@ -30,7 +30,7 @@ public class ErrorResult implements Serializable {
      *
      * @return ErrorResult
      */
-    public static ErrorResult failure(Integer code, String message) {
+    public static ErrorResult failure(int code, String message) {
         return ErrorResult.builder()
                 .code(code)
                 .message(message)
@@ -46,6 +46,19 @@ public class ErrorResult implements Serializable {
         return ErrorResult.builder()
                 .code(HttpStatus.BAD_REQUEST.getCode())
                 .message(HttpStatus.BAD_REQUEST.getMsg())
+                .build();
+    }
+
+    /**
+     * 错误请求时使用,包含code和message
+     *
+     * @param message 错误信息
+     * @return ErrorResult
+     */
+    public static ErrorResult failure(String message) {
+        return ErrorResult.builder()
+                .code(HttpStatus.BAD_REQUEST.getCode())
+                .message(message)
                 .build();
     }
 

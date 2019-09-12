@@ -10,7 +10,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface NotNull2 {
-    String[] exclude()default {};
-
     String message() default "";
 }

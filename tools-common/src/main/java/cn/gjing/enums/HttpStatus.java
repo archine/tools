@@ -27,9 +27,9 @@ public enum HttpStatus {
     PARAM_EMPTY(512, "Parameter cannot be null"),
     NO_LOGIN(513,"Current Not Login,To Login Please"),
     INVALID_PARAMETER(514,"Parameter is invalid");
-    private Integer code;
+    private int code;
     private String msg;
-    HttpStatus(Integer code, String msg) {
+    HttpStatus(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

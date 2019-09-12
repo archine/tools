@@ -19,14 +19,14 @@ import java.io.Serializable;
 @SuppressWarnings("unused")
 public class ResultVO<T> implements Serializable {
 
-    private Integer code;
+    private int code;
     private String message;
     private T data;
 
-    public static<T> ResultVO success(Integer code, String message, T data) {
+    public static<T> ResultVO success(int code, String message, T data) {
         return ResultVO.builder()
-                .code(code == null ? HttpStatus.OK.getCode() : code)
-                .message(message == null ? HttpStatus.OK.getMsg() : message)
+                .code(code)
+                .message(message)
                 .data(data)
                 .build();
     }
@@ -46,10 +46,10 @@ public class ResultVO<T> implements Serializable {
                 .build();
     }
 
-    public static ResultVO error(Integer code, String message) {
+    public static ResultVO error(int code, String message) {
         return ResultVO.builder()
-                .code(code == null ? HttpStatus.BAD_REQUEST.getCode() : code)
-                .message(message == null ? HttpStatus.BAD_REQUEST.getMsg() : message)
+                .code(code)
+                .message(message)
                 .build();
     }
 

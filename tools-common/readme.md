@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.1.9-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -9,7 +9,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.1.9</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 ### 使用须知
@@ -19,9 +19,9 @@
 ```
 ## 二、常用注解:
 ### 1、@NotNull 
-方法参数校验,如若要排除方法中的某个参数,搭配使用``@ExcludeParam``注解到指定参数上;
+方法参数校验，如若要排除方法中的某个参数,搭配使用``@Exclude``注解到指定参数上;
 ### 2、@NotNull2
-方法参数校验, 可对null和空字符串进行校验, 如果要排除某些参数, 可将这些参数的名称设置到注解的参数``exclude``里, 如果需要自定义异常提示信息, 可设置``message``
+方法参数校验, 可对null和空字符串进行校验,如若要排除方法中的某个参数,搭配使用``@Exclude2``注解到指定参数上，如果需要自定义异常提示信息, 可设置``message``
 ### 3、@EnableCors
 开启允许跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：
 * **yml方式**
@@ -61,7 +61,7 @@ public class CorsConfiguration {
 ResultVO resultVo = ResultVO.success();
 ```
 ### 2、PageResult
-分页查询返回结果集, 包含``data(数据)``和``totalPage(总页数)``以及``CurrentPage(当前页数)``, 使用时可以直接使用builder构造, 也可以调用其中``of()``方法
+分页查询返回结果集, 包含``data(数据)``、``totalPages(总页数)``、``CurrentPage(当前页数)``、``totalRows(总条数)``、``pageRows(每页的条数)``
 ```java
 PageResult pageResult = PageResult.of("data", 1);
 ```
