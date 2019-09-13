@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.http;
 
 
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +23,7 @@ public class UrlUtil {
      * @param params 参数
      * @return string
      */
-    public static String urlAppend(String url,Object...params) {
+    public static String append(String url,Object...params) {
         StringBuilder builder = new StringBuilder(url);
         if (url.indexOf("/", url.length() - 1) == -1) {
             builder.append("/");
@@ -84,7 +84,7 @@ public class UrlUtil {
      * @param url 将url的参数转为map
      * @return map
      */
-    public static Map<String, String> urlParamToMap(String url) {
+    public static Map<String, String> toMap(String url) {
         final Map<String, String> queryPairs = new ConcurrentHashMap<>(16);
         final String[] param = url.split("\\?");
         if (param.length<1) {

@@ -5,15 +5,16 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.3.1</version>
+        <version>1.4.8</version>
     </parent>
     <artifactId>tools-httpclient</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
     <name>tools-httpclient</name>
     <description>http request tool</description>
 
     <properties>
         <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
@@ -32,6 +33,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -41,6 +43,7 @@
                 <!--跳过发布-->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.3</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
