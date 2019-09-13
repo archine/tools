@@ -1,4 +1,4 @@
-package cn.gjing;
+package cn.gjing.http;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
@@ -7,7 +7,7 @@ import java.security.cert.X509Certificate;
 /**
  * @author Gjing
  **/
- class HttpsProcess implements X509TrustManager {
+ class HttpsManager implements X509TrustManager {
     @Override
     public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
 

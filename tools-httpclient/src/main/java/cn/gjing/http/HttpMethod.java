@@ -1,9 +1,9 @@
-package cn.gjing;
+package cn.gjing.http;
 
 /**
  * @author Gjing
  **/
-enum HttpMethod {
+public enum HttpMethod {
     /**
      *
      */
