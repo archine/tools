@@ -5,17 +5,16 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.8</version>
+    <version>1.5.0</version>
     <name>tools</name>
     <modules>
         <module>tools-common</module>
         <module>tools-ali</module>
-        <module>tools-tx</module>
-        <module>tools-all</module>
         <module>tools-starter-swagger</module>
         <module>tools-httpclient</module>
         <module>tools-starter-feign</module>
         <module>tools-redis</module>
+        <module>tools-excel</module>
     </modules>
     <description>develop tool</description>
     <properties>
@@ -56,46 +55,6 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
-    <!--版本说明,统一管理依赖的版本号-->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>cn.gjing</groupId>
-                <artifactId>tools-common</artifactId>
-                <version>1.2.0</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.gjing</groupId>
-                <artifactId>tools-ali</artifactId>
-                <version>1.0.1</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.gjing</groupId>
-                <artifactId>tools-tx</artifactId>
-                <version>1.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.gjing</groupId>
-                <artifactId>tools-starter-swagger</artifactId>
-                <version>1.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.gjing</groupId>
-                <artifactId>tools-httpclient</artifactId>
-                <version>1.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.gjing</groupId>
-                <artifactId>tools-starter-feign</artifactId>
-                <version>1.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.gjing</groupId>
-                <artifactId>tools-redis</artifactId>
-                <version>1.0.3</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <profiles>
         <profile>
             <id>release</id>

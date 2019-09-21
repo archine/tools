@@ -1,5 +1,5 @@
 # tools-ali
-![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp;
  ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
  ![](https://img.shields.io/badge/builder-success-green.svg)    
 
@@ -9,7 +9,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-ali</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 ### 二、项目使用

@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.2.0-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 **快速在SpringBoot项目中集成Swagger**
@@ -9,7 +9,7 @@
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>1.1.0</version>
+     <version>1.2.0</version>
 </dependency>
 ```
 #### 2. 使用注解
