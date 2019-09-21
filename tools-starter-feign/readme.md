@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.0.2-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 
@@ -9,7 +9,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-starter-feign</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 **2. 启动类标注@EnableFeignUtil注解**
