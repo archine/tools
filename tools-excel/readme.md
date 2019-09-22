@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.0.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **提供Excel导入导出功能**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -31,6 +31,7 @@
 
 |参数|描述|
 |---|---|
+|validClass|校验器class, 可以指定自己的校验器, 不指定则走默认|
 |boxLastRow|数据校验最多校验多少行，默认是正文第一行|
 |pattern|校验的时间格式，默认``yyyy-MM-dd``|
 |operatorType|操作类型，默认``OperatorType.BETWEEN``|
@@ -47,6 +48,7 @@
 
 |参数|描述|
 |-----|-----|
+|validClass|校验器class, 可以指定自己的校验器, 不指定则走默认|
 |combobox|范围值，数组类型|
 |boxLastRow|数据校验最多校验多少行，默认为``列表头下一行``|
 |showErrorBox|是否弹出错误框，默认``true``|
@@ -59,6 +61,7 @@
 
 |参数|描述|
 |-----|-----|
+|validClass|校验器class, 可以指定自己的校验器, 不指定则走默认|
 |boxLastRow|数据校验最多校验多少行，默认为``列表头下一行``|
 |operatorType|操作类型，默认``OperatorType.EQUAL``|
 |validationType|校验类型，``必填``|
@@ -181,7 +184,8 @@ public class UserController {
                 //设置正文样式
                 .contentStyle(MyStyle::new)
                 //列表头样式
-                .headerStyle(MyStyle::new).write();
+                .headerStyle(MyStyle::new)
+                .write();
     }
 }
 ```
@@ -233,7 +237,8 @@ public class UserController {
 ```
 ## 三、复杂场景
 ### 1、自定义实现数据校验的逻辑
-**自定义一些逻辑，在导出时在ExcelWrite通过``.setDateValidation(MyValid::new)``设置，其他几个校验也是一样**
+**如果不想使用默认的数据校验器, 可以自己实现``ExcelValidation``接口, 然后在对应校验注解中``validClass``参数指定自己定义的校验器**
+#### a、定义自己的校验器
 ```java
 /**
  * @author Gjing
@@ -243,6 +248,16 @@ public class MyValid implements ExcelValidation {
     public DataValidation valid(Sheet sheet) {
         return null;
     }
+}
+```
+#### b、校验注解中使用
+**以下只举例其中一个, 其他几个校验注解也一样**
+```java
+@Excel("用户列表")
+public class User {
+    @ExcelField("性别")
+    @NumericValid(validClass = MyValid.class)
+    private Gender userGender;
 }
 ```
 ### 2、导入导出枚举转换
@@ -312,20 +327,6 @@ public class MyWriterResolver implements ExcelWriterResolver {
 
     }
 
-    @Override
-    public void setDateValidation(Supplier<? extends ExcelValidation> supplier) {
-
-    }
-
-    @Override
-    public void setExplicitValidation(Supplier<? extends ExcelValidation> supplier) {
-
-    }
-
-    @Override
-    public void setNumberValidation(Supplier<? extends ExcelValidation> supplier) {
-
-    }
 }
 ```
 #### b、导入解析器

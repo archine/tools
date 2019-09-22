@@ -4,7 +4,6 @@ import cn.gjing.tools.excel.BigTitle;
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.ExcelStyle;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
-import cn.gjing.tools.excel.valid.ExcelValidation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -147,39 +146,6 @@ public class ExcelWriter {
      */
     public ExcelWriter setBigTitleStyle(Supplier<? extends ExcelStyle> bigTitleStyle) {
         this.excelWriterResolver.setBigTitleStyle(bigTitleStyle);
-        return this;
-    }
-
-    /**
-     * 添加时间校验
-     *
-     * @param dateValidation dateValidation
-     * @return ExcelWriter
-     */
-    public ExcelWriter setDateValidation(Supplier<? extends ExcelValidation> dateValidation) {
-        this.excelWriterResolver.setDateValidation(dateValidation);
-        return this;
-    }
-
-    /**
-     * 添加指定范围的校验
-     *
-     * @param explicitValidation explicitValidation
-     * @return ExcelWriter
-     */
-    public ExcelWriter setExplicitValidation(Supplier<? extends ExcelValidation> explicitValidation) {
-        this.excelWriterResolver.setExplicitValidation(explicitValidation);
-        return this;
-    }
-
-    /**
-     * 设置数据校验
-     *
-     * @param numberValidation numberValidation
-     * @return ExcelWriter
-     */
-    public ExcelWriter setNumberValidation(Supplier<? extends ExcelValidation> numberValidation) {
-        this.excelWriterResolver.setNumberValidation(numberValidation);
         return this;
     }
 }

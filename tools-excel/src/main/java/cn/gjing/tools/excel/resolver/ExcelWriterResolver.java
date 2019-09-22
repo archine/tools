@@ -2,7 +2,6 @@ package cn.gjing.tools.excel.resolver;
 
 import cn.gjing.tools.excel.BigTitle;
 import cn.gjing.tools.excel.ExcelStyle;
-import cn.gjing.tools.excel.valid.ExcelValidation;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,14 +18,16 @@ public interface ExcelWriterResolver {
 
     /**
      * 创建Excel读解析器
-     * @param workbook workbook 工作簿
-     * @param response response
-     * @param header 列表头
-     * @param fieldList 字段集合
-     * @param fileName 文件名
+     *
+     * @param workbook  workbook 工作簿
+     * @param response  response
+     * @param header    列表头
+     * @param fieldList Excel列表头字段集合
+     * @param fileName  文件名
      * @return ExcelWriterResolver
      */
     ExcelWriterResolver builder(Workbook workbook, HttpServletResponse response, List<String> header, List<Field> fieldList, String fileName);
+
     /**
      * 写Excel
      *
@@ -61,23 +62,5 @@ public interface ExcelWriterResolver {
      * @param contentStyle excelStyle
      */
     void setContentStyle(Supplier<? extends ExcelStyle> contentStyle);
-
-    /**
-     * 设置时间校验器
-     * @param dateValidation dateValidation
-     */
-    void setDateValidation(Supplier<? extends ExcelValidation> dateValidation);
-
-    /**
-     * 设置指定范围字段的校验器
-     * @param explicitValidation dateValidation
-     */
-    void setExplicitValidation(Supplier<? extends ExcelValidation> explicitValidation);
-
-    /**
-     * 设置数据类型校验器
-     * @param numberValidation dateValidation
-     */
-    void setNumberValidation(Supplier<? extends ExcelValidation> numberValidation);
 
 }

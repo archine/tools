@@ -4,10 +4,7 @@ import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
-import cn.gjing.tools.excel.valid.DateValid;
-import cn.gjing.tools.excel.valid.ExcelValidation;
-import cn.gjing.tools.excel.valid.ExplicitValid;
-import cn.gjing.tools.excel.valid.NumericValid;
+import cn.gjing.tools.excel.valid.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -32,7 +29,6 @@ import java.util.function.Supplier;
 @SuppressWarnings("all")
 class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
     private HSSFWorkbook workbook;
-    private HSSFSheet sheet;
     private HttpServletResponse response;
     private List<String> header;
     private List<Field> fieldList;
@@ -43,9 +39,6 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
     private HSSFCellStyle headerStyle;
     private HSSFCellStyle bigTitleStyle;
     private HSSFCellStyle contentStyle;
-    private DataValidation dateValidation;
-    private DataValidation explicitValidation;
-    private DataValidation numberValidation;
 
     @Override
     public ExcelWriterResolver builder(Workbook workbook, HttpServletResponse response, List<String> header, List<Field> fieldList, String fileName) {
@@ -63,7 +56,6 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
     @Override
     public void write(List<?> excelClassList) {
         HSSFSheet sheet = this.workbook.createSheet();
-        this.sheet = sheet;
         HSSFRow row;
         HSSFCell cell;
         if (bigTitle != null) {
@@ -119,21 +111,6 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
     }
 
     @Override
-    public void setDateValidation(Supplier<? extends ExcelValidation> dateValidation) {
-        this.dateValidation = dateValidation.get().valid(this.sheet);
-    }
-
-    @Override
-    public void setExplicitValidation(Supplier<? extends ExcelValidation> explicitValidation) {
-        this.explicitValidation = explicitValidation.get().valid(this.sheet);
-    }
-
-    @Override
-    public void setNumberValidation(Supplier<? extends ExcelValidation> numberValidation) {
-        this.numberValidation = numberValidation.get().valid(this.sheet);
-    }
-
-    @Override
     public void close() throws IOException {
         if (outputStream != null) {
             outputStream.flush();
@@ -155,19 +132,34 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
             DateValid dateValid = field.getAnnotation(DateValid.class);
             NumericValid numericValid = field.getAnnotation(NumericValid.class);
             if (explicitValid != null) {
-                sheet.addValidationData(this.explicitValidation == null
-                        ? new ExcelExplicitValidation(explicitValid, row.getRowNum() + 1, i).valid(sheet)
-                        : this.explicitValidation);
+                try {
+                    DataValidation dataValidation = ParamUtils.equals(explicitValid.validClass(), ExcelExplicitValidation.class)
+                            ? new ExcelExplicitValidation(explicitValid, row.getRowNum() + 1, i).valid(sheet)
+                            : explicitValid.validClass().newInstance().valid(sheet);
+                    sheet.addValidationData(dataValidation);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
             if (dateValid != null) {
-                sheet.addValidationData(this.dateValidation == null
-                        ? new ExcelDateValidation(dateValid, i, row.getRowNum() + 1).valid(sheet)
-                        : this.dateValidation);
+                try {
+                    DataValidation dataValidation = ParamUtils.equals(dateValid.validClass(), ExcelDateValidation.class)
+                            ? new ExcelDateValidation(dateValid, i, row.getRowNum() + 1).valid(sheet)
+                            : dateValid.validClass().newInstance().valid(sheet);
+                    sheet.addValidationData(dataValidation);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
             if (numericValid != null) {
-                sheet.addValidationData(this.numberValidation == null
-                        ? new ExcelNumberValidation(numericValid, row.getRowNum() + 1, i).valid(sheet)
-                        : this.numberValidation);
+                try {
+                    DataValidation dataValidation = ParamUtils.equals(numericValid.validClass(), ExcelNumberValidation.class)
+                            ? new ExcelNumberValidation(numericValid, row.getRowNum() + 1, i).valid(sheet)
+                            : numericValid.validClass().newInstance().valid(sheet);
+                    sheet.addValidationData(dataValidation);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
         }
         //设置正文

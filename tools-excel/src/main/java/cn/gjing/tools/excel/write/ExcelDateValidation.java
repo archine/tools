@@ -11,7 +11,7 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 /**
  * @author Gjing
  **/
-class ExcelDateValidation implements ExcelValidation {
+public class ExcelDateValidation implements ExcelValidation {
 
     private DateValid dateValid;
     private int cellNum;

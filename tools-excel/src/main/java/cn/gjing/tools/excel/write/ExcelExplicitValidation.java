@@ -11,7 +11,7 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 /**
  * @author Gjing
  **/
-class ExcelExplicitValidation implements ExcelValidation {
+public class ExcelExplicitValidation implements ExcelValidation {
     private ExplicitValid explicitValid;
     private int firstRow;
     private int cellNum;
