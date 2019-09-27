@@ -21,6 +21,7 @@ public class ExcelReader<T> implements Closeable {
     private ExcelReaderResolver excelReaderResolver;
     private List<T> data = new ArrayList<>();
     private InputStream inputStream;
+    private int titleRow = 0;
 
     public ExcelReader(Class<T> excelClass, InputStream inputStream) {
         this.excelClass = excelClass;
@@ -35,7 +36,7 @@ public class ExcelReader<T> implements Closeable {
      */
     @SuppressWarnings("unchecked")
     public List<T> read() {
-        this.excelReaderResolver.read(this.excelClass, acceptList -> data = (List<T>) acceptList);
+        this.excelReaderResolver.read(this.excelClass, acceptList -> data = (List<T>) acceptList,this.titleRow);
         return this.data;
     }
 
@@ -45,7 +46,7 @@ public class ExcelReader<T> implements Closeable {
      * @param acceptList 接收读取完毕后的实体集合
      */
     public void read(Consumer<List<Object>> acceptList) {
-        this.excelReaderResolver.read(this.excelClass, acceptList);
+        this.excelReaderResolver.read(this.excelClass, acceptList,this.titleRow);
     }
 
     /**
@@ -56,6 +57,16 @@ public class ExcelReader<T> implements Closeable {
      */
     public ExcelReader<T> changeResolver(Supplier<? extends ExcelReaderResolver> supplier) {
         this.excelReaderResolver = supplier.get().builder(this.inputStream);
+        return this;
+    }
+
+    /**
+     * 如果excel文件有大标题，需要指定大标题所占行数
+     * @param row 行数
+     * @return ExcelReader
+     */
+    public ExcelReader<T> titleRow(int row) {
+        this.titleRow = row;
         return this;
     }
 

@@ -24,6 +24,7 @@ public interface ExcelReaderResolver {
      *
      * @param excelClass Excel对应的实体Class
      * @param acceptList 接收数据的集合
+     * @param titleRow 大标题占用行
      */
-    void read(Class<?> excelClass, Consumer<List<Object>> acceptList);
+    void read(Class<?> excelClass, Consumer<List<Object>> acceptList,int titleRow);
 }

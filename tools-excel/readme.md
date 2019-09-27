@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **提供Excel导入导出功能**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -132,6 +132,7 @@ public class UserController {
 }
 ```
 ### 4、导出有大标题的Excel
+**需要传入``BigTitle``对象，该对象中包含了``lastRow``、``content``两个参数，分别为大标题占用行(默认2行)、大标题内容(默认空)**
 ```java
 /**
  * @author Gjing
@@ -213,7 +214,7 @@ public class User {
 #### b、导出
 **按之前的导出示例导出即可**
 ### 7、导入Excel文件
-**这里只说明如何使用，不提供数据接下来处理的示例代码**
+**如果导出的Excel模板有设置大标题，这里导入时需要通过``.titleRow()``方法指定对应模板导出时设置的大标题``lastRow``参数的值**
 ```java
 /**
  * @author Gjing
@@ -225,13 +226,12 @@ public class UserController {
 
     @PostMapping("/excel")
     @ApiOperation(value = "excel导入")
-    public ResponseEntity excelImport(MultipartFile file) {
+    public void excelImport(MultipartFile file) {
         try {
-            ExcelFactory.createReader(file.getInputStream(), User.class).read();
+            List<User> readResult = ExcelFactory.createReader(file.getInputStream(), User.class).read();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return ResponseEntity.ok("ok");
     }
 }
 ```

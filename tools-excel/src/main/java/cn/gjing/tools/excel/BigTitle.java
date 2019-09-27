@@ -14,12 +14,6 @@ import lombok.*;
 public class BigTitle {
 
     /**
-     * 放前面还是放后面
-     */
-    @Builder.Default
-    private boolean front = true;
-
-    /**
      * 占几行
      */
     @Builder.Default

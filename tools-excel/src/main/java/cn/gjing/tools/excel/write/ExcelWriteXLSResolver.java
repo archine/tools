@@ -4,7 +4,9 @@ import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
-import cn.gjing.tools.excel.valid.*;
+import cn.gjing.tools.excel.valid.DateValid;
+import cn.gjing.tools.excel.valid.ExplicitValid;
+import cn.gjing.tools.excel.valid.NumericValid;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -59,15 +61,9 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
         HSSFRow row;
         HSSFCell cell;
         if (bigTitle != null) {
-            if (bigTitle.isFront()) {
-                this.startRow = bigTitle.getLastRow() + 1;
-                sheet.addMergedRegion(new CellRangeAddress(0, bigTitle.getLastRow(), 0, this.header.size() - 1));
-                row = sheet.createRow(0);
-            } else {
-                int bigTitleStartRow = excelClassList.size() + 1;
-                sheet.addMergedRegion(new CellRangeAddress(bigTitleStartRow, bigTitleStartRow + bigTitle.getLastRow(), 0, this.header.size()));
-                row = sheet.createRow(bigTitleStartRow);
-            }
+            this.startRow = bigTitle.getLastRow() + 1;
+            sheet.addMergedRegion(new CellRangeAddress(0, bigTitle.getLastRow(), 0, this.header.size() - 1));
+            row = sheet.createRow(0);
             cell = row.createCell(0);
             //set big title value
             cell.setCellStyle(this.bigTitleStyle);

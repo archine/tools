@@ -55,7 +55,7 @@ class ExcelReadResolver implements ExcelReaderResolver {
     }
 
     @Override
-    public void read(Class<?> excelClass, Consumer<List<Object>> acceptList) {
+    public void read(Class<?> excelClass, Consumer<List<Object>> acceptList,int titleRow) {
         //得到excel的class实体
         Excel excel = excelClass.getAnnotation(Excel.class);
         if (excel == null) {
@@ -86,19 +86,19 @@ class ExcelReadResolver implements ExcelReaderResolver {
                 }
                 //得到sheet
                 this.sheet = this.workbook.getSheetAt(0);
-                reader(excelClass, acceptList);
+                this.reader(excelClass, acceptList,titleRow);
                 break;
             case XLSX:
                 this.workbook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(this.inputStream);
                 this.sheet = this.workbook.getSheetAt(0);
-                reader(excelClass, acceptList);
+                this.reader(excelClass, acceptList,titleRow);
                 break;
             default:
                 throw new NullPointerException("Doc type was not found");
         }
     }
 
-    private void reader(Class<?> excelClass, Consumer<List<Object>> consumer) {
+    private void reader(Class<?> excelClass, Consumer<List<Object>> consumer,int titleRow) {
         List<Object> dataList = new ArrayList<>();
         //excel列表头名称
         List<String> headNameList = new ArrayList<>();
@@ -106,8 +106,12 @@ class ExcelReadResolver implements ExcelReaderResolver {
         int totalCell = 0;
         //创建个新实例
         Object o = null;
+        int i = titleRow == 0 ? 0 : titleRow + 1;
         for (Row row : sheet) {
-            if (row.getRowNum() == 0) {
+            if (row.getRowNum() < titleRow) {
+                continue;
+            }
+            if (row.getRowNum() == i) {
                 //增加列表头名称和总列数
                 for (Cell cell : row) {
                     totalCell++;
