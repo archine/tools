@@ -30,7 +30,7 @@ public class Cors {
      * 允许的方法
      */
     @Builder.Default
-    private String[] allowedMethods = new String[]{"GET", "DELETE", "POST", "PUT"};
+    private String[] allowedMethods = new String[]{"GET", "DELETE", "POST", "PUT","OP"};
 
     /**
      * 允许的请求头

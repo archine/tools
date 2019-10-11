@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.2.2-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -9,7 +9,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.2.2</version>
+  <version>1.2.3</version>
 </dependency>
 ```
 ### 使用须知
@@ -20,7 +20,7 @@
 ## 二、常用注解:
 ### 1、@NotNull 
 方法参数校验，如若要排除方法中的某个参数,搭配使用``@Exclude``注解到指定参数上;
-### 2、@NotNull2
+### 2、@NotEmpty
 方法参数校验, 可对null和空字符串进行校验,如若要排除方法中的某个参数,搭配使用``@Exclude2``注解到指定参数上，如果需要自定义异常提示信息, 可设置``message``
 ### 3、@EnableCors
 开启允许跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：

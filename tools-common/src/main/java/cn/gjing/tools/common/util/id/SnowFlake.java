@@ -10,11 +10,17 @@ class SnowFlake {
     private final static long START_STAMP = 1565973494035L;
 
     /**
-     * 每一部分占用的位数
+     * 序列号占用的位数
      */
-    private final static long SEQUENCE_BIT = 12; //序列号占用的位数
-    private final static long MACHINE_BIT = 5;   //机器标识占用的位数
-    private final static long DATA_CENTER_BIT = 5;//数据中心占用的位数
+    private final static long SEQUENCE_BIT = 12;
+    /**
+     * 机器标识占用的位数
+     */
+    private final static long MACHINE_BIT = 5;
+    /**
+     * 数据中心占用的位数
+     */
+    private final static long DATA_CENTER_BIT = 5;
 
     /**
      * 每一部分的最大值
@@ -29,13 +35,21 @@ class SnowFlake {
     private final static long MACHINE_LEFT = SEQUENCE_BIT;
     private final static long DATA_CENTER_LEFT = SEQUENCE_BIT + MACHINE_BIT;
     private final static long TIMESTAMP_LEFT = DATA_CENTER_LEFT + DATA_CENTER_BIT;
-    //数据中心
+    /**
+     * 数据中心
+     */
     private long dataCenterId;
-    //机器标识
+    /**
+     * 机器标识
+     */
     private long machineId;
-    //序列号
+    /**
+     * 序列号
+     */
     private long sequence = 0L;
-    //上一次时间戳
+    /**
+     * 上一次时间戳
+     */
     private long lastStamp = -1L;
 
     SnowFlake(long dataCenterId, long machineId) {
@@ -54,7 +68,7 @@ class SnowFlake {
      *
      * @return id
      */
-    public synchronized long nextId() {
+    synchronized long nextId() {
         long currStamp = this.getNewStamp();
         if (currStamp < lastStamp) {
             throw new RuntimeException("Clock moved backwards. Refusing to generate id");

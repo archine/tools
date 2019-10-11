@@ -22,7 +22,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class ErrorResult implements Serializable {
 
-    private int code;
+    private Integer code;
     private String message;
 
     /**

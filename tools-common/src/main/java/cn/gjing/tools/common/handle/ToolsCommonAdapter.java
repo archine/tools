@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Configuration;
 public class ToolsCommonAdapter {
 
     @Bean
-    @ConditionalOnClass(NotNull2Processor.class)
-    public NotNull2Processor notNullProxy() {
-        return new NotNull2Processor();
+    @ConditionalOnClass(NotEmptyProcessor.class)
+    public NotEmptyProcessor notNullProxy() {
+        return new NotEmptyProcessor();
     }
     @Bean
     @ConditionalOnMissingBean(SnowId.class)

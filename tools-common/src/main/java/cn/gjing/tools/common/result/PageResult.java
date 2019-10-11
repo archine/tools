@@ -1,9 +1,6 @@
 package cn.gjing.tools.common.result;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -12,17 +9,17 @@ import java.io.Serializable;
  * 主要用于分页查询时候进行返回
  **/
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@SuppressWarnings("unused")
 public class PageResult<T> implements Serializable {
 
     private T data;
-    private int totalPages;
-    private int currentPage;
-    private long totalRows;
-    private int pageRows;
+    private Integer totalPages;
+    private Integer currentPage;
+    private Long totalRows;
+    private Integer pageRows;
+
+    private PageResult() {
+
+    }
     /**
      * 构建分页结果
      *
@@ -31,12 +28,12 @@ public class PageResult<T> implements Serializable {
      * @param currentPage 当前页数
      * @return PageResult
      */
-    public static <T> PageResult of(T data, int totalPages, int currentPage) {
-        return PageResult.builder()
-                .data(data)
-                .totalPages(totalPages)
-                .currentPage(currentPage)
-                .build();
+    public static <T> PageResult<T> of(T data, int totalPages, int currentPage) {
+        PageResult<T> pageResult = new PageResult<>();
+        pageResult.setData(data);
+        pageResult.setTotalPages(totalPages);
+        pageResult.setCurrentPage(currentPage);
+        return pageResult;
     }
 
     /**
@@ -46,11 +43,11 @@ public class PageResult<T> implements Serializable {
      * @param totalPages 总页数
      * @return PageResult
      */
-    public static <T> PageResult of(T data, int totalPages) {
-        return PageResult.builder()
-                .data(data)
-                .totalPages(totalPages)
-                .build();
+    public static <T> PageResult<T> of(T data, int totalPages) {
+        PageResult<T> pageResult = new PageResult<>();
+        pageResult.setData(data);
+        pageResult.setTotalPages(totalPages);
+        return pageResult;
     }
 
     /**
@@ -62,13 +59,13 @@ public class PageResult<T> implements Serializable {
      * @param totalRows 总条数
      * @return PageResult
      */
-    public static <T> PageResult of(T data, int totalPages, int currentPage, long totalRows) {
-        return PageResult.builder()
-                .data(data)
-                .totalPages(totalPages)
-                .currentPage(currentPage)
-                .totalRows(totalRows)
-                .build();
+    public static <T> PageResult<T> of(T data, int totalPages, int currentPage, long totalRows) {
+        PageResult<T> pageResult = new PageResult<>();
+        pageResult.setData(data);
+        pageResult.setTotalPages(totalPages);
+        pageResult.setCurrentPage(currentPage);
+        pageResult.setTotalRows(totalRows);
+        return pageResult;
     }
 
     /**
@@ -81,13 +78,13 @@ public class PageResult<T> implements Serializable {
      * @param pageRows 每页条数
      * @return PageResult
      */
-    public static <T> PageResult of(T data, int totalPages, int currentPage, long totalRows,int pageRows) {
-        return PageResult.builder()
-                .data(data)
-                .totalPages(totalPages)
-                .currentPage(currentPage)
-                .totalRows(totalRows)
-                .pageRows(pageRows)
-                .build();
+    public static <T> PageResult<T> of(T data, int totalPages, int currentPage, long totalRows,int pageRows) {
+        PageResult<T> pageResult = new PageResult<>();
+        pageResult.setData(data);
+        pageResult.setTotalPages(totalPages);
+        pageResult.setCurrentPage(currentPage);
+        pageResult.setTotalRows(totalRows);
+        pageResult.setPageRows(pageRows);
+        return pageResult;
     }
 }

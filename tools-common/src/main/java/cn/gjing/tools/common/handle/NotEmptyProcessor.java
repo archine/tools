@@ -1,7 +1,7 @@
 package cn.gjing.tools.common.handle;
 
 import cn.gjing.tools.common.annotation.Exclude2;
-import cn.gjing.tools.common.annotation.NotNull2;
+import cn.gjing.tools.common.annotation.NotEmpty;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -21,8 +21,8 @@ import java.lang.reflect.Parameter;
  **/
 @Component
 @Aspect
-class NotNull2Processor {
-    @Pointcut("@annotation(cn.gjing.tools.common.annotation.NotNull2)")
+class NotEmptyProcessor {
+    @Pointcut("@annotation(cn.gjing.tools.common.annotation.NotEmpty)")
     public void cut() {
 
     }
@@ -34,7 +34,7 @@ class NotNull2Processor {
         assert attributes != null;
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        NotNull2 notNull2 = method.getAnnotation(NotNull2.class);
+        NotEmpty notEmpty = method.getAnnotation(NotEmpty.class);
         Parameter[] parameters = method.getParameters();
         Object[] args = joinPoint.getArgs();
         for (int i = 0; i < parameters.length; i++) {
@@ -43,7 +43,9 @@ class NotNull2Processor {
                 continue;
             }
             if (args[i] == null) {
-                throw new NullPointerException(notNull2.message().equals("") ? "The parameter " + parameter.getName() + " cannot be null" : notNull2.message());
+                throw new NullPointerException("".equals(notEmpty.message())
+                        ? "The parameter " + parameter.getName() + " cannot be null"
+                        : notEmpty.message());
             }
         }
     }

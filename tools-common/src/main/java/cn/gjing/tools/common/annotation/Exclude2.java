@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * @author Gjing
  **/
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Exclude2 {
 }
