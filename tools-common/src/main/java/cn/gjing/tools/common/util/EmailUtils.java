@@ -16,14 +16,14 @@ import java.util.Properties;
  * @author Gjing
  **/
 @SuppressWarnings("unused")
-public class EmailUtil {
+public class EmailUtils {
 
     private String host;
     private String password;
     private String from;
 
-    private EmailUtil(String host, String password, String from) {
-        if (ParamUtil.multiEmpty(host, password, from)) {
+    private EmailUtils(String host, String password, String from) {
+        if (ParamUtils.multiEmpty(host, password, from)) {
             throw new NullPointerException("Instantiation exception, Parameters cannot be null");
         }
         this.host = host;
@@ -39,8 +39,8 @@ public class EmailUtil {
      * @param from     发送者邮箱地址
      * @return e
      */
-    public static EmailUtil of(String host, String password, String from) {
-        return new EmailUtil(host, password, from);
+    public static EmailUtils of(String host, String password, String from) {
+        return new EmailUtils(host, password, from);
     }
 
     /**
@@ -53,7 +53,7 @@ public class EmailUtil {
      * @return true为发送成功
      */
     public boolean sendEmail(String subject, String body, String tos, String copyTo) {
-        if (ParamUtil.isEmpty(tos)) {
+        if (ParamUtils.isEmpty(tos)) {
             throw new ParamException("The parameter 'tos' cannot be null");
         }
         try {
@@ -82,7 +82,7 @@ public class EmailUtil {
      * @return true为发送成功
      */
     public boolean sendEmail(String subject, String body, String[] files, String tos, String copyTo) {
-        if (ParamUtil.isEmpty(tos)) {
+        if (ParamUtils.isEmpty(tos)) {
             throw new ParamException("The parameter 'tos' cannot be null");
         }
         try {
@@ -93,7 +93,7 @@ public class EmailUtil {
             // 设置邮件主体内容(包括html文本和附件)
             MimeMultipart mm = getMimeMultipart(body);
             // 设置多个附件
-            if (ParamUtil.isNotEmpty(files)) {
+            if (ParamUtils.isNotEmpty(files)) {
                 for (String f : files) {
                     // 设置附件部分
                     MimeBodyPart attachment = new MimeBodyPart();
@@ -137,12 +137,12 @@ public class EmailUtil {
      * @throws MessagingException email异常
      */
     private void setRecipient(String tos, String copyTo, Message msg) throws MessagingException {
-        if (ParamUtil.split(tos, ",").length == 1) {
+        if (ParamUtils.split(tos, ",").length == 1) {
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(tos));
         } else {
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(tos));
         }
-        if (ParamUtil.isNotEmpty(copyTo)) {
+        if (ParamUtils.isNotEmpty(copyTo)) {
             InternetAddress[] copyToArr = InternetAddress.parse(copyTo);
             msg.setRecipients(Message.RecipientType.CC, copyToArr);
         }

@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.5</version>
     </parent>
     <artifactId>tools-common</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <name>tools-common</name>
     <description>common tool</description>
 

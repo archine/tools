@@ -15,14 +15,14 @@ import java.security.SecureRandom;
  * @author Gjing
  **/
 @SuppressWarnings("unused")
-public class EncryptionUtil {
+public class EncryptionUtils {
 
-    private EncryptionUtil() {
+    private EncryptionUtils() {
 
     }
 
-    public static EncryptionUtil of() {
-        return new EncryptionUtil();
+    public static EncryptionUtils of() {
+        return new EncryptionUtils();
     }
 
     /**

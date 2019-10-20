@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.2.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -9,7 +9,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.2.3</version>
+  <version>1.2.4</version>
 </dependency>
 ```
 ### 使用须知
@@ -263,10 +263,10 @@ int dateBetween(String startDate, String endDate)
 int dateBetween(String startDate, String endDate)
 ```
 ## 六、加密工具类
-**主要用于数据加密，使用时通过``EncryptionUtil.xxx()``调用，该工具包含的所有方法如下:**
+**主要用于数据加密，使用时通过``EncryptionUtils.xxx()``调用，该工具包含的所有方法如下:**
 * **of**：生成加密实例
 ```java
-EncryptionUtil of()
+EncryptionUtils.of()
 ```
 * **encodeMd5**：MD5加密
 ```java
@@ -297,7 +297,7 @@ String encodeAes(String content, String password)
 String decodeAes(String content, String password)
 ```
 ## 七、随机数工具类
-**用于随机生成数字或字符串，使用时通过``RandomUtil.xxx()``调用，该工具包含的所有方法如下 :**
+**用于随机生成数字或字符串，使用时通过``RandomUtils.xxx()``调用，该工具包含的所有方法如下 :**
 * **randomInt**：获取随机整数，可设置最大值和最小值
 ```java
 int randomInt(int min, int max)
@@ -319,7 +319,7 @@ String generateString(int length)
 String generateNumber(int length)
 ```
 ## 八、Bean工具类：
-**使用时通过``BeanUtil.xxx()``调用**
+**使用时通过``BeanUtils.xxx()``调用**
 ### 1、copyProperties
 属性复制，用于将一个对象的属性赋值到另一个对象，两个对象间的``参数名和数据类型必须相同``      
 **参数说明**     
@@ -425,16 +425,16 @@ public void getCode(HttpServletResponse response, HttpServletRequest request) th
 }
 ```
 ## 十、Id生成工具类
-**生成无符号的UUID和通过雪花算法生成一个唯一ID，在项目使用时，先通过``@Resource``注入，然后通过``idUtil.xxx()``生成，该工具包含的方法如下 :**
+**生成无符号的UUID和通过雪花算法生成一个唯一ID，在项目使用时，先通过``@Resource``注入，然后通过``idUtils.xxx()``生成，该工具包含的方法如下 :**
 ### 1、uuid 
 获取去除``-``符号的uuid
 ```java
-idUtil.uuid();
+idUtils.uuid();
 ```
 ### 2、snowId
 得到一个唯一的ID，在多服务需要操作同一个数据表的情况下, 需要保证每个服务的``centerId``和``machineId``唯一   
 ```java
-idUtil.snowId();
+idUtils.snowId();
 ```
 **配置如下**    
 ```yaml
@@ -443,11 +443,11 @@ snow:
   machine-id: 机器id, 范围0-31, 默认0
 ```
 ## 十一、文件工具类
-**对文件的一些操作，使用时通过``FileUtil.of()``生成实例之后再调用其中的方法，包含的所有方法如下 :**
+**对文件的一些操作，使用时通过``FileUtils.of()``生成实例之后再调用其中的方法，包含的所有方法如下 :**
 ### 1、downloadByUrl
 从远程URL地址下载文件到本地
 ```java
-FileUtil.of().downloadByUrl(fileUrl, fileName, savePath);
+FileUtils.of().downloadByUrl(fileUrl, fileName, savePath);
 ```
 **参数说明**   
 
@@ -460,7 +460,7 @@ FileUtil.of().downloadByUrl(fileUrl, fileName, savePath);
 ### 2、downloadByStream
 将本地的指定地址文件通过流下载
 ```java
-FileUtil.of().downlocdByStream(response, file);
+FileUtils.of().downlocdByStream(response, file);
 ```
 **参数说明**   
 
@@ -472,12 +472,12 @@ FileUtil.of().downlocdByStream(response, file);
 ### 3、getBytes
 将指定路径下的文件转为byte数组
 ```java
-byte[] data = FileUtil.of().getBytes(file);
+byte[] data = FileUtils.of().getBytes(file);
 ```
 ### 4、writeFile
 将字节数组写入到指定文件, 写入成功返回true
 ```java
-boolean b = FileUtil.of().writeFile(bytes, file);
+boolean b = FileUtils.of().writeFile(bytes, file);
 ```
 **参数说明**    
 
@@ -489,15 +489,15 @@ boolean b = FileUtil.of().writeFile(bytes, file);
 ### 5、readInputStream
 从输入流读取内容并返回字节数组
 ```java
-byte[] b = FileUtil.of().readInputStream(inputStream);
+byte[] b = FileUtils.of().readInputStream(inputStream);
 ```
 ### 6、getExtension
 获取文件扩展名
 ```java
-String name = FileUtil.of().getExtension(fileName);
+String name = FileUtils.of().getExtension(fileName);
 ```
 ## 十二、邮件工具类
-**用于发送邮件，支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功，使用时通过``EmailUtil.of()``生成实例之后在进行其中的方法，``of()``方法参数如下 :**     
+**用于发送邮件，支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功，使用时通过``EmailUtils.of()``生成实例之后在进行其中的方法，``of()``方法参数如下 :**     
 
 |参数|描述|
 |-----|-----|
@@ -520,7 +520,7 @@ String name = FileUtil.of().getExtension(fileName);
 **完整示例如下 :**
 ```java
 public static void main(String[] args) {
-    boolean b = EmailUtil.of("smtp.qq.com", "发送人密码或者授权码", "发送人邮箱")
+    boolean b = EmailUtils.of("smtp.qq.com", "发送人密码或者授权码", "发送人邮箱")
             .sendEmail("主题", "内容",new String[]{"附件物理地址"},"收件人邮箱地址", "抄送人邮箱地址");
     if (b) {
         System.out.println("发送成功");

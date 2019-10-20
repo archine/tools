@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * param util
  **/
 @SuppressWarnings("unused")
-public final class ParamUtil {
+public final class ParamUtils {
     /**
      * 检查参数是否为空
      *
@@ -52,7 +52,7 @@ public final class ParamUtil {
      * @return true为包含
      */
     public static <T> boolean ListHasEmpty(Collection<? extends T> list) {
-        return list.stream().anyMatch(ParamUtil::isEmpty);
+        return list.stream().anyMatch(ParamUtils::isEmpty);
     }
 
     /**
@@ -62,7 +62,7 @@ public final class ParamUtil {
      * @return true为包括, false不包括
      */
     public static boolean multiEmpty(Object... params) {
-        return Arrays.stream(params).anyMatch(ParamUtil::isEmpty);
+        return Arrays.stream(params).anyMatch(ParamUtils::isEmpty);
     }
 
     /**
@@ -103,8 +103,8 @@ public final class ParamUtil {
      * @return 不包含空值的集合
      */
     public static List<String> trim(List<String> list) {
-        List<String> listNonNull = list.stream().filter(ParamUtil::isNotEmpty).collect(Collectors.toList());
-        return listNonNull.size() <= 0 ? null : listNonNull.stream().map(ParamUtil::trim).collect(Collectors.toList());
+        List<String> listNonNull = list.stream().filter(ParamUtils::isNotEmpty).collect(Collectors.toList());
+        return listNonNull.size() <= 0 ? null : listNonNull.stream().map(ParamUtils::trim).collect(Collectors.toList());
     }
 
     /**
@@ -256,6 +256,7 @@ public final class ParamUtil {
      * 验证是不是合法的手机号
      *
      * @param phone 验证的手机号
+     * @return boolean
      */
     public static boolean isMobileNumber(String phone) {
         String regex = "^1([3-8]){1}\\d{9}$";
@@ -270,6 +271,7 @@ public final class ParamUtil {
      * 验证是不是合法的固话
      *
      * @param tel 验证的固话
+     * @return boolean
      */
     public static boolean isTelPhone(String tel) {
         String regex = "^(0[0-9]{2,3}\\-)?([2-9][0-9]{6,7})+(\\-[0-9]{1,4})?$";
@@ -284,6 +286,7 @@ public final class ParamUtil {
      * 验证是不是合法的邮编
      *
      * @param postCode 验证的邮编
+     * @return boolean
      */
     public static boolean isPostCode(String postCode) {
         String regex = "^\\d{6}$";

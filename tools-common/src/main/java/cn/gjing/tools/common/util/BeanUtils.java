@@ -1,7 +1,6 @@
 package cn.gjing.tools.common.util;
 
 import cn.gjing.tools.common.exception.CastException;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.beans.BeanInfo;
@@ -17,7 +16,7 @@ import java.util.Map;
  **/
 @Component
 @SuppressWarnings("unused")
-public class BeanUtil {
+public class BeanUtils {
     /**
      * 复制属性
      *
@@ -56,9 +55,10 @@ public class BeanUtil {
 
     /**
      * map转bean
-     * @param map map
+     *
+     * @param map  map
      * @param bean bean对象
-     * @param <T> T
+     * @param <T>  T
      * @return T
      */
     public static <T> T toBean(Map<String, ?> map, Class<T> bean) {
@@ -80,11 +80,12 @@ public class BeanUtil {
 
     /**
      * bean转map
+     *
      * @param bean bean对象
      * @return map
      */
-    public static Map<String,Object> toMap(Object bean){
-        Map<String, Object> map=new HashMap<>();
+    public static Map<String, Object> toMap(Object bean) {
+        Map<String, Object> map = new HashMap<>();
         try {
             BeanInfo beaninfo = Introspector.getBeanInfo(bean.getClass(), Object.class);
             PropertyDescriptor[] pro = beaninfo.getPropertyDescriptors();
@@ -102,7 +103,8 @@ public class BeanUtil {
 
     /**
      * 查找给定类中的方法
-     * @param clazz 目标类
+     *
+     * @param clazz      目标类
      * @param methodName 方法名
      * @param paramTypes 方法参数类型
      * @return Method
@@ -117,7 +119,8 @@ public class BeanUtil {
 
     /**
      * 查找给定类中声明的方法
-     * @param clazz 目标类
+     *
+     * @param clazz      目标类
      * @param methodName 方法名
      * @param paramTypes 方法参数类型
      * @return Method
@@ -132,7 +135,8 @@ public class BeanUtil {
 
     /**
      * 设置某个对象的字段的值
-     * @param o 字段所在的对象
+     *
+     * @param o     字段所在的对象
      * @param field 字段
      * @param value 内容
      */
@@ -147,7 +151,8 @@ public class BeanUtil {
 
     /**
      * 获取字段内的值
-     * @param o 字段所在的对象
+     *
+     * @param o     字段所在的对象
      * @param field 字段
      * @return 值
      */

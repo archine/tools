@@ -6,7 +6,7 @@ import java.util.Random;
  * @author Gjing
  **/
 @SuppressWarnings("unused")
-public class RandomUtil {
+public class RandomUtils {
 
     private final static Random RANDOM = new Random();
 

@@ -77,6 +77,7 @@ public class AuthCodeUtil {
      * 生成验证码到本地文件夹
      * @param localPath 本地目录
      * @throws IOException IOException
+     * @return this
      */
     public AuthCodeUtil writeToLocal(String localPath) throws IOException {
         OutputStream outputStream = new FileOutputStream(localPath);
@@ -90,6 +91,7 @@ public class AuthCodeUtil {
      * 用流传输
      * @param outputStream 输出流
      * @throws IOException IOException
+     * @return this
      */
     public AuthCodeUtil write(OutputStream outputStream) throws IOException {
         ImageIO.write(bufferedImage, "png", outputStream);

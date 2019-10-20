@@ -1,6 +1,6 @@
 package cn.gjing.tools.common.handle;
 
-import cn.gjing.tools.common.util.id.IdUtil;
+import cn.gjing.tools.common.util.id.IdUtils;
 import cn.gjing.tools.common.util.id.SnowId;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -26,9 +26,9 @@ public class ToolsCommonAdapter {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = {IdUtil.class})
+    @ConditionalOnMissingBean(value = {IdUtils.class})
     @ConditionalOnBean(SnowId.class)
-    public IdUtil idUtil() {
-        return new IdUtil(snowId());
+    public IdUtils idUtil() {
+        return new IdUtils(snowId());
     }
 }

@@ -11,7 +11,7 @@ import java.util.Date;
  * @author Gjing
  **/
 @SuppressWarnings("unused")
-public class TimeUtil {
+public class TimeUtils {
 
     /**
      * 获取文本格式时间
@@ -297,7 +297,7 @@ public class TimeUtil {
      * @return 时间戳
      */
     public static Long stringDateToStamp(String stringDate) {
-        return TimeUtil.stringToDate(stringDate).getTime();
+        return TimeUtils.stringToDate(stringDate).getTime();
     }
 
     /**
@@ -308,7 +308,7 @@ public class TimeUtil {
      */
     public static String stampToStringDate(Long timeStamp) {
         long l = timeStamp;
-        return TimeUtil.dateToString(new Date(l));
+        return TimeUtils.dateToString(new Date(l));
     }
 
     /**

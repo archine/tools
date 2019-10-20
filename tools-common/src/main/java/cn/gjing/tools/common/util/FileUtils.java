@@ -11,9 +11,9 @@ import java.net.URLEncoder;
  * 文件工具类
  **/
 @SuppressWarnings("unused")
-public class FileUtil {
+public class FileUtils {
 
-    private FileUtil() {
+    private FileUtils() {
     }
 
     /**
@@ -21,8 +21,8 @@ public class FileUtil {
      *
      * @return fileUtil
      */
-    public static FileUtil of() {
-        return new FileUtil();
+    public static FileUtils of() {
+        return new FileUtils();
     }
 
     /**

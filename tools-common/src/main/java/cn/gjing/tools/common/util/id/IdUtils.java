@@ -6,11 +6,11 @@ import java.util.UUID;
  * @author Gjing
  **/
 @SuppressWarnings("unused")
-public class IdUtil {
+public class IdUtils {
 
     private SnowFlake snowFlake;
 
-    public IdUtil(SnowId snowId) {
+    public IdUtils(SnowId snowId) {
         this.snowFlake = new SnowFlake(snowId.getCenterId(), snowId.getMachineId());
     }
 
