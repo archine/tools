@@ -104,7 +104,7 @@ class SnowFlake {
         }
         return mill;
     }
-    
+
     private long getNewStamp() {
         return System.currentTimeMillis();
     }

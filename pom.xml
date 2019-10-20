@@ -5,11 +5,10 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
     <name>tools</name>
     <modules>
         <module>tools-common</module>
-        <module>tools-ali</module>
         <module>tools-starter-swagger</module>
         <module>tools-httpclient</module>
         <module>tools-starter-feign</module>

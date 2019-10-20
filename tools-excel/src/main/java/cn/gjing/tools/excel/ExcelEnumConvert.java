@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Convert {
+public @interface ExcelEnumConvert {
     /**
      * 枚举转换器Class
      * @return EnumConvert

@@ -1,5 +1,7 @@
 package cn.gjing.tools.excel.read;
 
+
+import cn.gjing.tools.excel.Listener;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 
 import java.io.Closeable;
@@ -7,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -17,62 +18,132 @@ import java.util.function.Supplier;
  **/
 public class ExcelReader<T> implements Closeable {
 
+    /**
+     * excel class
+     */
     private Class<T> excelClass;
-    private ExcelReaderResolver excelReaderResolver;
+    /**
+     * excel读处理器
+     */
+    private ExcelReaderResolver readerResolver;
+    /**
+     * 读到的结果
+     */
     private List<T> data = new ArrayList<>();
+    /**
+     * 输入流
+     */
     private InputStream inputStream;
-    private int titleRow = 0;
+    /**
+     * 列表头下标
+     */
+    private int headerIndex;
+
+    /**
+     * 读取截止位
+     */
+    private int endIndex;
+
+    private ExcelReader() {
+
+    }
 
     public ExcelReader(Class<T> excelClass, InputStream inputStream) {
         this.excelClass = excelClass;
         this.inputStream = inputStream;
-        this.excelReaderResolver = new ExcelReadResolver().builder(inputStream);
+        this.readerResolver = new ExcelReadResolver();
+        this.init();
+    }
+
+    /**
+     * 初始化序号
+     */
+    private void init() {
+        this.headerIndex = 0;
+        this.endIndex = 0;
     }
 
     /**
      * 读Excel
      *
-     * @return 指定类型的实体集合
+     * @return this
      */
     @SuppressWarnings("unchecked")
-    public List<T> read() {
-        this.excelReaderResolver.read(this.excelClass, acceptList -> data = (List<T>) acceptList,this.titleRow);
-        return this.data;
-    }
-
-    /**
-     * 读Excel
-     *
-     * @param acceptList 接收读取完毕后的实体集合
-     */
-    public void read(Consumer<List<Object>> acceptList) {
-        this.excelReaderResolver.read(this.excelClass, acceptList,this.titleRow);
-    }
-
-    /**
-     * 使用用户自定义的处理器
-     *
-     * @param supplier 用户自定义的Excel处理器
-     * @return ExcelReader
-     */
-    public ExcelReader<T> changeResolver(Supplier<? extends ExcelReaderResolver> supplier) {
-        this.excelReaderResolver = supplier.get().builder(this.inputStream);
+    public ExcelReader<T> read() {
+        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = (List<T>) listener, this.headerIndex, this.endIndex, "sheet1");
+        this.init();
         return this;
     }
 
     /**
-     * 如果excel文件有大标题，需要指定大标题所占行数
-     * @param row 行数
-     * @return ExcelReader
+     * 读Excel
+     *
+     * @param sheetName sheet名称
+     * @return this
      */
-    public ExcelReader<T> titleRow(int row) {
-        this.titleRow = row;
+    @SuppressWarnings("unchecked")
+    public ExcelReader<T> read(String sheetName) {
+        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = (List<T>) listener, this.headerIndex, this.endIndex, sheetName);
+        this.init();
+        return this;
+    }
+
+    /**
+     * 重置处理器, 该操作要在其他操作之前进行, 否则之前的操作会无效
+     *
+     * @param excelReaderResolver 用户定义的Excel处理器
+     * @return this
+     */
+    public ExcelReader<T> resetResolver(Supplier<? extends ExcelReaderResolver> excelReaderResolver) {
+        this.readerResolver = excelReaderResolver.get();
+        return this;
+    }
+
+    /**
+     * 列表头开始行
+     *
+     * @param index 列表头下标, 为excel文件列表头左边的序号
+     * @return this
+     */
+    public ExcelReader<T> headerIndex(int index) {
+        this.headerIndex = index - 1;
+        return this;
+    }
+
+    /**
+     * 读取截止行
+     *
+     * @param index 结束读取下标, 为excel文件列表头左边的序号
+     * @return this
+     */
+    public ExcelReader<T> endIndex(int index) {
+        this.endIndex = index;
+        return this;
+    }
+
+    /**
+     * 获取结果
+     *
+     * @return List
+     */
+    public List<T> get() {
+        return this.data;
+    }
+
+    /**
+     * 获取结果
+     *
+     * @param resultListener 结果监听器
+     * @return this
+     */
+    public ExcelReader<T> listener(Listener<List<T>> resultListener) {
+        resultListener.notify(this.data);
         return this;
     }
 
     @Override
     public void close() throws IOException {
-        if (inputStream != null) {
+        if (this.inputStream != null) {
             this.inputStream.close();
         }
     }

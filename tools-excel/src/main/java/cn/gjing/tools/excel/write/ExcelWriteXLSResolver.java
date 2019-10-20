@@ -5,10 +5,14 @@ import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
 import cn.gjing.tools.excel.valid.DateValid;
+import cn.gjing.tools.excel.valid.ExcelValidation;
 import cn.gjing.tools.excel.valid.ExplicitValid;
 import cn.gjing.tools.excel.valid.NumericValid;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -21,156 +25,146 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 /**
- * XLS resolver
+ * XLS处理器
  *
  * @author Gjing
  **/
-@SuppressWarnings("all")
 class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
+    /**
+     * 工作簿
+     */
     private HSSFWorkbook workbook;
-    private HttpServletResponse response;
-    private List<String> header;
-    private List<Field> fieldList;
-    private BigTitle bigTitle;
-    private String fileName;
-    private int startRow = 0;
+    /**
+     * 偏移量
+     */
+    private int offset = 0;
+    /**
+     * 输出流
+     */
     private OutputStream outputStream;
-    private HSSFCellStyle headerStyle;
-    private HSSFCellStyle bigTitleStyle;
-    private HSSFCellStyle contentStyle;
+
+    /**
+     * sheet
+     */
+    private HSSFSheet sheet;
 
     @Override
-    public ExcelWriterResolver builder(Workbook workbook, HttpServletResponse response, List<String> header, List<Field> fieldList, String fileName) {
+    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle) {
         this.workbook = (HSSFWorkbook) workbook;
-        this.response = response;
-        this.header = header;
-        this.fieldList = fieldList;
-        this.fileName = fileName;
-        this.headerStyle = (HSSFCellStyle) new ExcelHeaderStyle().style(workbook.createCellStyle());
-        this.bigTitleStyle = (HSSFCellStyle) new ExcelTitleStyle().style(workbook.createCellStyle());
-        this.contentStyle = (HSSFCellStyle) new ExcelContentStyle().style(workbook.createCellStyle());
-        return this;
-    }
-
-    @Override
-    public void write(List<?> excelClassList) {
-        HSSFSheet sheet = this.workbook.createSheet();
+        HSSFSheet hssfSheet = this.workbook.getSheet(sheetName);
+        if (hssfSheet == null) {
+            this.offset = 0;
+            this.sheet = this.workbook.createSheet(sheetName);
+        }
+        //读取默认的偏移量
+        this.offset = this.sheet.getLastRowNum() == 0 ? 0 : this.sheet.getLastRowNum() + 1;
         HSSFRow row;
         HSSFCell cell;
         if (bigTitle != null) {
-            this.startRow = bigTitle.getLastRow() + 1;
-            sheet.addMergedRegion(new CellRangeAddress(0, bigTitle.getLastRow(), 0, this.header.size() - 1));
-            row = sheet.createRow(0);
+            int titleOffset = this.offset + bigTitle.getLastRow() - 1;
+            sheet.addMergedRegion(new CellRangeAddress(this.offset, titleOffset, 0, headFieldList.size() - 1));
+            row = sheet.createRow(this.offset);
             cell = row.createCell(0);
-            //set big title value
-            cell.setCellStyle(this.bigTitleStyle);
-            cell.setCellValue(this.bigTitle.getContent());
-            HSSFRow headerRow = sheet.createRow(startRow);
-            this.setVal(excelClassList, sheet, headerRow);
+            cell.setCellStyle(metaStyle.getTitleStyle());
+            cell.setCellValue(bigTitle.getContent());
+            this.offset = titleOffset + 1;
+            HSSFRow headerRow = sheet.createRow(offset);
+            this.setVal(data, headFieldList, this.sheet, headerRow, metaStyle.getBodyStyle(), metaStyle.getHeadStyle());
         } else {
-            HSSFRow headerRow = sheet.createRow(startRow);
-            this.setVal(excelClassList, sheet, headerRow);
+            HSSFRow headerRow = sheet.createRow(offset);
+            this.setVal(data, headFieldList, this.sheet, headerRow, metaStyle.getBodyStyle(), metaStyle.getHeadStyle());
         }
-        this.response.setContentType("application/vnd.ms-excel");
-        this.response.setHeader("Content-disposition",
+    }
+
+    @Override
+    public void flush(HttpServletResponse response, String fileName) {
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-disposition",
                 "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8),
                         StandardCharsets.ISO_8859_1) + ".xls");
         try {
             this.outputStream = response.getOutputStream();
-            this.workbook.write(outputStream);
+            this.workbook.write(this.outputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void setBigTitle(BigTitle bigTitle) {
-        this.bigTitle = bigTitle;
-    }
-
-    @Override
-    public void setHeaderStyle(Supplier<? extends ExcelStyle> headerStyle) {
-        this.headerStyle = (HSSFCellStyle) headerStyle.get().style(this.workbook.createCellStyle());
-    }
-
-    @Override
-    public void setBigTitleStyle(Supplier<? extends ExcelStyle> bigTitleStyle) {
-        this.bigTitleStyle = (HSSFCellStyle) bigTitleStyle.get().style(this.workbook.createCellStyle());
-    }
-
-    @Override
-    public void setContentStyle(Supplier<? extends ExcelStyle> contentStyle) {
-        this.contentStyle = (HSSFCellStyle) contentStyle.get().style(this.workbook.createCellStyle());
-    }
-
-    @Override
     public void close() throws IOException {
-        if (outputStream != null) {
-            outputStream.flush();
-            outputStream.close();
+        if (this.outputStream != null) {
+            this.outputStream.flush();
+            this.outputStream.close();
+        }
+        if (this.workbook != null) {
+            this.workbook.close();
         }
     }
 
-    private void setVal(List<?> excelClassList, HSSFSheet sheet, HSSFRow row) {
+    @SuppressWarnings("unchecked")
+    private void setVal(List<?> data, List<Field> headFieldList, HSSFSheet sheet, HSSFRow row, CellStyle bodyStyle, CellStyle headStyle) {
         HSSFCell cell;
+        ExcelValidation explicitValidation = null;
+        ExcelValidation dateValidation = null;
+        ExcelValidation numbericValidation = null;
         //设置列表头
-        for (int i = 0; i < header.size(); i++) {
+        for (int i = 0; i < headFieldList.size(); i++) {
             cell = row.createCell(i);
-            cell.setCellStyle(this.headerStyle);
-            cell.setCellValue(header.get(i));
-            Field field = fieldList.get(i);
-            sheet.setColumnWidth(i, field.getAnnotation(ExcelField.class).width());
+            cell.setCellStyle(headStyle);
+            ExcelField excelField = headFieldList.get(i).getAnnotation(ExcelField.class);
+            cell.setCellValue(excelField.value());
+            Field field = headFieldList.get(i);
+            sheet.setColumnWidth(i, excelField.width());
             //查看是否需要校验
-            ExplicitValid explicitValid = field.getAnnotation(ExplicitValid.class);
-            DateValid dateValid = field.getAnnotation(DateValid.class);
-            NumericValid numericValid = field.getAnnotation(NumericValid.class);
-            if (explicitValid != null) {
+            ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
+            DateValid dv = field.getAnnotation(DateValid.class);
+            NumericValid nv = field.getAnnotation(NumericValid.class);
+            if (ev != null) {
                 try {
-                    DataValidation dataValidation = ParamUtils.equals(explicitValid.validClass(), ExcelExplicitValidation.class)
-                            ? new ExcelExplicitValidation(explicitValid, row.getRowNum() + 1, i).valid(sheet)
-                            : explicitValid.validClass().newInstance().valid(sheet);
-                    sheet.addValidationData(dataValidation);
+                    if (explicitValidation == null) {
+                        explicitValidation = ev.validClass().newInstance();
+                    }
+                    explicitValidation.valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i);
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
-            if (dateValid != null) {
+            if (dv != null) {
                 try {
-                    DataValidation dataValidation = ParamUtils.equals(dateValid.validClass(), ExcelDateValidation.class)
-                            ? new ExcelDateValidation(dateValid, i, row.getRowNum() + 1).valid(sheet)
-                            : dateValid.validClass().newInstance().valid(sheet);
-                    sheet.addValidationData(dataValidation);
+                    if (dateValidation == null) {
+                        dateValidation = dv.validClass().newInstance();
+                    }
+                    dateValidation.valid(dv, sheet, row.getRowNum() + 1, i, i);
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
-            if (numericValid != null) {
+            if (nv != null) {
                 try {
-                    DataValidation dataValidation = ParamUtils.equals(numericValid.validClass(), ExcelNumberValidation.class)
-                            ? new ExcelNumberValidation(numericValid, row.getRowNum() + 1, i).valid(sheet)
-                            : numericValid.validClass().newInstance().valid(sheet);
-                    sheet.addValidationData(dataValidation);
+                    if (numbericValidation == null) {
+                        numbericValidation = nv.validClass().newInstance();
+                    }
+                    numbericValidation.valid(nv, sheet, row.getRowNum() + 1, i, i);
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
         }
-        //设置正文
-        int valueStartRow = this.startRow + 1;
-        if (excelClassList == null) {
+        //设置正文偏移量
+        this.offset++;
+        if (data == null) {
             return;
         }
-        for (int i = 0; i < excelClassList.size(); i++) {
-            Object o = excelClassList.get(i);
-            row = sheet.createRow(valueStartRow + i);
-            for (int j = 0; j < fieldList.size(); j++) {
-                HSSFCell valueCell = row.createCell(j);
-                valueCell.setCellStyle(this.contentStyle);
-                Field field = this.fieldList.get(j);
+        for (int i = 0; i < data.size(); i++) {
+            Object o = data.get(i);
+            row = sheet.createRow(offset + i);
+            for (int j = 0; j < headFieldList.size(); j++) {
+                Field field = headFieldList.get(j);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
+                HSSFCell valueCell = row.createCell(j);
+                valueCell.setCellStyle(bodyStyle);
                 field.setAccessible(true);
                 Object value = null;
                 try {
@@ -183,12 +177,12 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
                 } else {
                     if (ParamUtils.equals("", excelField.pattern())) {
                         if (field.getType().isEnum()) {
-                            Convert convert = field.getAnnotation(Convert.class);
-                            Objects.requireNonNull(convert, "Enum convert cannot be null");
+                            ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
+                            Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
                             Class<? extends Enum> enumType = (Class<? extends Enum>) field.getType();
                             try {
-                                EnumConvert enumConvert = convert.convert().newInstance();
-                                valueCell.setCellValue(enumConvert.toDatabaseColumn(Enum.valueOf(enumType, ((Enum) value).name())).toString());
+                                EnumConvert enumConvert = excelEnumConvert.convert().newInstance();
+                                valueCell.setCellValue(enumConvert.toExcelAttribute(Enum.valueOf(enumType, ((Enum) value).name())).toString());
                             } catch (InstantiationException | IllegalAccessException e) {
                                 e.printStackTrace();
                             }
@@ -202,4 +196,5 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
             }
         }
     }
+
 }

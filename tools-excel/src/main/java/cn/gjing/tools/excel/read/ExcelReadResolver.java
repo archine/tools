@@ -1,9 +1,6 @@
 package cn.gjing.tools.excel.read;
 
-import cn.gjing.tools.excel.Convert;
-import cn.gjing.tools.excel.EnumConvert;
-import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
@@ -21,7 +18,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -34,11 +30,6 @@ class ExcelReadResolver implements ExcelReaderResolver {
     private Workbook workbook;
 
     /**
-     * 输入流
-     */
-    private InputStream inputStream;
-
-    /**
      * sheet
      */
     private Sheet sheet;
@@ -48,83 +39,93 @@ class ExcelReadResolver implements ExcelReaderResolver {
      */
     private Map<String, Field> hasAnnotationFieldMap = new HashMap<>();
 
-    @Override
-    public ExcelReaderResolver builder(InputStream inputStream) {
-        this.inputStream = inputStream;
-        return this;
-    }
+    /**
+     * 列表头名
+     */
+    private List<String> headNameList = new ArrayList<>();
+
+    /**
+     * 总列数
+     */
+    private int totalCol = 0;
 
     @Override
-    public void read(Class<?> excelClass, Consumer<List<Object>> acceptList,int titleRow) {
+    public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName) {
         //得到excel的class实体
         Excel excel = excelClass.getAnnotation(Excel.class);
         if (excel == null) {
             throw new NullPointerException("@Excel was not found on the excelClass");
         }
-        //拿到所有带有注解的字段，放进map中
-        this.hasAnnotationFieldMap = Arrays.stream(excelClass.getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(ExcelField.class))
-                .collect(
-                        Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field)
-                );
-        //找找是否有父类，有就加进来
-        Class superclass = excelClass.getSuperclass();
-        if (superclass != Object.class) {
-            Map<String, Field> supperFieldMap = Arrays.stream(superclass.getDeclaredFields())
+        if (hasAnnotationFieldMap.isEmpty()) {
+            //拿到所有带有注解的字段，放进map中
+            this.hasAnnotationFieldMap = Arrays.stream(excelClass.getDeclaredFields())
                     .filter(f -> f.isAnnotationPresent(ExcelField.class))
                     .collect(
                             Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field)
                     );
-            this.hasAnnotationFieldMap.putAll(supperFieldMap);
+            //找找是否有父类，有就加进来
+            Class superclass = excelClass.getSuperclass();
+            if (superclass != Object.class) {
+                Map<String, Field> supperFieldMap = Arrays.stream(superclass.getDeclaredFields())
+                        .filter(f -> f.isAnnotationPresent(ExcelField.class))
+                        .collect(
+                                Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field)
+                        );
+                this.hasAnnotationFieldMap.putAll(supperFieldMap);
+            }
         }
         switch (excel.type()) {
             case XLS:
                 try {
-                    this.workbook = new HSSFWorkbook(this.inputStream);
+                    if (this.workbook == null) {
+                        this.workbook = new HSSFWorkbook(inputStream);
+                        //得到sheet
+                        this.sheet = this.workbook.getSheet(sheetName);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //得到sheet
-                this.sheet = this.workbook.getSheetAt(0);
-                this.reader(excelClass, acceptList,titleRow);
+                this.reader(excelClass, listener, headerIndex, endIndex);
                 break;
             case XLSX:
-                this.workbook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(this.inputStream);
-                this.sheet = this.workbook.getSheetAt(0);
-                this.reader(excelClass, acceptList,titleRow);
+                if (this.workbook == null) {
+                    this.workbook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(inputStream);
+                    this.sheet = this.workbook.getSheet(sheetName);
+                }
+                this.reader(excelClass, listener, headerIndex, endIndex);
                 break;
             default:
                 throw new NullPointerException("Doc type was not found");
         }
     }
 
-    private void reader(Class<?> excelClass, Consumer<List<Object>> consumer,int titleRow) {
+    private void reader(Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex) {
         List<Object> dataList = new ArrayList<>();
-        //excel列表头名称
-        List<String> headNameList = new ArrayList<>();
-        //获取excel列表头这行, 并设置总列数和列表头名称
-        int totalCell = 0;
         //创建个新实例
         Object o = null;
-        int i = titleRow == 0 ? 0 : titleRow + 1;
         for (Row row : sheet) {
-            if (row.getRowNum() < titleRow) {
+            if (row.getRowNum() < headerIndex) {
                 continue;
             }
-            if (row.getRowNum() == i) {
-                //增加列表头名称和总列数
-                for (Cell cell : row) {
-                    totalCell++;
-                    headNameList.add(cell.getStringCellValue());
+            if (row.getRowNum() == headerIndex) {
+                if (this.headNameList.isEmpty()) {
+                    //增加列表头名称和总列数
+                    for (Cell cell : row) {
+                        this.totalCol++;
+                        headNameList.add(cell.getStringCellValue());
+                    }
                 }
                 continue;
+            }
+            if (endIndex != 0 && endIndex == row.getRowNum()) {
+                break;
             }
             try {
                 o = excelClass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
-            for (int c = 0; c < totalCell; c++) {
+            for (int c = 0; c < totalCol; c++) {
                 Field field = hasAnnotationFieldMap.get(headNameList.get(c));
                 if (field == null) {
                     continue;
@@ -137,7 +138,7 @@ class ExcelReadResolver implements ExcelReaderResolver {
             }
             dataList.add(o);
         }
-        consumer.accept(dataList);
+        listener.notify(dataList);
     }
 
     /**
@@ -205,14 +206,15 @@ class ExcelReadResolver implements ExcelReaderResolver {
         if (field.getType() == Date.class) {
             this.setField(field, o, ParamUtils.equals("", excelField.pattern())
                     ? TimeUtils.stringToDate(value)
-                    : TimeUtils.stringToDate(value, excelField.pattern()));
+                    : TimeUtils.stringToDate(value, excelField.pattern())
+            );
             return;
         }
         if (field.getType().isEnum()) {
-            Convert convert = field.getAnnotation(Convert.class);
-            Objects.requireNonNull(convert, "Enum convert cannot be null");
+            ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
+            Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
             try {
-                EnumConvert enumConvert = convert.convert().newInstance();
+                EnumConvert enumConvert = excelEnumConvert.convert().newInstance();
                 this.setField(field, o, enumConvert.toEntityAttribute(value));
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -230,7 +232,6 @@ class ExcelReadResolver implements ExcelReaderResolver {
         if (field.getType() == byte.class || field.getType() == Byte.class) {
             this.setField(field, o, Byte.parseByte(value));
         }
-
     }
 
     /**

@@ -1,7 +1,5 @@
 package cn.gjing.tools.excel.valid;
 
-import cn.gjing.tools.excel.write.ExcelExplicitValidation;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,7 +19,7 @@ public @interface ExplicitValid {
      *
      * @return ExcelValidation
      */
-    Class<? extends ExcelValidation> validClass() default ExcelExplicitValidation.class;
+    Class<? extends ExcelValidation> validClass() default DefaultExplicitValidation.class;
 
     /**
      * 范围值
@@ -31,7 +29,7 @@ public @interface ExplicitValid {
 
     /**
      * 数据校验最多校验多少行
-     * @return 校验多少行
+     * @return 行数
      */
     int boxLastRow() default 0;
 
@@ -55,7 +53,7 @@ public @interface ExplicitValid {
 
     /**
      * 详细错误内容
-     * @return 错误内容
+     * @return 内容
      */
     String errorContent() default "请填写下拉框内的值";
 
@@ -64,4 +62,5 @@ public @interface ExplicitValid {
      * @return boolean
      */
     boolean showPromptBox() default true;
+
 }

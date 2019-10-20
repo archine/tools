@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static cn.gjing.tools.excel.Type.XLS;
+
 /**
  * 标记这个类是与Excel关联的
  *
@@ -25,5 +27,12 @@ public @interface Excel {
      *
      * @return Type
      */
-    Type type() default Type.XLS;
+    Type type() default XLS;
+
+    /**
+     * Excel样式
+     *
+     * @return ExcelStyle
+     */
+    Class<? extends ExcelStyle> style() default DefaultExcelStyle.class;
 }

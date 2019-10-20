@@ -29,7 +29,7 @@ class NotEmptyProcessor {
 
     @Before("cut()")
     @SuppressWarnings("unchecked")
-    public void doBefore(JoinPoint joinPoint) {
+    public void validation(JoinPoint joinPoint) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();

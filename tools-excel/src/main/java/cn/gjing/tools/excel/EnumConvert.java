@@ -20,6 +20,6 @@ public interface EnumConvert<T extends Enum, U> {
      * @param t 枚举
      * @return 枚举对应的值
      */
-    U toDatabaseColumn(T t);
+    U toExcelAttribute(T t);
 
 }

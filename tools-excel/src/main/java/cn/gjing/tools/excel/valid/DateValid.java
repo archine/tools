@@ -1,7 +1,5 @@
 package cn.gjing.tools.excel.valid;
 
-import cn.gjing.tools.excel.write.ExcelDateValidation;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -9,7 +7,6 @@ import java.lang.annotation.Target;
 
 /**
  * 时间校验注解
- *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,23 +18,23 @@ public @interface DateValid {
      *
      * @return ExcelValidation
      */
-    Class<? extends ExcelValidation> validClass() default ExcelDateValidation.class;
+    Class<? extends ExcelValidation> validClass() default DefaultDateValidation.class;
 
     /**
      * 数据校验最多校验多少行
-     * @return 校验行数
+     * @return 行数
      */
     int boxLastRow() default 0;
 
     /**
      * 时间格式
-     * @return 时间转换格式
+     * @return 表达式
      */
     String pattern() default "yyyy-MM-dd";
 
     /**
      * 操作类型
-     * @return 操作类型,默认between
+     * @return 操作类型
      */
     OperatorType operatorType() default OperatorType.BETWEEN;
 
@@ -67,13 +64,13 @@ public @interface DateValid {
 
     /**
      * 错误框标题
-     * @return 错误框标题
+     * @return 标题
      */
     String errorTitle() default "错误提示";
 
     /**
      * 详细错误内容
-     * @return 错误内容
+     * @return 内容
      */
     String errorContent() default "请填写正确的时间范围：1970-01-01至2999-01-01";
 

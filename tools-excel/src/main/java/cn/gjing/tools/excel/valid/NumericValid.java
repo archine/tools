@@ -1,7 +1,5 @@
 package cn.gjing.tools.excel.valid;
 
-import cn.gjing.tools.excel.write.ExcelNumberValidation;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,23 +18,23 @@ public @interface NumericValid {
      *
      * @return ExcelValidation
      */
-    Class<? extends ExcelValidation> validClass() default ExcelNumberValidation.class;
+    Class<? extends ExcelValidation> validClass() default DefaultNumericValidation.class;
 
     /**
      * 数据校验最多校验多少行
-     * @return 校验行数
+     * @return 行数
      */
     int boxLastRow() default 0;
 
     /**
      * 操作类型
-     * @return 操作类型
+     * @return 类型
      */
     OperatorType operatorType() default OperatorType.EQUAL;
 
     /**
      * 校验类型
-     * @return 校验类型
+     * @return 类型
      */
     ValidType validationType();
 
@@ -72,7 +70,7 @@ public @interface NumericValid {
 
     /**
      * 详细错误内容
-     * @return 错误内容
+     * @return 内容
      */
     String errorContent() default "请填写正确的值";
 

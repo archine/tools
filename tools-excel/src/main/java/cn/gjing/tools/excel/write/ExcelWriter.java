@@ -3,7 +3,9 @@ package cn.gjing.tools.excel.write;
 import cn.gjing.tools.excel.BigTitle;
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.ExcelStyle;
+import cn.gjing.tools.excel.MetaStyle;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
+import cn.gjing.tools.excel.util.BeanUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -11,6 +13,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -18,7 +21,6 @@ import java.util.function.Supplier;
  *
  * @author Gjing
  **/
-@SuppressWarnings("unused")
 public class ExcelWriter {
 
     /**
@@ -27,14 +29,14 @@ public class ExcelWriter {
     private String fileName;
 
     /**
-     * excel注解
+     * excel样式
      */
-    private Excel excel;
+    private MetaStyle metaStyle;
 
     /**
-     * excel列表头
+     * 工作簿
      */
-    private List<String> header;
+    private Workbook workbook;
 
     /**
      * response
@@ -42,110 +44,138 @@ public class ExcelWriter {
     private HttpServletResponse response;
 
     /**
-     * Excel需要导出的实体集合
-     */
-    private List<?> excelClassList;
-
-    /**
      * 写Excel的解析器
      */
-    private ExcelWriterResolver excelWriterResolver;
+    private ExcelWriterResolver writerResolver;
 
     /**
      * excel列表头字段
      */
-    private List<Field> fieldList;
+    private List<Field> headFieldList;
+
+    /**
+     * 大标题
+     */
+    private BigTitle bigTitle;
 
     private ExcelWriter() {
 
     }
 
-    public ExcelWriter(String fileName, Excel excel, List<String> header, HttpServletResponse response, List<?> excelClassList, List<Field> excelFieldList) {
+    public ExcelWriter(String fileName, Excel excel, HttpServletResponse response, List<Field> headFieldList) {
         this.fileName = fileName;
-        this.header = header;
         this.response = response;
-        this.excelClassList = excelClassList;
-        this.excel = excel;
-        this.fieldList = excelFieldList;
-        this.chooseResolver();
+        this.headFieldList = headFieldList;
+        this.initResolver(excel);
+        this.initStyle(excel, this.workbook);
     }
 
     /**
-     * 选择默认的解析器
+     * 初始化解析器
+     *
+     * @param excel excel
      */
-    private void chooseResolver() {
+    private void initResolver(Excel excel) {
         switch (excel.type()) {
             case XLS:
-                HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
-                this.excelWriterResolver = new ExcelWriteXLSResolver().builder(hssfWorkbook, response, header, fieldList, fileName);
+                this.workbook = new HSSFWorkbook();
+                this.writerResolver = new ExcelWriteXLSResolver();
                 break;
             case XLSX:
-                SXSSFWorkbook sxssfWorkbook = new SXSSFWorkbook();
-                this.excelWriterResolver = new ExcelWriteXLSXResolver().builder(sxssfWorkbook, response, header, fieldList, fileName);
+                this.workbook = new SXSSFWorkbook();
+                this.writerResolver = new ExcelWriteXLSXResolver();
                 break;
             default:
         }
     }
 
     /**
-     * 写excel
+     * 初始化样式
+     *
+     * @param excel excel
      */
-    public void write() {
-        this.excelWriterResolver.write(excelClassList);
+    private void initStyle(Excel excel, Workbook workbook) {
+        try {
+            ExcelStyle excelStyle = excel.style().newInstance();
+            this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(workbook.createCellStyle()), excelStyle.setBodyStyle(workbook.createCellStyle()),
+                    excelStyle.setTitleStyle(workbook.createCellStyle()));
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
-     * 使用用户定义的解析器
+     * 写excel
      *
-     * @param writeResolver customWriteResolver
-     * @return ExcelWriter
+     * @param data 要导出的数据
+     * @return this
      */
-    public ExcelWriter changeResolver(Supplier<? extends ExcelWriterResolver> writeResolver, Workbook workbook) {
-        this.excelWriterResolver = writeResolver.get().builder(workbook, this.response, this.header, this.fieldList, this.fileName);
+    public ExcelWriter write(List<?> data) {
+        this.writerResolver.write(data, this.workbook, "sheet1", this.headFieldList, this.metaStyle, this.bigTitle);
+        this.bigTitle = null;
+        return this;
+    }
+
+    /**
+     * 写入指定的sheet中
+     *
+     * @param data      要导出的数据
+     * @param sheetName sheetName
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName) {
+        this.writerResolver.write(data, this.workbook, sheetName, this.headFieldList, this.metaStyle, this.bigTitle);
+        this.bigTitle = null;
+        return this;
+    }
+
+    /**
+     * 重置处理器, <b>该操作要在其他操作之前进行, 否则之前的操作会无效</b>
+     * @param excelWriteResolver 读处理器
+     * @return this
+     */
+    public ExcelWriter resetResolver(Supplier<? extends ExcelWriterResolver> excelWriteResolver) {
+        this.writerResolver = excelWriteResolver.get();
+        return this;
+    }
+
+    /**
+     * 重置模板
+     *
+     * @param excelClass 导出的这个Excel对应的Class
+     * @param ignores    忽略导出的字段
+     * @return this
+     */
+    public ExcelWriter resetExcelClass(Class<?> excelClass, String... ignores) {
+        Excel excel = excelClass.getAnnotation(Excel.class);
+        Objects.requireNonNull(excel, "@Excel was not found on the excelClass");
+        try {
+            ExcelStyle excelStyle = excel.style().newInstance();
+            this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook.createCellStyle()),
+                    excelStyle.setTitleStyle(this.workbook.createCellStyle()));
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        this.headFieldList = BeanUtils.getFields(excelClass, ignores);
         return this;
     }
 
     /**
      * 添加大标题
      *
-     * @param supplier 大标题提供者
-     * @return ExcelWriter
+     * @param bigTitle 大标题提供者
+     * @return this
      */
-    public ExcelWriter bigTitle(Supplier<? extends BigTitle> supplier) {
-        this.excelWriterResolver.setBigTitle(supplier.get());
+    public ExcelWriter bigTitle(Supplier<? extends BigTitle> bigTitle) {
+        this.bigTitle = bigTitle.get();
         return this;
     }
 
     /**
-     * 设置列表头样式
-     *
-     * @param headerStyle headerStyle
-     * @return ExcelWriter
+     * 输出缓存中的内容
      */
-    public ExcelWriter setHeaderStyle(Supplier<? extends ExcelStyle> headerStyle) {
-        this.excelWriterResolver.setHeaderStyle(headerStyle);
-        return this;
+    public void flush() {
+        this.writerResolver.flush(this.response, this.fileName);
     }
 
-    /**
-     * 设置正文样式
-     *
-     * @param contentStyle headerStyle
-     * @return ExcelWriter
-     */
-    public ExcelWriter setContentStyle(Supplier<? extends ExcelStyle> contentStyle) {
-        this.excelWriterResolver.setContentStyle(contentStyle);
-        return this;
-    }
-
-    /**
-     * 设置大标题样式
-     *
-     * @param bigTitleStyle headerStyle
-     * @return ExcelWriter
-     */
-    public ExcelWriter setBigTitleStyle(Supplier<? extends ExcelStyle> bigTitleStyle) {
-        this.excelWriterResolver.setBigTitleStyle(bigTitleStyle);
-        return this;
-    }
 }
