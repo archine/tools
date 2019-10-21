@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
+![](https://img.shields.io/badge/version-1.2.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
   
 **Http请求工具**
 ## 一、添加依赖
@@ -6,60 +6,62 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-httpclient</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 ## 二、使用说明
-### 1、创建httpClient实例
-**请求地址支持``https``**
+**``返回值类型最好与目标方法一致``，否则可能会出现转换异常，在不确认返回类型时最好使用``String``去接收。在请求结束后，可以通过``get()``方法获取返回的内容，也可以通过``listener()``方法指定监听者去监听结果返回后的处理逻辑**
+### 1、无参数请求
 ```java
-public static void main(String[] args) {
-    HttpClient httpClient = HttpClientFactory.builder("http://127.0.0.1:8080/test", HttpMethod.GET)
+public class Test{
+    public static void main(String[] args) {
+        String result = HttpClient.builder("http://127.0.0.1:8080/test", HttpMethod.GET, String.class)
+                        .execute()
+                        .get();
+        System.out.println(result);
+    }
 }
 ```
-### 2、携带请求头
+### 2、带请求头请求
 ```java
-public static void main(String[] args) {
-    Map<String, String> header = new HashMap<>();
-    header.put("token", "xxxx");
-    HttpClient httpClient = HttpClientFactory.builder("http://127.0.0.1:8080/test", HttpMethod.GET)
-            .withHeader(header);
+public class Test{
+    public static void main(String[] args) {
+            Map<String, String> map = new HashMap<>(16);
+            map.put("head", "111");
+            HttpClient.builder("http://127.0.0.1:8080/test6", HttpMethod.GET, String.class)
+                    .header(map)
+                    .execute()
+                    .listener(System.out::println);
+    }
 }
 ```
 ### 3、携带参数
 ```java
-public static void main(String[] args) {
-    Map<String, Object> param = new HashMap<>();
-    param.put("id","1")
-    HttpClient httpClient = HttpClientFactory.builder("http://127.0.0.1:8080/test", HttpMethod.GET)
-            .withParam(param);
+public class Test{
+    public static void main(String[] args) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("id","1");
+        HttpClient.builder("http://127.0.0.1:8080/test6", HttpMethod.GET, String.class)
+                .param(param)
+                .listener(System.out::println);
+    }
 }
 ```
 ### 4、携带JSON
-**``withBody()``方法内参数可以是JSON字符串、Map、JSON对应实体对象**
+**可以是JSON字符串、Map、JSON对应实体对象，这里演示通过map传递**
 ```java
-public static void main(String[] args) {
-    Map<String, String> map = new HashMap<>();
-    map.put("key", "code");
-    map.put("val", "200");
-    HttpClient httpClient = HttpClientFactory.builder("http://127.0.0.1:8080/test_body", HttpMethod.POST)
-            .withBody(map);
+public class Test{
+    public static void main(String[] args) {
+        Map<String, String> map = new HashMap<>();
+        map.put("key", "code");
+        map.put("val", "200");
+        Map resultMap = HttpClient.builder("http://127.0.0.1:8080/test6", HttpMethod.POST, Map.class)
+                .body(map)
+                .get();
+    }
 }
 ```
-### 5、发起请求
-**需要传入响应类型, ``最好与目标方法一致``, 否则可能出现转换异常, 此方法为``最终操作``**
-```java
-public static void main(String[] args) {
-    Map<String, String> map = new HashMap<>();
-    map.put("key", "code");
-    map.put("val", "200");
-    HttpClient httpClient = HttpClientFactory.builder("http://127.0.0.1:8080/test_body", HttpMethod.POST)
-            .withBody(map);
-    HttpVo httpVo = httpClient.execute(HttpVo.class);
-    System.out.println(httpVo.toString());
-}
-```
-## 三、 UrlUtil工具类
+## 三、 UrlUtils工具类
 #### 1、url拼接
 Url拼接, 返回结果格式如: http://xxx/param1/param2
 ```java

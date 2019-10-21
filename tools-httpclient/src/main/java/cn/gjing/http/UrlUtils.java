@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Gjing
  **/
-public class UrlUtil {
+public class UrlUtils {
 
     /**
      * 用户请求连接采用占位符的时候进行url和参数拼接,结果例子为: http://localhost:xx/test/2414/42daf
