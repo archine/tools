@@ -65,21 +65,25 @@ public class Test{
 #### 1、url拼接
 Url拼接, 返回结果格式如: http://xxx/param1/param2
 ```java
+public class Test{
     public static void main(String[] args) {
         String url = "http://127.0.0.1:8080/";
         Object[] param = {1, 2, 3, 4};
         UrlUtil.urlAppend(url, param);
     }
+}
 ```
 #### 2、参数排序
 **参数按照字段名的Unicode码从小到大排序(字典序), 得到的结果格式如: a=参数1&b=参数2**
 ```java
+public class Test{
     public static void main(String[] args) {
         Map<String, Object> map = new HashMap<>(16);
         map.put("a", "参数1");
         map.put("b", "参数2");
         UrlUtil.paramUnicodeSort(map, false, false);
     }
+}
 ```
 **参数说明**     
 
@@ -92,10 +96,12 @@ Url拼接, 返回结果格式如: http://xxx/param1/param2
 #### 3、url参数转map
 **将URL地址后带的参数转成map**
 ```java
+public class Test{
     public static void main(String[] args) {
         String url = "http://127.0.0.1:8080?a=2&b=2";
         UrlUtil.toMap(url);
     }
+}
 ```
 ---
 **更多教程可前往博客查看: [Java http请求工具](https://yq.aliyun.com/articles/703132?spm=a2c4e.11155435.0.0.73393312Egko4y)**
