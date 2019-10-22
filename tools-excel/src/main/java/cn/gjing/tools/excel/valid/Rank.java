@@ -5,6 +5,9 @@ package cn.gjing.tools.excel.valid;
  * @author Gjing
  **/
 public enum Rank {
+    /**
+     * 提示框等级
+     */
     WARNING(1),STOP(0),INFO(2);
     private int rank;
 

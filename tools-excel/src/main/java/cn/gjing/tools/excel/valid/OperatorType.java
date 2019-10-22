@@ -6,6 +6,9 @@ package cn.gjing.tools.excel.valid;
  **/
 @SuppressWarnings("unused")
 public enum OperatorType {
+    /**
+     * 操作类型
+     */
     BETWEEN(0),
     NOT_BETWEEN(1),
     EQUAL(2),

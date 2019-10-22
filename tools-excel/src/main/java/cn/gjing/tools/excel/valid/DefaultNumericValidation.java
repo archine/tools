@@ -18,7 +18,7 @@ public class DefaultNumericValidation implements ExcelValidation {
         DataValidationConstraint numericConstraint = helper.createNumericConstraint(numericValid.validationType().getType(),
                 numericValid.operatorType().getType(),
                 numericValid.expr1(),
-                numericValid.expr2().equals("") ? null : numericValid.expr2());
+                "".equals(numericValid.expr2()) ? null : numericValid.expr2());
         // 四个参数分别是：起始行、终止行、起始列、终止列
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, numericValid.boxLastRow() == 0 ? firstRow : numericValid.boxLastRow() + firstRow,
                 firstCol, lastCol);

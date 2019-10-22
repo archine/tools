@@ -4,6 +4,8 @@ import cn.gjing.tools.excel.ExcelField;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,16 +72,34 @@ public class BeanUtils {
         //找到所有带有@ExcelField注解且不为过滤的字段
         List<Field> hasExcelFieldList = Arrays.stream(declaredFields)
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .filter(e -> !ParamUtils.contains(ignores, e.getName()))
+                .filter(e -> ParamUtils.noContains(ignores, e.getName()))
                 .collect(Collectors.toList());
         //如果有父类，父类也加进来
         Class<?> superclass = excelClass.getSuperclass();
         if (superclass != Object.class) {
             hasExcelFieldList.addAll(Arrays.stream(superclass.getDeclaredFields())
                     .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                    .filter(e -> !ParamUtils.contains(ignores, e.getName()))
+                    .filter(e -> ParamUtils.noContains(ignores, e.getName()))
                     .collect(Collectors.toList()));
         }
         return hasExcelFieldList;
+    }
+
+    /**
+     * 获取泛型接口中某个泛型的class
+     * @param source 实现泛型接口的类
+     * @param typeInterface 泛型接口
+     * @param paramIndex 参数下标，0开始
+     * @return 指定下标参数的class
+     */
+    public static Class<?> getInterfaceType(Class<?> source, Class<?> typeInterface, int paramIndex) {
+        Type[] genericInterfaces = source.getGenericInterfaces();
+        for (Type type : genericInterfaces) {
+            if (type.getTypeName().startsWith(typeInterface.getName())) {
+                ParameterizedType pt = (ParameterizedType) type;
+                return (Class<?>) pt.getActualTypeArguments()[paramIndex];
+            }
+        }
+        return null;
     }
 }

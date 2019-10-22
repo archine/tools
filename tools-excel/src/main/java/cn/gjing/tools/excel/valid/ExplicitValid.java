@@ -55,7 +55,7 @@ public @interface ExplicitValid {
      * 详细错误内容
      * @return 内容
      */
-    String errorContent() default "请填写下拉框内的值";
+    String errorContent() default "请选择下拉框内的值";
 
     /**
      * 是否立即弹出

@@ -8,6 +8,8 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -163,5 +165,23 @@ public class BeanUtils {
         } catch (IllegalAccessException e) {
             return null;
         }
+    }
+
+    /**
+     * 获取泛型接口中某个泛型的class
+     * @param source 实现泛型接口的类
+     * @param typeInterface 泛型接口
+     * @param paramIndex 参数下标，0开始
+     * @return 指定下标参数的class
+     */
+    public static Class<?> getInterfaceType(Class<?> source, Class<?> typeInterface, int paramIndex) {
+        Type[] genericInterfaces = source.getGenericInterfaces();
+        for (Type type : genericInterfaces) {
+            if (type.getTypeName().startsWith(typeInterface.getName())) {
+                ParameterizedType pt = (ParameterizedType) type;
+                return (Class<?>) pt.getActualTypeArguments()[paramIndex];
+            }
+        }
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **提供Excel导入导出功能**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -553,7 +553,7 @@ public class UserController {
         ExcelFactory.createReader(file.getInputStream(), User.class)
                 .resetResolver(MyReaderResolver::new)
                 .read()
-                .listener(e -> userService.saveUserList(e))
+                .listener(e -> userService.saveUserList(e));
         return ResponseEntity.ok("导入成功");
     }
 }

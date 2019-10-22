@@ -117,29 +117,7 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
             ExcelField excelField = field.getAnnotation(ExcelField.class);
             cell.setCellValue(excelField.value());
             sheet.setColumnWidth(i, excelField.width());
-            //查看是否需要校验
-            ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
-            NumericValid nv = field.getAnnotation(NumericValid.class);
-            if (ev != null) {
-                try {
-                    if (explicitValidation == null) {
-                        explicitValidation = ev.validClass().newInstance();
-                    }
-                    explicitValidation.valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (nv != null) {
-                try {
-                    if (numericValidation == null) {
-                        numericValidation = nv.validClass().newInstance();
-                    }
-                    numericValidation.valid(nv, sheet, row.getRowNum() + 1, i, i);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
+            this.addValid(field, row, i, explicitValidation, numericValidation);
         }
         //设置正文
         this.offset++;
@@ -182,6 +160,31 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
                         valueCell.setCellValue(TimeUtils.dateToString((Date) value, excelField.pattern()));
                     }
                 }
+            }
+        }
+    }
+
+    private void addValid(Field field, SXSSFRow row, int i, ExcelValidation explicitValidation, ExcelValidation numericValidation) {
+        ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
+        NumericValid nv = field.getAnnotation(NumericValid.class);
+        if (ev != null) {
+            try {
+                if (explicitValidation == null) {
+                    explicitValidation = ev.validClass().newInstance();
+                }
+                explicitValidation.valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        if (nv != null) {
+            try {
+                if (numericValidation == null) {
+                    numericValidation = nv.validClass().newInstance();
+                }
+                numericValidation.valid(nv, sheet, row.getRowNum() + 1, i, i);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
     }

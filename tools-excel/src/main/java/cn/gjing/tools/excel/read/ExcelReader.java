@@ -17,31 +17,11 @@ import java.util.function.Supplier;
  * @author Gjing
  **/
 public class ExcelReader<T> implements Closeable {
-
-    /**
-     * excel class
-     */
     private Class<T> excelClass;
-    /**
-     * excel读处理器
-     */
     private ExcelReaderResolver readerResolver;
-    /**
-     * 读到的结果
-     */
-    private List<T> data = new ArrayList<>();
-    /**
-     * 输入流
-     */
+    private List<T> data;
     private InputStream inputStream;
-    /**
-     * 列表头下标
-     */
     private int headerIndex;
-
-    /**
-     * 读取截止位
-     */
     private int endIndex;
 
     private ExcelReader() {
@@ -52,6 +32,7 @@ public class ExcelReader<T> implements Closeable {
         this.excelClass = excelClass;
         this.inputStream = inputStream;
         this.readerResolver = new ExcelReadResolver();
+        this.data = new ArrayList<>();
         this.init();
     }
 

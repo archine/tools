@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import static cn.gjing.tools.excel.Type.XLS;
 
 /**
- * 标记这个类是与Excel关联的
+ * Excel与实体的映射
  *
  * @author Gjing
  **/

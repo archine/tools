@@ -32,22 +32,9 @@ import java.util.Objects;
  * @author Gjing
  **/
 class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
-    /**
-     * 工作簿
-     */
     private HSSFWorkbook workbook;
-    /**
-     * 偏移量
-     */
     private int offset = 0;
-    /**
-     * 输出流
-     */
     private OutputStream outputStream;
-
-    /**
-     * sheet
-     */
     private HSSFSheet sheet;
 
     @Override
@@ -105,10 +92,10 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
 
     @SuppressWarnings("unchecked")
     private void setVal(List<?> data, List<Field> headFieldList, HSSFSheet sheet, HSSFRow row, CellStyle bodyStyle, CellStyle headStyle) {
-        HSSFCell cell;
         ExcelValidation explicitValidation = null;
         ExcelValidation dateValidation = null;
-        ExcelValidation numbericValidation = null;
+        ExcelValidation numericValidation = null;
+        HSSFCell cell;
         //设置列表头
         for (int i = 0; i < headFieldList.size(); i++) {
             cell = row.createCell(i);
@@ -117,40 +104,7 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
             cell.setCellValue(excelField.value());
             Field field = headFieldList.get(i);
             sheet.setColumnWidth(i, excelField.width());
-            //查看是否需要校验
-            ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
-            DateValid dv = field.getAnnotation(DateValid.class);
-            NumericValid nv = field.getAnnotation(NumericValid.class);
-            if (ev != null) {
-                try {
-                    if (explicitValidation == null) {
-                        explicitValidation = ev.validClass().newInstance();
-                    }
-                    explicitValidation.valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (dv != null) {
-                try {
-                    if (dateValidation == null) {
-                        dateValidation = dv.validClass().newInstance();
-                    }
-                    dateValidation.valid(dv, sheet, row.getRowNum() + 1, i, i);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (nv != null) {
-                try {
-                    if (numbericValidation == null) {
-                        numbericValidation = nv.validClass().newInstance();
-                    }
-                    numbericValidation.valid(nv, sheet, row.getRowNum() + 1, i, i);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
+            this.addValid(field, row, i, explicitValidation, dateValidation, numericValidation);
         }
         //设置正文偏移量
         this.offset++;
@@ -195,6 +149,42 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
                 }
             }
         }
+
     }
 
+    private void addValid(Field field, HSSFRow row, int i, ExcelValidation explicitValidation, ExcelValidation dateValidation, ExcelValidation numericValidation) {
+        ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
+        DateValid dv = field.getAnnotation(DateValid.class);
+        NumericValid nv = field.getAnnotation(NumericValid.class);
+        if (ev != null) {
+            try {
+                if (explicitValidation == null) {
+                    explicitValidation = ev.validClass().newInstance();
+                }
+                explicitValidation.valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        if (dv != null) {
+            try {
+                if (dateValidation == null) {
+                    dateValidation = dv.validClass().newInstance();
+                }
+                dateValidation.valid(dv, sheet, row.getRowNum() + 1, i, i);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        if (nv != null) {
+            try {
+                if (numericValidation == null) {
+                    numericValidation = nv.validClass().newInstance();
+                }
+                numericValidation.valid(nv, sheet, row.getRowNum() + 1, i, i);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.2.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -9,7 +9,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.2.4</version>
+  <version>1.2.5</version>
 </dependency>
 ```
 ### 使用须知
@@ -71,7 +71,7 @@ PageResult pageResult = PageResult.of("data", 1);
 ErrorResult.error(HttpStatus.BAD_REQUEST.getMsg());
 ```
 ## 四、参数校验工具类： 
-**主要提供参数校验、处理,匹配等等， 使用时通过``ParamUtil.xxx()``使用，以下为该工具的所有方法介绍 :**
+**主要提供参数校验、处理,匹配等等， 使用时通过``ParamUtils.xxx()``使用，以下为该工具的所有方法介绍 :**
 * **isEmpty**：判断给定参数是否为空，可以是字符串、包装类型、数组、集合等
 ```java
 boolean isEmpty(T str)
@@ -145,7 +145,7 @@ boolean isTelPhone(String tel)
 boolean isPostCode(String postCode)
 ```
 ## 五、时间工具类： 
-**对时间进行操作，使用时通过``TimeUtil.xxx()``调用，该工具的所有方法介绍如下 :**
+**对时间进行操作，使用时通过``TimeUtils.xxx()``调用，该工具的所有方法介绍如下 :**
 * **dateToString**：获取文本格式时间
 ```java
 String dateToString(Date date)
@@ -380,6 +380,15 @@ String generateNumber(int length)
 |参数|描述|
 |-----|-----|
 |bean|需要转为map的bean对象|
+### 8、getInterfaceType
+获取泛型接口中某个泛型的真实对象类型     
+**参数说明**     
+
+|参数|描述|
+|---|---|
+|source|实现泛型接口的类|
+|typeInterface|泛型接口|
+|paramIndex|泛型参数下标，0开始|
 ## 九、验证码工具类
 **用于生成英文和数字混合的验证码，使用时通过构造``AuthCodeUtil``在进行调用其中的方法，构造时参数如下 :**    
 

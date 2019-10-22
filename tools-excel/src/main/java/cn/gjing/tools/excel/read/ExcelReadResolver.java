@@ -5,6 +5,7 @@ import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
+import com.google.gson.Gson;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -24,30 +25,12 @@ import java.util.stream.Collectors;
  * @author Gjing
  **/
 class ExcelReadResolver implements ExcelReaderResolver {
-    /**
-     * 工作簿
-     */
     private Workbook workbook;
-
-    /**
-     * sheet
-     */
     private Sheet sheet;
-
-    /**
-     * 存放带有ExcelField注解的字段
-     */
     private Map<String, Field> hasAnnotationFieldMap = new HashMap<>();
-
-    /**
-     * 列表头名
-     */
     private List<String> headNameList = new ArrayList<>();
-
-    /**
-     * 总列数
-     */
     private int totalCol = 0;
+    private static Gson gson = new Gson();
 
     @Override
     public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName) {
@@ -186,6 +169,7 @@ class ExcelReadResolver implements ExcelReaderResolver {
      * @param value      excel读出来的值
      * @param excelField excel字段注解
      */
+    @SuppressWarnings("unchecked")
     private void setValue(Object o, Field field, String value, ExcelField excelField) {
         if (field.getType() == String.class) {
             this.setField(field, o, value);
@@ -213,9 +197,10 @@ class ExcelReadResolver implements ExcelReaderResolver {
         if (field.getType().isEnum()) {
             ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
             Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
+            Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
             try {
                 EnumConvert enumConvert = excelEnumConvert.convert().newInstance();
-                this.setField(field, o, enumConvert.toEntityAttribute(value));
+                this.setField(field, o, enumConvert.toEntityAttribute(gson.fromJson(value, interfaceType)));
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }

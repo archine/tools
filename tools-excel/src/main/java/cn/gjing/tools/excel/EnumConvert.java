@@ -7,15 +7,15 @@ package cn.gjing.tools.excel;
  **/
 public interface EnumConvert<T extends Enum, U> {
     /**
-     * 转为实体类字段
+     * 转为实体类的枚举字段
      *
-     * @param t 值的数据类型
+     * @param u 读到的Excel的值
      * @return 枚举
      */
-    T toEntityAttribute(String t);
+    T toEntityAttribute(U u);
 
     /**
-     * 转成数据库字段
+     * 转成Excel的值
      *
      * @param t 枚举
      * @return 枚举对应的值

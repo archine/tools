@@ -23,39 +23,12 @@ import java.util.function.Supplier;
  **/
 public class ExcelWriter {
 
-    /**
-     * excel文件名
-     */
     private String fileName;
-
-    /**
-     * excel样式
-     */
     private MetaStyle metaStyle;
-
-    /**
-     * 工作簿
-     */
     private Workbook workbook;
-
-    /**
-     * response
-     */
     private HttpServletResponse response;
-
-    /**
-     * 写Excel的解析器
-     */
     private ExcelWriterResolver writerResolver;
-
-    /**
-     * excel列表头字段
-     */
     private List<Field> headFieldList;
-
-    /**
-     * 大标题
-     */
     private BigTitle bigTitle;
 
     private ExcelWriter() {

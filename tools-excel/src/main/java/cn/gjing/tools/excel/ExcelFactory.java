@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Excel读写工厂
+ * 创建Excel读写的工厂
  *
  * @author Gjing
  **/
 public class ExcelFactory {
 
     /**
-     * 创建excel读
+     * 创建excel写出者
      *
      * @param excelClass 导出的这个Excel对应的Class
      * @param response   response
@@ -30,7 +30,7 @@ public class ExcelFactory {
     }
 
     /**
-     * create excel write
+     * 创建excel写出者
      *
      * @param fileName   Excel文件名，优先级高于注解
      * @param excelClass 导出的这个Excel对应的Class
@@ -46,7 +46,7 @@ public class ExcelFactory {
     }
 
     /**
-     * 创建Excel reader
+     * 创建Excel读入者
      *
      * @param inputStream excel文件输入流
      * @param excelClass  导出的这个Excel对应的Class
