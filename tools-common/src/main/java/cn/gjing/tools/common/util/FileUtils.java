@@ -1,5 +1,7 @@
 package cn.gjing.tools.common.util;
 
+import lombok.NoArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -10,20 +12,8 @@ import java.net.URLEncoder;
  * @author Gjing
  * 文件工具类
  **/
-@SuppressWarnings("unused")
+@NoArgsConstructor
 public class FileUtils {
-
-    private FileUtils() {
-    }
-
-    /**
-     * 生成FileUtil实例
-     *
-     * @return fileUtil
-     */
-    public static FileUtils of() {
-        return new FileUtils();
-    }
 
     /**
      * 从网络Url中下载文件

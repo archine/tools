@@ -5,17 +5,17 @@ import java.util.UUID;
 /**
  * @author Gjing
  **/
-@SuppressWarnings("unused")
 public class IdUtils {
 
     private SnowFlake snowFlake;
 
-    public IdUtils(SnowId snowId) {
-        this.snowFlake = new SnowFlake(snowId.getCenterId(), snowId.getMachineId());
+    public IdUtils(long centerId, long machineId) {
+        this.snowFlake = new SnowFlake(centerId, machineId);
     }
 
     /**
      * 获取UUID
+     *
      * @return uuid
      */
     public String uuid() {
@@ -24,6 +24,7 @@ public class IdUtils {
 
     /**
      * 获取id
+     *
      * @return id
      */
     public Long snowId() {

@@ -1,7 +1,8 @@
 package cn.gjing.tools.common.util;
 
+import cn.gjing.tools.common.annotation.Exclude;
+import cn.gjing.tools.common.annotation.NotNull;
 import cn.gjing.tools.common.exception.HttpException;
-import cn.gjing.tools.common.exception.ParamException;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -52,10 +53,8 @@ public class EmailUtils {
      * @param copyTo  抄送人,可以多个,逗号隔开,不需要抄送,传null或者""
      * @return true为发送成功
      */
-    public boolean sendEmail(String subject, String body, String tos, String copyTo) {
-        if (ParamUtils.isEmpty(tos)) {
-            throw new ParamException("The parameter 'tos' cannot be null");
-        }
+    @NotNull
+    public boolean sendEmail(@Exclude String subject, @Exclude String body, String tos, @Exclude String copyTo) {
         try {
             Properties props = getProperties();
             Session session = Session.getInstance(props);
@@ -81,10 +80,8 @@ public class EmailUtils {
      * @param copyTo  抄送人,可以多个,逗号隔开,不需要抄送,传null或者""
      * @return true为发送成功
      */
-    public boolean sendEmail(String subject, String body, String[] files, String tos, String copyTo) {
-        if (ParamUtils.isEmpty(tos)) {
-            throw new ParamException("The parameter 'tos' cannot be null");
-        }
+    @NotNull
+    public boolean sendEmail(@Exclude String subject, @Exclude String body, @Exclude String[] files, String tos, @Exclude String copyTo) {
         try {
             Properties props = getProperties();
             Session session = Session.getInstance(props);

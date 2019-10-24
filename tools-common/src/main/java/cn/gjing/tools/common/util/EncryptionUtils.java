@@ -1,6 +1,7 @@
 package cn.gjing.tools.common.util;
 
 import cn.gjing.tools.common.exception.ParamException;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
@@ -14,16 +15,8 @@ import java.security.SecureRandom;
 /**
  * @author Gjing
  **/
-@SuppressWarnings("unused")
+@NoArgsConstructor
 public class EncryptionUtils {
-
-    private EncryptionUtils() {
-
-    }
-
-    public static EncryptionUtils of() {
-        return new EncryptionUtils();
-    }
 
     /**
      * MD5 encryption

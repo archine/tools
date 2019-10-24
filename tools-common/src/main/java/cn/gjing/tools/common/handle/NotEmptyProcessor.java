@@ -16,8 +16,8 @@ import java.lang.reflect.Parameter;
 
 /**
  * @author Gjing
- * This class is primarily used for method parsing as a notnull annotation to detect whether all parameters on a method
- * contain null values , Throws an {ParamException} if it contains null values
+ * This class is primarily used for method parsing as a notempty annotation to detect whether all parameters on a method
+ * contain null values , Throws an {NullPointerException} if it contains null values
  **/
 @Component
 @Aspect
@@ -28,7 +28,6 @@ class NotEmptyProcessor {
     }
 
     @Before("cut()")
-    @SuppressWarnings("unchecked")
     public void validation(JoinPoint joinPoint) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;

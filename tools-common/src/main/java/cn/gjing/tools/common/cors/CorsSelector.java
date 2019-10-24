@@ -10,8 +10,8 @@ class CorsSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
         return new String[]{
-                CorsAdapter.class.getName(),
-                Cors.class.getName()
+                CommonCorsConfiguration.class.getName(),
+                CommonCors.class.getName()
         };
     }
 }

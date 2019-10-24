@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
  * @author Gjing
  * param util
  **/
-@SuppressWarnings("unused")
 public final class ParamUtils {
     /**
      * 检查参数是否为空
@@ -221,16 +220,13 @@ public final class ParamUtils {
     /**
      * 判断数组里是否包含指定值
      *
-     * @param t 目标数组
-     * @param u param 值
-     * @return 返回true为包含
+     * @param arr 目标数组
+     * @param val 值
+     * @return 返回true为包含该值
      */
-    public static boolean contains(Object[] t, Object u) {
-        if (multiEmpty(t, u)) {
-            return false;
-        }
-        for (Object o : t) {
-            if (equals(o, u)) {
+    public static boolean contains(String[] arr, String val) {
+        for (String s : arr) {
+            if (equals(s, val)) {
                 return true;
             }
         }

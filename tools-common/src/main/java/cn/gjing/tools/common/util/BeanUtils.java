@@ -1,7 +1,6 @@
 package cn.gjing.tools.common.util;
 
 import cn.gjing.tools.common.exception.CastException;
-import org.springframework.stereotype.Component;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -16,8 +15,6 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-@Component
-@SuppressWarnings("unused")
 public class BeanUtils {
     /**
      * 复制属性
@@ -27,7 +24,7 @@ public class BeanUtils {
      * @param ignores 忽略的字段
      */
     public static void copyProperties(Object source, Object target, String... ignores) {
-        BeanUtils.copyProperties(source, target, ignores);
+        org.springframework.beans.BeanUtils.copyProperties(source, target, ignores);
     }
 
     /**

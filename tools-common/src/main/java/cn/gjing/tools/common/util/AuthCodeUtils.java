@@ -11,8 +11,7 @@ import java.util.Random;
 /**
  * @author Gjing
  **/
-@SuppressWarnings("unused")
-public class AuthCodeUtil {
+public class AuthCodeUtils {
     /**
      * 图片的宽度。
      */
@@ -44,7 +43,7 @@ public class AuthCodeUtil {
     /**
      * 全部默认
      */
-    public AuthCodeUtil() {
+    public AuthCodeUtils() {
         this.createCodeImage();
     }
 
@@ -53,7 +52,7 @@ public class AuthCodeUtil {
      * @param width 宽度
      * @param height 高度
      */
-    public AuthCodeUtil(int width, int height){
+    public AuthCodeUtils(int width, int height){
         this.width = width;
         this.height = height;
         this.createCodeImage();
@@ -66,7 +65,7 @@ public class AuthCodeUtil {
      * @param codeCount 验证码数量
      * @param lineCount 干扰线数量
      */
-    public AuthCodeUtil(int width, int height, int codeCount, int lineCount){
+    public AuthCodeUtils(int width, int height, int codeCount, int lineCount){
         this(width, height);
         this.codeCount = codeCount;
         this.lineCount = lineCount;
@@ -79,9 +78,9 @@ public class AuthCodeUtil {
      * @throws IOException IOException
      * @return this
      */
-    public AuthCodeUtil writeToLocal(String localPath) throws IOException {
+    public AuthCodeUtils writeToLocal(String localPath) throws IOException {
         OutputStream outputStream = new FileOutputStream(localPath);
-        AuthCodeUtil write = this.write(outputStream);
+        AuthCodeUtils write = this.write(outputStream);
         outputStream.flush();
         outputStream.close();
         return write;
@@ -93,7 +92,7 @@ public class AuthCodeUtil {
      * @throws IOException IOException
      * @return this
      */
-    public AuthCodeUtil write(OutputStream outputStream) throws IOException {
+    public AuthCodeUtils write(OutputStream outputStream) throws IOException {
         ImageIO.write(bufferedImage, "png", outputStream);
         return this;
     }

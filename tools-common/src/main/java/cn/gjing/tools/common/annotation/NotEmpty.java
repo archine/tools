@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * @author Gjing
- * parameter check,Only for methods,example：@NotNull2 or @NotNull2(exclude={“”,””})
+ * parameter check,Only for methods,example：@NotNull2 or @NotNull2(message="")
  **/
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

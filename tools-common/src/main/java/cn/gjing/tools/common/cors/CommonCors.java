@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Data
 @ConfigurationProperties("cors")
 @EnableConfigurationProperties
-public class Cors {
+public class CommonCors {
 
     /**
      * 允许的域名
@@ -30,7 +30,7 @@ public class Cors {
      * 允许的方法
      */
     @Builder.Default
-    private String[] allowedMethods = new String[]{"GET", "DELETE", "POST", "PUT","OP"};
+    private String[] allowedMethods = new String[]{"GET", "DELETE", "POST", "PUT", "OPTIONS"};
 
     /**
      * 允许的请求头

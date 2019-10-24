@@ -1,34 +1,33 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.2.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
-提供参数，Excel，时间，加密、验证码、邮件、跨域、随机数、Id生成等开发中常用到的工具。。。
+提供参数，时间，加密、验证码、邮件、跨域、随机数、Id生成等开发中常用到的工具。。。
 ## 一、导入依赖
 ```xml
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.2.5</version>
+  <version>1.2.6</version>
 </dependency>
-```
-### 使用须知
-> 如果是**Spring**环境，确保一些工具的可用, 需要手动在xml文件中进行如下配置，**SpringBoot**环境无需配置
-```xml
-<bean id="xxx" class="cn.gjing.tools.common.handle.ToolsCommonAdapter"/>
 ```
 ## 二、常用注解:
 ### 1、@NotNull 
 方法参数校验，如若要排除方法中的某个参数,搭配使用``@Exclude``注解到指定参数上;
 ### 2、@NotEmpty
 方法参数校验, 可对null和空字符串进行校验,如若要排除方法中的某个参数,搭配使用``@Exclude2``注解到指定参数上，如果需要自定义异常提示信息, 可设置``message``
+> 如果是**Spring**环境, 需要手动在xml文件中进行如下配置，**SpringBoot**环境无需配置
+```xml
+<bean id="xxx" class="cn.gjing.tools.common.handle.ToolsCommonNotEmptyAdapter"/>
+```
 ### 3、@EnableCors
-开启允许跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：
+开启全局跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：
 * **yml方式**
 ```yaml
 cors:
   # 支持的方法类型
-  allowed-methods: POST,GET,DELETE,PUT...
+  allowed-methods: POST,GET,DELETE,PUT,OPTIONS
   # 支持的请求头
   allowed-headers: xxx
   # 支持的域名
@@ -39,14 +38,14 @@ cors:
 ```
 * **javaBean方式**
 ```java
-  /**
+/**
  * @author Gjing
  **/
 @Configuration
 public class CorsConfiguration {
     @Bean
-    public Cors cors() {
-        return Cors.builder()
+    public CommonCors cors() {
+        return CommonCors.builder()
                 .allowCredentials(Boolean.TRUE)
                 .maxAge(1800L)
                 .path("/**")
@@ -57,19 +56,10 @@ public class CorsConfiguration {
 ## 三、返回结果模板
 ### 1、ResultVO
 通用返回结果模板,包含``code(状态码)``和``message(提示信息)``以及``data(数据)``
-```java
-ResultVO resultVo = ResultVO.success();
-```
 ### 2、PageResult
 分页查询返回结果集, 包含``data(数据)``、``totalPages(总页数)``、``CurrentPage(当前页数)``、``totalRows(总条数)``、``pageRows(每页的条数)``
-```java
-PageResult pageResult = PageResult.of("data", 1);
-```
 ### 3、ErrorResult
 错误返回模板, 里面包含``failure``(``状态码400``时使用,包含``code``和``message``, ``code``用于进一步确定错误), ``error``(服务器型异常,一般``用于500``等, 只包含``message``)
-```java
-ErrorResult.error(HttpStatus.BAD_REQUEST.getMsg());
-```
 ## 四、参数校验工具类： 
 **主要提供参数校验、处理,匹配等等， 使用时通过``ParamUtils.xxx()``使用，以下为该工具的所有方法介绍 :**
 * **isEmpty**：判断给定参数是否为空，可以是字符串、包装类型、数组、集合等
@@ -126,7 +116,7 @@ String removeAllSymbol(String str, String symbol)
 ```
 * **contains**：判断数组里是否包含指定的值
 ```java
-boolean contains(Object[] t, Object u)
+boolean contains(String[] arr, String val)
 ```
 * **isEmail**：判断是否为email
 ```java
@@ -263,11 +253,7 @@ int dateBetween(String startDate, String endDate)
 int dateBetween(String startDate, String endDate)
 ```
 ## 六、加密工具类
-**主要用于数据加密，使用时通过``EncryptionUtils.xxx()``调用，该工具包含的所有方法如下:**
-* **of**：生成加密实例
-```java
-EncryptionUtils.of()
-```
+**主要用于数据加密, 该工具包含的所有方法如下:**
 * **encodeMd5**：MD5加密
 ```java
 String encodeMd5(String body)
@@ -390,7 +376,7 @@ String generateNumber(int length)
 |typeInterface|泛型接口|
 |paramIndex|泛型参数下标，0开始|
 ## 九、验证码工具类
-**用于生成英文和数字混合的验证码，使用时通过构造``AuthCodeUtil``在进行调用其中的方法，构造时参数如下 :**    
+**用于生成英文和数字混合的验证码，使用时通过构造``AuthCodeUtils``在进行调用其中的方法，构造时参数如下 :**    
 
 |参数|描述|
 |----|----|
@@ -434,30 +420,35 @@ public void getCode(HttpServletResponse response, HttpServletRequest request) th
 }
 ```
 ## 十、Id生成工具类
-**生成无符号的UUID和通过雪花算法生成一个唯一ID，在项目使用时，先通过``@Resource``注入，然后通过``idUtils.xxx()``生成，该工具包含的方法如下 :**
+**项目中使用可以将``IdUtils``注册为一个bean以在其他地方进行依赖注入, 或者将其设置为``静态的``, 不要出现重复的``IdUtils``对象, 否则并发情况下会出现重复,
+如果要调用``snowId``, 必须通过带参数的构造方法进行创建实例**
 ### 1、uuid 
 获取去除``-``符号的uuid
 ```java
-idUtils.uuid();
+public class Test{
+    public static void main(String[] args){
+      IdUtils idUtils = new IdUtils();
+      System.out.println(idUtils.uuid());
+    }
+}
 ```
 ### 2、snowId
 得到一个唯一的ID，在多服务需要操作同一个数据表的情况下, 需要保证每个服务的``centerId``和``machineId``唯一   
 ```java
-idUtils.snowId();
-```
-**配置如下**    
-```yaml
-snow:
-  center-id: 数据中心id, 范围0-31, 默认0
-  machine-id: 机器id, 范围0-31, 默认0
+public class Test{
+    public static void main(String[] args){
+      IdUtils idUtils = new IdUtils(1,2);
+      for(int i = 0; i < 100; i++) {
+        System.out.println(idUtils.snowId());
+      }
+    }
+}
 ```
 ## 十一、文件工具类
-**对文件的一些操作，使用时通过``FileUtils.of()``生成实例之后再调用其中的方法，包含的所有方法如下 :**
+**对文件的一些操作，包含的所有方法如下 :**
 ### 1、downloadByUrl
 从远程URL地址下载文件到本地
-```java
-FileUtils.of().downloadByUrl(fileUrl, fileName, savePath);
-```
+
 **参数说明**   
 
 |参数|描述|
@@ -467,10 +458,8 @@ FileUtils.of().downloadByUrl(fileUrl, fileName, savePath);
 |savePath|保存到本地的目录|    
 
 ### 2、downloadByStream
-将本地的指定地址文件通过流下载
-```java
-FileUtils.of().downlocdByStream(response, file);
-```
+将本地的指定地址文件通过流下载    
+
 **参数说明**   
 
 |参数|描述|
@@ -479,15 +468,16 @@ FileUtils.of().downlocdByStream(response, file);
 |file|文件对象|   
 
 ### 3、getBytes
-将指定路径下的文件转为byte数组
-```java
-byte[] data = FileUtils.of().getBytes(file);
-```
+将文件转为byte数组   
+  
+**参数说明**    
+
+|参数|描述|
+|---|---|
+|file|文件|
 ### 4、writeFile
 将字节数组写入到指定文件, 写入成功返回true
-```java
-boolean b = FileUtils.of().writeFile(bytes, file);
-```
+
 **参数说明**    
 
 |参数|描述|
@@ -496,15 +486,21 @@ boolean b = FileUtils.of().writeFile(bytes, file);
 |file|文件对象|   
 
 ### 5、readInputStream
-从输入流读取内容并返回字节数组
-```java
-byte[] b = FileUtils.of().readInputStream(inputStream);
-```
+从输入流读取内容并返回字节数组  
+  
+**参数说明**     
+   
+|参数|描述|
+|---|---|
+|InputStream|输入流|
 ### 6、getExtension
-获取文件扩展名
-```java
-String name = FileUtils.of().getExtension(fileName);
-```
+获取文件扩展名    
+    
+**参数说明**    
+
+|参数|描述|
+|---|---|
+|fileName|文件名|
 ## 十二、邮件工具类
 **用于发送邮件，支持普通邮件和带附件邮件,支持html格式文本,支持群发和抄送,返回true为发送成功，使用时通过``EmailUtils.of()``生成实例之后在进行其中的方法，``of()``方法参数如下 :**     
 
@@ -528,11 +524,13 @@ String name = FileUtils.of().getExtension(fileName);
 
 **完整示例如下 :**
 ```java
-public static void main(String[] args) {
-    boolean b = EmailUtils.of("smtp.qq.com", "发送人密码或者授权码", "发送人邮箱")
-            .sendEmail("主题", "内容",new String[]{"附件物理地址"},"收件人邮箱地址", "抄送人邮箱地址");
-    if (b) {
-        System.out.println("发送成功");
+public class Test{
+    public static void main(String[] args) {
+        boolean b = EmailUtils.of("smtp.qq.com", "发送人密码或者授权码", "发送人邮箱")
+                .sendEmail("主题", "内容",new String[]{"附件物理地址"},"收件人邮箱地址", "抄送人邮箱地址");
+        if (b) {
+            System.out.println("发送成功");
+        }
     }
 }
 ```

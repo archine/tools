@@ -6,8 +6,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @author Gjing
  * 返回模板
+ * @author Gjing
  **/
 @Data
 public class ResultVO<T> implements Serializable {
