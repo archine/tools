@@ -5,16 +5,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 时间工具
+ * Time utils
  * @author Gjing
  **/
 public class TimeUtils {
     /**
-     * 自定义格式获取文本时间
+     * Gets the text time in a custom format
      *
-     * @param date   date
-     * @param pattern 格式("yyyy-MM-dd")
-     * @return string 文本
+     * @param date    date
+     * @param pattern Format, such as yyyy-mm-dd
+     * @return string String
      */
     public static String dateToString(Date date, String pattern) {
         SimpleDateFormat format1 = new SimpleDateFormat(pattern);
@@ -22,10 +22,10 @@ public class TimeUtils {
     }
 
     /**
-     * 获取时间对象
+     * Get time object
      *
-     * @param date 文本格式时间
-     * @return 时间对象
+     * @param date String date
+     * @return Date
      */
     public static Date stringToDate(String date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -38,13 +38,13 @@ public class TimeUtils {
     }
 
     /**
-     * 获取时间对象
+     * Get time object
      *
-     * @param date 文本格式时间
-     * @param pattern 格式
-     * @return 时间对象
+     * @param date    String date
+     * @param pattern Format, such as yyyy-mm-dd
+     * @return Date
      */
-    public static Date stringToDate(String date,String pattern) {
+    public static Date stringToDate(String date, String pattern) {
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         try {
             return format.parse(date);

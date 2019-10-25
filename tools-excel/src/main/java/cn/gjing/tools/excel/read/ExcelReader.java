@@ -37,7 +37,7 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 初始化序号
+     * Initializes the sequence number
      */
     private void init() {
         this.headerIndex = 0;
@@ -45,7 +45,7 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 读Excel
+     * Read excel
      *
      * @return this
      */
@@ -57,9 +57,9 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 读Excel
+     * Read the excel sheet
      *
-     * @param sheetName sheet名称
+     * @param sheetName sheet name
      * @return this
      */
     @SuppressWarnings("unchecked")
@@ -70,9 +70,9 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 重置处理器, 该操作要在其他操作之前进行, 否则之前的操作会无效
+     * Reset the processor before any other operation
      *
-     * @param excelReaderResolver 用户定义的Excel处理器
+     * @param excelReaderResolver Excel read resolver
      * @return this
      */
     public ExcelReader<T> resetResolver(Supplier<? extends ExcelReaderResolver> excelReaderResolver) {
@@ -81,9 +81,9 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 列表头开始行
+     * Excel header index
      *
-     * @param index 列表头下标, 为excel文件列表头左边的序号
+     * @param index List header, which is the number to the left of the excel file list header
      * @return this
      */
     public ExcelReader<T> headerIndex(int index) {
@@ -92,9 +92,9 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 读取截止行
+     * Read the cutoff index
      *
-     * @param index 结束读取下标, 为excel文件列表头左边的序号
+     * @param index cutoff index
      * @return this
      */
     public ExcelReader<T> endIndex(int index) {
@@ -103,7 +103,7 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 获取结果
+     * Get result
      *
      * @return List
      */
@@ -112,9 +112,9 @@ public class ExcelReader<T> implements Closeable {
     }
 
     /**
-     * 获取结果
+     * Listens for the return of the result through the listener
      *
-     * @param resultListener 结果监听器
+     * @param resultListener Result listener
      * @return this
      */
     public ExcelReader<T> listener(Listener<List<T>> resultListener) {

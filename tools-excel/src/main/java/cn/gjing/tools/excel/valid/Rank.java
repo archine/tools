@@ -1,12 +1,12 @@
 package cn.gjing.tools.excel.valid;
 
 /**
- * 提示等级
+ * Tip grade
  * @author Gjing
  **/
 public enum Rank {
     /**
-     * 提示框等级
+     * Tip grade
      */
     WARNING(1),STOP(0),INFO(2);
     private int rank;

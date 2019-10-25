@@ -26,28 +26,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * XLSX处理器
+ * XLSX type excel file resolver
  *
  * @author Gjing
  **/
 class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
-    /**
-     * 工作簿
-     */
     private SXSSFWorkbook workbook;
-
-    /**
-     * 偏移量
-     */
     private int offset = 0;
-    /**
-     * 输出流
-     */
     private OutputStream outputStream;
-
-    /**
-     * sheet
-     */
     private SXSSFSheet sheet;
 
     @Override
@@ -58,7 +44,7 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
             this.offset = 0;
             this.sheet = this.workbook.createSheet(sheetName);
         }
-        //读取默认的偏移量
+        //Read the default offset
         this.offset = this.sheet.getLastRowNum() == 0 ? 0 : this.sheet.getLastRowNum() + 1;
         SXSSFRow row;
         SXSSFCell cell;
@@ -109,7 +95,6 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
         ExcelValidation explicitValidation = null;
         ExcelValidation numericValidation = null;
         SXSSFCell cell;
-        //设置列表头
         for (int i = 0; i < headFieldList.size(); i++) {
             cell = row.createCell(i);
             cell.setCellStyle(headStyle);
@@ -119,7 +104,6 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
             sheet.setColumnWidth(i, excelField.width());
             this.addValid(field, row, i, explicitValidation, numericValidation);
         }
-        //设置正文
         this.offset++;
         if (data == null) {
             return;

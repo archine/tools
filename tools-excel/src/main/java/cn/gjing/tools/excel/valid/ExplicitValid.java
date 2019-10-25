@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Excel明确范围数据校验注解
+ * Excel clear scope data validation annotations
  *
  * @author Gjing
  **/
@@ -15,50 +15,57 @@ import java.lang.annotation.Target;
 public @interface ExplicitValid {
 
     /**
-     * 校验器
+     * Validator Class
      *
      * @return ExcelValidation
      */
     Class<? extends ExcelValidation> validClass() default DefaultExplicitValidation.class;
 
     /**
-     * 范围值
-     * @return 范围值
+     * The value in the drop-down box
+     *
+     * @return value
      */
     String[] combobox() default {};
 
     /**
-     * 数据校验最多校验多少行
-     * @return 行数
+     * Check the number of rows
+     *
+     * @return rows
      */
     int boxLastRow() default 0;
 
     /**
-     * 是否弹出错误框
+     * Whether the error box pops up
+     *
      * @return boolean
      */
     boolean showErrorBox() default true;
 
     /**
-     * 提示框级别
-     * @return 级别
+     * Prompt box level
+     *
+     * @return level
      */
     Rank rank() default Rank.WARNING;
 
     /**
-     * 错误框标题
-     * @return 标题
+     * Error box title
+     *
+     * @return title
      */
-    String errorTitle() default "错误提示";
+    String errorTitle() default "Error Message";
 
     /**
-     * 详细错误内容
-     * @return 内容
+     * Error content
+     *
+     * @return content
      */
-    String errorContent() default "请选择下拉框内的值";
+    String errorContent() default "Please select the value in the drop-down box";
 
     /**
-     * 是否立即弹出
+     * Whether it pops up immediately
+     *
      * @return boolean
      */
     boolean showPromptBox() default true;

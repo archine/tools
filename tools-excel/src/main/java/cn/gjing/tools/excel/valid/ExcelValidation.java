@@ -4,44 +4,47 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 /**
- * Excel校验器
+ * Excel validator
  *
  * @author Gjing
  **/
 public interface ExcelValidation {
 
     /**
-     * 自定义时间校验规则
-     * @param dateValid 时间注解
-     * @param sheet sheet
-     * @param firstRow 开始行
-     * @param firstCol 开始列
-     * @param lastCol 结束列
+     * Custom time validation rules
+     *
+     * @param dateValid DateValid
+     * @param sheet     sheet
+     * @param firstRow  First row
+     * @param firstCol  First col
+     * @param lastCol   Last col
      */
     default void valid(DateValid dateValid, Sheet sheet, int firstRow, int firstCol, int lastCol) {
 
     }
 
     /**
-     * 自定义数据校验规则
-     * @param numericValid 数据注解
-     * @param sheet sheet
-     * @param firstRow 开始行
-     * @param firstCol 开始列
-     * @param lastCol 结束列
+     * Custom data validation rules
+     *
+     * @param numericValid NumericValid
+     * @param sheet        sheet
+     * @param firstRow     First row
+     * @param firstCol     First col
+     * @param lastCol      Last col
      */
     default void valid(NumericValid numericValid, Sheet sheet, int firstRow, int firstCol, int lastCol) {
 
     }
 
     /**
-     * 下拉框校验规则
-     * @param explicitValid 下拉框注解
-     * @param workbook workbook
-     * @param sheet 当前sheet
-     * @param firstRow 开始列
-     * @param firstCol 开始行
-     * @param lastCol 结束行
+     * Drop-down check rule
+     *
+     * @param explicitValid ExplicitValid
+     * @param workbook      workbook
+     * @param sheet         The current sheet
+     * @param firstRow      First row
+     * @param firstCol      First col
+     * @param lastCol       Last col
      */
     default void valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int firstCol, int lastCol) {
 

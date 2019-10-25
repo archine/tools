@@ -3,7 +3,8 @@ package cn.gjing.tools.excel;
 import lombok.*;
 
 /**
- * Excel大标题
+ * Excel big title
+ *
  * @author Gjing
  **/
 @Getter
@@ -13,13 +14,13 @@ import lombok.*;
 public class BigTitle {
 
     /**
-     * 占几行
+     * a few lines
      */
     private int lastRow = 2;
 
     /**
-     * 大标题内容
+     * content
      */
-    private String content="";
+    private String content = "";
 
 }

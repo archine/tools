@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * @author Gjing
  **/
-public class RandomUtils {
+public final class RandomUtils {
 
     private final static Random RANDOM = new Random();
 

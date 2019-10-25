@@ -1,22 +1,22 @@
 package cn.gjing.tools.excel.util;
 
 /**
- * 参数工具
+ * Param utils
  *
  * @author Gjing
  **/
 public class ParamUtils {
 
     /**
-     * 判断数组是否包含某个值
+     * Determines whether the array contains a value
      *
-     * @param t 数据
-     * @param u 值
-     * @return true is 包含
+     * @param arr array
+     * @param val value
+     * @return boolean
      */
-    public static boolean noContains(String[] t, String u) {
-        for (String o : t) {
-            if (o.equals(u)) {
+    public static boolean noContains(String[] arr, String val) {
+        for (String o : arr) {
+            if (o.equals(val)) {
                 return false;
             }
         }
@@ -24,11 +24,11 @@ public class ParamUtils {
     }
 
     /**
-     * 判断是否相等
+     * Whether it's equal or not
      *
-     * @param t 参数1
-     * @param u 参数2
-     * @return true is 相等
+     * @param t param1
+     * @param u param2
+     * @return boolean
      */
     public static boolean equals(Object t, Object u) {
         return t == u || t.equals(u);

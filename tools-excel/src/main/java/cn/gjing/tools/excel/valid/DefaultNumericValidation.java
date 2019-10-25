@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
 /**
- * 默认数值校验器
+ * Default value verifier
  *
  * @author Gjing
  **/
@@ -19,7 +19,6 @@ public class DefaultNumericValidation implements ExcelValidation {
                 numericValid.operatorType().getType(),
                 numericValid.expr1(),
                 "".equals(numericValid.expr2()) ? null : numericValid.expr2());
-        // 四个参数分别是：起始行、终止行、起始列、终止列
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, numericValid.boxLastRow() == 0 ? firstRow : numericValid.boxLastRow() + firstRow,
                 firstCol, lastCol);
         DataValidation dataValidation = helper.createValidation(numericConstraint, regions);

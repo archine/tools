@@ -16,7 +16,6 @@ import java.util.Properties;
 /**
  * @author Gjing
  **/
-@SuppressWarnings("unused")
 public class EmailUtils {
 
     private String host;

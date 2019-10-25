@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import static cn.gjing.tools.excel.Type.XLS;
 
 /**
- * Excel与实体的映射
+ * Excel mapped entity annotation
  *
  * @author Gjing
  **/
@@ -16,21 +16,21 @@ import static cn.gjing.tools.excel.Type.XLS;
 @Target(ElementType.TYPE)
 public @interface Excel {
     /**
-     * Excel文件名，优先级低于方法传入
+     * Excel file name
      *
      * @return name
      */
     String value() default "";
 
     /**
-     * Excel文档类型
+     * Excel file type
      *
      * @return Type
      */
     Type type() default XLS;
 
     /**
-     * Excel样式
+     * Excel style
      *
      * @return ExcelStyle
      */

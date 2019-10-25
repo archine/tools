@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 数据类型校验注解
+ * Data type validation annotation
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
@@ -14,74 +15,85 @@ import java.lang.annotation.Target;
 public @interface NumericValid {
 
     /**
-     * 校验器
+     * Validator Class
      *
      * @return ExcelValidation
      */
     Class<? extends ExcelValidation> validClass() default DefaultNumericValidation.class;
 
     /**
-     * 数据校验最多校验多少行
-     * @return 行数
+     * Check the number of rows
+     *
+     * @return rows
      */
     int boxLastRow() default 0;
 
     /**
-     * 操作类型
-     * @return 类型
+     * Operator type
+     *
+     * @return OperatorType
      */
     OperatorType operatorType() default OperatorType.EQUAL;
 
     /**
-     * 校验类型
-     * @return 类型
+     * Valid type
+     *
+     * @return ValidType
      */
     ValidType validationType();
 
     /**
-     * 表达式1
-     * @return 表达式1
+     * expr1
+     *
+     * @return expr1
      */
     String expr1();
 
     /**
-     * 表达式2
-     * @return 表达式2
+     * expr2
+     *
+     * @return expr2
      */
     String expr2() default "";
 
     /**
-     * 是否弹出错误框
+     * Whether the error box pops up
+     *
      * @return boolean
      */
     boolean showErrorBox() default true;
 
     /**
-     * 提示框级别
-     * @return 级别
+     * Prompt box level
+     *
+     * @return level
      */
     Rank rank() default Rank.WARNING;
 
     /**
-     * 错误框标题
-     * @return 标题
+     * Error box title
+     *
+     * @return title
      */
-    String errorTitle() default "错误提示";
+    String errorTitle() default "Error Message";
 
     /**
-     * 详细错误内容
-     * @return 内容
+     * Error content
+     *
+     * @return content
      */
-    String errorContent() default "请填写正确的值";
+    String errorContent() default "Please fill in the correct value";
 
     /**
-     * 是否立即弹出
+     * Whether it pops up immediately
+     *
      * @return boolean
      */
     boolean showPromptBox() default true;
 
     /**
-     * 是否允许空值
+     * Whether null values are allowed
+     *
      * @return boolean
      */
     boolean allowEmpty() default true;

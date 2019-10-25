@@ -13,47 +13,16 @@ import java.util.Objects;
  * @author Gjing
  **/
 public class HttpClient<T> implements Closeable {
-    /**
-     * request url
-     */
     private String requestUrl;
-    /**
-     * response type
-     */
     private Class<T> responseType;
-    /**
-     * 请求到的数据
-     */
     private T data;
-    /**
-     * request header map
-     */
     private Map<String, String> header;
-    /**
-     * parameter string
-     */
     private String paramsStr;
-    /**
-     * http method
-     */
     private HttpMethod httpMethod;
-    /**
-     * connection
-     */
     private HttpURLConnection connection;
-    /**
-     * json string
-     */
     private String json;
-    /**
-     * writer
-     */
     private BufferedWriter bufferedWriter;
-    /**
-     * reader
-     */
     private BufferedReader bufferedReader;
-
     private static Gson gson = new Gson();
 
     private HttpClient(String url, HttpMethod method, Class<T> responseType) {

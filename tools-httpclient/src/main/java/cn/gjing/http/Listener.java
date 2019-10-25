@@ -1,10 +1,16 @@
 package cn.gjing.http;
 
 /**
- * 监听者
+ * Result Listener
+ *
  * @author Gjing
  **/
 @FunctionalInterface
 public interface Listener<T> {
+    /**
+     * notify listener
+     *
+     * @param t t
+     */
     void notify(T t);
 }

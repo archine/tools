@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.apache.poi.ss.usermodel.CellStyle;
 
 /**
+ * Style metadata
  * @author Gjing
  **/
 @Getter

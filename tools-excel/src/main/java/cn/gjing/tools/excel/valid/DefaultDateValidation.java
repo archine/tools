@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
 /**
- * 默认时间校验器
+ * Default time verifier
  *
  * @author Gjing
  **/
@@ -17,10 +17,8 @@ public class DefaultDateValidation implements ExcelValidation {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint dvConstraint = helper.createDateConstraint(dateValid.operatorType().getType(), dateValid.expr1(),
                 dateValid.expr2(), dateValid.pattern());
-        // 四个参数分别是：起始行、终止行、起始列、终止列
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, dateValid.boxLastRow() == 0 ? firstRow : dateValid.boxLastRow() + firstRow,
                 firstCol, lastCol);
-        // 数据有效性对象
         DataValidation dataValidation = helper.createValidation(dvConstraint, regions);
         dataValidation.setShowErrorBox(dateValid.showErrorBox());
         dataValidation.setShowPromptBox(dateValid.showPromptBox());

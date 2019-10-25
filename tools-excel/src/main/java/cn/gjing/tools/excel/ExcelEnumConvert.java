@@ -6,14 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 枚举转换注解
+ * Enumeration transformation annotation
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ExcelEnumConvert {
     /**
-     * 枚举转换器Class
+     * Enumeration converter Class
+     *
      * @return EnumConvert
      */
     Class<? extends EnumConvert> convert();

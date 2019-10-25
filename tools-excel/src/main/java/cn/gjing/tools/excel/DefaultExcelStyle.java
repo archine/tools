@@ -1,7 +1,8 @@
 package cn.gjing.tools.excel;
 
 /**
- * 默认的Excel样式
+ * Default excel style
+ *
  * @author Gjing
  **/
 public class DefaultExcelStyle implements ExcelStyle {

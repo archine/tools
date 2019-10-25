@@ -6,28 +6,32 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Excel列表头与实体字段映射
+ * Excel list headers map to entity fields annotation
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ExcelField {
     /**
-     * Excel列表头名称
+     * Excel header name
+     *
      * @return name
      */
     String value() default "";
 
     /**
-     * 时间类型的字段，如果需要转化自定义格式，则需要写，如：yyyy-MM-dd
+     * The field is of time type. If the custom time format needs to be converted, it needs to be written, such as yyyy-mm-dd
+     *
      * @return pattern
      */
     String pattern() default "";
 
     /**
-     * 列表头单元格的宽度
+     * Excel header width
+     *
      * @return cell width
      */
-    int width() default 20*256;
+    int width() default 20 * 256;
 
 }

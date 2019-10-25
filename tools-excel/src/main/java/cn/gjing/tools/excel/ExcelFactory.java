@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 创建Excel读写的工厂
+ * Excel factory
  *
  * @author Gjing
  **/
 public class ExcelFactory {
 
     /**
-     * 创建excel写出者
+     * Create an Excel write
      *
-     * @param excelClass 导出的这个Excel对应的Class
+     * @param excelClass Excel mapped entity
      * @param response   response
-     * @param ignores    忽略导出的字段
+     * @param ignores    The exported field is to be ignored
      * @return ExcelWriter
      */
     public static ExcelWriter createWriter(Class<?> excelClass, HttpServletResponse response, String... ignores) {
@@ -30,12 +30,12 @@ public class ExcelFactory {
     }
 
     /**
-     * 创建excel写出者
+     * Create an Excel write
      *
-     * @param fileName   Excel文件名，优先级高于注解
-     * @param excelClass 导出的这个Excel对应的Class
+     * @param fileName   Excel file name，The priority is higher than the annotation specification
+     * @param excelClass Excel mapped entity
      * @param response   response
-     * @param ignores    忽略导出的字段
+     * @param ignores    The exported field is to be ignored
      * @return ExcelWriter
      */
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
@@ -46,11 +46,11 @@ public class ExcelFactory {
     }
 
     /**
-     * 创建Excel读入者
+     * Create an Excel read
      *
-     * @param inputStream excel文件输入流
-     * @param excelClass  导出的这个Excel对应的Class
-     * @param <T>         返回的实体类型
+     * @param inputStream Excel file inputStream
+     * @param excelClass  Excel mapped entity
+     * @param <T>         Entity type
      * @return ExcelReader
      */
     public static <T> ExcelReader<T> createReader(InputStream inputStream, Class<T> excelClass) {

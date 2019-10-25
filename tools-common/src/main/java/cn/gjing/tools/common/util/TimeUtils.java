@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * @author Gjing
  **/
-public class TimeUtils {
+public final class TimeUtils {
 
     /**
      * 获取文本格式时间

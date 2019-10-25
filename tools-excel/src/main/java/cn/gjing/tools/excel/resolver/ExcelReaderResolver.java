@@ -14,14 +14,14 @@ import java.util.List;
 public interface ExcelReaderResolver {
 
     /**
-     * 读Excel
+     * Read excel
      *
-     * @param inputStream 输入流
-     * @param excelClass  Excel对应的实体Class
-     * @param listener    数据监听器
-     * @param headerIndex  列表头下标
-     * @param endIndex 读取截止位
-     * @param sheetName   sheet名
+     * @param inputStream Excel file inputStream
+     * @param excelClass  Excel mapped entity
+     * @param listener    Result listener
+     * @param headerIndex Excel header index
+     * @param endIndex    Read the cutoff index
+     * @param sheetName   sheetName
      */
     void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName);
 }

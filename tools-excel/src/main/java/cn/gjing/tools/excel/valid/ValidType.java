@@ -1,13 +1,12 @@
 package cn.gjing.tools.excel.valid;
 
 /**
- * 校验类型
+ * Check the type
  * @author Gjing
  **/
-@SuppressWarnings("unused")
 public enum ValidType {
     /**
-     * 校验类型
+     * Check the type
      */
     INTEGER(1),
     DECIMAL(2),

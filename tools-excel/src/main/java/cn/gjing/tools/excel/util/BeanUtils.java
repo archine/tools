@@ -11,15 +11,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Bean工具
+ * Bean tools
+ *
  * @author Gjing
  **/
 public class BeanUtils {
     /**
-     * 查找给定类中声明的方法
-     * @param clazz 目标类
-     * @param methodName 方法名
-     * @param paramTypes 方法参数类型
+     * Finds methods declared in a given class
+     *
+     * @param clazz      class
+     * @param methodName method name
+     * @param paramTypes param types
      * @return Method
      */
     public static Method findDeclaredMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
@@ -31,10 +33,11 @@ public class BeanUtils {
     }
 
     /**
-     * 设置某个对象的字段的值
-     * @param o 字段所在的对象
-     * @param field 字段
-     * @param value 内容
+     * Sets the value of a field of an object
+     *
+     * @param o     object
+     * @param field field
+     * @param value value
      */
     public static void setFieldValue(Object o, Field field, Object value) {
         try {
@@ -46,10 +49,11 @@ public class BeanUtils {
     }
 
     /**
-     * 获取字段内的值
-     * @param o 字段所在的对象
-     * @param field 字段
-     * @return 值
+     * Gets the value in the field
+     *
+     * @param o     object
+     * @param field field
+     * @return Object
      */
     public static Object getFieldValue(Object o, Field field) {
         try {
@@ -61,20 +65,18 @@ public class BeanUtils {
     }
 
     /**
-     * 获取父子类的所有带有注解的字段
-     * @param excelClass Excel类
-     * @param ignores 忽略的字段
-     * @return 带注解的字段
+     * Gets all annotated fields of the parent and child classes
+     *
+     * @param excelClass Excel mapped entity
+     * @param ignores    The exported field is to be ignored
+     * @return Annotated fields
      */
     public static List<Field> getFields(Class<?> excelClass, String[] ignores) {
-        //Get all the declared fields
         Field[] declaredFields = excelClass.getDeclaredFields();
-        //找到所有带有@ExcelField注解且不为过滤的字段
         List<Field> hasExcelFieldList = Arrays.stream(declaredFields)
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .filter(e -> ParamUtils.noContains(ignores, e.getName()))
                 .collect(Collectors.toList());
-        //如果有父类，父类也加进来
         Class<?> superclass = excelClass.getSuperclass();
         if (superclass != Object.class) {
             hasExcelFieldList.addAll(Arrays.stream(superclass.getDeclaredFields())
@@ -86,11 +88,12 @@ public class BeanUtils {
     }
 
     /**
-     * 获取泛型接口中某个泛型的class
-     * @param source 实现泛型接口的类
-     * @param typeInterface 泛型接口
-     * @param paramIndex 参数下标，0开始
-     * @return 指定下标参数的class
+     * Gets the class of a generic in a generic interface
+     *
+     * @param source        A class that implements a generic interface
+     * @param typeInterface A generic interface
+     * @param paramIndex    Parameter subscript, starting at 0
+     * @return Class<?>
      */
     public static Class<?> getInterfaceType(Class<?> source, Class<?> typeInterface, int paramIndex) {
         Type[] genericInterfaces = source.getGenericInterfaces();

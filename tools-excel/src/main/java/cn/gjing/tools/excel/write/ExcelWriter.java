@@ -44,7 +44,7 @@ public class ExcelWriter {
     }
 
     /**
-     * 初始化解析器
+     * Init resolver
      *
      * @param excel excel
      */
@@ -63,7 +63,7 @@ public class ExcelWriter {
     }
 
     /**
-     * 初始化样式
+     * Init style
      *
      * @param excel excel
      */
@@ -78,9 +78,9 @@ public class ExcelWriter {
     }
 
     /**
-     * 写excel
+     * Write Excel
      *
-     * @param data 要导出的数据
+     * @param data data
      * @return this
      */
     public ExcelWriter write(List<?> data) {
@@ -90,9 +90,9 @@ public class ExcelWriter {
     }
 
     /**
-     * 写入指定的sheet中
+     * Write to the specified sheet
      *
-     * @param data      要导出的数据
+     * @param data      data
      * @param sheetName sheetName
      * @return this
      */
@@ -103,8 +103,9 @@ public class ExcelWriter {
     }
 
     /**
-     * 重置处理器, <b>该操作要在其他操作之前进行, 否则之前的操作会无效</b>
-     * @param excelWriteResolver 读处理器
+     * Reset the processor before any other operation
+     *
+     * @param excelWriteResolver Excel write Resolver
      * @return this
      */
     public ExcelWriter resetResolver(Supplier<? extends ExcelWriterResolver> excelWriteResolver) {
@@ -113,10 +114,10 @@ public class ExcelWriter {
     }
 
     /**
-     * 重置模板
+     * Reset Excel mapped entity
      *
-     * @param excelClass 导出的这个Excel对应的Class
-     * @param ignores    忽略导出的字段
+     * @param excelClass Excel mapped entity
+     * @param ignores    The exported field is to be ignored
      * @return this
      */
     public ExcelWriter resetExcelClass(Class<?> excelClass, String... ignores) {
@@ -134,9 +135,9 @@ public class ExcelWriter {
     }
 
     /**
-     * 添加大标题
+     * Set big title
      *
-     * @param bigTitle 大标题提供者
+     * @param bigTitle Big title supplier
      * @return this
      */
     public ExcelWriter bigTitle(Supplier<? extends BigTitle> bigTitle) {
@@ -145,7 +146,7 @@ public class ExcelWriter {
     }
 
     /**
-     * 输出缓存中的内容
+     * Output the contents of the cache
      */
     public void flush() {
         this.writerResolver.flush(this.response, this.fileName);

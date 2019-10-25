@@ -3,14 +3,16 @@ package cn.gjing.tools.excel;
 import org.apache.poi.ss.usermodel.*;
 
 /**
- * Excel样式
+ * Excel style
+ *
  * @author Gjing
  **/
 public interface ExcelStyle {
 
     /**
-     * 设置大标题样式
-     * @param cellStyle 样式
+     * Big title style
+     *
+     * @param cellStyle cellStyle
      * @return CellStyle
      */
     default CellStyle setTitleStyle(CellStyle cellStyle) {
@@ -23,8 +25,9 @@ public interface ExcelStyle {
     }
 
     /**
-     * 设置列表头样式
-     * @param cellStyle 样式
+     * Header style
+     *
+     * @param cellStyle cellStyle
      * @return CellStyle
      */
     default CellStyle setHeaderStyle(CellStyle cellStyle) {
@@ -39,8 +42,9 @@ public interface ExcelStyle {
     }
 
     /**
-     * 设置正文样式
-     * @param cellStyle 样式
+     * Body style
+     *
+     * @param cellStyle cellStyle
      * @return CellStyle
      */
     default CellStyle setBodyStyle(CellStyle cellStyle) {
@@ -48,7 +52,6 @@ public interface ExcelStyle {
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        //自动换行
         cellStyle.setWrapText(true);
         cellStyle.setBorderBottom(BorderStyle.THIN);
         cellStyle.setBorderLeft(BorderStyle.THIN);

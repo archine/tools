@@ -1,13 +1,12 @@
 package cn.gjing.tools.excel.valid;
 
 /**
- * 操作类型
+ * Operation type
  * @author Gjing
  **/
-@SuppressWarnings("unused")
 public enum OperatorType {
     /**
-     * 操作类型
+     * Operation type
      */
     BETWEEN(0),
     NOT_BETWEEN(1),

@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-public class BeanUtils {
+public final class BeanUtils {
     /**
      * 复制属性
      *
@@ -45,10 +45,10 @@ public class BeanUtils {
         }
         assert t != null;
         if (ignores == null) {
-            BeanUtils.copyProperties(source, t);
+            org.springframework.beans.BeanUtils.copyProperties(source, t);
             return t;
         }
-        BeanUtils.copyProperties(source, t, ignores);
+        org.springframework.beans.BeanUtils.copyProperties(source, t, ignores);
         return t;
     }
 
