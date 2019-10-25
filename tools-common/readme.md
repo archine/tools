@@ -55,255 +55,408 @@ public class CorsConfiguration {
 ```
 ## 三、返回结果模板
 ### 1、ResultVO
-通用返回结果模板,包含``code(状态码)``和``message(提示信息)``以及``data(数据)``
+通用返回结果模板     
+
+|参数|描述|
+|---|---|
+|code|状态码|
+|message|提示信息|
+|data|数据|
 ### 2、PageResult
-分页查询返回结果集, 包含``data(数据)``、``totalPages(总页数)``、``CurrentPage(当前页数)``、``totalRows(总条数)``、``pageRows(每页的条数)``
+分页查询返回结果集    
+
+|参数|描述|
+|---|---|
+|totalPages|总页数|
+|CurrentPage|当前页数|
+|totalRows|总条数|
+|pageRows|每页的条数|
+|data|数据|
 ### 3、ErrorResult
-错误返回模板, 里面包含``failure``(``状态码400``时使用,包含``code``和``message``, ``code``用于进一步确定错误), ``error``(服务器型异常,一般``用于500``等, 只包含``message``)
+错误返回模板      
+
+|参数|描述|
+|---|---|
+|code|状态码|
+|message|提示信息|
 ## 四、参数校验工具类： 
 **主要提供参数校验、处理,匹配等等， 使用时通过``ParamUtils.xxx()``使用，以下为该工具的所有方法介绍 :**
-* **isEmpty**：判断给定参数是否为空，可以是字符串、包装类型、数组、集合等
-```java
-boolean isEmpty(T str)
-```
-* **isNotEmpty**：判断给定是否不为空，可以是字符串、包装类型、数组、集合等。。
-```java
-boolean isNotEmpty(T str)
-```
-* **requireNotNull**：该参数不能为空，为空抛出NPE，否则返回原值
-```java
-T requireNotNull(T str)
-```
-* **ListHasEmpty**：判断集合里是否含有空值
-```java
-boolean ListHasEmpty(Collection<? extends T> list)
-```
-* **multiEmpty**：检查多参数里面是否有空值
-```java
-boolean multiEmpty(Object...params)
-```
-* **equals**：判断两个参数是否相等
-```java
-boolean equals(Object t, Object u)
-```
-* **trim**：去除字符串的空格
-```java
-String trim(String str)
-```
-* **trim**：去除集合中的空元素
-```java
-List<String> trim(List<String> list)
-```
-* **removeSymbol**：移除字符串两边的符号
-```java
-String removeSymbol(String str, String symbol)
-```
-* **removeStartSymbol**：移除字符串开始的符号
-```java
-String removeStartSymbol(String str, String symbol)
-```
-* **removeEndSymbol**：移除字符串末尾的符号
-```java
-String removeEndSymbol(String str, String symbol)
-```
-* **split**：根据符号截取
-```java
-String[] split(String str, String symbol)
-```
-* **removeAllSymbol**：移除字符串里的符号
-```java
-String removeAllSymbol(String str, String symbol)
-```
-* **contains**：判断数组里是否包含指定的值
-```java
-boolean contains(String[] arr, String val)
-```
-* **isEmail**：判断是否为email
-```java
-boolean isEmail(String email)
-```
-* **isMobileNumber**：判断是否是手机号码
-```java
-boolean isMobileNumber(String phone)
-```
-* **isTelPhone**：判断是不是电话号码
-```java
-boolean isTelPhone(String tel)
-```
-* **判断是否为邮编**
-```java
-boolean isPostCode(String postCode)
-```
+### 1、isEmpty
+判断给定参数是否为空，可以是字符串、包装类型、数组、集合等    
+
+|参数|描述|
+|---|---|
+|str|参数|
+### 2、isNotEmpty
+判断给定是否不为空，可以是字符串、包装类型、数组、集合等     
+
+|参数|描述|
+|---|---|
+|str|参数|
+### 3、requireNotNull
+该参数不能为空，为空抛出NPE，否则返回原值     
+
+|参数|描述|
+|---|---|
+|str|参数|
+### 4、ListHasEmpty
+判断集合里是否含有空值   
+
+|参数|描述|
+|---|---|
+|list|集合|
+### 5、multiEmpty
+检查多个参数里面是否有空值     
+
+|参数|描述|
+|---|---|
+|params|多个参数|
+### 6、equals
+判断两个参数是否相等    
+
+|参数|描述|
+|---|---|
+|t|参数1|
+|u|参数2|
+### 7、trim
+去除字符串的空格     
+
+|参数|描述|
+|---|---|
+|str|字符串|
+### 8、trim
+去除集合中的空元素     
+
+|参数|描述|
+|---|---|
+|list|集合|
+### 9、removeSymbol
+移除字符串两边的指定符号      
+
+|参数|描述|
+|---|---|
+|str|字符串|
+|symbol|符号|
+### 10、removeStartSymbol
+移除字符串开始的指定符号     
+
+|参数|描述|
+|---|---|
+|str|字符串|
+|symbol|符号|
+### 11、removeEndSymbol
+移除字符串末尾的指定符号    
+
+|参数|描述|
+|---|---|
+|str|字符串|
+|symbol|符号|
+### 12、split
+根据符号截取    
+
+|参数|描述|
+|---|---|
+|str|字符串|
+|symbol|符号|
+### 13、removeAllSymbol
+移除字符串里的所有指定符号    
+
+|参数|描述|
+|---|---|
+|str|字符串|
+|symbol|符号|
+### 14、contains
+判断数组里是否包含指定的值     
+
+|参数|描述|
+|---|---|
+|arr|数组|
+|val|值|
+### 15、isEmail
+判断是否为email       
+
+|参数|描述|
+|---|---|
+|email|字符串|
+### 16、isMobileNumber
+判断是否是手机号码    
+
+|参数|描述|
+|---|---|
+|phone|字符串|
+### 17、isTelPhone
+判断是不是电话号码     
+
+|参数|描述|
+|---|---|
+|tel|字符串|
+### 18、isPostCode
+判断是否为邮编    
+
+|参数|描述|
+|---|---|
+|postCode|字符串|
 ## 五、时间工具类： 
 **对时间进行操作，使用时通过``TimeUtils.xxx()``调用，该工具的所有方法介绍如下 :**
-* **dateToString**：获取文本格式时间
-```java
-String dateToString(Date date)
-```
-* **dateToLocalDateTime**：date转localDateTime
-```java
-LocalDateTime dateToLocalDateTime(Date date)
-```
-* **dateToLocalDate**：date转localDate
-```java
-LocalDate dateToLocalDate(Date date)
-```
-* **localDateToDate**：localDate转Date
-```java
-Date localDateToDate(LocalDate localDate)
-```
-* **LocalDateToString**：LocalDate转指定格式字符串
-```java
-String localDateToString(LocalDate localDate)
-```
-* **LocalDateTimeToString**：LocalDateTime转指定格式字符串
-```java
-localDateTimeToString(LocalDateTime localDateTime)
-```
-* **localTimeToString**：LocalTime转指定格式字符串
-```java
-localTimeToString(LocalTime localTime)
-```
-* **stringToLocalDate**：字符串日期转指定格式
-```java
-LocalDate stringToLocalDate(String time)
-```
-* **stringToLocalDateTime**：字符串日期转指定格式
-```java
-LocalDate stringToLocalDateTime(String time)
-```
-* **localDateTimeToDate**：LocalDateTime转
-```java
-Date localDateTimeToDate(LocalDateTime dateTime)
-```
-* **localDateTimeToStamp**：localDateTime转时间
-```java
-long localDateTimeToStamp(LocalDateTime localDateTime)
-```
-* **stampToLocalDateTime**：时间戳转
-```java
-LocalDateTime stampToLocalDateTime(Long stamp)
-```
-* **getYearsByStartTime**：查询一个日期（年月日）到现在过了多少
-```java
-Integer getYearsByStartTime(String startTime)
-```
-* **dateToString**：Date转字符串
-```java
-String dateToString(Date date, String format)
-```
-* **stringToDate**：字符串转Date
-```java
-Date stringToDate(String date)
-```
-* **getDate**：字符串日期转指定格式Date
-```java
-Date stringToDate(String date, string format)
-```
-* **stringDateToCalendar**：字符串时间转日期
-```java
-Calendar stringDateToCalendar(String str)
-```
-* **calendarToDate**：日期转Date
-```java
-Date calendarToDate(Calendar calendar, String format)
-```
-* **calendarToStringDate**：日期转字符串
-```java
-String calendarToStringDate(Calendar calendar, String format)
-```
-* **getAllDaysOfMonth**：获取某个时间所在月份的天数
-```java
-int getAllDaysOfMonth(Date date)
-```
-* **getDays**：获取时间的天数，如2017-12-13，返回13
-```java
-int getDays(Date date)
-```
-* **getYears**：获取时间所在的年份
-```java
-int getYears(Date date)    
-```
-* **getMonth**：获取时间所在月份
-```java
-int getMonth(Date date)
-```
-* **addMonth**：增加月份
-```java
-Date addMonth(Date date, int n)
-```
-* **addDay**：增加天数
-```java
-Date addDay(Date date, int n)
-```
-* **stringDateToStamp**：字符串日期转时间戳
-```java
-Long stringDateToStamp(String stringDate)
-```
-* **stampToStringDate**：时间戳转字符串
-```java
-String stampToStringDate(Long timeStamp)
-````
-* **dateBetween**：计算两个日期相差的天数（不包括今天）
-```java
-int dateBetween(String startDate, String endDate)
-```
-* **dateBetweenIncludeToday**：计算两个日期相差的天数（包括今天）
-```java
-int dateBetween(String startDate, String endDate)
-```
+### 1、dateToString
+获取文本格式时间     
+
+|参数|描述|
+|---|---|
+|date|Date对象|
+### 2、dateToLocalDateTime
+date转localDateTime     
+
+|参数|描述|
+|---|---|
+|date|Date对象|
+### 3、dateToLocalDate
+date转localDate    
+
+|参数|描述|
+|---|---|
+|date|Date对象|
+### 4、localDateToDate
+localDate转Date    
+
+|参数|描述|
+|---|---|
+|localDate|LocalDate对象|
+### 5、LocalDateToString
+LocalDate转指定格式字符串     
+
+|参数|描述|
+|---|---|
+|localDate|LocalDate对象|
+### 6、LocalDateTimeToString
+LocalDateTime转指定格式字符串     
+
+|参数|描述|
+|---|---|
+|localDateTime|LocalDateTime对象|
+### 7、localTimeToString
+LocalTime转指定格式字符串     
+
+|参数|描述|
+|---|---|
+|localTime|LocalTime对象|
+### 8、stringToLocalDate
+字符串日期转指定格式      
+
+|参数|描述|
+|---|---|
+|time|字符串日期|
+### 9、stringToLocalDateTime
+字符串日期转指定格式     
+
+|参数|描述|
+|---|---|
+|time|字符串日期|
+### 10、localDateTimeToDate
+LocalDateTime转Date     
+
+|参数|描述|
+|---|---|
+|dateTime|LocalDateTime对象|
+### 11、localDateTimeToStamp
+localDateTime转时间戳     
+
+|参数|描述|
+|---|---|
+|dateTime|LocalDateTime对象|
+### 12、stampToLocalDateTime
+时间戳转LocalDateTime     
+
+|参数|描述|
+|---|---|
+|stamp|时间戳|
+### 13、getYearsByStartTime
+查询一个日期(年月日格式)到目前过了多少年    
+
+|参数|描述|
+|---|---|
+|startTime|开始的时间(字符串)|
+### 14、dateToString
+Date转字符串      
+
+|参数|描述|
+|---|---|
+|date|Date对象|
+|format|格式，如:yyyy-MM-dd|
+### 15、stringToDate
+字符串转Date      
+
+|参数|描述|
+|---|---|
+|date|时间字符串|
+### 16、getDate
+字符串日期转指定格式Date     
+
+|参数|描述|
+|---|---|
+|date|时间字符串|
+|format|格式，如:yyyy-MM-dd|
+### 17、stringDateToCalendar
+字符串时间转日期   
+
+|参数|描述|
+|---|---|
+|str|字符串时间|
+### 18、calendarToDate
+日期转Date     
+
+|参数|描述|
+|---|---|
+|calendar|日期|
+|format|格式，如:yyyy-MM-dd|
+### 19、calendarToStringDate
+日期转字符串      
+
+|参数|描述|
+|---|---|
+|calendar|日期|
+|format|格式，如:yyyy-MM-dd|
+### 20、getAllDaysOfMonth
+获取某个时间所在月份的天数     
+
+|参数|描述|
+|---|---|
+|date|时间对象|
+### 21、getDays
+获取时间的天数，如2017-12-13，返回13    
+
+|参数|描述|
+|---|---|
+|date|时间对象|
+### 22、getYears
+获取时间所在的年份    
+
+|参数|描述|
+|---|---|
+|date|时间对象|
+### 23、getMonth
+获取时间所在月份    
+
+|参数|描述|
+|---|---|
+|date|时间对象|
+### 24、addMonth
+增加月份    
+
+|参数|描述|
+|---|---|
+|date|时间对象|
+|n|月数|
+### 25、addDay
+增加天数    
+
+|参数|描述|
+|---|---|
+|date|时间对象|
+|n|天数|
+### 26、stringDateToStamp
+字符串日期转时间戳      
+
+|参数|描述|
+|---|---|
+|stringDate|字符串时间|
+### 27、stampToStringDate
+时间戳转字符串时间     
+
+|参数|描述|
+|---|---|
+|timeStamp|时间戳|
+### 28、dateBetween
+计算两个日期相差的天数（不包括今天）     
+
+|参数|描述|
+|---|---|
+|startDate|开始时间|
+|endDate|结束时间|
+### 29、dateBetweenIncludeToday
+计算两个日期相差的天数（包括今天）     
+
+|参数|描述|
+|---|---|
+|startDate|开始时间|
+|endDate|结束时间|
 ## 六、加密工具类
 **主要用于数据加密, 该工具包含的所有方法如下:**
-* **encodeMd5**：MD5加密
-```java
-String encodeMd5(String body)
-```
-* **encodeBase64**：Base64加密
-```java
-encodeBase64(String content)
-```
-* **decodeBase64**：Base64解密
-```java
-String decodeBase64(String content)
-```
-* **encodeSha256Hmac**：sha566 hmac加密
-```java
-String encodeSha256Hmac(String str, String secret)
-```
-* **sha1Hmac**：sha1Hmac加密
-```java
-String sha1Hmac(String str, String secret)
-```
-* **encodeAes**：AES加密
-```java
-String encodeAes(String content, String password)
-```
-* **decodeAes**：AES解密
-```java
-String decodeAes(String content, String password)
-```
+### 1、encodeMd5
+MD5加密     
+
+|参数|描述|
+|---|---|
+|body|要加密的内容|
+### 2、encodeBase64
+Base64加密     
+
+|参数|描述|
+|---|---|
+|content|要加密的内容|
+### 3、decodeBase64
+Base64解密     
+
+|参数|描述|
+|---|---|
+|content|要加密的内容|
+### 4、encodeSha256Hmac
+sha566 hmac加密     
+
+|参数|描述|
+|---|---|
+|str|要加密的内容|
+|secret|密钥|
+### 5、sha1Hmac
+sha1Hmac加密      
+
+|参数|描述|
+|---|---|
+|str|要加密的内容|
+|secret|密钥|
+### 6、encodeAes
+AES加密     
+
+|参数|描述|
+|---|---|
+|content|要加密的内容|
+|password|加密需要的密码|
+### 7、decodeAes
+AES解密     
+
+|参数|描述|
+|---|---|
+|content|要加密的内容|
+|password|加密需要的密码|
 ## 七、随机数工具类
 **用于随机生成数字或字符串，使用时通过``RandomUtils.xxx()``调用，该工具包含的所有方法如下 :**
-* **randomInt**：获取随机整数，可设置最大值和最小值
-```java
-int randomInt(int min, int max)
-```
-* **getRandom**：获取一个Random实例
-```java
-Random getRandom()
-```
-* **generateMixString**：生成混合指定长度字符串（数字、字母大小写）
-```java
-String generateMixString(int length)
-```
-* **generateString**：获取指定长度纯字符串（字母大小写）
-```java
-String generateString(int length)
-```
-* **generateNumber**：获取指定长度数字字符串
-```java
-String generateNumber(int length)
-```
+### 1、randomInt
+获取随机整数，可设置最大值和最小值    
+
+|参数|描述|
+|---|---|
+|min|最小值|
+|max|最大值|
+### 2、getRandom
+获取一个Random实例
+### 3、generateMixString
+生成混合指定长度字符串（数字、字母大小写）      
+
+|参数|描述|
+|---|---|
+|length|生成的字符串长度|
+### 4、generateString
+获取指定长度纯字符串（字母大小写）         
+
+|参数|描述|
+|---|---|
+|length|生成的字符串长度|
+### 5、generateNumber
+获取指定长度数字字符串    
+
+|参数|描述|
+|---|---|
+|length|生成的字符串长度|
 ## 八、Bean工具类：
 **使用时通过``BeanUtils.xxx()``调用**
 ### 1、copyProperties
@@ -389,34 +542,43 @@ String generateNumber(int length)
 ### 1、writeToLocal
 生成验证码到本地，案例如下
 ```java
-public static void main(String[] args) {
-    AuthCodeUtil authCodeUtil = new AuthCodeUtil(160,40,5,150);
-    try {
-        String path="/文件夹路径/code.png";
-        //写入到本地时可以通过getCode()方法获取生成的验证码
-        String code = authCodeUtil.writeToLocal(path).getCode();
-        System.out.println(code);
-    } catch (IOException e) {
-        e.printStackTrace();
+public class Test{
+    public static void main(String[] args) {
+        AuthCodeUtil authCodeUtil = new AuthCodeUtil(160,40,5,150);
+        try {
+            String path="/文件夹路径/code.png";
+            //写入到本地时可以通过getCode()方法获取生成的验证码
+            String code = authCodeUtil.writeToLocal(path).getCode();
+            System.out.println(code);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 ```
 ### 2、getCode
 获取生成的验证码字符
 ```java
-String code = authCodeUtil.writeToLocal(xxx).getCode;
+public class Test{
+    public static void main(String[] args){
+      String code = authCodeUtil.writeToLocal(xxx).getCode;
+      System.out.println(code);
+    }
+}
 ```
 ### 3、write
 以流的方式返回给前端，案例如下
 ```java
-@GetMapping("/code")
-public void getCode(HttpServletResponse response, HttpServletRequest request) throws IOException {
-    AuthCodeUtil authCodeUtil = new AuthCodeUtil(100, 50, 4, 50);
-    response.setContentType("image/jpeg");
-    //禁止图像缓存
-    response.setHeader("param", "no-cache");
-    response.setDateHeader("Expires", 0);
-    authCodeUtil.write(response.getOutputStream());
+public class Test{
+    @GetMapping("/code")
+    public void getCode(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        AuthCodeUtil authCodeUtil = new AuthCodeUtil(100, 50, 4, 50);
+        response.setContentType("image/jpeg");
+        //禁止图像缓存
+        response.setHeader("param", "no-cache");
+        response.setDateHeader("Expires", 0);
+        authCodeUtil.write(response.getOutputStream());
+    }
 }
 ```
 ## 十、Id生成工具类
