@@ -93,7 +93,7 @@ public class BeanUtils {
      * @param source        A class that implements a generic interface
      * @param typeInterface A generic interface
      * @param paramIndex    Parameter subscript, starting at 0
-     * @return Class<?>
+     * @return Class
      */
     public static Class<?> getInterfaceType(Class<?> source, Class<?> typeInterface, int paramIndex) {
         Type[] genericInterfaces = source.getGenericInterfaces();

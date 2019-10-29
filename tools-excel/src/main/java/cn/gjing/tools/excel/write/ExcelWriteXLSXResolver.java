@@ -19,8 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -68,9 +69,12 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
     @Override
     public void flush(HttpServletResponse response, String fileName) {
         response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-disposition",
-                "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8),
-                        StandardCharsets.ISO_8859_1) + ".xlsx");
+        try {
+            response.setHeader("Content-disposition",
+                    "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8") + ".xlsx");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         try {
             this.outputStream = response.getOutputStream();
             this.workbook.write(outputStream);
