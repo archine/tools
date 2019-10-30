@@ -34,19 +34,16 @@ class ExcelReadResolver implements ExcelReaderResolver {
 
     @Override
     public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName) {
-        //得到excel的class实体
         Excel excel = excelClass.getAnnotation(Excel.class);
         if (excel == null) {
             throw new NullPointerException("@Excel was not found on the excelClass");
         }
         if (hasAnnotationFieldMap.isEmpty()) {
-            //拿到所有带有注解的字段，放进map中
             this.hasAnnotationFieldMap = Arrays.stream(excelClass.getDeclaredFields())
                     .filter(f -> f.isAnnotationPresent(ExcelField.class))
                     .collect(
                             Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field)
                     );
-            //找找是否有父类，有就加进来
             Class superclass = excelClass.getSuperclass();
             if (superclass != Object.class) {
                 Map<String, Field> supperFieldMap = Arrays.stream(superclass.getDeclaredFields())
@@ -62,7 +59,6 @@ class ExcelReadResolver implements ExcelReaderResolver {
                 try {
                     if (this.workbook == null) {
                         this.workbook = new HSSFWorkbook(inputStream);
-                        //得到sheet
                         this.sheet = this.workbook.getSheet(sheetName);
                     }
                 } catch (IOException e) {
@@ -84,7 +80,6 @@ class ExcelReadResolver implements ExcelReaderResolver {
 
     private void reader(Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex) {
         List<Object> dataList = new ArrayList<>();
-        //创建个新实例
         Object o = null;
         for (Row row : sheet) {
             if (row.getRowNum() < headerIndex) {
@@ -92,7 +87,6 @@ class ExcelReadResolver implements ExcelReaderResolver {
             }
             if (row.getRowNum() == headerIndex) {
                 if (this.headNameList.isEmpty()) {
-                    //增加列表头名称和总列数
                     for (Cell cell : row) {
                         this.totalCol++;
                         headNameList.add(cell.getStringCellValue());
@@ -125,10 +119,10 @@ class ExcelReadResolver implements ExcelReaderResolver {
     }
 
     /**
-     * 获取值
+     * Gets the value of the cell
      *
-     * @param cell 单元格
-     * @return string
+     * @param cell cell
+     * @return value
      */
     private String getValue(Cell cell) {
         Object value = "";
@@ -162,12 +156,12 @@ class ExcelReadResolver implements ExcelReaderResolver {
     }
 
     /**
-     * 给对象的字段设置值
+     * Sets values for the fields of the object
      *
-     * @param o          具体对象
-     * @param field      字段
-     * @param value      excel读出来的值
-     * @param excelField excel字段注解
+     * @param o          object
+     * @param field      field
+     * @param value      value
+     * @param excelField Excel list headers map to entity fields annotations
      */
     @SuppressWarnings("unchecked")
     private void setValue(Object o, Field field, String value, ExcelField excelField) {
@@ -220,11 +214,11 @@ class ExcelReadResolver implements ExcelReaderResolver {
     }
 
     /**
-     * 字段set值
+     * Set field value
      *
-     * @param field 字段
-     * @param o     字段所在对象
-     * @param value 值
+     * @param field field
+     * @param o     object
+     * @param value value
      */
     private void setField(Field field, Object o, Object value) {
         BeanUtils.setFieldValue(o, field, value);
