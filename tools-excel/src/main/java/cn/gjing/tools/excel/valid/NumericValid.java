@@ -33,21 +33,21 @@ public @interface NumericValid {
      *
      * @return OperatorType
      */
-    OperatorType operatorType() default OperatorType.EQUAL;
+    OperatorType operatorType() default OperatorType.GREATER_OR_EQUAL;
 
     /**
      * Valid type
      *
      * @return ValidType
      */
-    ValidType validationType();
+    ValidType validationType() default ValidType.INTEGER;
 
     /**
      * expr1
      *
      * @return expr1
      */
-    String expr1();
+    String expr1() default "0";
 
     /**
      * expr2
@@ -82,7 +82,7 @@ public @interface NumericValid {
      *
      * @return content
      */
-    String errorContent() default "Please fill in the correct value";
+    String errorContent() default "Please enter Numbers greater than or equal to 0";
 
     /**
      * Whether it pops up immediately
@@ -90,11 +90,4 @@ public @interface NumericValid {
      * @return boolean
      */
     boolean showPromptBox() default true;
-
-    /**
-     * Whether null values are allowed
-     *
-     * @return boolean
-     */
-    boolean allowEmpty() default true;
 }

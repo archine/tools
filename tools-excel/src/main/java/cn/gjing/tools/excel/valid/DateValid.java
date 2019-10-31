@@ -82,7 +82,7 @@ public @interface DateValid {
      *
      * @return content
      */
-    String errorContent() default "Please fill in the correct time range: 1970-01-01 to 2999-01-01";
+    String errorContent() default "Please entry the correct time range: 1970-01-01 to 2999-01-01";
 
     /**
      * Whether it pops up immediately
@@ -90,11 +90,4 @@ public @interface DateValid {
      * @return boolean
      */
     boolean showPromptBox() default true;
-
-    /**
-     * Whether null values are allowed
-     *
-     * @return boolean
-     */
-    boolean allowEmpty() default true;
 }

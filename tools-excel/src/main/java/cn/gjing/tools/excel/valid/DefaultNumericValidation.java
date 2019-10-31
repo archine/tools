@@ -24,7 +24,6 @@ public class DefaultNumericValidation implements ExcelValidation {
         DataValidation dataValidation = helper.createValidation(numericConstraint, regions);
         dataValidation.setShowErrorBox(numericValid.showErrorBox());
         dataValidation.setShowPromptBox(numericValid.showPromptBox());
-        dataValidation.setEmptyCellAllowed(numericValid.allowEmpty());
         dataValidation.setErrorStyle(numericValid.rank().getRank());
         dataValidation.createErrorBox(numericValid.errorTitle(), numericValid.errorContent());
         dataValidation.createErrorBox(numericValid.errorTitle(), numericValid.errorContent());

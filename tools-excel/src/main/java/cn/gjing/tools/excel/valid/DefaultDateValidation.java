@@ -24,7 +24,6 @@ public class DefaultDateValidation implements ExcelValidation {
         dataValidation.setShowPromptBox(dateValid.showPromptBox());
         dataValidation.setErrorStyle(dateValid.rank().getRank());
         dataValidation.createErrorBox(dateValid.errorTitle(), dateValid.errorContent());
-        dataValidation.setEmptyCellAllowed(dateValid.allowEmpty());
         sheet.addValidationData(dataValidation);
     }
 }

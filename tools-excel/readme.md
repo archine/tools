@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.1.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **提供Excel导入导出功能**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -40,7 +40,6 @@
 |expr2|表达式2，默认``2999-01-01``|
 |showErrorBox|是否弹出错误框，默认``true``|
 |showPromptBox|是否立即弹出，默认``true``|
-|allowEmpty|是否允许空值，默认``true``|
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
@@ -64,13 +63,12 @@
 |-----|-----|
 |validClass|校验器Class|
 |boxLastRow|数据校验最多校验多少行，默认是该列表头下的正文第一行|
-|operatorType|操作类型，默认``OperatorType.EQUAL``|
-|validationType|校验类型，``必填``|
-|expr1|表达式1，在表达式2前面，``必填``|
+|operatorType|操作类型，默认``OperatorType.GREATER_OR_EQUAL``|
+|validType|校验类型，默认``ValidType.INTEGER``|
+|expr1|表达式1，在表达式2前面，默认``0``|
 |expr2|表达式2，在操作类型为``BETWEEN``和``NOT_BETWEEN``情况下必填|
 |showErrorBox|是否弹出错误框，默认``true``|
 |showPromptBox|是否立即弹出，默认``true``|
-|allowEmpty|是否允许空值，默认``true``|
 |rank|提示框级别，默认``Rank.WARING``警告级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
