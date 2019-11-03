@@ -1,7 +1,7 @@
 ![](https://img.shields.io/badge/version-1.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
-**提供Excel导入导出功能**
+**采用注解方式的导入导出，能让你在项目中更便捷的使用**
 ## 一、安装依赖
 ```xml
 <dependency>
@@ -12,7 +12,7 @@
 ```
 ## 二、注解说明
 ### 1、@Excel
-**使用在类上，表明这个类要绑定excel，注解参数如下**     
+**实体上使用，声明Excel与该实体存在映射，注解参数如下**     
 
 |参数|描述|
 |---|---|
@@ -20,15 +20,15 @@
 |type|Excel文档类型，默认``XLS``|
 |style|导出的Excel样式|
 ### 2、@ExcelField
-**使用在字段上，表明这是Excel的列表头，注解参数如下**     
+**字段上使用，声明Excel的列表头会与该字段映射，注解参数如下**     
 
 |参数|描述|
 |---|---|
 |value|列表头名字|
-|pattern|时间类型字段需要转换指定格式，需要指定|
-|width|这个列表头单元格的宽度|
+|pattern|如何字段是时间类型的，且需要格式转换，那么则一定要设置|
+|width|这个列表头单元格的宽度，默认``20 * 256``，建议设置``256``的倍数|
 ### 3、@DateValid
-**时间校验注解，使用在字段上，表明我这个列表头下指定行数的单元格要进行数据校验，``XLSX``类型文档不支持，注解参数如下**     
+**时间校验注解，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加时间的校验，``XLSX``类型文档不支持，注解参数如下**     
 
 |参数|描述|
 |---|---|
@@ -44,7 +44,7 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 ### 4、@ExplicitValid
-**明确范围内容校验，使用在注解上，注解参数如下**     
+**下拉框选值，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加下拉框选项，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
@@ -57,7 +57,7 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
 #### 5、@NumericValid
-**数据类型校验，使用在字段上，注解参数如下**     
+**数据类型校验，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加数据类型的校验，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
@@ -392,7 +392,7 @@ public class User {
 
     @ExcelField("性别")
     //指定该列表头下的第一行单元格只能选取这两个值
-    @ExplicitValid(combobox = {"男,女"})
+    @ExplicitValid(combobox = {"男","女"})
     @ExcelEnumConvert(convert = GenderEnum.MyExcelEnumConvert.class)
     private GenderEnum genderEnum;
 
@@ -551,9 +551,10 @@ public class UserController {
         ExcelFactory.createReader(file.getInputStream(), User.class)
                 .resetResolver(MyReaderResolver::new)
                 .read()
-                .listener(e -> userService.saveUserList(e));
+                .listener(e -> userService.saveUserList(e))
         return ResponseEntity.ok("导入成功");
     }
 }
 ```
 ---
+**Demo地址：[excel-demo](https://github.com/archine/excel-demo)**
