@@ -3,7 +3,6 @@ package cn.gjing.tools.excel.read;
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
-import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
 import com.google.gson.Gson;
 import com.monitorjbl.xlsx.StreamingReader;
@@ -165,29 +164,6 @@ class ExcelReadResolver implements ExcelReaderResolver {
      */
     @SuppressWarnings("unchecked")
     private void setValue(Object o, Field field, String value, ExcelField excelField) {
-        if (field.getType() == String.class) {
-            this.setField(field, o, value);
-            return;
-        }
-        if (field.getType() == int.class || field.getType() == Integer.class) {
-            this.setField(field, o, Integer.parseInt(value));
-            return;
-        }
-        if (field.getType() == long.class || field.getType() == Long.class) {
-            this.setField(field, o, Long.parseLong(value));
-            return;
-        }
-        if (field.getType() == boolean.class || field.getType() == Boolean.class) {
-            this.setField(field, o, Boolean.parseBoolean(value));
-            return;
-        }
-        if (field.getType() == Date.class) {
-            this.setField(field, o, ParamUtils.equals("", excelField.pattern())
-                    ? TimeUtils.stringToDate(value)
-                    : TimeUtils.stringToDate(value, excelField.pattern())
-            );
-            return;
-        }
         if (field.getType().isEnum()) {
             ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
             Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
@@ -198,18 +174,8 @@ class ExcelReadResolver implements ExcelReaderResolver {
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
-            return;
-        }
-        if (field.getType() == double.class || field.getType() == Double.class) {
-            this.setField(field, o, Double.parseDouble(value));
-            return;
-        }
-        if (field.getType() == float.class || field.getType() == Float.class) {
-            this.setField(field, o, Float.parseFloat(value));
-            return;
-        }
-        if (field.getType() == byte.class || field.getType() == Byte.class) {
-            this.setField(field, o, Byte.parseByte(value));
+        } else {
+            this.setField(field, o, gson.fromJson(value.toString(), field.getType()));
         }
     }
 
