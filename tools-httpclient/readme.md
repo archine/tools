@@ -43,6 +43,7 @@ public class Test{
         param.put("id","1");
         HttpClient.builder("http://127.0.0.1:8080/test6", HttpMethod.GET, String.class)
                 .param(param)
+                .execute()
                 .listener(System.out::println);
     }
 }
@@ -57,6 +58,7 @@ public class Test{
         map.put("val", "200");
         Map resultMap = HttpClient.builder("http://127.0.0.1:8080/test6", HttpMethod.POST, Map.class)
                 .body(map)
+                .execute()
                 .get();
     }
 }
