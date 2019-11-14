@@ -1,11 +1,13 @@
 package cn.gjing.tools.common.util;
 
 import cn.gjing.tools.common.exception.ParamException;
-import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -15,7 +17,6 @@ import java.security.SecureRandom;
 /**
  * @author Gjing
  **/
-@NoArgsConstructor
 public class EncryptionUtils {
 
     /**
@@ -24,7 +25,7 @@ public class EncryptionUtils {
      * @param body need to encryption
      * @return encrypted string
      */
-    public String encodeMd5(String body) {
+    public static String encodeMd5(String body) {
         StringBuilder buf = new StringBuilder();
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -54,7 +55,7 @@ public class EncryptionUtils {
      * @param content 要编码的字符串
      * @return 编码过的字符串
      */
-    public String encodeBase64(String content) {
+    public static String encodeBase64(String content) {
         return Base64.encodeBase64String(content.getBytes());
     }
 
@@ -64,7 +65,7 @@ public class EncryptionUtils {
      * @param content 编码过的字符串
      * @return 编码前的字符串
      */
-    public String decodeBase64(String content) {
+    public static String decodeBase64(String content) {
         return new String(Base64.decodeBase64(content));
     }
 
@@ -75,7 +76,7 @@ public class EncryptionUtils {
      * @param secret 秘钥
      * @return 加密后的字符串
      */
-    public String encodeSha256Hmac(String str, String secret) {
+    public static String encodeSha256Hmac(String str, String secret) {
         String hash;
         try {
             Mac sha256Hmac = Mac.getInstance("HmacSHA256");
@@ -94,7 +95,7 @@ public class EncryptionUtils {
      * @param secret 秘钥
      * @return str 加密后的字符串
      */
-    public String sha1Hmac(String str, String secret) {
+    public static String sha1Hmac(String str, String secret) {
         try {
             SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA1");
             Mac mac = Mac.getInstance("HmacSHA1");
@@ -113,7 +114,7 @@ public class EncryptionUtils {
      * @param password 加密需要的密码
      * @return 密文
      */
-    public String encodeAes(String content, String password) {
+    public static String encodeAes(String content, String password) {
         try {
             KeyGenerator kgen = KeyGenerator.getInstance("AES");
             kgen.init(128, new SecureRandom(password.getBytes()));
@@ -139,7 +140,7 @@ public class EncryptionUtils {
      * @param password 加密时的密码
      * @return 明文
      */
-    public String decodeAes(String content, String password) {
+    public static String decodeAes(String content, String password) {
         try {
             KeyGenerator kgen = KeyGenerator.getInstance("AES");
             kgen.init(128, new SecureRandom(password.getBytes()));
@@ -161,7 +162,7 @@ public class EncryptionUtils {
      * @param b 字节数组
      * @return 字符串
      */
-    private String byteArrayToHexString(byte[] b) {
+    private static String byteArrayToHexString(byte[] b) {
         StringBuilder hs = new StringBuilder();
         String stmp;
         for (int n = 0; b != null && n < b.length; n++) {

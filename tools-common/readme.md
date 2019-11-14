@@ -1,5 +1,5 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.2.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -9,7 +9,7 @@
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.2.6</version>
+  <version>1.2.7</version>
 </dependency>
 ```
 ## 二、常用注解:
@@ -381,7 +381,7 @@ Date转字符串
 |startDate|开始时间|
 |endDate|结束时间|
 ## 六、加密工具类
-**主要用于数据加密, 该工具包含的所有方法如下:**
+**主要用于数据加密, 使用时通过``EncryptionUtils.xxx()``调用，该工具包含的所有方法如下:**
 ### 1、encodeMd5
 MD5加密     
 
