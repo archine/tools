@@ -30,6 +30,7 @@ public class HttpClient<T> implements Closeable {
         this.requestUrl = url;
         this.httpMethod = method;
         this.responseType = responseType;
+        this.objectMapper = new ObjectMapper();
     }
 
     private HttpClient() {
