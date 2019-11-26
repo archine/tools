@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-mvn deploy -P release -Dgpg.passphrase=Gj980621
+mvn deploy -P release -Darguments="gpg.passphrase=Gj980621"

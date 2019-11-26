@@ -27,3 +27,4 @@ target/
 .mvn/
 #pom.xml
 #src/
+build.sh

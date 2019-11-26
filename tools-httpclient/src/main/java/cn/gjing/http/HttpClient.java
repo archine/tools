@@ -1,6 +1,7 @@
 package cn.gjing.http;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -23,7 +24,7 @@ public class HttpClient<T> implements Closeable {
     private String json;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
-    private static Gson gson = new Gson();
+    private ObjectMapper objectMapper;
 
     private HttpClient(String url, HttpMethod method, Class<T> responseType) {
         this.requestUrl = url;
@@ -87,7 +88,11 @@ public class HttpClient<T> implements Closeable {
             return this;
         }
         Objects.requireNonNull(json, "Request json cannot be null");
-        this.json = json instanceof String ? json.toString() : gson.toJson(json);
+        try {
+            this.json = json instanceof String ? json.toString() : objectMapper.writeValueAsString(json);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
@@ -129,7 +134,7 @@ public class HttpClient<T> implements Closeable {
                     result.append(line);
                 }
                 try {
-                    this.data = gson.fromJson(result.toString(), this.responseType);
+                    this.data = objectMapper.readValue(result.toString(), this.responseType);
                 } catch (Exception c) {
                     this.data = (T) result.toString();
                 }
