@@ -25,12 +25,16 @@ public class HttpClient<T> implements Closeable {
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private ObjectMapper objectMapper;
+    private FallbackHelper fallbackHelper;
 
     private HttpClient(String url, HttpMethod method, Class<T> responseType) {
         this.requestUrl = url;
         this.httpMethod = method;
         this.responseType = responseType;
         this.objectMapper = new ObjectMapper();
+        this.fallbackHelper = e -> {
+            throw new HttpException(e.toString());
+        };
     }
 
     private HttpClient() {
@@ -38,7 +42,7 @@ public class HttpClient<T> implements Closeable {
     }
 
     /**
-     * build a httpClient
+     * Build a httpClient
      *
      * @param url          Request url
      * @param method       Request method
@@ -51,7 +55,7 @@ public class HttpClient<T> implements Closeable {
     }
 
     /**
-     * carry request header
+     * Carry request header
      *
      * @param header request header map
      * @return HttpClient
@@ -63,7 +67,7 @@ public class HttpClient<T> implements Closeable {
     }
 
     /**
-     * carry request parameter
+     * Carry request parameter
      *
      * @param queryMap parameter map
      * @return HttpClient
@@ -79,13 +83,13 @@ public class HttpClient<T> implements Closeable {
     }
 
     /**
-     * carry request body
+     * Carry request body
      *
      * @param json json string or json object
      * @return HttpClient
      */
     public HttpClient<T> body(Object json) {
-        if (httpMethod != HttpMethod.POST) {
+        if (httpMethod == HttpMethod.GET) {
             return this;
         }
         Objects.requireNonNull(json, "Request json cannot be null");
@@ -98,7 +102,8 @@ public class HttpClient<T> implements Closeable {
     }
 
     /**
-     * send to request
+     * Send to request
+     * @return this
      */
     @SuppressWarnings("unchecked")
     public HttpClient<T> execute() {
@@ -116,7 +121,7 @@ public class HttpClient<T> implements Closeable {
         }
         StringBuilder result;
         try {
-            if (httpMethod == HttpMethod.POST) {
+            if (httpMethod == HttpMethod.POST || httpMethod == HttpMethod.PUT) {
                 if (paramsStr != null) {
                     this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), Charset.defaultCharset()));
                     this.bufferedWriter.write(paramsStr);
@@ -145,14 +150,27 @@ public class HttpClient<T> implements Closeable {
             while ((line = this.bufferedReader.readLine()) != null) {
                 result.append(line);
             }
-            throw new HttpException(result.toString());
+            this.fallbackHelper.fallBack(result.toString());
         } catch (IOException e) {
-            throw new HttpException(e.getMessage());
+            this.fallbackHelper.fallBack(e.getMessage());
         }
+        return this;
+    }
+
+    /**
+     * Fallback in case of an error
+     *
+     * @param fallbackHelper FallbackHelper
+     * @return this
+     */
+    public HttpClient<T> fallback(FallbackHelper<?, ?> fallbackHelper) {
+        this.fallbackHelper = fallbackHelper;
+        return this;
     }
 
     /**
      * Get Result
+     *
      * @return T
      */
     public T get() {
@@ -161,14 +179,15 @@ public class HttpClient<T> implements Closeable {
 
     /**
      * Listen to the result and process it
-     * @param listener listener
+     *
+     * @param resultListener listener
      */
-    public void listener(Listener<T> listener) {
-        listener.notify(this.data);
+    public void listener(Listener<T> resultListener) {
+        resultListener.notify(this.data);
     }
 
     /**
-     * set request header
+     * Set request header
      *
      * @param urlConnection HttpUrlConnection
      */
@@ -179,7 +198,7 @@ public class HttpClient<T> implements Closeable {
     }
 
     /**
-     * close stream
+     * Close stream
      *
      * @throws IOException io
      */

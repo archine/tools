@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
+![](https://img.shields.io/badge/version-1.2.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
   
 **Http请求工具**
 ## 一、添加依赖
@@ -6,7 +6,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-httpclient</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
 </dependency>
 ```
 ## 二、使用说明
@@ -58,6 +58,24 @@ public class Test{
         map.put("val", "200");
         Map resultMap = HttpClient.builder("http://127.0.0.1:8080/test6", HttpMethod.POST, Map.class)
                 .body(map)
+                .execute()
+                .get();
+    }
+}
+```
+### 5、异常回退
+**一旦发起请求出现了错误会进入该回退，默认抛出``HttpException``，你可以自行定义回退逻辑，该方法要在执行``execute()``请求方法之前调用，否则无效**
+```java
+public class Test{
+    public static void main(String[] args) {
+        Map<String, String> map = new HashMap<>();
+        map.put("key", "code");
+        map.put("val", "200");
+        Map resultMap = HttpClient.builder("http://127.0.0.1:8080/test6", HttpMethod.POST, Map.class)
+                .body(map)
+                .fallback(e -> {
+                   throw new ServiceException("哎。回退把");
+                })
                 .execute()
                 .get();
     }

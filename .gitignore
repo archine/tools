@@ -25,6 +25,6 @@ target/
 /build/
 #.gitignore
 .mvn/
+build.sh
 #pom.xml
 #src/
-build.sh
