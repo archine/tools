@@ -64,7 +64,7 @@ public class Test{
 }
 ```
 ### 5、异常回退
-**一旦发起请求出现了错误会进入该回退，默认抛出``HttpException``，你可以自行定义回退逻辑，该方法要在执行``execute()``请求方法之前调用，否则无效**
+**一旦发起请求出现了错误会进入该回退，默认抛出``HttpException``，你可以自行定义回退逻辑，该方法要在执行``execute()``请求方法之前调用，否则无效。该方法会将错误信息通知给你**
 ```java
 public class Test{
     public static void main(String[] args) {

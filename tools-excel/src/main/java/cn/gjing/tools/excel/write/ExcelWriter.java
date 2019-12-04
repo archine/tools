@@ -52,11 +52,19 @@ public class ExcelWriter {
         switch (excel.type()) {
             case XLS:
                 this.workbook = new HSSFWorkbook();
-                this.writerResolver = new ExcelWriteXLSResolver();
+                try (final ExcelWriteXLSResolver xlsResolver = new ExcelWriteXLSResolver()) {
+                    this.writerResolver = xlsResolver;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case XLSX:
                 this.workbook = new SXSSFWorkbook();
-                this.writerResolver = new ExcelWriteXLSXResolver();
+                try (final ExcelWriteXLSXResolver xlsxResolver = new ExcelWriteXLSXResolver()) {
+                    this.writerResolver = xlsxResolver;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             default:
         }

@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * @author Gjing
  **/
-public class HttpClient<T> implements Closeable {
+public class HttpClient<T> implements AutoCloseable {
     private String requestUrl;
     private Class<T> responseType;
     private T data;
@@ -25,7 +25,7 @@ public class HttpClient<T> implements Closeable {
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private ObjectMapper objectMapper;
-    private FallbackHelper fallbackHelper;
+    private FallBackHelper<String> fallbackHelper;
 
     private HttpClient(String url, HttpMethod method, Class<T> responseType) {
         this.requestUrl = url;
@@ -51,7 +51,11 @@ public class HttpClient<T> implements Closeable {
      * @return this
      */
     public static <T> HttpClient<T> builder(String url, HttpMethod method, Class<T> responseType) {
-        return new HttpClient<>(url, method, responseType);
+        try (final HttpClient<T> httpClient = new HttpClient<>(url, method, responseType)) {
+            return httpClient;
+        } catch (Exception e) {
+            throw new HttpException("Create httpclient error");
+        }
     }
 
     /**
@@ -150,9 +154,9 @@ public class HttpClient<T> implements Closeable {
             while ((line = this.bufferedReader.readLine()) != null) {
                 result.append(line);
             }
-            this.fallbackHelper.fallBack(result.toString());
+            this.fallbackHelper.fallback(result.toString());
         } catch (IOException e) {
-            this.fallbackHelper.fallBack(e.getMessage());
+            this.fallbackHelper.fallback(e.getMessage());
         }
         return this;
     }
@@ -163,7 +167,7 @@ public class HttpClient<T> implements Closeable {
      * @param fallbackHelper FallbackHelper
      * @return this
      */
-    public HttpClient<T> fallback(FallbackHelper<?, ?> fallbackHelper) {
+    public HttpClient<T> fallback(FallBackHelper<String> fallbackHelper) {
         this.fallbackHelper = fallbackHelper;
         return this;
     }

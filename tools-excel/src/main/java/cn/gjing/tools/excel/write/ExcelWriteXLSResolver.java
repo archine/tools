@@ -17,7 +17,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -32,7 +31,7 @@ import java.util.Objects;
  *
  * @author Gjing
  **/
-class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
+class ExcelWriteXLSResolver implements ExcelWriterResolver, AutoCloseable {
     private HSSFWorkbook workbook;
     private int offset = 0;
     private OutputStream outputStream;

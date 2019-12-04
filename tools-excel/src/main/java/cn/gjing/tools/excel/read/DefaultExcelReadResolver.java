@@ -23,16 +23,18 @@ import java.util.stream.Collectors;
 /**
  * @author Gjing
  **/
-class ExcelReadResolver implements ExcelReaderResolver {
+class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
     private Workbook workbook;
     private Sheet sheet;
     private Map<String, Field> hasAnnotationFieldMap = new HashMap<>();
     private List<String> headNameList = new ArrayList<>();
     private int totalCol = 0;
-    private static Gson gson = new Gson();
+    private Gson gson = new Gson();
+    private InputStream inputStream;
 
     @Override
     public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName) {
+        this.inputStream = inputStream;
         Excel excel = excelClass.getAnnotation(Excel.class);
         if (excel == null) {
             throw new NullPointerException("@Excel was not found on the excelClass");
@@ -74,6 +76,13 @@ class ExcelReadResolver implements ExcelReaderResolver {
                 break;
             default:
                 throw new NullPointerException("Doc type was not found");
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (this.inputStream != null) {
+            this.inputStream.close();
         }
     }
 

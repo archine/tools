@@ -16,7 +16,6 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -31,7 +30,7 @@ import java.util.Objects;
  *
  * @author Gjing
  **/
-class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
+class ExcelWriteXLSXResolver implements ExcelWriterResolver, AutoCloseable {
     private SXSSFWorkbook workbook;
     private int offset = 0;
     private OutputStream outputStream;

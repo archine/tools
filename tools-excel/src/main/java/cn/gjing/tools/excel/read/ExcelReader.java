@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  *
  * @author Gjing
  **/
-public class ExcelReader<T> implements Closeable {
+public class ExcelReader<T> {
     private Class<T> excelClass;
     private ExcelReaderResolver readerResolver;
     private List<T> data;
@@ -31,7 +31,11 @@ public class ExcelReader<T> implements Closeable {
     public ExcelReader(Class<T> excelClass, InputStream inputStream) {
         this.excelClass = excelClass;
         this.inputStream = inputStream;
-        this.readerResolver = new ExcelReadResolver();
+        try (final DefaultExcelReadResolver defaultExcelReadResolver = new DefaultExcelReadResolver()) {
+            this.readerResolver = defaultExcelReadResolver;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.data = new ArrayList<>();
         this.init();
     }
@@ -120,12 +124,5 @@ public class ExcelReader<T> implements Closeable {
     public ExcelReader<T> listener(Listener<List<T>> resultListener) {
         resultListener.notify(this.data);
         return this;
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (this.inputStream != null) {
-            this.inputStream.close();
-        }
     }
 }

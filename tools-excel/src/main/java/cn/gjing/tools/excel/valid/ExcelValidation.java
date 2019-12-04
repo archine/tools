@@ -20,7 +20,6 @@ public interface ExcelValidation {
      * @param lastCol   Last col
      */
     default void valid(DateValid dateValid, Sheet sheet, int firstRow, int firstCol, int lastCol) {
-
     }
 
     /**
@@ -33,7 +32,6 @@ public interface ExcelValidation {
      * @param lastCol      Last col
      */
     default void valid(NumericValid numericValid, Sheet sheet, int firstRow, int firstCol, int lastCol) {
-
     }
 
     /**
@@ -47,6 +45,5 @@ public interface ExcelValidation {
      * @param lastCol       Last col
      */
     default void valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int firstCol, int lastCol) {
-
     }
 }
