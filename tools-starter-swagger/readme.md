@@ -1,21 +1,21 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.3.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.3.1-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 **快速在SpringBoot项目中集成Swagger**
-### 使用方法
-#### 1. 导入依赖
+## 一、添加依赖
 ```xml
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>1.3.0</version>
+     <version>1.3.1</version>
 </dependency>
 ```
-#### 2. 使用注解
-**该注解可以用在``任何类``上, 案例中将其用在启动类上**
+## 二、使用@EnableSwagger注解
+**如果不手动配置swagger相关的配置会启用``默认配置``**  
 ```java
 @SpringBootApplication
+@EnableDiscoveryClient
 @EnableSwagger
 public class DemoApplication {
     public static void main(String[] args) {
@@ -23,47 +23,69 @@ public class DemoApplication {
     }
 }
 ```
-#### 3. 配置
-**在进行了第二步之后, 已经可以正常使用Swagger, 各个属性都提供了默认值, 当然如果需要自己设置一些属性也可以, 所有属性如下:**
-* yml格式
+**``此时你无需做任何配置，已经可以开始愉快的使用Swagger啦,如果需要自定义配置就继续往下``**
+## 三、自定义配置
+### 1、配置说明
 ```yaml
 swagger:
   contact:
-    email: 联系邮箱
-    name: 联系人昵称
-    url: 联系人地址
-  title: 标题
-  description: 描述
-  base-package: 接口所在包路径
-  path-type: 接口选择规则类型, 共分为: ALL(所有接口), REGEX(符合正则), ANT(符合路径)三个类型, 默认为ALL类型
-  path-pattern: 接口匹配规则,在path-type类型不为 "ALL" 的情况下必须设置,否则抛非法参数异常
-  exclude-pattern: 排除路径，默认使用正则表达式方式，可在pathType设置为其他类型(pathType类型为ALL时默认走正则)
-  terms-of-service-url: 服务条款
-  license: 许可证
-  license-url: 许可证地址
+    # 联系邮箱
+    email:
+    # 联系人昵称
+    name:
+    # 联系人地址
+    url:
+  # 标题
+  title: 
+  # 描述
+  description: 
+  # 接口所在包路径
+  base-package:
+  # 接口选择规则类型, 共分为: ALL(所有接口), REGEX(符合正则), ANT(符合路径)三个类型, 默认为ALL类型
+  path-type:
+  # 接口匹配规则,在path-type类型不为 "ALL" 的情况下必须设置,否则抛非法参数异常
+  path-pattern:
+  # 排除路径，默认使用正则表达式方式，可在pathType设置为其他类型（pathType类型为ALL时默认走正则
+  exclude-pattern:
+  # 服务条款
+  terms-of-service-url:
+  # 许可证
+  license:
+  # 许可证地址
+  license-url:
+  # 全局响应信息
+  global-response-schemas:
+      # 状态码
+    - code: 200
+      # 响应信息
+      message: 正常
+      # 结果Bean的类名
+      schema: ResultVO
+    - code: 400
+      message: 错误
+  # 请求头
+  global-headers:
+      # 请求头名称
+    - name: token
+      # 请求头描述
+      description: 登录的token
+      # 是否必须, 默认为true
+      required: true
+    - name: token2
+      description: 登录的token2
+      required: false
 ```
-*  JavaBean方式
-```java
-@Configuration
-public class DemoConfig {
-    @Bean
-    public SwaggerBean swaggerBean() {
-        return SwaggerBean.builder()
-                .basePackage("com.xxx.xxx")
-                .pathType(PathType.ALL)
-                .title("标题")
-                .termsOfServiceUrl("http://127.0.0.1")
-                .license("XXXX")
-                .licenseUrl("http://xxx.xx.xx")
-                .description("描述")
-                .build();
-    }
-}     
-```
-#### 4. 聚合文档
-**在实际工作中, 往往是多个服务的, 这样前端需要记住每个服务的地址, 显然太麻烦, 所以可以采用聚合文档模式, 将多个项目都聚合在一个服务里, 通常聚合在网关里, 毕竟
-每个服务都是走网关过得, 该模式``限于SpringCloud环境``, 且每个服务都在``同一个注册中心下``, 参考配置如下:**
-* yml格式
+### 2、注意点
+#### 全局响应结果信息
+* **全局响应信息，结果Bean的类名一定要在``Controller方法出现过``，否则文档无法展示其结构**
+* **方法返回值为``void``时，设置``状态码为200``的schema才``有效``，否则会采用方法本身的返回值，如需自定义，必须采用方法上使用``@ApiResponses``进行设置的方式，其他的状态码就没啥关系**
+* **全局配置的方式``优先级小于``方法或者类单独配置的方式**
+* **全局配置方式无法更改``状态码为200``的提示信息，如需更改必须采用在方法或者类上配置``@ApiResponses``的方式**
+#### 全局请求头
+* **配置全局会出现在``所有方法``里面，不与你在某个方法单独加个请求头冲突，``两者会合并``**
+## 四 聚合文档
+### 1、配置
+**SpringCloud环境下在网关``zuul``服务进行多服务的文档聚合,使用时只要登录网关服务的``swagger``文档即可,通过``tab``标签进行选择. 可参考如下配置**
 ```yaml
 server:
   port: 8080
@@ -81,37 +103,28 @@ zuul:
       path: /demo/**
 swagger:
   resources:
-    enable: 是否开启聚合模式, 默认 False
-    register-me: 当前项目的文档是否也要加入聚合, 默认 true
+    # 是否开启聚合模式, 默认 False
+    enable: false
+    # 当前项目的文档是否也要加入聚合, 默认 true
+    register-me: true
     # 服务列表
     service-list:
-      - projectA: 这里可以随便定义
-          view: 下拉选择时展示的名字, 一般用于标识对应文档的名字
-          service: 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
+      # projectA或者projectB这个可以随意写, 只是为了区分
+      - projectA:
+          # 下拉选择时展示的名称
+          view: 项目A
+          # 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
+          service: demo
       - projectB:
-          view: 项目b
+          view: 项目B
           service: demo 
 ```
-* JavaBean方式
-```java
-/**
- * @author Gjing
- **/
-@Configuration
-public class GatewayConfig {
-    @Bean
-    public SwaggerResources swaggerResources() {
-        List<Map<String, SwaggerService>> serviceList = new ArrayList<>();
-        Map<String, SwaggerService> service = new HashMap<>();
-        service.put("projectA", SwaggerService.builder().view("项目A").service("demo").build());
-        serviceList.add(service);
-        return SwaggerResources.builder()
-                .enable(true)
-                .registerMe(true)
-                .serviceList(serviceList)
-                .build();
-    }
-}
-```
+## 五、效果图
+### 1、全局响应信息以及全局请求头
+![rh.png](https://upload-images.jianshu.io/upload_images/17866147-d3f7c4ce2fc5a95d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+### 2、聚合文档
+![route.png](https://upload-images.jianshu.io/upload_images/17866147-7f9cb4c0105884d6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 ---
 **更多教程可前往查看博客: [SpringBoot使用swagger](https://yq.aliyun.com/articles/703133?spm=a2c4e.11155435.0.0.68153312Yeo5xN)**

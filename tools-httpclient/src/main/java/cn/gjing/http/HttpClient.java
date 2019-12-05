@@ -26,6 +26,8 @@ public class HttpClient<T> implements AutoCloseable {
     private BufferedReader bufferedReader;
     private ObjectMapper objectMapper;
     private FallBackHelper<String> fallbackHelper;
+    private int connectTimeout = 2000;
+    private int readTimeout = 5000;
 
     private HttpClient(String url, HttpMethod method, Class<T> responseType) {
         this.requestUrl = url;
@@ -33,7 +35,7 @@ public class HttpClient<T> implements AutoCloseable {
         this.responseType = responseType;
         this.objectMapper = new ObjectMapper();
         this.fallbackHelper = e -> {
-            throw new HttpException(e.toString());
+            throw new HttpException(e);
         };
     }
 
@@ -67,6 +69,26 @@ public class HttpClient<T> implements AutoCloseable {
     public HttpClient<T> header(Map<String, String> header) {
         Objects.requireNonNull(header, "Request Header cannot be null");
         this.header = header;
+        return this;
+    }
+
+    /**
+     * Set request timeout time
+     * @param connectTimeout Connect time
+     * @return this
+     */
+    public HttpClient<T> connectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+        return this;
+    }
+
+    /**
+     * Set request timeout time
+     * @param readTimeout Read time
+     * @return this
+     */
+    public HttpClient<T> readTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
         return this;
     }
 
@@ -107,11 +129,12 @@ public class HttpClient<T> implements AutoCloseable {
 
     /**
      * Send to request
+     *
      * @return this
      */
     @SuppressWarnings("unchecked")
     public HttpClient<T> execute() {
-        ConnectionFactory connectionFactory = new ConnectionFactory(this.requestUrl);
+        ConnectionFactory connectionFactory = new ConnectionFactory(this.requestUrl,this.connectTimeout,this.readTimeout);
         HttpURLConnection connection = requestUrl.startsWith("http") ? connectionFactory.getHttp() : connectionFactory.getHttps();
         connection.setRequestProperty("Content-type", json == null ? "application/x-www-form-urlencoded" : "application/json");
         try {

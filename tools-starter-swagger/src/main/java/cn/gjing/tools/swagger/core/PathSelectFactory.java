@@ -1,7 +1,6 @@
 package cn.gjing.tools.swagger.core;
 
 import cn.gjing.tools.swagger.PathType;
-import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +8,11 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-@NoArgsConstructor
-@SuppressWarnings("unchecked")
-class PathSelectFactory {
-    private static PathSelectFactory pathSelectFactory = new PathSelectFactory();
-    private static Map pathMap = new HashMap();
-    static {
+public enum PathSelectFactory {
+    SELECT;
+    private Map<PathType, PathSelect> pathMap = new HashMap<>();
+
+    PathSelectFactory() {
         pathMap.put(PathType.ALL, new All());
         pathMap.put(PathType.REGEX, new Regex());
         pathMap.put(PathType.ANT, new Ant());
@@ -22,9 +20,5 @@ class PathSelectFactory {
 
     PathSelect create(PathType pathType) {
         return (PathSelect) pathMap.get(pathType);
-    }
-
-    static PathSelectFactory getInstance() {
-        return pathSelectFactory;
     }
 }

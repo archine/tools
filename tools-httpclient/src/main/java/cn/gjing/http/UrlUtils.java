@@ -6,11 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 /**
  * @author Gjing
@@ -84,7 +80,7 @@ public class UrlUtils {
      * @return map Param map
      */
     public static Map<String, String> toMap(String url) {
-        final Map<String, String> queryPairs = new ConcurrentHashMap<>(16);
+        final Map<String, String> queryPairs = new HashMap<>(16);
         final String[] param = url.split("\\?");
         if (param.length < 1) {
             return null;

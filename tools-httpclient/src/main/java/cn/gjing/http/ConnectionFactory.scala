@@ -9,7 +9,22 @@ import javax.net.ssl.{HttpsURLConnection, SSLContext, TrustManager}
 /**
  * @author Gjing
  **/
-class ConnectionFactory(requestUrl:String) {
+class ConnectionFactory(requestUrl: String) {
+  /**
+   * Connect timeout
+   */
+  var connectTimeout: Int = _
+  /**
+   * Read timeout
+   */
+  var readTimeout: Int = _
+
+  def this(requestUrl: String, connectTimeout: Int, readTimeout: Int) {
+    this(requestUrl)
+    this.connectTimeout = connectTimeout
+    this.readTimeout = readTimeout
+  }
+
   /**
    * Get httpsConnection instance
    *
@@ -17,7 +32,7 @@ class ConnectionFactory(requestUrl:String) {
    */
   private[http] def getHttps = try {
     val sslContext = SSLContext.getInstance("SSL")
-    val tm:Array[TrustManager] = Array(new HttpsManager)
+    val tm: Array[TrustManager] = Array(new HttpsManager)
     sslContext.init(null, tm, new SecureRandom)
     val ssf = sslContext.getSocketFactory
     val url = new URL(this.requestUrl)
@@ -26,8 +41,8 @@ class ConnectionFactory(requestUrl:String) {
     connection.setRequestProperty("Charset", "UTF-8")
     connection.setDoOutput(true)
     connection.setDoInput(true)
-    connection.setConnectTimeout(5000)
-    connection.setReadTimeout(10000)
+    connection.setConnectTimeout(this.connectTimeout)
+    connection.setReadTimeout(this.readTimeout)
     connection
   } catch {
     case e: Exception =>
@@ -46,8 +61,8 @@ class ConnectionFactory(requestUrl:String) {
     connection.setRequestProperty("Charset", "UTF-8")
     connection.setDoOutput(true)
     connection.setDoInput(true)
-    connection.setConnectTimeout(5000)
-    connection.setReadTimeout(10000)
+    connection.setConnectTimeout(this.connectTimeout)
+    connection.setReadTimeout(this.readTimeout)
     connection
   } catch {
     case e: IOException =>
