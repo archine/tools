@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.1.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，能让你在项目中更便捷的使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -551,7 +551,7 @@ public class UserController {
         ExcelFactory.createReader(file.getInputStream(), User.class)
                 .resetResolver(MyReaderResolver::new)
                 .read()
-                .listener(e -> userService.saveUserList(e))
+                .listener(e -> userService.saveUserList(e));
         return ResponseEntity.ok("导入成功");
     }
 }
