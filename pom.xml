@@ -11,7 +11,6 @@
         <module>tools-common</module>
         <module>tools-starter-swagger</module>
         <module>tools-httpclient</module>
-        <module>tools-starter-feign</module>
         <module>tools-redis</module>
         <module>tools-excel</module>
     </modules>
