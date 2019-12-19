@@ -13,6 +13,10 @@ public class IdUtils {
         this.snowFlake = new SnowFlake(centerId, machineId);
     }
 
+    public IdUtils() {
+
+    }
+
     /**
      * 获取UUID
      *

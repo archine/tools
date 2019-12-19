@@ -12,7 +12,9 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -92,7 +94,20 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data) {
-        this.writerResolver.write(data, this.workbook, "sheet1", this.headFieldList, this.metaStyle, this.bigTitle);
+        this.writerResolver.write(data, this.workbook, "sheet1", this.headFieldList, this.metaStyle, this.bigTitle, new HashMap<>());
+        this.bigTitle = null;
+        return this;
+    }
+
+    /**
+     * Write Excel
+     *
+     * @param data data
+     * @param explicitValues The contents of the drop-down box
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Map<String, String[]> explicitValues) {
+        this.writerResolver.write(data, this.workbook, "sheet1", this.headFieldList, this.metaStyle, this.bigTitle, explicitValues);
         this.bigTitle = null;
         return this;
     }
@@ -105,7 +120,21 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName) {
-        this.writerResolver.write(data, this.workbook, sheetName, this.headFieldList, this.metaStyle, this.bigTitle);
+        this.writerResolver.write(data, this.workbook, sheetName, this.headFieldList, this.metaStyle, this.bigTitle, new HashMap<>());
+        this.bigTitle = null;
+        return this;
+    }
+
+    /**
+     * Write to the specified sheet
+     *
+     * @param data      data
+     * @param sheetName sheetName
+     * @param explicitValues The contents of the drop-down box
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName,Map<String, String[]> explicitValues) {
+        this.writerResolver.write(data, this.workbook, sheetName, this.headFieldList, this.metaStyle, this.bigTitle,explicitValues);
         this.bigTitle = null;
         return this;
     }

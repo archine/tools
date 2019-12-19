@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.1.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，能让你在项目中更便捷的使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -28,7 +28,7 @@
 |pattern|字段为时间类型且需要转换，那么必须设置，否则无需设置|
 |width|这个列表头单元格的宽度，默认``20 * 256``，建议设置``256``的倍数|
 ### 3、@DateValid
-**时间校验注解，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加时间的校验，``XLSX``类型文档不支持，注解参数如下**     
+**时间校验注解，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加时间的校验，``XLSX``类型文档不支持，``只在导出模板时有效``，注解参数如下**     
 
 |参数|描述|
 |---|---|
@@ -44,7 +44,7 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 ### 4、@ExplicitValid
-**下拉框选值，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加下拉框选项，注解参数如下**     
+**下拉框选值，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加下拉框选项，``只在导出模板时有效``，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
@@ -57,7 +57,7 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
 #### 5、@NumericValid
-**数据类型校验，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加数据类型的校验，注解参数如下**     
+**数据类型校验，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加数据类型的校验，``只在导出模板时有效``，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
@@ -402,6 +402,32 @@ public class User {
     private Date createTime;
 }
 ```
+**如果下拉框的值不是固定的，比如要通过数据库查询或者其他方式，这时候你可以通过方法进行传递**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class UserController {
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/user_empty")
+    @ApiOperation(value = "导出用户模板")
+    public void exportUserEmpty(HttpServletResponse response) {
+        String[] arr = new String[20];
+        for (int i = 0; i < 20; i++) {
+            arr[i] = "啦啦:" + i;
+        }
+        //构建下拉框内容，key为实体类对应标有@ExplicitValid注解的字段名称，value为下拉框内的值
+        Map<String, String[]> map = new HashMap<>(16);
+        map.put("genderEnum", arr);
+        ExcelFactory.createWriter(User.class, response)
+                .write(null, map)
+                .flush();
+    }
+}
+```
 ## 四、拓展
 **之前讲解的使用的一些功能都是采取默认实现的，有时候有点自己的想法，也可以进行自定义其中的功能**
 ### 1、自定义Excel样式
@@ -457,8 +483,8 @@ public class MyValid implements ExcelValidation {
     }
 
     @Override
-    public void valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int firstCol, int lastCol) {
-
+    public void valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int firstCol, int lastCol, int validIndex, String[] values) {
+        
     }
 }
 ```

@@ -36,29 +36,29 @@ public class ResultVO<T> implements Serializable {
         return resultVO;
     }
 
-    public static ResultVO success() {
-        ResultVO resultVO = new ResultVO();
+    public static ResultVO<String> success() {
+        ResultVO<String> resultVO = new ResultVO<>();
         resultVO.setCode(HttpStatus.OK.getCode());
         resultVO.setMessage(HttpStatus.OK.getMsg());
         return resultVO;
     }
 
-    public static ResultVO error(int code, String message) {
-        ResultVO resultVO = new ResultVO();
+    public static ResultVO<String> error(int code, String message) {
+        ResultVO<String> resultVO = new ResultVO<>();
         resultVO.setCode(code);
         resultVO.setMessage(message);
         return resultVO;
     }
 
-    public static ResultVO error() {
-        ResultVO resultVO = new ResultVO();
+    public static ResultVO<String> error() {
+        ResultVO<String> resultVO = new ResultVO<>();
         resultVO.setCode(HttpStatus.BAD_REQUEST.getCode());
         resultVO.setMessage(HttpStatus.BAD_REQUEST.getMsg());
         return resultVO;
     }
 
-    public static ResultVO error(String message) {
-        ResultVO resultVO = new ResultVO();
+    public static ResultVO<String> error(String message) {
+        ResultVO<String> resultVO = new ResultVO<>();
         resultVO.setCode(HttpStatus.BAD_REQUEST.getCode());
         resultVO.setMessage(message);
         return resultVO;

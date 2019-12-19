@@ -12,6 +12,10 @@ import java.util.Date;
  **/
 public final class TimeUtils {
 
+    private TimeUtils() {
+
+    }
+
     /**
      * 获取文本格式时间
      *

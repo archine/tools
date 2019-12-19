@@ -18,6 +18,9 @@ import java.security.SecureRandom;
  * @author Gjing
  **/
 public class EncryptionUtils {
+    private EncryptionUtils() {
+
+    }
 
     /**
      * MD5 encryption

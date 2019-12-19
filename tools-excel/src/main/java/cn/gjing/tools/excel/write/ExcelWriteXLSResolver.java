@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
+import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
 import cn.gjing.tools.excel.valid.DateValid;
@@ -22,9 +23,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Default XLS type excel file resolver
@@ -36,10 +35,12 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, AutoCloseable {
     private int offset = 0;
     private OutputStream outputStream;
     private HSSFSheet sheet;
+    private Map<String, String[]> explicitValues;
 
     @Override
-    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle) {
+    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle, Map<String, String[]> explicitValues) {
         this.workbook = (HSSFWorkbook) workbook;
+        this.explicitValues = explicitValues;
         HSSFSheet hssfSheet = this.workbook.getSheet(sheetName);
         if (hssfSheet == null) {
             this.offset = 0;
@@ -95,9 +96,7 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, AutoCloseable {
 
     @SuppressWarnings("unchecked")
     private void setVal(List<?> data, List<Field> headFieldList, HSSFSheet sheet, HSSFRow row, CellStyle bodyStyle, CellStyle headStyle) {
-        ExcelValidation explicitValidation = null;
-        ExcelValidation dateValidation = null;
-        ExcelValidation numericValidation = null;
+        int validIndex = 0;
         HSSFCell cell;
         for (int i = 0; i < headFieldList.size(); i++) {
             cell = row.createCell(i);
@@ -106,7 +105,9 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, AutoCloseable {
             cell.setCellValue(excelField.value());
             Field field = headFieldList.get(i);
             sheet.setColumnWidth(i, excelField.width());
-            this.addValid(field, row, i, explicitValidation, dateValidation, numericValidation);
+            if (data == null || data.isEmpty()) {
+                validIndex = this.addValid(field, row, i, validIndex);
+            }
         }
         //Set the body offset
         this.offset++;
@@ -135,10 +136,10 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, AutoCloseable {
                         if (field.getType().isEnum()) {
                             ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
                             Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
-                            Class<? extends Enum> enumType = (Class<? extends Enum>) field.getType();
+                            Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
                             try {
-                                EnumConvert enumConvert = excelEnumConvert.convert().newInstance();
-                                valueCell.setCellValue(enumConvert.toExcelAttribute(Enum.valueOf(enumType, ((Enum) value).name())).toString());
+                                EnumConvert<Enum<?>, ?> enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
+                                valueCell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
                             } catch (InstantiationException | IllegalAccessException e) {
                                 e.printStackTrace();
                             }
@@ -154,39 +155,39 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, AutoCloseable {
 
     }
 
-    private void addValid(Field field, HSSFRow row, int i, ExcelValidation explicitValidation, ExcelValidation dateValidation, ExcelValidation numericValidation) {
+    private int addValid(Field field, HSSFRow row, int i, int validIndex) {
         ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
         DateValid dv = field.getAnnotation(DateValid.class);
         NumericValid nv = field.getAnnotation(NumericValid.class);
         if (ev != null) {
+            String[] values = this.explicitValues.get(field.getName());
             try {
-                if (explicitValidation == null) {
-                    explicitValidation = ev.validClass().newInstance();
-                }
-                explicitValidation.valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i);
+                ev.validClass().newInstance().valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i, validIndex, values);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+            if (values == null) {
+                return validIndex;
+            }
+            validIndex++;
+            return validIndex;
         }
         if (dv != null) {
             try {
-                if (dateValidation == null) {
-                    dateValidation = dv.validClass().newInstance();
-                }
-                dateValidation.valid(dv, sheet, row.getRowNum() + 1, i, i);
+                dv.validClass().newInstance().valid(dv, sheet, row.getRowNum() + 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+            return validIndex;
         }
         if (nv != null) {
             try {
-                if (numericValidation == null) {
-                    numericValidation = nv.validClass().newInstance();
-                }
-                numericValidation.valid(nv, sheet, row.getRowNum() + 1, i, i);
+                nv.validClass().newInstance().valid(nv, sheet, row.getRowNum() + 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+            return validIndex;
         }
+        return validIndex;
     }
 }

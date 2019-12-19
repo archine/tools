@@ -22,6 +22,9 @@ public class EmailUtils {
     private String password;
     private String from;
 
+    private EmailUtils() {
+
+    }
     private EmailUtils(String host, String password, String from) {
         if (ParamUtils.multiEmpty(host, password, from)) {
             throw new NullPointerException("Instantiation exception, Parameters cannot be null");

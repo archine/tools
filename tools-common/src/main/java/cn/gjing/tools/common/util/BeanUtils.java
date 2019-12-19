@@ -16,6 +16,9 @@ import java.util.Map;
  * @author Gjing
  **/
 public final class BeanUtils {
+    private BeanUtils() {
+
+    }
     /**
      * 复制属性
      *

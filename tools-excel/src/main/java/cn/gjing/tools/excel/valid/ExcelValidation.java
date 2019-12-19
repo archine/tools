@@ -43,7 +43,9 @@ public interface ExcelValidation {
      * @param firstRow      First row
      * @param firstCol      First col
      * @param lastCol       Last col
+     * @param validIndex Valid index
+     * @param values Combobox values
      */
-    default void valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int firstCol, int lastCol) {
+    default void valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int firstCol, int lastCol, int validIndex,String[] values) {
     }
 }

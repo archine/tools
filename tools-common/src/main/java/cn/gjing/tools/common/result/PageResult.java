@@ -12,10 +12,10 @@ import java.io.Serializable;
 public class PageResult<T> implements Serializable {
 
     private T data;
-    private Integer totalPages;
-    private Integer currentPage;
-    private Long totalRows;
-    private Integer pageRows;
+    private long totalPages;
+    private long currentPage;
+    private long totalRows;
+    private long pageRows;
 
     private PageResult() {
 
@@ -28,7 +28,7 @@ public class PageResult<T> implements Serializable {
      * @param currentPage 当前页数
      * @return PageResult
      */
-    public static <T> PageResult<T> of(T data, int totalPages, int currentPage) {
+    public static <T> PageResult<T> of(T data, long totalPages, long currentPage) {
         PageResult<T> pageResult = new PageResult<>();
         pageResult.setData(data);
         pageResult.setTotalPages(totalPages);
@@ -43,7 +43,7 @@ public class PageResult<T> implements Serializable {
      * @param totalPages 总页数
      * @return PageResult
      */
-    public static <T> PageResult<T> of(T data, int totalPages) {
+    public static <T> PageResult<T> of(T data, long totalPages) {
         PageResult<T> pageResult = new PageResult<>();
         pageResult.setData(data);
         pageResult.setTotalPages(totalPages);
@@ -59,7 +59,7 @@ public class PageResult<T> implements Serializable {
      * @param totalRows 总条数
      * @return PageResult
      */
-    public static <T> PageResult<T> of(T data, int totalPages, int currentPage, long totalRows) {
+    public static <T> PageResult<T> of(T data, long totalPages, long currentPage, long totalRows) {
         PageResult<T> pageResult = new PageResult<>();
         pageResult.setData(data);
         pageResult.setTotalPages(totalPages);
@@ -78,7 +78,7 @@ public class PageResult<T> implements Serializable {
      * @param pageRows 每页条数
      * @return PageResult
      */
-    public static <T> PageResult<T> of(T data, int totalPages, int currentPage, long totalRows,int pageRows) {
+    public static <T> PageResult<T> of(T data, long totalPages, long currentPage, long totalRows,long pageRows) {
         PageResult<T> pageResult = new PageResult<>();
         pageResult.setData(data);
         pageResult.setTotalPages(totalPages);

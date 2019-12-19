@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
  * param util
  **/
 public final class ParamUtils {
+    private ParamUtils() {
+
+    }
     /**
      * 检查参数是否为空
      *
@@ -20,9 +23,9 @@ public final class ParamUtils {
         if (str == null || "".equals(str)) {
             return true;
         } else if (str instanceof Collection) {
-            return ((Collection) str).isEmpty();
+            return ((Collection<?>) str).isEmpty();
         } else if (str instanceof Map) {
-            return ((Map) str).isEmpty();
+            return ((Map<?, ?>) str).isEmpty();
         } else if (str.getClass().isArray()) {
             return Array.getLength(str) == 0;
         }
@@ -50,7 +53,7 @@ public final class ParamUtils {
      * @param <T>  泛型
      * @return true为包含
      */
-    public static <T> boolean ListHasEmpty(Collection<? extends T> list) {
+    public static <T> boolean listHasEmpty(Collection<? extends T> list) {
         return list.stream().anyMatch(ParamUtils::isEmpty);
     }
 
@@ -173,12 +176,11 @@ public final class ParamUtils {
      * @param symbol 符号
      * @return 截取完的文本数组
      */
-    @SuppressWarnings("unchecked")
     public static String[] split(String str, String symbol) {
         if (isEmpty(str) || symbol.length() != 1) {
             return new String[]{};
         } else {
-            List<String> list = new ArrayList();
+            List<String> list = new ArrayList<>();
             int i = 0;
             int start = 0;
             while (i < str.length()) {
@@ -240,7 +242,7 @@ public final class ParamUtils {
      * @return true/false
      */
     public static boolean isEmail(String email) {
-        String regex = "^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$";
+        String regex = "^([a-z0-9_.-]+)@([\\da-z.-]+)\\.([a-z.]{2,6})$";
         if (isNotEmpty(email)) {
             return Pattern.compile(regex).matcher(email).matches();
         } else {
@@ -270,7 +272,7 @@ public final class ParamUtils {
      * @return boolean
      */
     public static boolean isTelPhone(String tel) {
-        String regex = "^(0[0-9]{2,3}\\-)?([2-9][0-9]{6,7})+(\\-[0-9]{1,4})?$";
+        String regex = "^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$";
         if (isNotEmpty(tel)) {
             return Pattern.compile(regex).matcher(tel).matches();
         } else {

@@ -105,4 +105,20 @@ public class BeanUtils {
         }
         return null;
     }
+
+    /**
+     * Gets the corresponding enum by value
+     * @param enumClass The enum class to get
+     * @param value Enum value
+     * @return Enum
+     */
+    public static Enum<?> getEnum(Class<? extends Enum<?>> enumClass, String value) {
+        Enum<?>[] enumConstants = enumClass.getEnumConstants();
+        for (Enum<?> constant : enumConstants) {
+            if (value.equals(constant.name())) {
+                return constant;
+            }
+        }
+        throw new NullPointerException("No found your enum");
+    }
 }

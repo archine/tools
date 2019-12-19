@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Excel writer resolver
@@ -24,9 +25,9 @@ public interface ExcelWriterResolver {
      * @param bigTitle      Excel big title
      * @param metaStyle     Style metadata
      * @param data          data
+     * @param explicitValues The contents of the drop-down box
      */
-    void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle);
-
+    void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle, Map<String, String[]> explicitValues);
     /**
      * Output the contents of the cache
      *

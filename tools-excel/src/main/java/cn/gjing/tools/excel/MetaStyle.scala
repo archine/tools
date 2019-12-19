@@ -8,7 +8,7 @@ import scala.beans.BeanProperty
  * Style metadata
  * @author Gjing
  **/
-class MetaStyle {
+private class MetaStyle {
   @BeanProperty
   var headStyle:CellStyle = _
   @BeanProperty

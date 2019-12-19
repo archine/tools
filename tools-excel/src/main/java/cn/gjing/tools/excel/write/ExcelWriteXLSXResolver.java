@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
+import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
 import cn.gjing.tools.excel.valid.ExcelValidation;
@@ -23,6 +24,7 @@ import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -35,10 +37,12 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, AutoCloseable {
     private int offset = 0;
     private OutputStream outputStream;
     private SXSSFSheet sheet;
+    private Map<String, String[]> explicitValues;
 
     @Override
-    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle) {
+    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle,Map<String, String[]> explicitValues) {
         this.workbook = (SXSSFWorkbook) workbook;
+        this.explicitValues = explicitValues;
         SXSSFSheet sxssfSheet = this.workbook.getSheet(sheetName);
         if (sxssfSheet == null) {
             this.offset = 0;
@@ -95,8 +99,7 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, AutoCloseable {
 
     @SuppressWarnings("unchecked")
     private void setVal(List<?> data, List<Field> headFieldList, SXSSFSheet sheet, SXSSFRow row, CellStyle bodyStyle, CellStyle headStyle) {
-        ExcelValidation explicitValidation = null;
-        ExcelValidation numericValidation = null;
+        int validIndex = 0;
         SXSSFCell cell;
         for (int i = 0; i < headFieldList.size(); i++) {
             cell = row.createCell(i);
@@ -105,8 +108,9 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, AutoCloseable {
             ExcelField excelField = field.getAnnotation(ExcelField.class);
             cell.setCellValue(excelField.value());
             sheet.setColumnWidth(i, excelField.width());
-            this.addValid(field, row, i, explicitValidation, numericValidation);
-        }
+            if (data == null || data.isEmpty()) {
+                validIndex = this.addValid(field, row, i, validIndex);
+            }        }
         this.offset++;
         if (data == null) {
             return;
@@ -133,10 +137,10 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, AutoCloseable {
                         if (field.getType().isEnum()) {
                             ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
                             Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
-                            Class<? extends Enum> enumType = (Class<? extends Enum>) field.getType();
+                            Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
                             try {
-                                EnumConvert enumConvert = excelEnumConvert.convert().newInstance();
-                                valueCell.setCellValue(enumConvert.toExcelAttribute(Enum.valueOf(enumType, ((Enum) value).name())).toString());
+                                EnumConvert<Enum<?>, ?> enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
+                                valueCell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
                             } catch (InstantiationException | IllegalAccessException e) {
                                 e.printStackTrace();
                             }
@@ -151,28 +155,30 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, AutoCloseable {
         }
     }
 
-    private void addValid(Field field, SXSSFRow row, int i, ExcelValidation explicitValidation, ExcelValidation numericValidation) {
+    private int addValid(Field field, SXSSFRow row, int i, int validIndex) {
         ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
         NumericValid nv = field.getAnnotation(NumericValid.class);
         if (ev != null) {
+            String[] values = this.explicitValues.get(field.getName());
             try {
-                if (explicitValidation == null) {
-                    explicitValidation = ev.validClass().newInstance();
-                }
-                explicitValidation.valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i);
+                ev.validClass().newInstance().valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i, validIndex, values);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+            if (values == null) {
+                return validIndex;
+            }
+            validIndex++;
+            return validIndex;
         }
         if (nv != null) {
             try {
-                if (numericValidation == null) {
-                    numericValidation = nv.validClass().newInstance();
-                }
-                numericValidation.valid(nv, sheet, row.getRowNum() + 1, i, i);
+                nv.validClass().newInstance().valid(nv, sheet, row.getRowNum() + 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+            return validIndex;
         }
+        return validIndex;
     }
 }

@@ -6,6 +6,9 @@ import java.util.Random;
  * @author Gjing
  **/
 public final class RandomUtils {
+    private RandomUtils() {
+
+    }
 
     private final static Random RANDOM = new Random();
 
