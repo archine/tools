@@ -49,7 +49,7 @@
 |参数|描述|
 |-----|-----|
 |validClass|校验器Class|
-|combobox|范围值，数组类型|
+|combobox|下拉框中的内容，数组类型|
 |boxLastRow|数据校验最多校验多少行，默认是该列表头下的正文第一行|
 |showErrorBox|是否弹出错误框，默认``true``|
 |showPromptBox|是否立即弹出，默认``true``|
