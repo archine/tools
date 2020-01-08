@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.1.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，能让你在项目中更便捷的使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.1.6</version>
+    <version>1.1.7</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -27,6 +27,7 @@
 |value|列表头名字|
 |pattern|字段为时间类型且需要转换，那么必须设置，否则无需设置|
 |width|这个列表头单元格的宽度，默认``20 * 256``，建议设置``256``的倍数|
+|autoMerge|是否自动合并多行相同的数据，默认false|
 ### 3、@DateValid
 **时间校验注解，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加时间的校验，``XLSX``类型文档不支持，``只在导出模板时有效``，注解参数如下**     
 
@@ -90,6 +91,9 @@ public class User {
 
     @ExcelField("用户名")
     private String userName;
+
+    @ExcelField(value = "性别", autoMerge= true)
+    private GenderEnum gender;
 
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
     private Date createTime;
@@ -156,7 +160,8 @@ public class UserController {
     }
 }
 ```
-**如果需要将不同规则数据导入到不同的sheet中或者是在同一个sheet中分层，可以多次调用``write()``方法，如果不指定sheet的名称则会写入到默认名称的sheet**
+**如果需要将不同规则数据导入到不同的sheet中或者是在同一个sheet中，可以多次调用``write()``方法，不指定sheet的名称则会写入到默认名称的sheet，如果导入在``同一个sheet中且映射关系为同一个，
+那么只会出现一次列表头``**
 ```java
 /**
  * @author Gjing
@@ -194,8 +199,7 @@ public class UserController {
         List<User> users = userService.userList();
         ExcelFactory.createWriter(User.class, response)
                 //指定大标题占用的行数和内容
-                .bigTitle(() -> new BigTitle(3,"我是大标题"))
-                .write(users)
+                .write(users,new BigTitle(3,"我是大标题"))
                 .flush();
     }
 }
@@ -273,7 +277,7 @@ public class UserController {
     }
 }
 ```
-**导入的Excel存在大标题的话，需要指定列表头开始的下标，对应Excel文件列表头那一行左边的数字序号，该操作要在调用``read()``前进行**
+**导入的Excel存在大标题的话，需要指定列表头开始的下标，对应Excel列表头那一行``左边的数字序号``或者你设置的``大标题行数+1``，该操作要在调用``read()``前进行**
 ```java
 /**
  * @author Gjing
@@ -462,6 +466,26 @@ public class User {
 
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
     private Date createTime;
+}
+```
+**在``@Excel``注解配置样式是属于全局的，表示只要是这个映射实体那么都会采用这个样式，灵活性比较差，如果需要在某一次导出的时候使用另外一种样式可以采用``方法设置``**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class UserController {
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/user")
+    @ApiOperation(value = "导出用户")
+    public void exportUser(HttpServletResponse response) {
+        List<User> users = userService.userList(0);
+        ExcelFactory.createWriter(User.class, response)
+                .write(users, MyExcelStyle::new)
+                .flush();
+    }
 }
 ```
 ### 2、自定义校验注解的逻辑

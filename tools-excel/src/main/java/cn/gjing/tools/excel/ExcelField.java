@@ -34,4 +34,9 @@ public @interface ExcelField {
      */
     int width() default 20 * 256;
 
+    /**
+     * If a cell has the same number of rows, merge automatically
+     * @return autoMerge
+     */
+    boolean autoMerge() default false;
 }

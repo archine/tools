@@ -1,13 +1,11 @@
 package cn.gjing.tools.excel.resolver;
 
-import cn.gjing.tools.excel.BigTitle;
-import cn.gjing.tools.excel.MetaStyle;
+import cn.gjing.tools.excel.MetaObject;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Excel writer resolver
@@ -22,12 +20,12 @@ public interface ExcelWriterResolver {
      * @param headFieldList Fields in Excel mapped entity that map to list headers
      * @param sheetName     sheet name
      * @param workbook      workbook
-     * @param bigTitle      Excel big title
-     * @param metaStyle     Style metadata
      * @param data          data
-     * @param explicitValues The contents of the drop-down box
+     * @param metaObject    Excel meta object
+     * @param changed Changed mapping
      */
-    void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaStyle metaStyle, BigTitle bigTitle, Map<String, String[]> explicitValues);
+    void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed);
+
     /**
      * Output the contents of the cache
      *

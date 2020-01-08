@@ -29,8 +29,8 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
     private Map<String, Field> hasAnnotationFieldMap = new HashMap<>();
     private List<String> headNameList = new ArrayList<>();
     private int totalCol = 0;
-    private Gson gson = new Gson();
     private InputStream inputStream;
+    private Gson gson;
 
     @Override
     public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName) {
@@ -45,7 +45,7 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
                     .collect(
                             Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field)
                     );
-            Class superclass = excelClass.getSuperclass();
+            Class<?> superclass = excelClass.getSuperclass();
             if (superclass != Object.class) {
                 Map<String, Field> supperFieldMap = Arrays.stream(superclass.getDeclaredFields())
                         .filter(f -> f.isAnnotationPresent(ExcelField.class))
