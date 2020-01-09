@@ -1,13 +1,13 @@
-![](https://img.shields.io/badge/version-1.1.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
-**采用注解方式的导入导出，能让你在项目中更便捷的使用**
+**采用注解方式的导入导出，项目中可以便捷的进行使用**
 ## 一、安装依赖
 ```xml
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.1.7</version>
+    <version>1.1.8</version>
 </dependency>
 ```
 ## 二、注解说明
