@@ -1,8 +1,8 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.MetaObject;
+import cn.gjing.tools.excel.Type;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
-import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -27,6 +27,7 @@ import java.util.List;
 class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
     private SXSSFWorkbook workbook;
     private OutputStream outputStream;
+    private ExcelHelper excelHelper;
 
     @Override
     public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed) {
@@ -37,7 +38,9 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
             sheet = this.workbook.createSheet(sheetName);
         }
         int offset = sheet.getLastRowNum() == 0 ? 0 : sheet.getLastRowNum() + 1;
-        ExcelHelper excelHelper = new ExcelHelper(this.workbook, sheet, metaObject);
+        if (excelHelper == null) {
+            this.excelHelper = new ExcelHelper(this.workbook, Type.XLSX);
+        }
         SXSSFRow row;
         SXSSFCell cell;
         if (metaObject.getBigTitle() != null) {
@@ -51,12 +54,9 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
                     cell.setCellStyle(metaObject.getMetaStyle().getTitleStyle());
                 }
             }
-            offset = titleOffset + 1;
-            SXSSFRow headerRow = sheet.createRow(offset);
-            excelHelper.setVal(data, headFieldList, sheet, headerRow, changed, offset);
+            this.excelHelper.setVal(data, headFieldList, sheet, changed, titleOffset,metaObject);
         } else {
-            SXSSFRow headerRow = sheet.createRow(offset);
-            excelHelper.setVal(data, headFieldList, sheet, headerRow, changed, offset);
+            this.excelHelper.setVal(data, headFieldList, sheet, changed, offset,metaObject);
         }
     }
 

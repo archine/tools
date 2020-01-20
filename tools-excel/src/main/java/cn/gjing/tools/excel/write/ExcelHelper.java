@@ -21,19 +21,22 @@ import java.util.*;
  **/
 class ExcelHelper {
     private Workbook workbook;
-    private Sheet sheet;
     private MetaObject metaObject;
+    private Type type;
 
-    public ExcelHelper(Workbook workbook, Sheet sheet, MetaObject metaObject) {
+    public ExcelHelper(Workbook workbook,Type type) {
         this.workbook = workbook;
-        this.sheet = sheet;
-        this.metaObject = metaObject;
+        this.type = type;
     }
     
-    public void setVal(List<?> data, List<Field> headFieldList, Sheet sheet, Row row, boolean changed, int offset) {
+    public void setVal(List<?> data, List<Field> headFieldList, Sheet sheet, boolean changed, int offset,MetaObject metaObject) {
+        this.metaObject = metaObject;
         Cell cell;
         int validIndex = 0;
+        Row row;
         if (changed) {
+            offset++;
+            row = sheet.createRow(offset);
             for (int i = 0; i < headFieldList.size(); i++) {
                 cell = row.createCell(i);
                 cell.setCellStyle(this.metaObject.getMetaStyle().getHeadStyle());
@@ -42,14 +45,14 @@ class ExcelHelper {
                 cell.setCellValue(excelField.value());
                 sheet.setColumnWidth(i, excelField.width());
                 if (data == null || data.isEmpty()) {
-                    validIndex = this.addValid(field, row, i, validIndex, Type.XLSX);
+                    validIndex = this.addValid(field, row, i, validIndex, sheet);
                 }
             }
-            offset++;
         }
         if (data == null || data.isEmpty()) {
             return;
         }
+        offset++;
         ExcelField excelField;
         Field field;
         Object value = null;
@@ -77,13 +80,13 @@ class ExcelHelper {
                         if (excelModel != null) {
                             if (ParamUtils.equals(value, excelModel.getOldValue())) {
                                 if (i == dataSize - 1) {
-                                    this.sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), row.getRowNum(), j, j));
+                                    sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), row.getRowNum(), j, j));
                                 } else {
                                     excelModelMap.put(key, excelModel);
                                 }
                             } else {
                                 if (excelModel.getRowIndex() + 1 < row.getRowNum()) {
-                                    this.sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), row.getRowNum() - 1, j, j));
+                                    sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), row.getRowNum() - 1, j, j));
                                 }
                                 if (i != dataSize - 1) {
                                     this.putExcelModel(row, value, excelModelMap, key);
@@ -92,7 +95,7 @@ class ExcelHelper {
                         }
                     }
                 }
-                this.setCellVal(excelField, field, row, value, j, this.metaObject);
+                this.setCellVal(excelField, field, row, value, j);
             }
         }
     }
@@ -105,9 +108,9 @@ class ExcelHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public void setCellVal(ExcelField excelField, Field field, Row row, Object value, int index, MetaObject metaObject) {
+    public void setCellVal(ExcelField excelField, Field field, Row row, Object value, int index) {
         Cell valueCell = row.createCell(index);
-        valueCell.setCellStyle(metaObject.getMetaStyle().getBodyStyle());
+        valueCell.setCellStyle(this.metaObject.getMetaStyle().getBodyStyle());
         if (value == null) {
             valueCell.setCellValue("");
         } else {
@@ -131,14 +134,14 @@ class ExcelHelper {
         }
     }
 
-    public int addValid(Field field, Row row, int i, int validIndex, Type type) {
+    public int addValid(Field field, Row row, int i, int validIndex, Sheet sheet) {
         ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
         DateValid dv = field.getAnnotation(DateValid.class);
         NumericValid nv = field.getAnnotation(NumericValid.class);
         if (ev != null) {
-            String[] values = metaObject.getExplicitValues().get(field.getName());
+            String[] values = this.metaObject.getExplicitValues().get(field.getName());
             try {
-                ev.validClass().newInstance().valid(ev, workbook, sheet, row.getRowNum() + 1, i, i, validIndex, values);
+                ev.validClass().newInstance().valid(ev, this.workbook, sheet, row.getRowNum() + 1, i, i, validIndex, values);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -148,7 +151,7 @@ class ExcelHelper {
             validIndex++;
             return validIndex;
         }
-        if (type == Type.XLS) {
+        if (this.type == Type.XLS) {
             if (dv != null) {
                 try {
                     dv.validClass().newInstance().valid(dv, sheet, row.getRowNum() + 1, i, i);

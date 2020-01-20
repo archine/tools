@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.MetaObject;
+import cn.gjing.tools.excel.Type;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -26,9 +27,12 @@ import java.util.List;
 class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
     private HSSFWorkbook workbook;
     private OutputStream outputStream;
+    private ExcelHelper excelHelper;
+    private int times;
 
     @Override
     public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed) {
+        times++;
         this.workbook = (HSSFWorkbook) workbook;
         HSSFSheet sheet = this.workbook.getSheet(sheetName);
         if (sheet == null) {
@@ -36,8 +40,15 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
             sheet = this.workbook.createSheet(sheetName);
         }
         //Read the default offset
-        int offset = sheet.getLastRowNum() == 0 ? 0 : sheet.getLastRowNum() + 1;
-        ExcelHelper excelHelper = new ExcelHelper(this.workbook, sheet, metaObject);
+        int offset;
+        if (times > 2) {
+            offset = sheet.getLastRowNum()-1;
+        }else {
+            offset = sheet.getLastRowNum() == 0 ? 0 : sheet.getLastRowNum() + 1;
+        }
+        if (excelHelper == null) {
+            this.excelHelper = new ExcelHelper(this.workbook, Type.XLS);
+        }
         HSSFRow row;
         HSSFCell cell;
         if (metaObject.getBigTitle() != null) {
@@ -51,12 +62,9 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
                     cell.setCellStyle(metaObject.getMetaStyle().getTitleStyle());
                 }
             }
-            offset = titleOffset + 1;
-            HSSFRow headerRow = sheet.createRow(offset);
-            excelHelper.setVal(data, headFieldList, sheet, headerRow, changed, offset);
+            this.excelHelper.setVal(data, headFieldList, sheet, changed, titleOffset,metaObject);
         } else {
-            HSSFRow headerRow = sheet.createRow(offset);
-            excelHelper.setVal(data, headFieldList, sheet, headerRow, changed, offset);
+            this.excelHelper.setVal(data, headFieldList, sheet, changed, offset,metaObject);
         }
     }
 

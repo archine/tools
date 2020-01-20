@@ -24,5 +24,4 @@ public class Contact {
     private String url = "";
     @Builder.Default
     private String email = "";
-
 }
