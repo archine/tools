@@ -24,18 +24,39 @@ class ExcelHelper {
     private MetaObject metaObject;
     private Type type;
 
-    public ExcelHelper(Workbook workbook,Type type) {
+    public ExcelHelper(Workbook workbook, Type type) {
         this.workbook = workbook;
         this.type = type;
     }
-    
-    public void setVal(List<?> data, List<Field> headFieldList, Sheet sheet, boolean changed, int offset,MetaObject metaObject) {
+
+    public int setBigTitle(List<Field> headFieldList, MetaObject metaObject, Sheet sheet) {
+        if (metaObject.getBigTitle() != null) {
+            Row row;
+            Cell cell;
+            int offset = sheet.getLastRowNum() == 0 ? 0 : sheet.getLastRowNum() + 1;
+            int titleOffset = offset + metaObject.getBigTitle().getLastRow() - 1;
+            sheet.addMergedRegion(new CellRangeAddress(offset, titleOffset, 0, headFieldList.size() - 1));
+            for (int i = 0; i < metaObject.getBigTitle().getLastRow(); i++) {
+                row = sheet.createRow(offset + i);
+                for (int j = 0; j < headFieldList.size(); j++) {
+                    cell = row.createCell(j);
+                    cell.setCellValue(metaObject.getBigTitle().getContent());
+                    cell.setCellStyle(metaObject.getMetaStyle().getTitleStyle());
+                }
+            }
+            return titleOffset;
+        } else {
+            return sheet.getLastRowNum();
+        }
+    }
+
+    public void setVal(List<?> data, List<Field> headFieldList, Sheet sheet, boolean changed, int offset, MetaObject metaObject) {
         this.metaObject = metaObject;
         Cell cell;
         int validIndex = 0;
         Row row;
         if (changed) {
-            offset++;
+            offset = offset == 0 ? 0 : offset + 1;
             row = sheet.createRow(offset);
             for (int i = 0; i < headFieldList.size(); i++) {
                 cell = row.createCell(i);
@@ -100,7 +121,7 @@ class ExcelHelper {
         }
     }
 
-    public void putExcelModel(Row row, Object value, Map<Object, ExcelModel> excelModelMap, String key) {
+    private void putExcelModel(Row row, Object value, Map<Object, ExcelModel> excelModelMap, String key) {
         excelModelMap.put(key, ExcelModel.builder()
                 .oldValue(value)
                 .rowIndex(row.getRowNum())
@@ -108,7 +129,7 @@ class ExcelHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public void setCellVal(ExcelField excelField, Field field, Row row, Object value, int index) {
+    private void setCellVal(ExcelField excelField, Field field, Row row, Object value, int index) {
         Cell valueCell = row.createCell(index);
         valueCell.setCellStyle(this.metaObject.getMetaStyle().getBodyStyle());
         if (value == null) {
@@ -134,7 +155,7 @@ class ExcelHelper {
         }
     }
 
-    public int addValid(Field field, Row row, int i, int validIndex, Sheet sheet) {
+    private int addValid(Field field, Row row, int i, int validIndex, Sheet sheet) {
         ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
         DateValid dv = field.getAnnotation(DateValid.class);
         NumericValid nv = field.getAnnotation(NumericValid.class);

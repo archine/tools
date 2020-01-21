@@ -2,6 +2,7 @@ package cn.gjing.tools.swagger;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -12,12 +13,19 @@ import java.util.List;
 /**
  * @author Gjing
  **/
+@Data
 @Builder
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
 @ConfigurationProperties("swagger")
 public class SwaggerBean {
+    /**
+     * 开启Swagger文档
+     */
+    @Builder.Default
+    private boolean enable = true;
+
     /**
      * 要扫描的包路径(controller包路径)
      */
@@ -84,102 +92,6 @@ public class SwaggerBean {
      */
     @Builder.Default
     private List<RequestHeader> globalHeaders = new ArrayList<>();
-
-    public String getBasePackage() {
-        return basePackage;
-    }
-
-    public void setBasePackage(String basePackage) {
-        this.basePackage = basePackage;
-    }
-
-    public PathType getPathType() {
-        return pathType;
-    }
-
-    public void setPathType(PathType pathType) {
-        this.pathType = pathType;
-    }
-
-    public String getPathPattern() {
-        return pathPattern;
-    }
-
-    public void setPathPattern(String pathPattern) {
-        this.pathPattern = pathPattern;
-    }
-
-    public String[] getExcludePattern() {
-        return excludePattern;
-    }
-
-    public void setExcludePattern(String[] excludePattern) {
-        this.excludePattern = excludePattern;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getLicense() {
-        return license;
-    }
-
-    public void setLicense(String license) {
-        this.license = license;
-    }
-
-    public String getLicenseUrl() {
-        return licenseUrl;
-    }
-
-    public void setLicenseUrl(String licenseUrl) {
-        this.licenseUrl = licenseUrl;
-    }
-
-    public String getTermsOfServiceUrl() {
-        return termsOfServiceUrl;
-    }
-
-    public void setTermsOfServiceUrl(String termsOfServiceUrl) {
-        this.termsOfServiceUrl = termsOfServiceUrl;
-    }
-
-    public List<ResponseSchema> getGlobalResponseSchemas() {
-        return globalResponseSchemas;
-    }
-
-    public void setGlobalResponseSchemas(List<ResponseSchema> globalResponseSchemas) {
-        this.globalResponseSchemas = globalResponseSchemas;
-    }
-
-    public List<RequestHeader> getGlobalHeaders() {
-        return globalHeaders;
-    }
-
-    public void setGlobalHeaders(List<RequestHeader> globalHeaders) {
-        this.globalHeaders = globalHeaders;
-    }
 }
 
 
