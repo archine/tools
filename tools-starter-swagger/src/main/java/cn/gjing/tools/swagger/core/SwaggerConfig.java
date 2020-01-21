@@ -31,12 +31,11 @@ class SwaggerConfig {
     @Resource
     private cn.gjing.tools.swagger.Contact contact;
 
-    private static PathSelectContext pathSelectContext = new PathSelectContext();
-
     @Bean
     @SuppressWarnings("all")
     public Docket createRestApi() {
-        final Docket docket = new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo());
+        PathSelectContext pathSelectContext = new PathSelectContext();
+        final Docket docket = new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).enable(swaggerBean.isEnable());
         if (!swaggerBean.getGlobalResponseSchemas().isEmpty()) {
             List<ResponseMessage> responseMessageList = new ArrayList<>();
             swaggerBean.getGlobalResponseSchemas().forEach(e -> {
@@ -52,7 +51,7 @@ class SwaggerConfig {
         if (!swaggerBean.getGlobalHeaders().isEmpty()) {
             List<Parameter> parameterList = new ArrayList<>();
             swaggerBean.getGlobalHeaders().forEach(e->{
-                parameterList.add(new ParameterBuilder().name(e.getName()).description(e.getDescription()).required(e.required())
+                parameterList.add(new ParameterBuilder().name(e.getName()).description(e.getDescription()).required(e.isRequired())
                         .modelRef(new ModelRef("String")).parameterType("header").build());
             });
             docket.globalOperationParameters(parameterList);

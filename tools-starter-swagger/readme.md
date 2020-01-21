@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.3.1-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.3.2-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 **快速在SpringBoot项目中集成Swagger**
@@ -8,7 +8,7 @@
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>1.3.1</version>
+     <version>1.3.2</version>
 </dependency>
 ```
 ## 二、使用@EnableSwagger注解
@@ -35,6 +35,8 @@ swagger:
     name:
     # 联系人地址
     url:
+  # 是否开启swagger，默认true
+  enable: true
   # 标题
   title: 
   # 描述

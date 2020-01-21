@@ -1,12 +1,9 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.MetaObject;
+import cn.gjing.tools.excel.Type;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
-import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
@@ -27,6 +24,7 @@ import java.util.List;
 class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
     private SXSSFWorkbook workbook;
     private OutputStream outputStream;
+    private ExcelHelper excelHelper;
 
     @Override
     public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed) {
@@ -36,28 +34,11 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
             changed = true;
             sheet = this.workbook.createSheet(sheetName);
         }
-        int offset = sheet.getLastRowNum() == 0 ? 0 : sheet.getLastRowNum() + 1;
-        ExcelHelper excelHelper = new ExcelHelper(this.workbook, sheet, metaObject);
-        SXSSFRow row;
-        SXSSFCell cell;
-        if (metaObject.getBigTitle() != null) {
-            int titleOffset = offset + metaObject.getBigTitle().getLastRow() - 1;
-            sheet.addMergedRegion(new CellRangeAddress(offset, titleOffset, 0, headFieldList.size() - 1));
-            for (int i = 0; i < metaObject.getBigTitle().getLastRow() + 1; i++) {
-                row = sheet.createRow(offset + i);
-                for (int j = 0; j < headFieldList.size(); j++) {
-                    cell = row.createCell(j);
-                    cell.setCellValue(metaObject.getBigTitle().getContent());
-                    cell.setCellStyle(metaObject.getMetaStyle().getTitleStyle());
-                }
-            }
-            offset = titleOffset + 1;
-            SXSSFRow headerRow = sheet.createRow(offset);
-            excelHelper.setVal(data, headFieldList, sheet, headerRow, changed, offset);
-        } else {
-            SXSSFRow headerRow = sheet.createRow(offset);
-            excelHelper.setVal(data, headFieldList, sheet, headerRow, changed, offset);
+        if (excelHelper == null) {
+            this.excelHelper = new ExcelHelper(this.workbook, Type.XLSX);
         }
+        int offset = this.excelHelper.setBigTitle(headFieldList, metaObject, sheet);
+        this.excelHelper.setVal(data, headFieldList, sheet, changed, offset, metaObject);
     }
 
     @Override
