@@ -1,6 +1,6 @@
 package cn.gjing.tools.common.util;
 
-import cn.gjing.tools.common.exception.ParamException;
+import cn.gjing.tools.common.exception.ParamValidException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
@@ -88,7 +88,7 @@ public class EncryptionUtils {
             byte[] bytes = sha256Hmac.doFinal(str.getBytes(StandardCharsets.UTF_8));
             hash = byteArrayToHexString(bytes);
         } catch (Exception e) {
-            throw new ParamException("Encryption abnormal");
+            throw new ParamValidException("Encryption abnormal");
         }
         return hash;
     }

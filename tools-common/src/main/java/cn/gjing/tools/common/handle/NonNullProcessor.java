@@ -97,7 +97,7 @@ public class NonNullProcessor extends AbstractProcessor {
     }
 
     private static JCTree.JCExpression buildExceptionClassExpression(TreeMaker factory, Names symbolsTable) {
-        String[] parts = "java.lang.NullPointerException".split("\\.");
+        String[] parts = "cn.gjing.tools.common.exception.ParamValidException".split("\\.");
         JCTree.JCIdent identifier = factory.Ident(symbolsTable.fromString(parts[0]));
         JCTree.JCFieldAccess selector = null;
         for (int i = 1; i < parts.length; i++) {
