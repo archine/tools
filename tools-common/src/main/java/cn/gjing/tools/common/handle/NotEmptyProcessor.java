@@ -2,6 +2,8 @@ package cn.gjing.tools.common.handle;
 
 import cn.gjing.tools.common.annotation.Exclude2;
 import cn.gjing.tools.common.annotation.NotEmpty;
+import cn.gjing.tools.common.exception.ParamValidException;
+import cn.gjing.tools.common.util.ParamUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -41,8 +43,8 @@ class NotEmptyProcessor {
             if (parameter.isAnnotationPresent(Exclude2.class)) {
                 continue;
             }
-            if (args[i] == null) {
-                throw new NullPointerException("".equals(notEmpty.message())
+            if (ParamUtils.isEmpty(args[i])) {
+                throw new ParamValidException("".equals(notEmpty.message())
                         ? "The parameter " + parameter.getName() + " cannot be null"
                         : notEmpty.message());
             }
