@@ -13,6 +13,7 @@
         <module>tools-httpclient</module>
         <module>tools-redis</module>
         <module>tools-excel</module>
+        <module>tools-aliyun</module>
     </modules>
     <description>develop tool</description>
     <properties>

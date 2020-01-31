@@ -94,7 +94,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.12</version>
+            <version>1.14</version>
         </dependency>
     </dependencies>
 

@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.gjing.tools.aliyun.oss.ToolsOssConfiguration
