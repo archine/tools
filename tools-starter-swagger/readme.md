@@ -43,11 +43,11 @@ swagger:
   description: 
   # 接口所在包路径
   base-package:
-  # 接口选择规则类型, 共分为: REGEX(正则), ANT(指定路径), 默认ANT
+  # 接口选择规则类型, 共分为: REGEX(正则匹配), ANT(路径匹配), 默认ANT
   path-type:
-  # 接口匹配规则
+  # 接口匹配规则表达式
   path-pattern:
-  # 接口排除匹配规则
+  # 接口排除匹配表达式
   exclude-pattern:
   # 服务条款
   terms-of-service-url:

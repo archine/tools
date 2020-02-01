@@ -1,6 +1,3 @@
-![](https://img.shields.io/badge/version-1.0.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
- ![](https://img.shields.io/badge/builder-success-green.svg)      
- 
 > 阿里云OSS和短信工具
 # 导入依赖
 ```xml
@@ -58,7 +55,7 @@ public class TestController {
 
     @PostMapping("/file3")
     public String upload(MultipartFile file) throws IOException {
-        // 通过流进行上传, 需要指定文件名
+        // 通过流或者byte[]进行上传, 需要指定文件名
         return this.ossUpload.upload(file.getInputStream(), UUID.randomUUID().toString()+".jpg");
     }
 }
@@ -67,7 +64,7 @@ public class TestController {
 
 |参数|描述|
 |---|---|
-|fileName|上传到oss后的oss文件名，不指定会默认生成，只在通过流和byte数组上传的时候需要指定|
+|fileName|上传到oss后的文件名, 重复会覆盖掉之前的，如果要上传到指定目录的话将目录一并作为文件名即可，如：files/1.jpg|
 |file|文件、文件流、byte数组|
 |dir|保存到bucket那个目录对应的目录名称|
 ### 3、文件删除
