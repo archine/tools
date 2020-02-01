@@ -7,8 +7,9 @@ import java.lang.annotation.Target;
 
 /**
  * @author Gjing
+ * Parameters that use this annotation do not need to be validated，Use with @NotEmpty
  **/
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Exclude2 {
+public @interface Not {
 }

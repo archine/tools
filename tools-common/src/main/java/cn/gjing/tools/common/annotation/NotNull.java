@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author Gjing
+ * Method parameters are not null
  **/
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)

@@ -16,9 +16,9 @@
 ```yaml
 aliyun:
   # 用户key，在阿里云获取
-  access-key: LTAI4FkasEMoEV8x5S83kX1G
+  access-key: xxxxxxx
   # 用户秘钥，在阿里云获取
-  access-key-secret: 215H0k9LRoxUxvMA10UKx64abWwgrP
+  access-key-secret: xxxxxxx
   oss:
    # 节点, 前往阿里云查看
    end-point: xxxxxxxx
@@ -215,3 +215,4 @@ public class SmsController {
 |sendDate|发送日期，格式：yyyy-MM-dd|
 |page|页数|
 |row|每页条数，最大``50``|
+---

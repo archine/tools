@@ -1,8 +1,8 @@
 package cn.gjing.tools.common.handle;
 
-import cn.gjing.tools.common.annotation.Exclude2;
-import cn.gjing.tools.common.annotation.NotEmpty;
+import cn.gjing.tools.common.annotation.*;
 import cn.gjing.tools.common.exception.ParamValidException;
+import cn.gjing.tools.common.util.BeanUtils;
 import cn.gjing.tools.common.util.ParamUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,20 +13,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 /**
  * @author Gjing
- * This class is primarily used for method parsing as a notempty annotation to detect whether all parameters on a method
- * contain null values , Throws an {NullPointerException} if it contains null values
  **/
 @Component
 @Aspect
 class NotEmptyProcessor {
     @Pointcut("@annotation(cn.gjing.tools.common.annotation.NotEmpty)")
     public void cut() {
-
     }
 
     @Before("cut()")
@@ -35,20 +33,59 @@ class NotEmptyProcessor {
         assert attributes != null;
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        NotEmpty notEmpty = method.getAnnotation(NotEmpty.class);
         Parameter[] parameters = method.getParameters();
         Object[] args = joinPoint.getArgs();
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
-            if (parameter.isAnnotationPresent(Exclude2.class)) {
+            if (parameter.isAnnotationPresent(Not.class)) {
+                continue;
+            }
+            if (parameter.isAnnotationPresent(Json.class)) {
+                this.jsonCheck(args[i]);
                 continue;
             }
             if (ParamUtils.isEmpty(args[i])) {
-                throw new ParamValidException("".equals(notEmpty.message())
-                        ? "The parameter " + parameter.getName() + " cannot be null"
-                        : notEmpty.message());
+                this.validError(parameter.getName() + " cannot be empty");
             }
         }
+    }
+
+    private void jsonCheck(Object o) {
+        Field[] fields = o.getClass().getDeclaredFields();
+        NotEmpty notEmpty;
+        Length length;
+        Mobile mobile;
+        Email email;
+        Object value;
+        for (Field field : fields) {
+            notEmpty = field.getAnnotation(NotEmpty.class);
+            length = field.getAnnotation(Length.class);
+            mobile = field.getAnnotation(Mobile.class);
+            email = field.getAnnotation(Email.class);
+            value = BeanUtils.getFieldValue(o, field);
+            if (notEmpty != null && ParamUtils.isEmpty(value)) {
+                this.validError(notEmpty.message());
+            }
+            if (length != null) {
+                if (value == null || value.toString().length() > length.value()) {
+                    this.validError(length.message());
+                }
+            }
+            if (mobile != null) {
+                if (value == null || !ParamUtils.isMobileNumber(value.toString())) {
+                    this.validError(mobile.message());
+                }
+            }
+            if (email != null) {
+                if (value == null || !ParamUtils.isEmail(value.toString())) {
+                    this.validError(email.message());
+                }
+            }
+        }
+    }
+
+    private void validError(String message) {
+        throw new ParamValidException(message);
     }
 
 }

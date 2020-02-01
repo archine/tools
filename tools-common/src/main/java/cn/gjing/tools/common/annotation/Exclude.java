@@ -7,9 +7,9 @@ import java.lang.annotation.Target;
 
 /**
  * @author Gjing
- * 排除参数,与NotNull搭配使用,可以指定对应的参数不进行非空校验
+ * Parameters that use this annotation do not need to be validated，Use with @NotNull
  **/
 @Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 public @interface Exclude {
 }

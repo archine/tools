@@ -4,11 +4,15 @@ import java.lang.annotation.*;
 
 /**
  * @author Gjing
- * parameter check,Only for methods,example：@NotNull2 or @NotNull2(message="")
+ * Method parameters are nonnull
  **/
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD,ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface NotEmpty {
-    String message() default "";
+    /**
+     * Exception information
+     * @return String
+     */
+    String message() default "Parameter cannot be null";
 }

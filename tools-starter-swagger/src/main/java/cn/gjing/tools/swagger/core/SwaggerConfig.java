@@ -1,12 +1,14 @@
 package cn.gjing.tools.swagger.core;
 
-import cn.gjing.tools.swagger.PathType;
 import cn.gjing.tools.swagger.SwaggerBean;
 import com.google.common.base.Predicates;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RequestMethod;
-import springfox.documentation.builders.*;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.ResponseMessageBuilder;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
@@ -50,7 +52,7 @@ class SwaggerConfig {
         }
         if (!swaggerBean.getGlobalHeaders().isEmpty()) {
             List<Parameter> parameterList = new ArrayList<>();
-            swaggerBean.getGlobalHeaders().forEach(e->{
+            swaggerBean.getGlobalHeaders().forEach(e -> {
                 parameterList.add(new ParameterBuilder().name(e.getName()).description(e.getDescription()).required(e.isRequired())
                         .modelRef(new ModelRef("String")).parameterType("header").build());
             });
@@ -64,11 +66,7 @@ class SwaggerConfig {
             builder.apis(RequestHandlerSelectors.basePackage(swaggerBean.getBasePackage()));
         }
         for (String exclude : swaggerBean.getExcludePattern()) {
-            if (swaggerBean.getPathType().equals(PathType.ALL)) {
-                builder.paths(Predicates.not(PathSelectors.regex(exclude)));
-            } else {
-                builder.paths(Predicates.not(pathSelectContext.getPredicate(swaggerBean, exclude)));
-            }
+            builder.paths(Predicates.not(pathSelectContext.getPredicate(swaggerBean, exclude)));
         }
         return builder.build();
     }

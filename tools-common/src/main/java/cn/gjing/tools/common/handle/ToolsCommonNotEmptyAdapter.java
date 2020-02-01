@@ -1,6 +1,6 @@
 package cn.gjing.tools.common.handle;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class ToolsCommonNotEmptyAdapter {
 
     @Bean
-    @ConditionalOnClass(NotEmptyProcessor.class)
+    @ConditionalOnMissingBean(NotEmptyProcessor.class)
     public NotEmptyProcessor notEmptyProcessor() {
         return new NotEmptyProcessor();
     }

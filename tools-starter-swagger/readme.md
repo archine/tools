@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.3.2-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.3.3-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 **快速在SpringBoot项目中集成Swagger**
@@ -8,7 +8,7 @@
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>1.3.2</version>
+     <version>1.3.3</version>
 </dependency>
 ```
 ## 二、使用@EnableSwagger注解
@@ -43,11 +43,11 @@ swagger:
   description: 
   # 接口所在包路径
   base-package:
-  # 接口选择规则类型, 共分为: ALL(所有接口), REGEX(符合正则), ANT(符合路径)三个类型, 默认为ALL类型
+  # 接口选择规则类型, 共分为: REGEX(正则), ANT(指定路径), 默认ANT
   path-type:
-  # 接口匹配规则,在path-type类型不为 "ALL" 的情况下必须设置,否则抛非法参数异常
+  # 接口匹配规则
   path-pattern:
-  # 排除路径，默认使用正则表达式方式，可在pathType设置为其他类型（pathType类型为ALL时默认走正则
+  # 接口排除匹配规则
   exclude-pattern:
   # 服务条款
   terms-of-service-url:

@@ -17,12 +17,11 @@ public enum PathSelectFactory {
     private Map<PathType, PathSelect> pathMap = new HashMap<>(16);
 
     PathSelectFactory() {
-        pathMap.put(PathType.ALL, new AllType());
         pathMap.put(PathType.REGEX, new RegexType());
         pathMap.put(PathType.ANT, new AntType());
     }
 
     PathSelect create(PathType pathType) {
-        return (PathSelect) pathMap.get(pathType);
+        return pathMap.get(pathType);
     }
 }

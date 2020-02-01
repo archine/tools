@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * 开启全局跨域
  * @author Gjing
  **/
 @Target(ElementType.TYPE)

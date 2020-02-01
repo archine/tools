@@ -1,28 +1,76 @@
 # tools-common
-![](https://img.shields.io/badge/version-1.3.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
-提供参数，时间，加密、验证码、邮件、跨域、随机数、Id生成等开发中常用到的工具。。。
+Java常用工具类整合
 ## 一、导入依赖
 ```xml
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.3.0</version>
+  <version>1.3.1</version>
 </dependency>
 ```
-## 二、常用注解:
+## 二、参数校验注解
 ### 1、@NotNull 
-方法参数校验，如若要排除方法中的某个参数,搭配使用``@Exclude``注解到指定参数上;
+方法参数非null校验，如若要排除方法中的某个参数,搭配使用``@Exclude``注解到指定参数上;
+```java
+@RestController
+public class TestController{
+    @PostMapping("/test")
+    @NotNull
+    public void test(String param1) {
+        System.out.println(param1);
+    }
+}
+```
 ### 2、@NotEmpty
-方法参数校验, 可对null和空字符串进行校验,如若要排除方法中的某个参数,搭配使用``@Exclude2``注解到指定参数上，如果需要自定义异常提示信息, 可设置``message``
-> 如果是**Spring**环境, 需要手动在xml文件中进行如下配置，**SpringBoot**环境无需配置
+对方法参数和实体字段非空校验，``使用了该注解的方法才会进行校验``，``Spring``环境需要手动在xml文件中进行如下配置
 ```xml
 <bean id="xxx" class="cn.gjing.tools.common.handle.ToolsCommonNotEmptyAdapter"/>
 ```
-### 3、@EnableCors
-开启全局跨域，在启动类或者任意类使用该注解即可，会走默认配置，也可以自行配置，配置示例如下：
+### 3、@Json
+**标记该参数是Json对象，与@NotEmpty搭配使用**
+```java
+@RestController
+public class TestController {
+    @PostMapping("/test")
+    @NotEmpty
+    public void test(@Json @RequestBody User user,String param) {
+        System.out.println("ok");
+    }
+}
+```
+### 4、Email
+**作用在Json对象的属性, 对邮箱格式进行校验，可自定义设置异常信息**
+```java
+@Data
+public class User {
+    @Email
+    private String userEmail;
+}
+```
+### 5、Length
+**作用在Json对象的属性，对字符串的长度进行校验，需要设置最大长度，也可以设置自定义异常信息**
+```java
+@Data
+public class User {
+    @Length(value = 3, message = "用户名长度不能大于3")
+    private String name;
+}
+```
+### 6、Mobile
+**作用在Json对象的属性，对手机号格式进行校验**
+```java
+@Data
+public class User {
+    @Mobile(message = "手机号格式错误")
+    private String name;
+}
+```
+## 三、跨域
+开启全局跨域，在启动类或者任意类使用``@EnableCors``注解即可，会走默认配置，也可以自行配置，配置示例如下：
 * **yml方式**
 ```yaml
 cors:
@@ -53,7 +101,7 @@ public class CorsConfiguration {
     }
 }
 ```
-## 三、返回结果模板
+## 四、返回结果模板
 ### 1、ResultVO
 通用返回结果模板     
 

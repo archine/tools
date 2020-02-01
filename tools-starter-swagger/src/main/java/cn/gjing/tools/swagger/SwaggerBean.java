@@ -33,22 +33,23 @@ public class SwaggerBean {
     private String basePackage = "";
 
     /**
-     * 接口选择规则, ALL (默认,所有接口), ANT (符合指定路径的接口)，REGEX（符合正则表达式的接口）
+     * 接口选择规则, ANT (指定路径)，REGEX（正则表达式)
      */
     @Builder.Default
-    private PathType pathType = PathType.ALL;
+    private PathType pathType = PathType.ANT;
 
     /**
-     * 接口选则表达式，如果是路径选择，则如：/test/** 即选择test路径下的所有接口，正则选择为满足正则表达式的所有接口
+     * 接口选则表达式
      */
     @Builder.Default
     private String pathPattern="/**";
 
     /**
-     * 排除路径，默认使用正则表达式方式，可在pathType设置为其他类型（pathType类型为ALL时默认走正则）
+     * 接口排除路径表达式
      */
     @Builder.Default
     private String[] excludePattern = new String[]{};
+
     /**
      * swagger文档标题
      */
@@ -87,6 +88,7 @@ public class SwaggerBean {
      */
     @Builder.Default
     private List<ResponseSchema> globalResponseSchemas = new ArrayList<>();
+
     /**
      * 请求头
      */
