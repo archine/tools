@@ -40,7 +40,7 @@ public interface OssUpload {
     /**
      * 上传
      * @param file 文件流
-     * @param fileName 文件名
+     * @param fileName oss文件名
      * @return oss文件名
      */
     String upload(InputStream file,String fileName);

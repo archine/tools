@@ -8,11 +8,10 @@ import org.springframework.stereotype.Component;
  * @author Gjing
  **/
 @Data
-@Builder
+@Component
 @NoArgsConstructor
 @AllArgsConstructor
-@Component
-@ConfigurationProperties(prefix = "oss")
+@ConfigurationProperties(prefix = "aliyun.oss")
 public class OssMeta {
     /**
      * 节点
@@ -25,36 +24,22 @@ public class OssMeta {
     private String bucket;
 
     /**
-     * 用户key
+     * 最大连接数
      */
-    private String accessKey;
+    private Integer maxConnections = 1024;
 
     /**
-     * 用户秘钥
+     * Socket层传输数据的超时时间
      */
-    private String accessKeySecret;
+    private Integer socketTimeout = 50000;
 
     /**
-     * 最大连接数,默认1024
+     * 空闲超时时间
      */
-    @Builder.Default
-    private int maxConnections = 1024;
+    private Integer idleTime = 60000;
 
     /**
-     * Socket层传输数据的超时时间,默认50000ms
+     * 连接超时时间
      */
-    @Builder.Default
-    private int socketTimeout = 50000;
-
-    /**
-     * 空闲超时时间,默认60000ms
-     */
-    @Builder.Default
-    private int idleTime = 60000;
-
-    /**
-     * 连接超时时间,默认50000ms
-     */
-    @Builder.Default
-    private int connectionTimeout = 50000;
+    private Integer connectionTimeout = 50000;
 }

@@ -1,5 +1,6 @@
 package cn.gjing.tools.aliyun.oss;
 
+import cn.gjing.tools.aliyun.AliyunMeta;
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -19,12 +20,14 @@ import java.util.UUID;
  *
  * @author Gjing
  **/
-class SimpleOssUpload implements OssUpload {
+public final class SimpleOssUpload implements OssUpload {
     private OSS ossClient;
     private OssMeta ossMeta;
+    private AliyunMeta aliyunMeta;
 
-    public SimpleOssUpload(OssMeta ossMeta) {
+    public SimpleOssUpload(OssMeta ossMeta, AliyunMeta aliyunMeta) {
         this.ossMeta = ossMeta;
+        this.aliyunMeta = aliyunMeta;
         this.ossInit();
     }
 
@@ -85,7 +88,7 @@ class SimpleOssUpload implements OssUpload {
         conf.setSocketTimeout(this.ossMeta.getSocketTimeout());
         conf.setConnectionTimeout(this.ossMeta.getConnectionTimeout());
         conf.setIdleConnectionTime(this.ossMeta.getIdleTime());
-        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.ossMeta.getAccessKey(), this.ossMeta.getAccessKeySecret(),conf);
+        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.aliyunMeta.getAccessKey(), this.aliyunMeta.getAccessKeySecret(),conf);
     }
 
     private void createBucket() {

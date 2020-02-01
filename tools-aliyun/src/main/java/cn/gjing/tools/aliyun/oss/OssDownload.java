@@ -1,5 +1,6 @@
 package cn.gjing.tools.aliyun.oss;
 
+import cn.gjing.tools.aliyun.AliyunMeta;
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -17,9 +18,11 @@ import java.util.function.Predicate;
 public class OssDownload {
     private OSS ossClient;
     private OssMeta ossMeta;
+    private AliyunMeta aliyunMeta;
 
-    public OssDownload(OssMeta ossMeta) {
+    public OssDownload(OssMeta ossMeta,AliyunMeta aliyunMeta) {
         this.ossMeta = ossMeta;
+        this.aliyunMeta = aliyunMeta;
         this.ossInit();
     }
 
@@ -96,6 +99,6 @@ public class OssDownload {
         conf.setSocketTimeout(this.ossMeta.getSocketTimeout());
         conf.setConnectionTimeout(this.ossMeta.getConnectionTimeout());
         conf.setIdleConnectionTime(this.ossMeta.getIdleTime());
-        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.ossMeta.getAccessKey(), this.ossMeta.getAccessKeySecret(), conf);
+        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.aliyunMeta.getAccessKey(), this.aliyunMeta.getAccessKeySecret(), conf);
     }
 }
