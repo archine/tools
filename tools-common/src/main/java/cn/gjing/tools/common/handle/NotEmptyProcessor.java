@@ -35,6 +35,9 @@ class NotEmptyProcessor {
         Method method = methodSignature.getMethod();
         Parameter[] parameters = method.getParameters();
         Object[] args = joinPoint.getArgs();
+        Length length;
+        Mobile mobile;
+        Email email;
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
             if (parameter.isAnnotationPresent(Not.class)) {
@@ -47,6 +50,10 @@ class NotEmptyProcessor {
             if (ParamUtils.isEmpty(args[i])) {
                 this.validError(parameter.getName() + " cannot be empty");
             }
+            length = parameter.getAnnotation(Length.class);
+            mobile = parameter.getAnnotation(Mobile.class);
+            email = parameter.getAnnotation(Email.class);
+            this.valid(length, mobile, email, args[i]);
         }
     }
 
@@ -66,20 +73,24 @@ class NotEmptyProcessor {
             if (notEmpty != null && ParamUtils.isEmpty(value)) {
                 this.validError(notEmpty.message());
             }
-            if (length != null) {
-                if (value == null || value.toString().length() > length.value()) {
-                    this.validError(length.message());
-                }
+            this.valid(length, mobile, email, value);
+        }
+    }
+
+    private void valid(Length length, Mobile mobile, Email email, Object value) {
+        if (length != null) {
+            if (value == null || value.toString().length() > length.value()) {
+                this.validError(length.message());
             }
-            if (mobile != null) {
-                if (value == null || !ParamUtils.isMobileNumber(value.toString())) {
-                    this.validError(mobile.message());
-                }
+        }
+        if (mobile != null) {
+            if (value == null || !ParamUtils.isMobileNumber(value.toString())) {
+                this.validError(mobile.message());
             }
-            if (email != null) {
-                if (value == null || !ParamUtils.isEmail(value.toString())) {
-                    this.validError(email.message());
-                }
+        }
+        if (email != null) {
+            if (value == null || !ParamUtils.isEmail(value.toString())) {
+                this.validError(email.message());
             }
         }
     }
