@@ -79,17 +79,17 @@ class NotEmptyProcessor {
 
     private void valid(Length length, Mobile mobile, Email email, Object value) {
         if (length != null) {
-            if (value == null || value.toString().length() > length.value()) {
+            if (value != null && value.toString().length() > length.value()) {
                 this.validError(length.message());
             }
         }
         if (mobile != null) {
-            if (value == null || !ParamUtils.isMobileNumber(value.toString())) {
+            if (value != null && !ParamUtils.isMobileNumber(value.toString())) {
                 this.validError(mobile.message());
             }
         }
         if (email != null) {
-            if (value == null || !ParamUtils.isEmail(value.toString())) {
+            if (value != null && !ParamUtils.isEmail(value.toString())) {
                 this.validError(email.message());
             }
         }

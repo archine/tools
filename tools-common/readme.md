@@ -1,5 +1,4 @@
-# tools-common
-![](https://img.shields.io/badge/version-1.3.2-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -9,7 +8,7 @@ Java常用工具类整合
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.3</version>
 </dependency>
 ```
 ## 二、参数校验注解
@@ -73,7 +72,7 @@ public class TestController {
     }
 }
 ```
-### 5、Email
+### 5、@Email
 **作用在对象的属性或者方法参数, 对邮箱格式进行校验，错误信息可自定义**      
 * **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
 ```java
@@ -94,7 +93,7 @@ public class TestController {
     }
 }
 ```
-### 6、Length
+### 6、@Length
 **作用在实体对象的属性或者方法参数，对字符串的长度进行校验，需要设置最大长度，错误信息可自定义**       
 * **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
 ```java
@@ -115,7 +114,7 @@ public class TestController {
     }
 }
 ```
-### 7、Mobile
+### 7、@Mobile
 **作用在实体对象的属性或者方法参数，对手机号格式进行校验，错误信息可自定义**      
 * **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
 ```java
