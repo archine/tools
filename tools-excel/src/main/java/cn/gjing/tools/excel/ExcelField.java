@@ -39,4 +39,29 @@ public @interface ExcelField {
      * @return autoMerge
      */
     boolean autoMerge() default false;
+
+    /**
+     * Excel style
+     *
+     * @return ExcelStyle
+     */
+    Class<? extends ExcelStyle> style() default DefaultExcelStyle.class;
+
+    /**
+     * Is allow empty
+     * @return boolean
+     */
+    boolean allowEmpty() default true;
+
+    /**
+     * Equal to the policy executed when empty
+     * @return EmptyStrategy
+     */
+    EmptyStrategy strategy() default EmptyStrategy.JUMP;
+
+    /**
+     * This message is read if the policy is error
+     * @return String
+     */
+    String message() default "参数不能为空";
 }

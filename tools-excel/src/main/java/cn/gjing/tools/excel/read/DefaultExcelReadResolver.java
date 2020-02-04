@@ -4,6 +4,7 @@ import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.TimeUtils;
+import cn.gjing.tools.excel.valid.DateValid;
 import com.google.gson.Gson;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -30,7 +31,7 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
     private List<String> headNameList = new ArrayList<>();
     private int totalCol = 0;
     private InputStream inputStream;
-    private Gson gson;
+    private Gson gson = new Gson();
 
     @Override
     public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName) {
@@ -89,7 +90,12 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
     private void reader(Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex) {
         List<Object> dataList = new ArrayList<>();
         Object o = null;
+        ExcelField excelField;
+        Field field;
+        Cell valueCell;
+        boolean n;
         for (Row row : sheet) {
+            n = true;
             if (row.getRowNum() < headerIndex) {
                 continue;
             }
@@ -111,17 +117,31 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
                 e.printStackTrace();
             }
             for (int c = 0; c < totalCol; c++) {
-                Field field = hasAnnotationFieldMap.get(headNameList.get(c));
+                field = hasAnnotationFieldMap.get(headNameList.get(c));
                 if (field == null) {
                     continue;
                 }
-                ExcelField excelField = field.getAnnotation(ExcelField.class);
-                Cell cell = row.getCell(c);
-                if (cell != null) {
-                    this.setValue(o, field, this.getValue(cell), excelField);
+                excelField = field.getAnnotation(ExcelField.class);
+                valueCell = row.getCell(c);
+                if (valueCell != null) {
+                    this.setValue(o, field, this.getValue(valueCell, field), excelField);
+                } else {
+                    if (excelField.allowEmpty()) {
+                        continue;
+                    }
+                    switch (excelField.strategy()) {
+                        case JUMP:
+                            n = false;
+                            break;
+                        case ERROR:
+                            throw new NullPointerException(excelField.message());
+                        default:
+                    }
                 }
             }
-            dataList.add(o);
+            if (n) {
+                dataList.add(o);
+            }
         }
         listener.notify(dataList);
     }
@@ -132,7 +152,7 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
      * @param cell cell
      * @return value
      */
-    private String getValue(Cell cell) {
+    private String getValue(Cell cell,Field field) {
         Object value = "";
         switch (cell.getCellType()) {
             case _NONE:
@@ -144,7 +164,8 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
                 break;
             case NUMERIC:
                 if (HSSFDateUtil.isCellDateFormatted(cell)) {
-                    value = TimeUtils.dateToString(cell.getDateCellValue(), "yyyy-MM-dd HH:mm:ss");
+                    DateValid valid = field.getAnnotation(DateValid.class);
+                    value = TimeUtils.dateToString(cell.getDateCellValue(), valid == null ? "yyyy-MM-dd HH:mm:ss" : valid.pattern());
                 } else {
                     NumberFormat numberFormat = NumberFormat.getInstance();
                     numberFormat.setMaximumFractionDigits(10);
@@ -178,13 +199,13 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
             Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
             Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
             try {
-                EnumConvert enumConvert = excelEnumConvert.convert().newInstance();
-                this.setField(field, o, enumConvert.toEntityAttribute(gson.fromJson(value, interfaceType)));
+                EnumConvert<? extends Enum<?>, ?> enumConvert = excelEnumConvert.convert().newInstance();
+                this.setField(field, o, enumConvert.toEntityAttribute(gson.fromJson(value, (java.lang.reflect.Type) interfaceType)));
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         } else {
-            this.setField(field, o, gson.fromJson(value.toString(), field.getType()));
+            this.setField(field, o, gson.fromJson(gson.toJson(value), field.getType()));
         }
     }
 

@@ -55,14 +55,24 @@ class ExcelHelper {
         Cell cell;
         int validIndex = 0;
         Row row;
+        ExcelField excelField;
+        Field field;
         if (changed) {
             offset = offset == 0 ? 0 : offset + 1;
             row = sheet.createRow(offset);
             for (int i = 0; i < headFieldList.size(); i++) {
                 cell = row.createCell(i);
-                cell.setCellStyle(this.metaObject.getMetaStyle().getHeadStyle());
-                Field field = headFieldList.get(i);
-                ExcelField excelField = field.getAnnotation(ExcelField.class);
+                field = headFieldList.get(i);
+                excelField = field.getAnnotation(ExcelField.class);
+                if (excelField.style() == DefaultExcelStyle.class) {
+                    cell.setCellStyle(this.metaObject.getMetaStyle().getHeadStyle());
+                } else {
+                    try {
+                        cell.setCellStyle(excelField.style().newInstance().setHeaderStyle(this.workbook.createCellStyle()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 cell.setCellValue(excelField.value());
                 sheet.setColumnWidth(i, excelField.width());
                 if (data == null || data.isEmpty()) {
@@ -74,8 +84,6 @@ class ExcelHelper {
             return;
         }
         offset++;
-        ExcelField excelField;
-        Field field;
         Object value = null;
         Map<Object, ExcelModel> excelModelMap = new HashMap<>(16);
         ExcelModel excelModel;
@@ -131,7 +139,15 @@ class ExcelHelper {
     @SuppressWarnings("unchecked")
     private void setCellVal(ExcelField excelField, Field field, Row row, Object value, int index) {
         Cell valueCell = row.createCell(index);
-        valueCell.setCellStyle(this.metaObject.getMetaStyle().getBodyStyle());
+        if (excelField.style() == DefaultExcelStyle.class) {
+            valueCell.setCellStyle(this.metaObject.getMetaStyle().getBodyStyle());
+        }else {
+            try {
+                valueCell.setCellStyle(excelField.style().newInstance().setBodyStyle(this.workbook.createCellStyle()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (value == null) {
             valueCell.setCellValue("");
         } else {

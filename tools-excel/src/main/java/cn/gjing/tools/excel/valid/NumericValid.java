@@ -33,14 +33,14 @@ public @interface NumericValid {
      *
      * @return OperatorType
      */
-    OperatorType operatorType() default OperatorType.GREATER_OR_EQUAL;
+    OperatorType operatorType() default OperatorType.LESS_OR_EQUAL;
 
     /**
      * Valid type
      *
      * @return ValidType
      */
-    ValidType validationType() default ValidType.INTEGER;
+    ValidType validationType() default ValidType.TEXT_LENGTH;
 
     /**
      * expr1
@@ -68,21 +68,21 @@ public @interface NumericValid {
      *
      * @return level
      */
-    Rank rank() default Rank.WARNING;
+    Rank rank() default Rank.STOP;
 
     /**
      * Error box title
      *
      * @return title
      */
-    String errorTitle() default "Error Message";
+    String errorTitle() default "错误提示: ";
 
     /**
      * Error content
      *
      * @return content
      */
-    String errorContent() default "Please enter Numbers greater than or equal to 0";
+    String errorContent() default "无效的文本长度";
 
     /**
      * Whether it pops up immediately

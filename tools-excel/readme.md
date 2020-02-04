@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.1.9-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，项目中可以便捷的进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.1.9</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -25,11 +25,15 @@
 |参数|描述|
 |---|---|
 |value|列表头名字|
-|pattern|字段为时间类型且需要转换，那么必须设置，否则无需设置|
-|width|这个列表头单元格的宽度，默认``20 * 256``，建议设置``256``的倍数|
-|autoMerge|是否自动合并多行相同的数据，默认false|
+|pattern|字段为时间类型且需要转换的时候进行配置|
+|width|该列表头对应整列的单元格宽度|
+|autoMerge|是否自动纵向合并多行相同的数据，默认false|
+|style|每个列表头可单独设置独立的样式，``优先级高于全局``|
+|allowEmpty|是否允许空值，默认``true``|
+|strategy|值为空时候的策略，策略有：``jump``(跳过当前这条数据)、``error``(抛出异常)|
+|message|执行``策略为error``的时候抛出的异常信息|
 ### 3、@DateValid
-**时间校验注解，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加时间的校验，``XLSX``类型文档不支持，``只在导出模板时有效``，注解参数如下**     
+**对该列表头下方的单元格加入时间校验，使用在字段上，``XLSX``类型文档不支持，``只在导出模板时有效``，注解参数如下**     
 
 |参数|描述|
 |---|---|
@@ -41,11 +45,11 @@
 |expr2|表达式2，默认``2999-01-01``|
 |showErrorBox|是否弹出错误框，默认``true``|
 |showPromptBox|是否立即弹出，默认``true``|
-|rank|提示框级别，默认``Rank.WARING``警告级别|
+|rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 ### 4、@ExplicitValid
-**下拉框选值，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加下拉框选项，``只在导出模板时有效``，注解参数如下**     
+**对该列表头下方的单元格加入下拉框，使用在字段上，``下拉框内的值注解方式传递优先级小于方法传递``，``只在导出模板时有效``，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
@@ -54,23 +58,23 @@
 |boxLastRow|数据校验最多校验多少行，默认是该列表头下的正文第一行|
 |showErrorBox|是否弹出错误框，默认``true``|
 |showPromptBox|是否立即弹出，默认``true``|
-|rank|提示框级别，默认``Rank.WARING``警告级别|
+|rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
 #### 5、@NumericValid
-**数据类型校验，使用在字段上，表明在``Excel文件``中这个列表头下指定行数的单元格会添加数据类型的校验，``只在导出模板时有效``，注解参数如下**     
+**对该列表头下方的单元格加入数据类型校验，使用在字段上，可对文本长度、数字大小进行校验``只在导出模板时有效``，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
 |validClass|校验器Class|
 |boxLastRow|数据校验最多校验多少行，默认是该列表头下的正文第一行|
-|operatorType|操作类型，默认``OperatorType.GREATER_OR_EQUAL``|
-|validType|校验类型，默认``ValidType.INTEGER``|
+|operatorType|操作类型，默认``OperatorType.LESS_OR_EQUAL``|
+|validType|校验类型，默认``ValidType.TEXT_LENGTH``|
 |expr1|表达式1，在表达式2前面，默认``0``|
 |expr2|表达式2，在操作类型为``BETWEEN``和``NOT_BETWEEN``情况下必填|
 |showErrorBox|是否弹出错误框，默认``true``|
 |showPromptBox|是否立即弹出，默认``true``|
-|rank|提示框级别，默认``Rank.WARING``警告级别|
+|rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 #### 6、@ExcelEnumConvert
@@ -78,7 +82,7 @@
 
 |参数|描述|
 |---|---|
-|convert|实现了``EnumConvert``接口的类Class|
+|convert|实现了``EnumConvert``接口的Class|
 ## 三、使用说明
 ### 1、定义Excel对应的实体
 **只需要在实体类的字段上加上对应注解即可**

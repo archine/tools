@@ -75,14 +75,14 @@ public @interface DateValid {
      *
      * @return title
      */
-    String errorTitle() default "Error message";
+    String errorTitle() default "错误提示: ";
 
     /**
      * Error content
      *
      * @return content
      */
-    String errorContent() default "Please entry the correct time range: 1970-01-01 to 2999-01-01";
+    String errorContent() default "请输入正确的时间范围及格式：1970-01-01至2999-01-01";
 
     /**
      * Whether it pops up immediately

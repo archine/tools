@@ -47,21 +47,21 @@ public @interface ExplicitValid {
      *
      * @return level
      */
-    Rank rank() default Rank.WARNING;
+    Rank rank() default Rank.STOP;
 
     /**
      * Error box title
      *
      * @return title
      */
-    String errorTitle() default "Error Message";
+    String errorTitle() default "错误提示：";
 
     /**
      * Error content
      *
      * @return content
      */
-    String errorContent() default "Please select the value in the drop-down box";
+    String errorContent() default "请选择下拉框中的内容";
 
     /**
      * Whether it pops up immediately
