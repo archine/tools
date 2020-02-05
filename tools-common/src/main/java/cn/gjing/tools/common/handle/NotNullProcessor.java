@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  **/
 @SupportedAnnotationTypes("cn.gjing.tools.common.annotation.NotNull")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class NonNullProcessor extends AbstractProcessor {
+public class NotNullProcessor extends AbstractProcessor {
 
     private JavacTrees trees;
     private TreeMaker treeMaker;
@@ -75,8 +75,7 @@ public class NonNullProcessor extends AbstractProcessor {
                                                                         null,
                                                                         List.nil(),
                                                                         buildExceptionClassExpression(treeMaker, names),
-                                                                        List.of(treeMaker.Literal(
-                                                                                "The parameter '"+parameter.getName().toString()+"' has been used @NotNull, so it cannot be null.")),
+                                                                        List.of(treeMaker.Literal(parameter.getName().toString()+"不能为空")),
                                                                         null
                                                                 )
                                                         )

@@ -14,5 +14,5 @@ public @interface Email {
      * Exception information
      * @return String
      */
-    String message() default "Invalid email format";
+    String message() default "无效的邮箱格式";
 }

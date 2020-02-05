@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * @author Gjing
  * Method parameters are nonnull
  **/
-@Target({ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.METHOD,ElementType.FIELD,ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface NotEmpty {
@@ -14,5 +14,5 @@ public @interface NotEmpty {
      * Exception information
      * @return String
      */
-    String message() default "Parameter cannot be null";
+    String message() default "参数不能为空";
 }

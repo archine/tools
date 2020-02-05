@@ -14,5 +14,5 @@ public @interface Mobile {
      * Exception information
      * @return String
      */
-    String message() default "Invalid mobile number format";
+    String message() default "无效的手机号格式";
 }

@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Configuration;
  * @author Gjing
  **/
 @Configuration
-public class ToolsCommonNotEmptyAdapter {
+public class ToolsParamValidationAdapter {
 
     @Bean
-    @ConditionalOnMissingBean(NotEmptyProcessor.class)
-    public NotEmptyProcessor notEmptyProcessor() {
-        return new NotEmptyProcessor();
+    @ConditionalOnMissingBean(ParamValidation.class)
+    public ParamValidation notEmptyProcessor() {
+        return new ParamValidation();
     }
 }

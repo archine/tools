@@ -32,6 +32,7 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
     private int totalCol = 0;
     private InputStream inputStream;
     private Gson gson = new Gson();
+    private boolean n;
 
     @Override
     public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName) {
@@ -93,9 +94,9 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
         ExcelField excelField;
         Field field;
         Cell valueCell;
-        boolean n;
+        String value;
         for (Row row : sheet) {
-            n = true;
+            this.n = true;
             if (row.getRowNum() < headerIndex) {
                 continue;
             }
@@ -116,7 +117,7 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
-            for (int c = 0; c < totalCol; c++) {
+            for (int c = 0; c < totalCol && this.n; c++) {
                 field = hasAnnotationFieldMap.get(headNameList.get(c));
                 if (field == null) {
                     continue;
@@ -124,22 +125,15 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
                 excelField = field.getAnnotation(ExcelField.class);
                 valueCell = row.getCell(c);
                 if (valueCell != null) {
-                    this.setValue(o, field, this.getValue(valueCell, field), excelField);
+                    value = this.getValue(valueCell, field, excelField);
+                    if (this.n) {
+                        this.setValue(o, field, value);
+                    }
                 } else {
-                    if (excelField.allowEmpty()) {
-                        continue;
-                    }
-                    switch (excelField.strategy()) {
-                        case JUMP:
-                            n = false;
-                            break;
-                        case ERROR:
-                            throw new NullPointerException(excelField.message());
-                        default:
-                    }
+                    this.valid(excelField);
                 }
             }
-            if (n) {
+            if (this.n) {
                 dataList.add(o);
             }
         }
@@ -152,12 +146,13 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
      * @param cell cell
      * @return value
      */
-    private String getValue(Cell cell,Field field) {
+    private String getValue(Cell cell, Field field, ExcelField excelField) {
         Object value = "";
         switch (cell.getCellType()) {
             case _NONE:
             case BLANK:
             case ERROR:
+                this.valid(excelField);
                 break;
             case BOOLEAN:
                 value = cell.getBooleanCellValue();
@@ -190,10 +185,9 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
      * @param o          object
      * @param field      field
      * @param value      value
-     * @param excelField Excel list headers map to entity fields annotations
      */
     @SuppressWarnings("unchecked")
-    private void setValue(Object o, Field field, String value, ExcelField excelField) {
+    private void setValue(Object o, Field field, String value) {
         if (field.getType().isEnum()) {
             ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
             Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
@@ -218,5 +212,19 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
      */
     private void setField(Field field, Object o, Object value) {
         BeanUtils.setFieldValue(o, field, value);
+    }
+
+    private void valid(ExcelField excelField) {
+        if (excelField.allowEmpty()) {
+            return;
+        }
+        switch (excelField.strategy()) {
+            case JUMP:
+                this.n = false;
+                break;
+            case ERROR:
+                throw new NullPointerException(excelField.message());
+            default:
+        }
     }
 }

@@ -20,5 +20,5 @@ public @interface Length {
      * Exception information
      * @return String
      */
-    String message() default "Invalid length";
+    String message() default "无效的文本长度";
 }

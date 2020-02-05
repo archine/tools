@@ -22,7 +22,7 @@ import java.lang.reflect.Parameter;
  **/
 @Component
 @Aspect
-class NotEmptyProcessor {
+class ParamValidation {
     @Pointcut("@annotation(cn.gjing.tools.common.annotation.NotEmpty)")
     public void cut() {
     }
@@ -38,22 +38,24 @@ class NotEmptyProcessor {
         Length length;
         Mobile mobile;
         Email email;
+        NotEmpty notEmpty;
+        Parameter parameter;
         for (int i = 0; i < parameters.length; i++) {
-            Parameter parameter = parameters[i];
-            if (parameter.isAnnotationPresent(Not.class)) {
-                continue;
-            }
+            parameter = parameters[i];
             if (parameter.isAnnotationPresent(Json.class)) {
                 this.jsonCheck(args[i]);
-                continue;
-            }
-            if (ParamUtils.isEmpty(args[i])) {
-                this.validError(parameter.getName() + " cannot be empty");
             }
             length = parameter.getAnnotation(Length.class);
             mobile = parameter.getAnnotation(Mobile.class);
             email = parameter.getAnnotation(Email.class);
+            notEmpty = parameter.getAnnotation(NotEmpty.class);
             this.valid(length, mobile, email, args[i]);
+            if (parameter.isAnnotationPresent(Not.class)) {
+                continue;
+            }
+            if (ParamUtils.isEmpty(args[i])) {
+                this.validError(notEmpty == null ? parameter.getName() + " cannot be null" : notEmpty.message());
+            }
         }
     }
 
@@ -79,17 +81,26 @@ class NotEmptyProcessor {
 
     private void valid(Length length, Mobile mobile, Email email, Object value) {
         if (length != null) {
-            if (value != null && value.toString().length() > length.value()) {
+            if (value == null) {
+                this.validError(length.message());
+            }
+            if (value.toString().length() > length.value()) {
                 this.validError(length.message());
             }
         }
         if (mobile != null) {
-            if (value != null && !ParamUtils.isMobileNumber(value.toString())) {
+            if (value == null) {
+                this.validError(mobile.message());
+            }
+            if (!ParamUtils.isMobileNumber(value.toString())) {
                 this.validError(mobile.message());
             }
         }
         if (email != null) {
-            if (value != null && !ParamUtils.isEmail(value.toString())) {
+            if (value == null) {
+                this.validError(email.message());
+            }
+            if (!ParamUtils.isEmail(value.toString())) {
                 this.validError(email.message());
             }
         }

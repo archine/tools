@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -8,7 +8,7 @@ Java常用工具类整合
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.3.3</version>
+  <version>1.3.4</version>
 </dependency>
 ```
 ## 二、参数校验注解
@@ -27,7 +27,7 @@ public class TestController{
 ### 2、@NotEmpty
 对方法或者实体字段进行校验，`Spring``环境需要手动在xml文件中进行如下配置
 ```xml
-<bean id="xxx" class="cn.gjing.tools.common.handle.ToolsCommonNotEmptyAdapter"/>
+<bean id="xxx" class="cn.gjing.tools.common.handle.ToolsParamValidationAdapter"/>
 ```
 * **方法，错误提示信息无法自定义**
 ```java
@@ -40,6 +40,17 @@ public class TestController{
     }
 }
 ```
+* **如果需要对某字段单独设置错误信息，可在该字段加上``@NotEmpty``**
+```java
+@RestController
+public class TestController{
+    @PostMapping("/test")
+    @NotEmpty
+    public void test(@NotEmpty(message = "参数不能为空") String param1) {
+        System.out.println(param1);
+    }
+}
+```
 * **字段属性，该对象作为参数要被``@Json``标记, 否则无效，错误信息可自定义**
 ```java
 @Data
@@ -48,8 +59,8 @@ public class User {
     private String userEmail;
 }
 ```
-### 3、@Not
-**排除某个参数不需要校验，``与@NotEmpty搭配使用``**
+### 2.1、@Not
+**排除某个参数不需要非空校验，``与@NotEmpty搭配使用``**
 ```java
 @RestController
 public class TestController{
@@ -60,8 +71,8 @@ public class TestController{
     }
 }
 ```
-### 4、@Json
-**标记这个参数是个对象，``与@NotEmpty搭配使用``**
+### 2.2、@Json
+**标记这个参数是个对象，所在方法要被``@NotEmpty``注释**
 ```java
 @RestController
 public class TestController {
@@ -72,7 +83,7 @@ public class TestController {
     }
 }
 ```
-### 5、@Email
+### 2.3、@Email
 **作用在对象的属性或者方法参数, 对邮箱格式进行校验，错误信息可自定义**      
 * **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
 ```java
@@ -82,7 +93,7 @@ public class User {
     private String userEmail;
 }
 ```
-* **方法参数，``与@NotEmpty搭配使用``**
+* **方法参数，所在方法要被``@NotEmpty``注释**
 ```java
 @RestController
 public class TestController {
@@ -93,7 +104,7 @@ public class TestController {
     }
 }
 ```
-### 6、@Length
+### 2.4、@Length
 **作用在实体对象的属性或者方法参数，对字符串的长度进行校验，需要设置最大长度，错误信息可自定义**       
 * **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
 ```java
@@ -103,7 +114,7 @@ public class User {
     private String name;
 }
 ```
-* **方法参数，``与@NotEmpty搭配使用``**
+* **方法参数，所在方法要被``@NotEmpty``注释**
 ```java
 @RestController
 public class TestController {
@@ -114,7 +125,7 @@ public class TestController {
     }
 }
 ```
-### 7、@Mobile
+### 2.5、@Mobile
 **作用在实体对象的属性或者方法参数，对手机号格式进行校验，错误信息可自定义**      
 * **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
 ```java
@@ -124,7 +135,7 @@ public class User {
     private String name;
 }
 ```
-* **方法参数，``与@NotEmpty搭配使用``**
+* **方法参数，所在方法要被``@NotEmpty``注释**
 ```java
 @RestController
 public class TestController {
