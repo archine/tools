@@ -4,7 +4,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-aliyun</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 ## 一、OSS
@@ -55,7 +55,7 @@ public class TestController {
 
     @PostMapping("/file3")
     public String upload(MultipartFile file) throws IOException {
-        // 通过流或者byte[]进行上传, 需要指定文件名
+        // 通过流或者byte[]进行上传, 需要指定文件名，前面不能出现 /
         return this.ossUpload.upload(file.getInputStream(), UUID.randomUUID().toString()+".jpg");
     }
 }

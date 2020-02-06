@@ -13,6 +13,7 @@ public final class ParamUtils {
     private ParamUtils() {
 
     }
+
     /**
      * 检查参数是否为空
      *
@@ -243,11 +244,7 @@ public final class ParamUtils {
      */
     public static boolean isEmail(String email) {
         String regex = "^([a-z0-9_.-]+)@([\\da-z.-]+)\\.([a-z.]{2,6})$";
-        if (isNotEmpty(email)) {
-            return Pattern.compile(regex).matcher(email).matches();
-        } else {
-            return false;
-        }
+        return Pattern.compile(regex).matcher(email).matches();
     }
 
     /**
@@ -258,11 +255,7 @@ public final class ParamUtils {
      */
     public static boolean isMobileNumber(String phone) {
         String regex = "^1([3-8]){1}\\d{9}$";
-        if (isNotEmpty(phone)) {
-            return Pattern.compile(regex).matcher(phone).matches();
-        } else {
-            return false;
-        }
+        return Pattern.compile(regex).matcher(phone).matches();
     }
 
     /**

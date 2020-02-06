@@ -6,7 +6,6 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.PutObjectRequest;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -55,7 +54,7 @@ public final class SimpleOssUpload implements OssUpload {
         if (file.getOriginalFilename() == null) {
             throw new NullPointerException("文件名不能为空");
         }
-        if (!StringUtils.isEmpty("")) {
+        if (!"".equals(dir)) {
             dir = dir + "/";
         }
         String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
@@ -88,7 +87,7 @@ public final class SimpleOssUpload implements OssUpload {
         conf.setSocketTimeout(this.ossMeta.getSocketTimeout());
         conf.setConnectionTimeout(this.ossMeta.getConnectionTimeout());
         conf.setIdleConnectionTime(this.ossMeta.getIdleTime());
-        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.aliyunMeta.getAccessKey(), this.aliyunMeta.getAccessKeySecret(),conf);
+        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.aliyunMeta.getAccessKey(), this.aliyunMeta.getAccessKeySecret(), conf);
     }
 
     private void createBucket() {
