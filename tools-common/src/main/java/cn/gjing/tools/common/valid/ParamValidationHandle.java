@@ -5,6 +5,8 @@ import cn.gjing.tools.common.util.ParamUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,51 +16,47 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Gjing
  **/
 class ParamValidationHandle implements HandlerInterceptor {
-    private NotEmpty notEmpty;
-    private NotNull notNull;
-    private Email email;
-    private Length length;
-    private Mobile mobile;
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Method method = handlerMethod.getMethod();
             Parameter[] parameters = method.getParameters();
-            this.notEmpty = method.getAnnotation(NotEmpty.class);
-            String value;
-            if (this.notEmpty != null) {
+            NotEmpty notEmpty = method.getAnnotation(NotEmpty.class);
+            NotNull notNull = method.getAnnotation(NotNull.class);
+            Object value;
+            boolean isFile;
+            if (notEmpty != null) {
                 for (Parameter parameter : parameters) {
-                    value = request.getParameter(parameter.getName());
-                    if (parameter.isAnnotationPresent(Not.class)) {
-                        this.expandCheck(parameter, value);
-                    } else {
+                    isFile = parameter.getType() == MultipartFile.class;
+                    value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
+                    if (!parameter.isAnnotationPresent(Not.class)) {
                         if (ParamUtils.isEmpty(value)) {
                             throw new ParamValidException(parameter.getName() + "不能为空");
                         }
-                        this.expandCheck(parameter, value);
+                    }
+                    if (!isFile) {
+                        this.expandCheck(parameter, value.toString());
                     }
                 }
                 return true;
             }
-            this.notNull = method.getAnnotation(NotNull.class);
-            if (this.notNull != null) {
+            if (notNull != null) {
                 for (Parameter parameter : parameters) {
-                    value = request.getParameter(parameter.getName());
-                    if (parameter.isAnnotationPresent(Not.class)) {
-                        this.expandCheck(parameter, value);
-                    } else {
+                    isFile = parameter.getType() == MultipartFile.class;
+                    value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
+                    if (!parameter.isAnnotationPresent(Not.class)) {
                         if (value == null) {
                             throw new ParamValidException(parameter.getName() + "不能为Null");
                         }
-                        this.expandCheck(parameter, value);
+                    }
+                    if (!isFile) {
+                        this.expandCheck(parameter, value.toString());
                     }
                 }
                 return true;
@@ -68,16 +66,19 @@ class ParamValidationHandle implements HandlerInterceptor {
                     this.jsonValid(parameter.getType(), request, parameter.isAnnotationPresent(RequestBody.class));
                     continue;
                 }
-                value = request.getParameter(parameter.getName());
-                this.notEmpty = parameter.getAnnotation(NotEmpty.class);
-                if (this.notEmpty != null && ParamUtils.isEmpty(value)) {
+                isFile = parameter.getType() == MultipartFile.class;
+                value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
+                notEmpty = parameter.getAnnotation(NotEmpty.class);
+                if (notEmpty != null && ParamUtils.isEmpty(value)) {
                     throw new ParamValidException(notEmpty.message());
                 }
                 notNull = parameter.getAnnotation(NotNull.class);
                 if (notNull != null && value == null) {
                     throw new ParamValidException(notNull.message());
                 }
-                this.expandCheck(parameter, value);
+                if (!isFile) {
+                    this.expandCheck(parameter, value);
+                }
             }
             return true;
         }
@@ -88,94 +89,74 @@ class ParamValidationHandle implements HandlerInterceptor {
     private void jsonValid(Class<?> c, HttpServletRequest request, boolean b) {
         Field[] fields = c.getDeclaredFields();
         if (b) {
-            String jsonStr = "";
-            try {
-                jsonStr = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Map<String,Object> valueMap;
+            ParamValidationServletRequest validationRequest = (ParamValidationServletRequest) request;
+            String jsonStr = validationRequest.getBody();
+            Map<String, Object> valueMap;
             try {
                 valueMap = new ObjectMapper().readValue(jsonStr, Map.class);
             } catch (IOException e) {
                 throw new ParamValidException("无效Json对象");
             }
             for (Field field : fields) {
-                this.expandCheck(field, valueMap.get(field.getName()));
+                this.expandCheck(field, request, valueMap, b);
             }
             return;
         }
         for (Field field : fields) {
-            this.expandCheck(field, request.getParameter(field.getName()));
+            this.expandCheck(field, request, null, b);
         }
     }
 
-    private void expandCheck(Parameter parameter, String value) {
-        this.length = parameter.getAnnotation(Length.class);
-        if (this.length != null) {
-            if (this.length.min() <= 0) {
-                if (value != null && value.length() > this.length.max()) {
-                    throw new ParamValidException(this.length.message());
-                }
-            } else {
-                if (value == null) {
-                    throw new ParamValidException(this.length.message());
-                }
-                int l = value.length();
-                if (l > this.length.max() || l < this.length.max()) {
-                    throw new ParamValidException(this.length.message());
-                }
-            }
-        }
-        this.email = parameter.getAnnotation(Email.class);
-        if (this.email != null) {
-            if (value != null && !ParamUtils.isEmail(value)) {
-                throw new ParamValidException(this.email.message());
-            }
-        }
-        this.mobile = parameter.getAnnotation(Mobile.class);
-        if (this.mobile != null) {
-            if (value != null && ParamUtils.isMobileNumber(value)) {
-                throw new ParamValidException(this.mobile.message());
-            }
-        }
+    private void expandCheck(Field field, HttpServletRequest request, Map<String, Object> valueMap,boolean body) {
+        NotNull notNull = field.getAnnotation(NotNull.class);
+        NotEmpty notEmpty = field.getAnnotation(NotEmpty.class);
+        Length length = field.getAnnotation(Length.class);
+        Email email = field.getAnnotation(Email.class);
+        Mobile mobile = field.getAnnotation(Mobile.class);
+        this.expandCheck(length, email, mobile, notNull, notEmpty, body ? valueMap.get(field.getName()) : request.getParameter(field.getName()));
     }
 
-    private void expandCheck(Field field, Object value) {
-        this.notEmpty = field.getAnnotation(NotEmpty.class);
-        if (this.notEmpty != null && ParamUtils.isEmpty(value)) {
+    private void expandCheck(Parameter parameter,Object value) {
+        Length length = parameter.getAnnotation(Length.class);
+        Email email = parameter.getAnnotation(Email.class);
+        Mobile mobile = parameter.getAnnotation(Mobile.class);
+        this.expandCheck(length, email, mobile, value);
+    }
+
+    private void expandCheck(Length length, Email email, Mobile mobile,NotNull notNull,NotEmpty notEmpty,Object value) {
+        if (notEmpty != null && ParamUtils.isEmpty(value)) {
             throw new ParamValidException(notEmpty.message());
         }
-        this.notNull = field.getAnnotation(NotNull.class);
-        if (this.notNull != null && value == null) {
+        if (notNull != null && value == null) {
             throw new ParamValidException(notNull.message());
         }
-        this.length = field.getAnnotation(Length.class);
-        if (this.length != null) {
-            if (this.length.min() <= 0) {
-                if (value != null && value.toString().length() > this.length.max()) {
-                    throw new ParamValidException(this.length.message());
+        this.expandCheck(length, email, mobile, value);
+    }
+
+    private void expandCheck(Length length, Email email, Mobile mobile,Object value) {
+        if (length != null) {
+            if (length.min() <= 0) {
+                if (value != null && value.toString().length() > length.max()) {
+                    throw new ParamValidException(length.message());
                 }
             } else {
                 if (value == null) {
-                    throw new ParamValidException(this.length.message());
+                    throw new ParamValidException(length.message());
                 }
                 int l = value.toString().length();
-                if (l > this.length.max() || l < this.length.max()) {
-                    throw new ParamValidException(this.length.message());
+                if (l > length.max() || l < length.max()) {
+                    throw new ParamValidException(length.message());
                 }
             }
         }
-        this.email = field.getAnnotation(Email.class);
-        if (this.email != null) {
+        if (email != null) {
             if (value != null && !ParamUtils.isEmail(value.toString())) {
-                throw new ParamValidException(this.email.message());
+                throw new ParamValidException(email.message());
             }
         }
-        this.mobile = field.getAnnotation(Mobile.class);
-        if (this.mobile != null) {
-            if (value != null && ParamUtils.isMobileNumber(value.toString())) {
-                throw new ParamValidException(this.mobile.message());
+        if (mobile != null) {
+            if (value != null && !ParamUtils.isMobileNumber(value.toString())) {
+                throw new ParamValidException(mobile.message());
             }
         }
     }

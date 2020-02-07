@@ -22,6 +22,11 @@ class ParamValidationAdapter {
     }
 
     @Bean
+    public ParamValidationRequestFilter requestFilter() {
+        return new ParamValidationRequestFilter();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(ParamValidConfigurer.class)
     public ParamValidConfigurer paramValidConfigurer() {
         return new ParamValidConfigurer(paramValidationHandle(),validMeta());
