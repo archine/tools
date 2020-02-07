@@ -1,7 +1,7 @@
 package cn.gjing.tools.common.result;
 
-import cn.gjing.tools.common.enums.HttpStatus;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 
@@ -31,15 +31,15 @@ public class ResultVO<T> implements Serializable {
     public static <T> ResultVO<T> success(T data) {
         ResultVO<T> resultVO = new ResultVO<>();
         resultVO.setData(data);
-        resultVO.setCode(HttpStatus.OK.getCode());
-        resultVO.setMessage(HttpStatus.OK.getMsg());
+        resultVO.setCode(HttpStatus.OK.value());
+        resultVO.setMessage(HttpStatus.OK.getReasonPhrase());
         return resultVO;
     }
 
     public static ResultVO<String> success() {
         ResultVO<String> resultVO = new ResultVO<>();
-        resultVO.setCode(HttpStatus.OK.getCode());
-        resultVO.setMessage(HttpStatus.OK.getMsg());
+        resultVO.setCode(HttpStatus.OK.value());
+        resultVO.setMessage(HttpStatus.OK.getReasonPhrase());
         return resultVO;
     }
 
@@ -52,14 +52,14 @@ public class ResultVO<T> implements Serializable {
 
     public static ResultVO<String> error() {
         ResultVO<String> resultVO = new ResultVO<>();
-        resultVO.setCode(HttpStatus.BAD_REQUEST.getCode());
-        resultVO.setMessage(HttpStatus.BAD_REQUEST.getMsg());
+        resultVO.setCode(HttpStatus.BAD_REQUEST.value());
+        resultVO.setMessage(HttpStatus.BAD_REQUEST.getReasonPhrase());
         return resultVO;
     }
 
     public static ResultVO<String> error(String message) {
         ResultVO<String> resultVO = new ResultVO<>();
-        resultVO.setCode(HttpStatus.BAD_REQUEST.getCode());
+        resultVO.setCode(HttpStatus.BAD_REQUEST.value());
         resultVO.setMessage(message);
         return resultVO;
     }

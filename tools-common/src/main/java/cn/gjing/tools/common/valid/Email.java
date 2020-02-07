@@ -1,10 +1,10 @@
-package cn.gjing.tools.common.annotation;
+package cn.gjing.tools.common.valid;
 
 import java.lang.annotation.*;
 
 /**
  * @author Gjing
- * Check the email address format，Use with @NotEmpty
+ * Check the email address format
  **/
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -14,5 +14,5 @@ public @interface Email {
      * Exception information
      * @return String
      */
-    String message() default "无效的邮箱格式";
+    String message() default "无效的邮件地址";
 }

@@ -266,11 +266,7 @@ public final class ParamUtils {
      */
     public static boolean isTelPhone(String tel) {
         String regex = "^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$";
-        if (isNotEmpty(tel)) {
-            return Pattern.compile(regex).matcher(tel).matches();
-        } else {
-            return false;
-        }
+        return Pattern.compile(regex).matcher(tel).matches();
     }
 
     /**
@@ -281,10 +277,7 @@ public final class ParamUtils {
      */
     public static boolean isPostCode(String postCode) {
         String regex = "^\\d{6}$";
-        if (isNotEmpty(postCode)) {
-            return Pattern.compile(regex).matcher(postCode).matches();
-        } else {
-            return false;
-        }
+        return Pattern.compile(regex).matcher(postCode).matches();
     }
+
 }

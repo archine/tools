@@ -1,10 +1,10 @@
 package cn.gjing.tools.common.result;
 
-import cn.gjing.tools.common.enums.HttpStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -43,8 +43,8 @@ public class ErrorResult implements Serializable {
      */
     public static ErrorResult failure() {
         return ErrorResult.builder()
-                .code(HttpStatus.BAD_REQUEST.getCode())
-                .message(HttpStatus.BAD_REQUEST.getMsg())
+                .code(HttpStatus.BAD_REQUEST.value())
+                .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class ErrorResult implements Serializable {
      */
     public static ErrorResult failure(String message) {
         return ErrorResult.builder()
-                .code(HttpStatus.BAD_REQUEST.getCode())
+                .code(HttpStatus.BAD_REQUEST.value())
                 .message(message)
                 .build();
     }
@@ -68,7 +68,7 @@ public class ErrorResult implements Serializable {
      */
     public static Map<String, String> error(String message) {
         Map<String, String> map = new HashMap<>(16);
-        map.put("message", message == null ? HttpStatus.INTERNAL_SERVER_ERROR.getMsg() : message);
+        map.put("message", message == null ? HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() : message);
         return map;
     }
 

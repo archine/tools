@@ -1,10 +1,10 @@
-package cn.gjing.tools.common.annotation;
+package cn.gjing.tools.common.valid;
 
 import java.lang.annotation.*;
 
 /**
  * @author Gjing
- * Method parameters are nonnull
+ * Method parameters are not empty ，Including map, array, collection
  **/
 @Target({ElementType.METHOD,ElementType.FIELD,ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

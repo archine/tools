@@ -1,10 +1,10 @@
-package cn.gjing.tools.common.annotation;
+package cn.gjing.tools.common.valid;
 
 import java.lang.annotation.*;
 
 /**
  * @author Gjing
- * Marks the parameter as a Json object，Use with @NotEmpty
+ * Marks the parameter as a Json object
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

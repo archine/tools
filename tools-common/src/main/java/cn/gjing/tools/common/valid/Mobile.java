@@ -1,10 +1,10 @@
-package cn.gjing.tools.common.annotation;
+package cn.gjing.tools.common.valid;
 
 import java.lang.annotation.*;
 
 /**
  * @author Gjing
- * Check the phone number format，Use with @NotEmpty
+ * Check the phone number format
  **/
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

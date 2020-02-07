@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -8,59 +8,24 @@ Java常用工具类整合
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.3.5</version>
+  <version>1.3.6</version>
 </dependency>
 ```
-## 二、参数校验注解
-### 1、@NotNull 
-方法参数非null校验，如若要排除方法中的某个参数,搭配使用``@Exclude``注解到指定参数上;
-```java
-@RestController
-public class TestController{
-    @PostMapping("/test")
-    @NotNull
-    public void test(String param1) {
-        System.out.println(param1);
-    }
-}
-```
-### 2、@NotEmpty
-对方法或者实体字段进行校验，`Spring``环境需要手动在xml文件中进行如下配置
+## 一、Rest接口参数校验注解
+项目为``Spring``环境需要手动在xml文件中对参数校验处理器bean进行配置
 ```xml
-<bean id="xxx" class="cn.gjing.tools.common.handle.ToolsParamValidationAdapter"/>
+<bean id="xxx" class="cn.gjing.tools.common.valid.ParamValidationAdapter"/>
 ```
-* **方法，错误提示信息无法自定义**
-```java
-@RestController
-public class TestController{
-    @PostMapping("/test")
-    @NotEmpty
-    public void test(String param1) {
-        System.out.println(param1);
-    }
-}
+**支持自定义配置需要校验的接口路径和要排除的接口路径，yml格式如下:**
+```yaml
+valid:
+  # 需要校验的接口路径
+  path: /**
+  # 需要排除的接口路径
+  exclude-path: /**
 ```
-* **如果需要对某字段单独设置错误信息，可在该字段加上``@NotEmpty``**
-```java
-@RestController
-public class TestController{
-    @PostMapping("/test")
-    @NotEmpty
-    public void test(@NotEmpty(message = "参数不能为空") String param1) {
-        System.out.println(param1);
-    }
-}
-```
-* **字段属性，该对象作为参数要被``@Json``标记, 否则无效，错误信息可自定义**
-```java
-@Data
-public class User {
-    @NotEmpty(message = "邮箱不能为空")
-    private String userEmail;
-}
-```
-### 2.1、@Not
-**排除某个参数不需要非空校验，``与@NotEmpty搭配使用``**
+### 1、@Not
+**排除某个参数不需要非空校验**
 ```java
 @RestController
 public class TestController{
@@ -71,21 +36,82 @@ public class TestController{
     }
 }
 ```
-### 2.2、@Json
-**标记这个参数是个对象，所在方法要被``@NotEmpty``注释**
+### 2、@Json
+**如果需要校验的参数为``对象``，通过该注解对其进行注释**
 ```java
 @RestController
 public class TestController {
     @PostMapping("/test")
-    @NotEmpty
-    public void test(@Json @RequestBody User user,String param) {
+    public void test(@Json @RequestBody User user) {
         System.out.println("ok");
     }
 }
 ```
-### 2.3、@Email
-**作用在对象的属性或者方法参数, 对邮箱格式进行校验，错误信息可自定义**      
-* **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
+### 3、@NotNull 
+对方法参数非null校验，可以作用在方法和参数以及对象属性上     
+* **使用在方法上默认会对该方法的``所有参数``进行校验，如果需要排除某个参数则在对应参数加上``@Not``注解。使用在方法上无法自定义错误信息，默认抛出具体哪个参数不能为空**
+```java
+@RestController
+public class TestController{
+    @PostMapping("/test")
+    @NotNull
+    public void test(String param1，@Not String param2) {
+        System.out.println(param1);
+    }
+}
+```
+* **方法参数**
+```java
+@RestController
+public class TestController{
+    @PostMapping("/test")
+    public void test(String param1，@NotNull(message = "参数不能为空") String param2) {
+        System.out.println(param1);
+    }
+}
+```
+* **对象属性**
+```java
+@Data
+public class User {
+    @NotNull(message = "邮箱不能为Null")
+    private String userEmail;
+}
+```
+### 4、@NotEmpty
+对方法参数非空校验（包括数组、集合、map、字符串、null），可以作用在方法和参数以及对象属性上     
+* **使用在方法上默认会对该方法的``所有参数``进行校验，如果需要排除某个参数则在对应参数加上``@Not``注解。使用在方法上无法自定义错误信息，默认抛出具体哪个参数不能为空**
+```java
+@RestController
+public class TestController{
+    @PostMapping("/test")
+    @NotEmpty
+    public void test(String param1,String param2) {
+        System.out.println(param1);
+    }
+}
+```
+* **方法参数**
+```java
+@RestController
+public class TestController{
+    @PostMapping("/test")
+    public void test(@NotEmpty(message = "参数不能为空") String param1) {
+        System.out.println(param1);
+    }
+}
+```
+* **对象属性**
+```java
+@Data
+public class User {
+    @NotEmpty(message = "邮箱不能为空")
+    private String userEmail;
+}
+```
+### 5、@Email
+**作用在对象的属性和方法参数, 对邮箱格式进行校验，错误信息可自定义**      
+* **对象属性**
 ```java
 @Data
 public class User {
@@ -93,41 +119,39 @@ public class User {
     private String userEmail;
 }
 ```
-* **方法参数，所在方法要被``@NotEmpty``注释**
+* **方法参数**
 ```java
 @RestController
 public class TestController {
     @PostMapping("/test")
-    @NotEmpty
     public void test(@Email String userEmail) {
         System.out.println("ok");
     }
 }
 ```
-### 2.4、@Length
-**作用在实体对象的属性或者方法参数，对字符串的长度进行校验，需要设置最大长度，错误信息可自定义**       
-* **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
+### 6、@Length
+**作用在方法参数和对象属性，可设置最小长度和最大长度，当``最小长度大于0``的时候会进行非null判断。可自定义错误信息**       
+* **对象属性**
 ```java
 @Data
 public class User {
-    @Length(value = 3, message = "用户名长度不能大于3")
+    @Length(max = 3, message = "用户名长度不能大于3")
     private String name;
 }
 ```
-* **方法参数，所在方法要被``@NotEmpty``注释**
+* **方法参数**
 ```java
 @RestController
 public class TestController {
     @PostMapping("/test")
-    @NotEmpty
-    public void test(@Length(5) String userName) {
+    public void test(@Length(max = 3,message = "长度不能超过3") String userName) {
         System.out.println("ok");
     }
 }
 ```
-### 2.5、@Mobile
-**作用在实体对象的属性或者方法参数，对手机号格式进行校验，错误信息可自定义**      
-* **实体对象属性，该对象作为参数要被``@Json``标记，否则无效**
+### 7、@Mobile
+**作用在对象属性和方法参数，对手机号格式进行校验，错误信息可自定义**      
+* **对象属性**
 ```java
 @Data
 public class User {
@@ -135,12 +159,11 @@ public class User {
     private String name;
 }
 ```
-* **方法参数，所在方法要被``@NotEmpty``注释**
+* **方法参数**
 ```java
 @RestController
 public class TestController {
     @PostMapping("/test")
-    @NotEmpty
     public void test(@Mobile String userPhone) {
         System.out.println("ok");
     }
