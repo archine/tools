@@ -2,6 +2,7 @@ package cn.gjing.tools.common.valid;
 
 import cn.gjing.tools.common.exception.ParamValidException;
 import cn.gjing.tools.common.util.ParamUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.method.HandlerMethod;
@@ -85,15 +86,13 @@ class ParamValidationHandle implements HandlerInterceptor {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     private void jsonValid(Class<?> c, HttpServletRequest request, boolean b) {
         Field[] fields = c.getDeclaredFields();
         if (b) {
             ParamValidationServletRequest validationRequest = (ParamValidationServletRequest) request;
-            String jsonStr = validationRequest.getBody();
             Map<String, Object> valueMap;
             try {
-                valueMap = new ObjectMapper().readValue(jsonStr, Map.class);
+                valueMap = new ObjectMapper().readValue(validationRequest.getBody(),new TypeReference<Map<String,Object>>(){});
             } catch (IOException e) {
                 throw new ParamValidException("无效Json对象");
             }
@@ -107,7 +106,7 @@ class ParamValidationHandle implements HandlerInterceptor {
         }
     }
 
-    private void expandCheck(Field field, HttpServletRequest request, Map<String, Object> valueMap,boolean body) {
+    private void expandCheck(Field field, HttpServletRequest request, Map<String, Object> valueMap, boolean body) {
         NotNull notNull = field.getAnnotation(NotNull.class);
         NotEmpty notEmpty = field.getAnnotation(NotEmpty.class);
         Length length = field.getAnnotation(Length.class);
@@ -116,14 +115,14 @@ class ParamValidationHandle implements HandlerInterceptor {
         this.expandCheck(length, email, mobile, notNull, notEmpty, body ? valueMap.get(field.getName()) : request.getParameter(field.getName()));
     }
 
-    private void expandCheck(Parameter parameter,Object value) {
+    private void expandCheck(Parameter parameter, Object value) {
         Length length = parameter.getAnnotation(Length.class);
         Email email = parameter.getAnnotation(Email.class);
         Mobile mobile = parameter.getAnnotation(Mobile.class);
         this.expandCheck(length, email, mobile, value);
     }
 
-    private void expandCheck(Length length, Email email, Mobile mobile,NotNull notNull,NotEmpty notEmpty,Object value) {
+    private void expandCheck(Length length, Email email, Mobile mobile, NotNull notNull, NotEmpty notEmpty, Object value) {
         if (notEmpty != null && ParamUtils.isEmpty(value)) {
             throw new ParamValidException(notEmpty.message());
         }
@@ -133,7 +132,7 @@ class ParamValidationHandle implements HandlerInterceptor {
         this.expandCheck(length, email, mobile, value);
     }
 
-    private void expandCheck(Length length, Email email, Mobile mobile,Object value) {
+    private void expandCheck(Length length, Email email, Mobile mobile, Object value) {
         if (length != null) {
             if (length.min() <= 0) {
                 if (value != null && value.toString().length() > length.max()) {
