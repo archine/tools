@@ -1,5 +1,7 @@
 package cn.gjing.tools.excel.util;
 
+import java.util.regex.Pattern;
+
 /**
  * Param utils
  *
@@ -34,4 +36,9 @@ public class ParamUtils {
         return t == u || t.equals(u);
     }
 
+
+    public static boolean isNumber(String str) {
+        Pattern pattern = Pattern.compile("^(-?\\d+)(\\.\\d+)?$");
+        return pattern.matcher(str).matches();
+    }
 }

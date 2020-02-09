@@ -6,7 +6,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,18 +75,16 @@ public class BeanUtils {
      */
     public static List<Field> getFields(Class<?> excelClass, String[] ignores) {
         Field[] declaredFields = excelClass.getDeclaredFields();
-        List<Field> hasExcelFieldList = Arrays.stream(declaredFields)
-                .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .filter(e -> ParamUtils.noContains(ignores, e.getName()))
-                .collect(Collectors.toList());
+        List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = excelClass.getSuperclass();
         if (superclass != Object.class) {
-            hasExcelFieldList.addAll(Arrays.stream(superclass.getDeclaredFields())
-                    .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                    .filter(e -> ParamUtils.noContains(ignores, e.getName()))
-                    .collect(Collectors.toList()));
+            fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
         }
-        return hasExcelFieldList;
+        return fieldList.stream()
+                .filter(e -> e.isAnnotationPresent(ExcelField.class))
+                .filter(e -> ParamUtils.noContains(ignores, e.getName()))
+                .sorted(Comparator.comparing(e->e.getAnnotation(ExcelField.class).sort()))
+                .collect(Collectors.toList());
     }
 
     /**

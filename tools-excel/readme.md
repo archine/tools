@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，项目中可以便捷的进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -24,14 +24,16 @@
 
 |参数|描述|
 |---|---|
-|value|列表头名字|
+|value|列表头名字, ``必填``|
 |pattern|字段为时间类型且需要转换的时候进行配置|
 |width|该列表头对应整列的单元格宽度|
-|autoMerge|是否自动纵向合并多行相同的数据，默认false|
+|autoMerge|是否自动纵向合并多行相同的数据，默认``false``|
 |style|每个列表头可单独设置独立的样式，``优先级高于全局``|
 |allowEmpty|是否允许空值，默认``true``|
 |strategy|值为空时候的策略，策略有：``jump``(跳过当前这条数据)、``error``(抛出异常)|
 |message|执行``策略为error``的时候抛出的异常信息|
+|sum|是否需要统计，默认``false``，可以通过``format``设置保存的数字格式，默认保存``整数``，需要的统计的字段``不要出现在第一行``|
+|sort|列表头排序，序号``越小越靠前``，当序号相同时会默认按实体类的字段顺序进行排序|
 ### 3、@DateValid
 **对该列表头下方的单元格加入时间校验，使用在字段上，``XLSX``类型文档不支持，``只在导出模板时有效``，注解参数如下**     
 

@@ -3,7 +3,6 @@ package cn.gjing.tools.excel.read;
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
-import cn.gjing.tools.excel.util.TimeUtils;
 import cn.gjing.tools.excel.valid.DateValid;
 import com.google.gson.Gson;
 import com.monitorjbl.xlsx.StreamingReader;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,11 +27,12 @@ import java.util.stream.Collectors;
 class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
     private Workbook workbook;
     private Sheet sheet;
-    private Map<String, Field> hasAnnotationFieldMap = new HashMap<>();
+    private Map<String, Field> hasAnnotationFieldMap = new HashMap<>(16);
     private List<String> headNameList = new ArrayList<>();
     private int totalCol = 0;
     private InputStream inputStream;
     private Gson gson = new Gson();
+    private Map<String, SimpleDateFormat> formatMap = new HashMap<>(16);
     private boolean n;
 
     @Override
@@ -160,7 +161,12 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
             case NUMERIC:
                 if (HSSFDateUtil.isCellDateFormatted(cell)) {
                     DateValid valid = field.getAnnotation(DateValid.class);
-                    value = TimeUtils.dateToString(cell.getDateCellValue(), valid == null ? "yyyy-MM-dd HH:mm:ss" : valid.pattern());
+                    SimpleDateFormat format = this.formatMap.get(field.getName());
+                    if (format == null) {
+                        format = new SimpleDateFormat(valid == null ? "yyyy-MM-dd HH:mm:ss" : valid.pattern());
+                        this.formatMap.put(field.getName(), format);
+                    }
+                    value = format.format(cell.getDateCellValue());
                 } else {
                     NumberFormat numberFormat = NumberFormat.getInstance();
                     numberFormat.setMaximumFractionDigits(10);
@@ -186,7 +192,6 @@ class DefaultExcelReadResolver implements ExcelReaderResolver,AutoCloseable {
      * @param field      field
      * @param value      value
      */
-    @SuppressWarnings("unchecked")
     private void setValue(Object o, Field field, String value) {
         if (field.getType().isEnum()) {
             ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);

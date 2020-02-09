@@ -6,17 +6,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Enumeration transformation annotation
- *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface ExcelEnumConvert {
+@Target(ElementType.ANNOTATION_TYPE)
+public @interface Sum {
     /**
-     * Enumeration converter Class
-     *
-     * @return EnumConvert
+     * Numeric format
+     * @return format
      */
-    Class<? extends EnumConvert<?,?>> convert();
+    String format() default "#,#0";
+
+    /**
+     * Open the sum
+     * @return boolean
+     */
+    boolean open() default false;
 }

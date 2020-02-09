@@ -3,18 +3,20 @@ package cn.gjing.tools.excel.write;
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
-import cn.gjing.tools.excel.util.TimeUtils;
 import cn.gjing.tools.excel.valid.DateValid;
 import cn.gjing.tools.excel.valid.ExplicitValid;
 import cn.gjing.tools.excel.valid.NumericValid;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Gjing
@@ -23,13 +25,19 @@ class ExcelHelper {
     private Workbook workbook;
     private MetaObject metaObject;
     private Type type;
+    private Map<String, SimpleDateFormat> formatMap;
+    private Map<Integer, String> formulaMap;
+    private List<Field> fieldList;
 
     public ExcelHelper(Workbook workbook, Type type) {
         this.workbook = workbook;
         this.type = type;
+        this.formatMap = new HashMap<>(16);
+        this.formulaMap = new HashMap<>(16);
     }
 
     public int setBigTitle(List<Field> headFieldList, MetaObject metaObject, Sheet sheet) {
+        this.fieldList = headFieldList;
         if (metaObject.getBigTitle() != null) {
             Row row;
             Cell cell;
@@ -84,7 +92,7 @@ class ExcelHelper {
             return;
         }
         offset++;
-        Object value = null;
+        Object value;
         Map<Object, ExcelModel> excelModelMap = new HashMap<>(16);
         ExcelModel excelModel;
         for (int i = 0, dataSize = data.size(); i < dataSize; i++) {
@@ -94,11 +102,8 @@ class ExcelHelper {
                 field = headFieldList.get(j);
                 excelField = field.getAnnotation(ExcelField.class);
                 field.setAccessible(true);
-                try {
-                    value = field.get(o);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                value = BeanUtils.getFieldValue(o, field);
+                cell = row.createCell(j);
                 if (excelField.autoMerge()) {
                     String key = i + "-" + j;
                     if (i == 0) {
@@ -124,8 +129,26 @@ class ExcelHelper {
                         }
                     }
                 }
-                this.setCellVal(excelField, field, row, value, j);
+                this.setCellVal(excelField, field, cell, value);
+                if (i == 0) {
+                    if (excelField.sum().open()) {
+                        if (formulaMap == null) {
+                            this.formulaMap = new HashMap<>();
+                        }
+                        this.formulaMap.put(j, cell.getAddress().formatAsString() + ":");
+                    }
+                }
+                if (i == dataSize - 1) {
+                    String formula = formulaMap.get(j);
+                    if (formula != null) {
+                        this.formulaMap.put(j, formula + cell.getAddress().formatAsString());
+                    }
+
+                }
             }
+        }
+        if (!this.formulaMap.isEmpty()) {
+            this.sum(sheet);
         }
     }
 
@@ -137,19 +160,18 @@ class ExcelHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private void setCellVal(ExcelField excelField, Field field, Row row, Object value, int index) {
-        Cell valueCell = row.createCell(index);
+    private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value) {
         if (excelField.style() == DefaultExcelStyle.class) {
-            valueCell.setCellStyle(this.metaObject.getMetaStyle().getBodyStyle());
-        }else {
+            cell.setCellStyle(this.metaObject.getMetaStyle().getBodyStyle());
+        } else {
             try {
-                valueCell.setCellStyle(excelField.style().newInstance().setBodyStyle(this.workbook.createCellStyle()));
+                cell.setCellStyle(excelField.style().newInstance().setBodyStyle(this.workbook.createCellStyle()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         if (value == null) {
-            valueCell.setCellValue("");
+            cell.setCellValue("");
         } else {
             if (ParamUtils.equals("", excelField.pattern())) {
                 if (field.getType().isEnum()) {
@@ -158,15 +180,25 @@ class ExcelHelper {
                     Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
                     try {
                         EnumConvert<Enum<?>, ?> enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
-                        valueCell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
+                        cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    valueCell.setCellValue(value.toString());
+                    String s = value.toString();
+                    if (ParamUtils.isNumber(s)) {
+                        cell.setCellValue(new BigDecimal(s).doubleValue());
+                    } else {
+                        cell.setCellValue(s);
+                    }
                 }
             } else {
-                valueCell.setCellValue(TimeUtils.dateToString((Date) value, excelField.pattern()));
+                SimpleDateFormat format = formatMap.get(field.getName());
+                if (format == null) {
+                    format = new SimpleDateFormat(excelField.pattern());
+                    this.formatMap.put(field.getName(), format);
+                }
+                cell.setCellValue(format.format(value));
             }
         }
     }
@@ -207,5 +239,22 @@ class ExcelHelper {
             return validIndex;
         }
         return validIndex;
+    }
+
+    private void sum(Sheet sheet) {
+        Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+        Cell cell;
+        Sum sum;
+        CellStyle cellStyle;
+        for (Map.Entry<Integer, String> f : formulaMap.entrySet()) {
+            sum = this.fieldList.get(f.getKey()).getAnnotation(ExcelField.class).sum();
+            cellStyle = this.workbook.createCellStyle();
+            cell = row.createCell(f.getKey());
+            cell.setCellFormula("SUM(" + f.getValue() + ")");
+            cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(sum.format()));
+            cell.setCellStyle(cellStyle);
+        }
+        cell = row.createCell(0);
+        cell.setCellValue("合计：");
     }
 }

@@ -17,10 +17,12 @@ public class BigTitle {
     /**
      * Title last row
      */
+    @Builder.Default
     private int lastRow = 2;
 
     /**
      * Title content
      */
+    @Builder.Default
     private String content = "";
 }

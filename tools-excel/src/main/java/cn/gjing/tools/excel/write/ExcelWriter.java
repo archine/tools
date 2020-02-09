@@ -29,7 +29,6 @@ public class ExcelWriter {
     private HttpServletResponse response;
     private ExcelWriterResolver writerResolver;
     private List<Field> headFieldList;
-    private BigTitle bigTitle;
     private boolean changed = true;
     private String defaultSheet = "sheet1";
 
