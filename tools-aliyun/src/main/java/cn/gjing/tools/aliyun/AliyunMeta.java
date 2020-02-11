@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties(prefix = "aliyun")
+@ConfigurationProperties(prefix = "tools.aliyun")
 public class AliyunMeta {
     /**
      * 用户key

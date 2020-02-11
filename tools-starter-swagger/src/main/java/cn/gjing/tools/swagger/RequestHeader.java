@@ -24,5 +24,5 @@ public class RequestHeader {
     /**
      * 是否必填, 默认true
      */
-    private boolean required = true;
+    private boolean required = false;
 }

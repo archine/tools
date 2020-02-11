@@ -8,7 +8,7 @@
         <version>1.8.1</version>
     </parent>
     <artifactId>tools-aliyun</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>tools-aliyun</name>
     <description>阿里云短信和OSS</description>
 

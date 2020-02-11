@@ -2,11 +2,12 @@ package cn.gjing.tools.redis.cache.core;
 
 import cn.gjing.tools.redis.cache.Message;
 import cn.gjing.tools.redis.cache.RedisCache;
-import cn.gjing.tools.redis.cache.SecondCache;
+import cn.gjing.tools.redis.cache.ToolsCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.lang.NonNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.concurrent.Callable;
 /**
  * @author Gjing
  **/
-class SecondCacheAdapter extends AbstractValueAdaptingCache {
+class ToolsCacheAdapter extends AbstractValueAdaptingCache {
     private String name;
     private RedisTemplate<Object, Object> redisTemplate;
     private Cache<Object, Object> caffeineCache;
@@ -28,13 +29,13 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
     private DefaultRedisScript<Boolean> setNxScript;
     private DefaultRedisScript<Boolean> setScript;
 
-    SecondCacheAdapter(String name, RedisTemplate<Object, Object> redisTemplate, Cache<Object, Object> caffeineCache, SecondCache secondCache,
-                       DefaultRedisScript<Boolean> setScript, DefaultRedisScript<Boolean> setNxScript, RedisCache redisCache) {
-        super(secondCache.isCacheValueNullable());
+    ToolsCacheAdapter(String name, RedisTemplate<Object, Object> redisTemplate, Cache<Object, Object> caffeineCache, ToolsCache toolsCache,
+                      DefaultRedisScript<Boolean> setScript, DefaultRedisScript<Boolean> setNxScript, RedisCache redisCache) {
+        super(toolsCache.isCacheValueNullable());
         this.name = name;
         this.redisTemplate = redisTemplate;
         this.caffeineCache = caffeineCache;
-        this.cachePrefix = secondCache.getCachePrefix();
+        this.cachePrefix = toolsCache.getCachePrefix();
         this.expire = redisCache.getExpire();
         this.everyCacheExpire = redisCache.getEveryCacheExpire();
         this.topic = redisCache.getTopic();
@@ -47,7 +48,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      * @return o
      */
     @Override
-    protected Object lookup(Object key) {
+    protected Object lookup(@NonNull Object key) {
         key = getKey(key);
         Object value = caffeineCache.getIfPresent(key);
         if (value != null) {
@@ -61,6 +62,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
     }
 
     @Override
+    @NonNull
     public String getName() {
         return this.name;
     }
@@ -71,6 +73,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      * @return this
      */
     @Override
+    @NonNull
     public Object getNativeCache() {
         return this;
     }
@@ -85,7 +88,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T get(Object key, Callable<T> callable) {
+    public <T> T get(@NonNull Object key, @NonNull Callable<T> callable) {
         key = getKey(key);
         Object value = this.lookup(key);
         if (value != null) {
@@ -108,7 +111,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      * @param val val
      */
     @Override
-    public void put(Object key, Object val) {
+    public void put(@NonNull Object key, Object val) {
         key = getKey(key);
         if (!super.isAllowNullValues() && val == null) {
             this.evict(key);
@@ -127,7 +130,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      * @return ValueWrapper
      */
     @Override
-    public ValueWrapper putIfAbsent(Object key, Object val) {
+    public ValueWrapper putIfAbsent(@NonNull Object key, Object val) {
         key = getKey(key);
         List<Object> keys = Collections.singletonList(key);
         Boolean execute = this.redisTemplate.execute(this.setNxScript, keys, val, this.getExpire());
@@ -144,7 +147,7 @@ class SecondCacheAdapter extends AbstractValueAdaptingCache {
      * @param key key
      */
     @Override
-    public void evict(Object key) {
+    public void evict(@NonNull Object key) {
         key = getKey(key);
         this.redisTemplate.delete(key);
         this.publish(Message.builder().cacheName(this.name).key(key).build());

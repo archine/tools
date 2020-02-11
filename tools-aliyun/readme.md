@@ -1,34 +1,38 @@
+![](https://img.shields.io/badge/version-1.0.2-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+ ![](https://img.shields.io/badge/builder-success-green.svg)      
+ 
 > 阿里云OSS和短信工具
 # 导入依赖
 ```xml
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-aliyun</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 ## 一、OSS
 ### 1、配置
 **以下配置除了``后四个配置不必填``，其他都``必填``**
 ```yaml
-aliyun:
-  # 用户key，在阿里云获取
-  access-key: xxxxxxx
-  # 用户秘钥，在阿里云获取
-  access-key-secret: xxxxxxx
-  oss:
-   # 节点, 前往阿里云查看
-   end-point: xxxxxxxx
-   # 存储空间, 不存在会创建
-   bucket: xxxxxxx
-   # 最大连接数，默认1024
-   max-connections: 1024
-   # 最大空闲时间(毫秒)，默认60000
-   idle-time: 60000
-   # socket超时时间(毫秒)，默认50000
-   socket-timeout: 50000
-   # 连接超时时间(毫秒)，默认50000
-   connection-timeout: 50000
+tools:
+  aliyun:
+    # 用户key，在阿里云获取
+    access-key: xxxxxxx
+    # 用户秘钥，在阿里云获取
+    access-key-secret: xxxxxxx
+    oss:
+     # 节点, 前往阿里云查看
+     end-point: xxxxxxxx
+     # 存储空间, 不存在会创建
+     bucket: xxxxxxx
+     # 最大连接数，默认1024
+     max-connections: 1024
+     # 最大空闲时间(毫秒)，默认60000
+     idle-time: 60000
+     # socket超时时间(毫秒)，默认50000
+     socket-timeout: 50000
+     # 连接超时时间(毫秒)，默认50000
+     connection-timeout: 50000
 ```
 ### 2、文件上传
 **如果有目录那么可以指定目录名称, 如果目录不存在会进行创建. 上传成功会返回``oss文件名``**
@@ -147,18 +151,19 @@ public class TestController {
 ### 1、配置
 **以下配置除了``region``其他都``必填``**
 ```yaml
-aliyun:
-  # 用户key，在阿里云获取
-  access-key: xxxxxxx
-  # 用户秘钥，在阿里云获取
-  access-key-secret: xxxxxx
-  sms:
-    # 短信模板ID，必须是已添加并审核通过的
-    template-code: xxxxxxx
-    # 短信签名名称，必须是已添加并审核通过的
-    sign-name: xxxxxx
-    # 区域，默认default
-    region: default
+wolf:
+  aliyun:
+    # 用户key，在阿里云获取
+    access-key: xxxxxxx
+    # 用户秘钥，在阿里云获取
+    access-key-secret: xxxxxx
+    sms:
+      # 短信模板ID，必须是已添加并审核通过的
+      template-code: xxxxxxx
+      # 短信签名名称，必须是已添加并审核通过的
+      sign-name: xxxxxx
+      # 区域，默认default
+      region: default
 ```
 ### 2、发送短信
 **短信模板变量对应的实际值**

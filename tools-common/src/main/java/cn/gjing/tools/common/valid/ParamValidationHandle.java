@@ -34,6 +34,9 @@ class ParamValidationHandle implements HandlerInterceptor {
             boolean isFile;
             if (notEmpty != null) {
                 for (Parameter parameter : parameters) {
+                    if (this.isJson(request, parameter)) {
+                        continue;
+                    }
                     isFile = parameter.getType() == MultipartFile.class;
                     value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
                     if (!parameter.isAnnotationPresent(Not.class)) {
@@ -41,14 +44,18 @@ class ParamValidationHandle implements HandlerInterceptor {
                             throw new ParamValidException(parameter.getName() + "不能为空");
                         }
                     }
+                    if (isJson(request, parameter)) continue;
                     if (!isFile) {
-                        this.expandCheck(parameter, value.toString());
+                        this.expandCheck(parameter, value);
                     }
                 }
                 return true;
             }
             if (notNull != null) {
                 for (Parameter parameter : parameters) {
+                    if (this.isJson(request, parameter)) {
+                        continue;
+                    }
                     isFile = parameter.getType() == MultipartFile.class;
                     value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
                     if (!parameter.isAnnotationPresent(Not.class)) {
@@ -57,26 +64,20 @@ class ParamValidationHandle implements HandlerInterceptor {
                         }
                     }
                     if (!isFile) {
-                        this.expandCheck(parameter, value.toString());
+                        this.expandCheck(parameter, value);
                     }
                 }
                 return true;
             }
             for (Parameter parameter : parameters) {
-                if (parameter.isAnnotationPresent(Json.class)) {
-                    this.jsonValid(parameter.getType(), request, parameter.isAnnotationPresent(RequestBody.class));
+                if (this.isJson(request, parameter)) {
                     continue;
                 }
                 isFile = parameter.getType() == MultipartFile.class;
                 value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
                 notEmpty = parameter.getAnnotation(NotEmpty.class);
-                if (notEmpty != null && ParamUtils.isEmpty(value)) {
-                    throw new ParamValidException(notEmpty.message());
-                }
                 notNull = parameter.getAnnotation(NotNull.class);
-                if (notNull != null && value == null) {
-                    throw new ParamValidException(notNull.message());
-                }
+                this.emptyCheck(notNull, notEmpty, value);
                 if (!isFile) {
                     this.expandCheck(parameter, value);
                 }
@@ -86,24 +87,29 @@ class ParamValidationHandle implements HandlerInterceptor {
         return true;
     }
 
-    private void jsonValid(Class<?> c, HttpServletRequest request, boolean b) {
-        Field[] fields = c.getDeclaredFields();
-        if (b) {
-            ParamValidationServletRequest validationRequest = (ParamValidationServletRequest) request;
-            Map<String, Object> valueMap;
-            try {
-                valueMap = new ObjectMapper().readValue(validationRequest.getBody(),new TypeReference<Map<String,Object>>(){});
-            } catch (IOException e) {
-                throw new ParamValidException("无效Json对象");
+    private boolean isJson(HttpServletRequest request, Parameter parameter) {
+        if (parameter.isAnnotationPresent(Json.class)) {
+            Field[] fields = parameter.getType().getDeclaredFields();
+            if (parameter.isAnnotationPresent(RequestBody.class)) {
+                ParamValidationServletRequest validationRequest = (ParamValidationServletRequest) request;
+                Map<String, Object> valueMap;
+                try {
+                    valueMap = new ObjectMapper().readValue(validationRequest.getBody(), new TypeReference<Map<String, Object>>() {
+                    });
+                } catch (IOException e) {
+                    throw new ParamValidException("无效的Json对象");
+                }
+                for (Field field : fields) {
+                    this.expandCheck(field, request, valueMap, true);
+                }
+            } else {
+                for (Field field : fields) {
+                    this.expandCheck(field, request, null, false);
+                }
             }
-            for (Field field : fields) {
-                this.expandCheck(field, request, valueMap, b);
-            }
-            return;
+            return true;
         }
-        for (Field field : fields) {
-            this.expandCheck(field, request, null, b);
-        }
+        return false;
     }
 
     private void expandCheck(Field field, HttpServletRequest request, Map<String, Object> valueMap, boolean body) {
@@ -112,24 +118,25 @@ class ParamValidationHandle implements HandlerInterceptor {
         Length length = field.getAnnotation(Length.class);
         Email email = field.getAnnotation(Email.class);
         Mobile mobile = field.getAnnotation(Mobile.class);
-        this.expandCheck(length, email, mobile, notNull, notEmpty, body ? valueMap.get(field.getName()) : request.getParameter(field.getName()));
+        Object v = body ? valueMap.get(field.getName()) : request.getParameter(field.getName());
+        this.emptyCheck(notNull, notEmpty, v);
+        this.expandCheck(length, email, mobile, v);
     }
 
-    private void expandCheck(Parameter parameter, Object value) {
+    private void expandCheck(Parameter parameter, Object v) {
         Length length = parameter.getAnnotation(Length.class);
         Email email = parameter.getAnnotation(Email.class);
         Mobile mobile = parameter.getAnnotation(Mobile.class);
-        this.expandCheck(length, email, mobile, value);
+        this.expandCheck(length, email, mobile, v);
     }
 
-    private void expandCheck(Length length, Email email, Mobile mobile, NotNull notNull, NotEmpty notEmpty, Object value) {
+    private void emptyCheck(NotNull notNull, NotEmpty notEmpty, Object value) {
         if (notEmpty != null && ParamUtils.isEmpty(value)) {
             throw new ParamValidException(notEmpty.message());
         }
         if (notNull != null && value == null) {
             throw new ParamValidException(notNull.message());
         }
-        this.expandCheck(length, email, mobile, value);
     }
 
     private void expandCheck(Length length, Email email, Mobile mobile, Object value) {
@@ -159,4 +166,5 @@ class ParamValidationHandle implements HandlerInterceptor {
             }
         }
     }
+
 }

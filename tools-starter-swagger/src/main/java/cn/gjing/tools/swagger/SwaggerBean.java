@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("swagger")
+@ConfigurationProperties("tools.swagger")
 public class SwaggerBean {
     /**
      * 开启Swagger文档

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@ConfigurationProperties("cors")
+@ConfigurationProperties("tools.common.cors")
 @EnableConfigurationProperties
 public class CommonCors {
 

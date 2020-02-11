@@ -3,7 +3,7 @@ package cn.gjing.tools.redis.cache.core;
 import cn.gjing.tools.redis.cache.CaffeineCache;
 import cn.gjing.tools.redis.cache.RedisCache;
 import cn.gjing.tools.redis.cache.Script;
-import cn.gjing.tools.redis.cache.SecondCache;
+import cn.gjing.tools.redis.cache.ToolsCache;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,9 +23,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * 二级缓存配置类
  **/
 @Configuration
-class SecondCacheConfiguration {
+class ToolsCacheConfiguration {
     @Bean
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"rawtypes","unchecked"})
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -57,9 +57,9 @@ class SecondCacheConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SecondCache.class)
-    public SecondCache secondCache() {
-        return new SecondCache();
+    @ConditionalOnMissingBean(ToolsCache.class)
+    public ToolsCache secondCache() {
+        return new ToolsCache();
     }
 
     @Bean
@@ -75,16 +75,16 @@ class SecondCacheConfiguration {
     }
 
     @Bean
-    public SecondCacheManager secondCacheManager(SecondCache secondCache,CaffeineCache caffeineCache,RedisCache redisCache) {
-        return new SecondCacheManager(secondCache, setNxScript(), setScript(),redisCache,caffeineCache);
+    public ToolsCacheManager secondCacheManager(ToolsCache toolsCache, CaffeineCache caffeineCache, RedisCache redisCache) {
+        return new ToolsCacheManager(toolsCache, setNxScript(), setScript(),redisCache,caffeineCache);
     }
 
     @Bean
-    public RedisMessageListenerContainer listenerContainer(RedisConnectionFactory connectionFactory,SecondCacheManager secondCacheManager,RedisCache redisCache
-            ,RedisTemplate<Object,Object> redisTemplate) {
+    public RedisMessageListenerContainer listenerContainer(RedisConnectionFactory connectionFactory, ToolsCacheManager toolsCacheManager, RedisCache redisCache
+            , RedisTemplate<Object,Object> redisTemplate) {
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
         listenerContainer.setConnectionFactory(connectionFactory);
-        CacheMessageListener listener = new CacheMessageListener(secondCacheManager,redisTemplate);
+        CacheMessageListener listener = new CacheMessageListener(toolsCacheManager,redisTemplate);
         listenerContainer.addMessageListener(listener, new PatternTopic(redisCache.getTopic()));
         return listenerContainer;
     }

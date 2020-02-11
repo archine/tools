@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("second.cache.caffeine")
+@ConfigurationProperties("tools.cache.caffeine")
 @Component
 public class CaffeineCache {
     /**

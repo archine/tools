@@ -1,5 +1,5 @@
 ### SpringBoot分布式锁和缓存
-![](https://img.shields.io/badge/version-1.1.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.2.0-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)      
 ## 分布式锁的使用
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-redis</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 ### 二. 启动类标注注解
@@ -17,7 +17,7 @@
  * @author Gjing
  */
 @SpringBootApplication
-@EnableRedisLock
+@EnableToolsLock
 public class TestRedisApplication {
     public static void main(String[] args) {
         SpringApplication.run(TestRedisApplication.class, args);
@@ -148,7 +148,7 @@ public class DemoLock extends AbstractLock {
  * @author Gjing
  */
 @SpringBootApplication
-@EnableSecondCache
+@EnableToolsCache
 public class TestRedisApplication {
     public static void main(String[] args) {
         SpringApplication.run(TestRedisApplication.class, args);
@@ -157,7 +157,7 @@ public class TestRedisApplication {
 ```
 ### 二. 配置
 #### 1. 配置介绍
-**以下为所有配置信息, 使用时可自定义设置, 皆以``second.cache``开头**      
+**以下为所有配置信息, 使用时可自定义设置, 皆以``tools.cache``开头**      
    
 |配置项|描述|
 |------|------|
@@ -176,7 +176,7 @@ public class TestRedisApplication {
 #### 2. 配置示例
 * **yml方式**
 ```yml
-second:
+tools:
   cache:
     cache-prefix: 锁的前缀
     redis:
@@ -193,8 +193,8 @@ second:
 public class CacheConfiguration {
 
     @Bean
-    public SecondCache secondCache() {
-        return SecondCache.builder()
+    public ToolsCache toolsCache() {
+        return ToolsCache.builder()
                 .cachePrefix("锁的前缀")
                 .dynamic(true)
                 .build();

@@ -15,5 +15,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Import(ToolsSecondCacheSelector.class)
 @EnableCaching
-public @interface EnableSecondCache {
+public @interface EnableToolsCache {
 }

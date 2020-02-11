@@ -9,11 +9,11 @@ import org.springframework.data.redis.core.RedisTemplate;
  **/
 class CacheMessageListener implements MessageListener {
     private RedisTemplate<Object, Object> redisTemplate;
-    private SecondCacheManager secondCacheManager;
+    private ToolsCacheManager toolsCacheManager;
 
-    CacheMessageListener(SecondCacheManager secondCacheManager,RedisTemplate<Object,Object> redisTemplate) {
+    CacheMessageListener(ToolsCacheManager toolsCacheManager, RedisTemplate<Object,Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
-        this.secondCacheManager = secondCacheManager;
+        this.toolsCacheManager = toolsCacheManager;
     }
 
     @Override
@@ -22,6 +22,6 @@ class CacheMessageListener implements MessageListener {
         if (message1 == null) {
             return;
         }
-        secondCacheManager.clearLocal(message1.getCacheName(), message1.getKey());
+        toolsCacheManager.clearLocal(message1.getCacheName(), message1.getKey());
     }
 }

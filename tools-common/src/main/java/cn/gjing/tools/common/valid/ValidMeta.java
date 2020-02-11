@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  **/
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "valid")
+@ConfigurationProperties(prefix = "tools.common.valid")
 public class ValidMeta {
     /**
      * 校验接口路径

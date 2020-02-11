@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties(prefix = "aliyun.oss")
+@ConfigurationProperties(prefix = "tools.aliyun.oss")
 public class OssMeta {
     /**
      * 节点

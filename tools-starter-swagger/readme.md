@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.3.3-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.5.0-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 **快速在SpringBoot项目中集成Swagger**
@@ -8,7 +8,7 @@
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>1.3.3</version>
+     <version>1.5.0</version>
 </dependency>
 ```
 ## 二、使用@EnableSwagger注解
@@ -27,55 +27,56 @@ public class DemoApplication {
 ## 三、自定义配置
 ### 1、配置说明
 ```yaml
-swagger:
-  contact:
-    # 联系邮箱
-    email:
-    # 联系人昵称
-    name:
-    # 联系人地址
-    url:
-  # 是否开启swagger，默认true
-  enable: true
-  # 标题
-  title: 
-  # 描述
-  description: 
-  # 接口所在包路径
-  base-package:
-  # 接口选择规则类型, 共分为: REGEX(正则匹配), ANT(路径匹配), 默认ANT
-  path-type:
-  # 接口匹配规则表达式
-  path-pattern:
-  # 接口排除匹配表达式
-  exclude-pattern:
-  # 服务条款
-  terms-of-service-url:
-  # 许可证
-  license:
-  # 许可证地址
-  license-url:
-  # 全局响应信息
-  global-response-schemas:
-      # 状态码
-    - code: 200
-      # 响应信息
-      message: 正常
-      # 结果Bean的类名
-      schema: ResultVO
-    - code: 400
-      message: 错误
-  # 请求头
-  global-headers:
-      # 请求头名称
-    - name: token
-      # 请求头描述
-      description: 登录的token
-      # 是否必须, 默认为true
-      required: true
-    - name: token2
-      description: 登录的token2
-      required: false
+tools:
+  swagger:
+    contact:
+      # 联系邮箱
+      email:
+      # 联系人昵称
+      name:
+      # 联系人地址
+      url:
+    # 是否开启swagger，默认true
+    enable: true
+    # 标题
+    title: 
+    # 描述
+    description: 
+    # 接口所在包路径
+    base-package:
+    # 接口选择规则类型, 共分为: REGEX(正则匹配), ANT(路径匹配), 默认ANT
+    path-type:
+    # 接口匹配规则表达式
+    path-pattern:
+    # 接口排除匹配表达式
+    exclude-pattern:
+    # 服务条款
+    terms-of-service-url:
+    # 许可证
+    license:
+    # 许可证地址
+    license-url:
+    # 全局响应信息
+    global-response-schemas:
+       # 状态码
+      - code: 200
+        # 响应信息
+        message: 正常
+        # 结果Bean的类名
+        schema: ResultVO
+      - code: 400
+        message: 错误
+    # 请求头
+    global-headers:
+        # 请求头名称
+      - name: token
+        # 请求头描述
+        description: 登录的token
+        # 是否必须, 默认为false
+        required: true
+      - name: token2
+        description: 登录的token2
+        required: false
 ```
 ### 2、注意点
 #### 全局响应结果信息
@@ -103,23 +104,24 @@ zuul:
     projectA:
       serviceId: web1
       path: /demo/**
-swagger:
-  resources:
-    # 是否开启聚合模式, 默认 False
-    enable: false
-    # 当前项目的文档是否也要加入聚合, 默认 true
-    register-me: true
-    # 服务列表
-    service-list:
-      # projectA或者projectB这个可以随意写, 只是为了区分
-      - projectA:
-          # 下拉选择时展示的名称
-          view: 项目A
-          # 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
-          service: demo
-      - projectB:
-          view: 项目B
-          service: demo 
+tools:
+  swagger:
+    resources:
+      # 是否开启聚合模式, 默认 False
+      enable: false
+      # 当前项目的文档是否也要加入聚合, 默认 true
+      register-me: true
+      # 服务列表
+      service-list:
+        # projectA或者projectB这个可以随意写, 只是为了区分
+        - projectA:
+            # 下拉选择时展示的名称
+            view: 项目A
+            # 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
+            service: demo
+        - projectB:
+            view: 项目B
+            service: demo 
 ```
 ## 五、效果图
 ### 1、全局响应信息以及全局请求头

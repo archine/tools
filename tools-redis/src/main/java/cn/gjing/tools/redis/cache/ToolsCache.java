@@ -19,7 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ConfigurationProperties("second.cache")
 @Component
-public class SecondCache {
+public class ToolsCache {
     /**
      * 缓存key名
      */

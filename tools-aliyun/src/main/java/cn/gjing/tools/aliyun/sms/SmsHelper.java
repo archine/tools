@@ -19,10 +19,8 @@ import java.util.Map;
 public class SmsHelper {
     private SmsMeta smsMeta;
     private IAcsClient client;
-    private static final String DO_MAIN = "dysmsapi.aliyuncs.com";
-    private static final String VERSION = "2017-05-25";
-    private static final String SEND_ACTION = "sendSms";
-    private static final String QUERY_ACTION = "QuerySendDetails";
+    private final String DO_MAIN = "dysmsapi.aliyuncs.com";
+    private final String VERSION = "2017-05-25";
 
     public SmsHelper(AliyunMeta aliyunMeta, SmsMeta smsMeta) {
         this.smsMeta = smsMeta;
@@ -56,7 +54,7 @@ public class SmsHelper {
         request.setMethod(MethodType.POST);
         request.setDomain(DO_MAIN);
         request.setVersion(VERSION);
-        request.setAction(SEND_ACTION);
+        request.setAction("sendSms");
         request.putQueryParameter("PhoneNumbers", phones);
         if (param != null) {
             request.putQueryParameter("TemplateParam", new Gson().toJson(param));
@@ -87,7 +85,7 @@ public class SmsHelper {
         request.setMethod(MethodType.POST);
         request.setDomain(DO_MAIN);
         request.setVersion(VERSION);
-        request.setAction(QUERY_ACTION);
+        request.setAction("QuerySendDetails");
         request.putQueryParameter("PhoneNumber", phone);
         request.putQueryParameter("SendDate", sendDate.replaceAll("-", ""));
         request.putQueryParameter("PageSize", String.valueOf(row));

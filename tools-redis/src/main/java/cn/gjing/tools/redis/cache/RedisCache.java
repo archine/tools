@@ -18,7 +18,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-@ConfigurationProperties("second.cache.redis")
+@ConfigurationProperties("tools.cache.redis")
 public class RedisCache {
     /**
      * 全局过期时间，单位秒，默认不过期
@@ -34,5 +34,5 @@ public class RedisCache {
      * 缓存更新时通知其他节点的topic名称
      */
     @Builder.Default
-    private String topic = "second-cache";
+    private String topic = "tools-cache";
 }

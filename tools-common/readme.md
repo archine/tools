@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.5.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 
@@ -8,21 +8,23 @@ Java常用工具类整合
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.3.8</version>
+  <version>1.5.0</version>
 </dependency>
 ```
 ## 一、Rest接口参数校验注解
-项目为``Spring``环境需要手动在xml文件中对参数校验处理器bean进行配置
+项目为``Spring``环境需要手动在xml文件中对参数校验处理器交给Spring管理
 ```xml
 <bean id="xxx" class="cn.gjing.tools.common.valid.ParamValidationAdapter"/>
 ```
 **支持自定义配置需要校验的接口路径和要排除的接口路径，yml格式如下:**
 ```yaml
-valid:
-  # 需要校验的接口路径
-  path: /**
-  # 需要排除的接口路径
-  exclude-path: /**
+tools:
+  common:
+    valid:
+      # 需要校验的接口路径
+      path: /**
+      # 需要排除的接口路径
+      exclude-path: /**
 ```
 ### 1、@Not
 **排除某个参数不需要非空校验**
@@ -173,16 +175,18 @@ public class TestController {
 开启全局跨域，在启动类或者任意类使用``@EnableCors``注解即可，会走默认配置，也可以自行配置，配置示例如下：
 * **yml方式**
 ```yaml
-cors:
-  # 支持的方法类型
-  allowed-methods: POST,GET,DELETE,PUT,OPTIONS
-  # 支持的请求头
-  allowed-headers: xxx
-  # 支持的域名
-  allowed-origins: xxx
-  # 方法路径
-  path: /**
-  max-age: 1800
+tools:
+  common:
+    cors:
+      # 支持的方法类型
+      allowed-methods: POST,GET,DELETE,PUT,OPTIONS
+      # 支持的请求头
+      allowed-headers: xxx
+      # 支持的域名
+      allowed-origins: xxx
+      # 方法路径
+      path: /**
+      max-age: 1800
 ```
 * **javaBean方式**
 ```java

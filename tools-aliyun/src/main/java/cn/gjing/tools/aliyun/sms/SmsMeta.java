@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties(prefix = "aliyun.sms")
+@ConfigurationProperties(prefix = "tools.aliyun.sms")
 public class SmsMeta {
     /**
      * 短信签名

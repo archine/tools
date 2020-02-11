@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Import(ToolsRedisLockSelector.class)
-public @interface EnableRedisLock {
+public @interface EnableToolsLock {
 }

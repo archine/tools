@@ -2,12 +2,13 @@ package cn.gjing.tools.redis.cache.core;
 
 import cn.gjing.tools.redis.cache.CaffeineCache;
 import cn.gjing.tools.redis.cache.RedisCache;
-import cn.gjing.tools.redis.cache.SecondCache;
+import cn.gjing.tools.redis.cache.ToolsCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.lang.NonNull;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -19,13 +20,13 @@ import java.util.concurrent.TimeUnit;
  * @author Gjing
  * 二级缓存管理
  **/
-class SecondCacheManager implements CacheManager {
+class ToolsCacheManager implements CacheManager {
 
     @Resource
     private RedisTemplate<Object, Object> redisTemplate;
 
     private ConcurrentHashMap<String, Cache> cacheMap = new ConcurrentHashMap<>();
-    private SecondCache secondCache;
+    private ToolsCache toolsCache;
     private boolean dynamic;
     private Set<String> cacheNames;
     private DefaultRedisScript<Boolean> setNxScript;
@@ -33,12 +34,12 @@ class SecondCacheManager implements CacheManager {
     private RedisCache redisCache;
     private CaffeineCache caffeineCache;
 
-    SecondCacheManager(SecondCache secondCache,DefaultRedisScript<Boolean> setNxScript, DefaultRedisScript<Boolean> setScript,
-                       RedisCache redisCache,CaffeineCache caffeineCache) {
+    ToolsCacheManager(ToolsCache toolsCache, DefaultRedisScript<Boolean> setNxScript, DefaultRedisScript<Boolean> setScript,
+                      RedisCache redisCache, CaffeineCache caffeineCache) {
         super();
-        this.secondCache = secondCache;
-        this.dynamic = secondCache.isDynamic();
-        this.cacheNames = secondCache.getCacheNames();
+        this.toolsCache = toolsCache;
+        this.dynamic = toolsCache.isDynamic();
+        this.cacheNames = toolsCache.getCacheNames();
         this.setNxScript = setNxScript;
         this.setScript = setScript;
         this.redisCache = redisCache;
@@ -46,7 +47,7 @@ class SecondCacheManager implements CacheManager {
     }
 
     @Override
-    public Cache getCache(String s) {
+    public Cache getCache(@NonNull String s) {
         Cache cache = cacheMap.get(s);
         if (cache != null) {
             return cache;
@@ -54,12 +55,13 @@ class SecondCacheManager implements CacheManager {
         if (!dynamic && cacheNames.contains(s)) {
             return null;
         }
-        cache = new SecondCacheAdapter(s, redisTemplate, caffeineCache(), secondCache, setScript, setNxScript,redisCache);
+        cache = new ToolsCacheAdapter(s, redisTemplate, caffeineCache(), toolsCache, setScript, setNxScript,redisCache);
         Cache newCache = cacheMap.putIfAbsent(s, cache);
         return newCache == null ? cache : newCache;
     }
 
     @Override
+    @NonNull
     public Collection<String> getCacheNames() {
         return this.cacheNames;
     }
@@ -74,8 +76,8 @@ class SecondCacheManager implements CacheManager {
         if (cache == null) {
             return;
         }
-        SecondCacheAdapter secondCacheAdapter = (SecondCacheAdapter) cache;
-        secondCacheAdapter.clearLocal(key);
+        ToolsCacheAdapter toolsCacheAdapter = (ToolsCacheAdapter) cache;
+        toolsCacheAdapter.clearLocal(key);
     }
 
     /**

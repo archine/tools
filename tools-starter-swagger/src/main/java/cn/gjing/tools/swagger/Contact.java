@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("swagger.contact")
+@ConfigurationProperties("tools.swagger.contact")
 public class Contact {
 
     @Builder.Default

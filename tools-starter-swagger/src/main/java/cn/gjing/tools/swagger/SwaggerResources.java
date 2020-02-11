@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("swagger.resources")
+@ConfigurationProperties("tools.swagger.resources")
 public class SwaggerResources {
 
     /**
