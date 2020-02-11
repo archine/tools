@@ -10,12 +10,12 @@ import java.util.Map;
  * @author Gjing
  **/
 @SuppressWarnings("rawtypes")
-class ParamValidationServletRequest extends HttpServletRequestWrapper {
+class ToolsParamValidationServletRequest extends HttpServletRequestWrapper {
     private final byte[] body;
     private final HttpServletRequest request;
     private final Map map;
 
-    public ParamValidationServletRequest(HttpServletRequest request) throws IOException {
+    public ToolsParamValidationServletRequest(HttpServletRequest request) throws IOException {
         super(request);
         this.request = request;
         this.map = request.getParameterMap();
@@ -46,10 +46,6 @@ class ParamValidationServletRequest extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String name) {
         return this.request.getParameter(name);
-    }
-
-    public String getBody() {
-        return new String(this.body);
     }
 
     private byte[] readBytes(InputStream inputStream) throws IOException {

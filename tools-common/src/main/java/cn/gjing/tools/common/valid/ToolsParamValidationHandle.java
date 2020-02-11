@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-class ParamValidationHandle implements HandlerInterceptor {
+class ToolsParamValidationHandle implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
@@ -91,11 +91,9 @@ class ParamValidationHandle implements HandlerInterceptor {
         if (parameter.isAnnotationPresent(Json.class)) {
             Field[] fields = parameter.getType().getDeclaredFields();
             if (parameter.isAnnotationPresent(RequestBody.class)) {
-                ParamValidationServletRequest validationRequest = (ParamValidationServletRequest) request;
                 Map<String, Object> valueMap;
                 try {
-                    valueMap = new ObjectMapper().readValue(validationRequest.getBody(), new TypeReference<Map<String, Object>>() {
-                    });
+                    valueMap = new ObjectMapper().readValue(request.getInputStream(), new TypeReference<Map<String, Object>>() {});
                 } catch (IOException e) {
                     throw new ParamValidException("无效的Json对象");
                 }

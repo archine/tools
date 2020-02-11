@@ -1,20 +1,19 @@
-![](https://img.shields.io/badge/version-1.5.0-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.5.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
-
-Java常用工具类整合
+Java开发基础工具包
 ## 一、导入依赖
 ```xml
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.1</version>
 </dependency>
 ```
 ## 一、Rest接口参数校验注解
 项目为``Spring``环境需要手动在xml文件中对参数校验处理器交给Spring管理
 ```xml
-<bean id="xxx" class="cn.gjing.tools.common.valid.ParamValidationAdapter"/>
+<bean id="xxx" class="cn.gjing.tools.common.valid.ToolsParamValidationAdapter"/>
 ```
 **支持自定义配置需要校验的接口路径和要排除的接口路径，yml格式如下:**
 ```yaml

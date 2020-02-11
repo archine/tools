@@ -8,18 +8,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Gjing
  **/
 @Configuration
-class ParamValidConfigurer implements WebMvcConfigurer {
-    private ParamValidationHandle paramValidationHandle;
+class ToolsParamValidationConfigurer implements WebMvcConfigurer {
+    private ToolsParamValidationHandle toolsParamValidationHandle;
     private ValidMeta meta;
 
-    public ParamValidConfigurer(ParamValidationHandle paramValidationHandle, ValidMeta validMeta) {
-        this.paramValidationHandle = paramValidationHandle;
+    public ToolsParamValidationConfigurer(ToolsParamValidationHandle toolsParamValidationHandle, ValidMeta validMeta) {
+        this.toolsParamValidationHandle = toolsParamValidationHandle;
         this.meta = validMeta;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(paramValidationHandle)
+        registry.addInterceptor(toolsParamValidationHandle)
                 .addPathPatterns(this.meta.getPath())
                 .excludePathPatterns(this.meta.getExcludePath());
     }
