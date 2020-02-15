@@ -27,6 +27,7 @@ public class PageResult<T> implements Serializable {
      * @param totalPages   总页数
      * @param currentPage 当前页数
      * @return PageResult
+     * @param <T> 返回结果泛型
      */
     public static <T> PageResult<T> of(T data, long totalPages, long currentPage) {
         PageResult<T> pageResult = new PageResult<>();
@@ -42,6 +43,7 @@ public class PageResult<T> implements Serializable {
      * @param data      page数据
      * @param totalPages 总页数
      * @return PageResult
+     * @param <T> 返回结果泛型
      */
     public static <T> PageResult<T> of(T data, long totalPages) {
         PageResult<T> pageResult = new PageResult<>();
@@ -57,6 +59,7 @@ public class PageResult<T> implements Serializable {
      * @param totalPages 总页数
      * @param currentPage 当前页数
      * @param totalRows 总条数
+     * @param <T> 返回结果泛型
      * @return PageResult
      */
     public static <T> PageResult<T> of(T data, long totalPages, long currentPage, long totalRows) {
@@ -76,6 +79,7 @@ public class PageResult<T> implements Serializable {
      * @param currentPage 当前页数
      * @param totalRows 总条数
      * @param pageRows 每页条数
+     * @param <T> 返回结果泛型
      * @return PageResult
      */
     public static <T> PageResult<T> of(T data, long totalPages, long currentPage, long totalRows,long pageRows) {

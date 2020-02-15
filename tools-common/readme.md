@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.5.1-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.5.2-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 Java开发基础工具包
@@ -7,7 +7,7 @@ Java开发基础工具包
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.5.1</version>
+  <version>1.5.2</version>
 </dependency>
 ```
 ## 一、Rest接口参数校验注解
@@ -46,6 +46,22 @@ public class TestController {
     public void test(@Json @RequestBody User user) {
         System.out.println("ok");
     }
+}
+```
+**支持Json对象中字段类型为对象或对象集合类型的嵌套校验，如果该字段不允许为空的话需要自行在原Json对象中加入非空注释。``目前支持嵌套一层``**
+```java
+public class User{
+    @Json
+    private List<Order> orderList;
+
+    @NotNull
+    @Json
+    private Order order;
+}
+
+class Order{
+    @NotEmpty
+    private String orderName;
 }
 ```
 ### 3、@NotNull 
@@ -671,13 +687,21 @@ AES解密
 |-----|-----|
 |bean|需要转为map的bean对象|
 ### 8、getInterfaceType
-获取泛型接口中某个泛型的真实对象类型     
+获取泛型接口中某个泛型的真实对象class     
 **参数说明**     
 
 |参数|描述|
 |---|---|
 |source|实现泛型接口的类|
 |typeInterface|泛型接口|
+|paramIndex|泛型参数下标，0开始|
+### 9、getGenericType
+获取某个泛型字段的真实对象class     
+**参数说明**     
+
+|参数|描述|
+|---|---|
+|type|字段的泛型类型|
 |paramIndex|泛型参数下标，0开始|
 ## 九、验证码工具类
 **用于生成英文和数字混合的验证码，使用时通过构造``AuthCodeUtils``在进行调用其中的方法，构造时参数如下 :**    

@@ -184,4 +184,15 @@ public final class BeanUtils {
         }
         return null;
     }
+
+    /**
+     * 获取某个参数中的泛型
+     * @param type 参数的genericType
+     * @param paramIndex 参数下标
+     * @return Class
+     */
+    public static Class<?> getGenericType(Type type, int paramIndex) {
+        ParameterizedType pt = (ParameterizedType) type;
+        return (Class<?>) pt.getActualTypeArguments()[paramIndex];
+    }
 }

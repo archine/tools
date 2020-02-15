@@ -26,7 +26,8 @@ public class ErrorResult implements Serializable {
 
     /**
      * 错误请求时使用,包含code和message
-     *
+     * @param code 状态码
+     * @param message 错误信息
      * @return ErrorResult
      */
     public static ErrorResult failure(int code, String message) {
@@ -63,7 +64,7 @@ public class ErrorResult implements Serializable {
 
     /**
      * 服务器错误使用,只包含错误信息
-     *
+     * @param message 错误信息
      * @return map
      */
     public static Map<String, String> error(String message) {

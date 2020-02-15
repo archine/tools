@@ -1,6 +1,7 @@
 package cn.gjing.tools.common.valid;
 
 import cn.gjing.tools.common.exception.ParamValidException;
+import cn.gjing.tools.common.util.BeanUtils;
 import cn.gjing.tools.common.util.ParamUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,7 +47,6 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
                             throw new ParamValidException(parameter.getName() + "不能为空");
                         }
                     }
-                    if (isJson(request, parameter)) continue;
                     if (!isFile) {
                         this.expandCheck(parameter, value);
                     }
@@ -87,22 +89,42 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
         return true;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private boolean isJson(HttpServletRequest request, Parameter parameter) {
         if (parameter.isAnnotationPresent(Json.class)) {
-            Field[] fields = parameter.getType().getDeclaredFields();
             if (parameter.isAnnotationPresent(RequestBody.class)) {
+                Field[] fields = parameter.getType().getDeclaredFields();
                 Map<String, Object> valueMap;
                 try {
-                    valueMap = new ObjectMapper().readValue(request.getInputStream(), new TypeReference<Map<String, Object>>() {});
+                    valueMap = new ObjectMapper().readValue(request.getInputStream(), new TypeReference<Map<String, Object>>() {
+                    });
                 } catch (IOException e) {
                     throw new ParamValidException("无效的Json对象");
                 }
                 for (Field field : fields) {
-                    this.expandCheck(field, request, valueMap, true);
-                }
-            } else {
-                for (Field field : fields) {
-                    this.expandCheck(field, request, null, false);
+                    Object value = valueMap.get(field.getName());
+                    if (field.isAnnotationPresent(Json.class)) {
+                        this.emptyCheck(field.getAnnotation(NotNull.class), field.getAnnotation(NotEmpty.class), value);
+                        if (value instanceof Collection) {
+                            List<Map<String, Object>> nestValueList = (List) value;
+                            Field[] nestObjFields = BeanUtils.getGenericType(field.getGenericType(), 0).getDeclaredFields();
+                            for (Map<String, Object> nestValueMap : nestValueList) {
+                                for (Field objField : nestObjFields) {
+                                    this.jsonCheck(objField, nestValueMap.get(objField.getName()));
+                                }
+                            }
+                        } else {
+                            if (value != null) {
+                                Field[] nestObjFields = field.getType().getDeclaredFields();
+                                Map<String, ?> nestObjMap = (Map<String, ?>) value;
+                                for (Field objField : nestObjFields) {
+                                    this.jsonCheck(objField, nestObjMap.get(objField.getName()));
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                    this.jsonCheck(field, value);
                 }
             }
             return true;
@@ -110,22 +132,9 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
         return false;
     }
 
-    private void expandCheck(Field field, HttpServletRequest request, Map<String, Object> valueMap, boolean body) {
-        NotNull notNull = field.getAnnotation(NotNull.class);
-        NotEmpty notEmpty = field.getAnnotation(NotEmpty.class);
-        Length length = field.getAnnotation(Length.class);
-        Email email = field.getAnnotation(Email.class);
-        Mobile mobile = field.getAnnotation(Mobile.class);
-        Object v = body ? valueMap.get(field.getName()) : request.getParameter(field.getName());
-        this.emptyCheck(notNull, notEmpty, v);
-        this.expandCheck(length, email, mobile, v);
-    }
-
-    private void expandCheck(Parameter parameter, Object v) {
-        Length length = parameter.getAnnotation(Length.class);
-        Email email = parameter.getAnnotation(Email.class);
-        Mobile mobile = parameter.getAnnotation(Mobile.class);
-        this.expandCheck(length, email, mobile, v);
+    private void jsonCheck(Field field, Object value) {
+        this.emptyCheck(field.getAnnotation(NotNull.class), field.getAnnotation(NotEmpty.class), value);
+        this.expandCheck(field.getAnnotation(Length.class), field.getAnnotation(Email.class), field.getAnnotation(Mobile.class), value);
     }
 
     private void emptyCheck(NotNull notNull, NotEmpty notEmpty, Object value) {
@@ -135,6 +144,10 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
         if (notNull != null && value == null) {
             throw new ParamValidException(notNull.message());
         }
+    }
+
+    private void expandCheck(Parameter parameter, Object value) {
+        this.expandCheck(parameter.getAnnotation(Length.class), parameter.getAnnotation(Email.class), parameter.getAnnotation(Mobile.class), value);
     }
 
     private void expandCheck(Length length, Email email, Mobile mobile, Object value) {

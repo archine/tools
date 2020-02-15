@@ -19,6 +19,7 @@ public final class ParamUtils {
      *
      * @param str 参数
      * @return True 为空,false不为空
+     * @param <T> 泛型参数
      */
     public static <T> boolean isEmpty(T str) {
         if (str == null || "".equals(str)) {
@@ -73,6 +74,7 @@ public final class ParamUtils {
      *
      * @param str 参数
      * @return true为不含有, false为含有
+     * @param <T> 泛型参数
      */
     public static <T> boolean isNotEmpty(T str) {
         return !isEmpty(str);
