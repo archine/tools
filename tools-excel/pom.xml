@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.8.5</version>
+        <version>1.8.9</version>
     </parent>
     <artifactId>tools-excel</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <name>tools-excel</name>
     <description>Excel导入导出工具</description>
 

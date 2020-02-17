@@ -186,7 +186,8 @@ class ExcelHelper {
                     }
                 } else {
                     String s = value.toString();
-                    if (ParamUtils.isNumber(s)) {
+                    int len = s.contains(".") ? s.substring(0, s.indexOf(".")).length() : s.length();
+                    if (field.getType() != String.class && ParamUtils.isNumber(s) && len < 17) {
                         cell.setCellValue(new BigDecimal(s).doubleValue());
                     } else {
                         cell.setCellValue(s);
@@ -251,10 +252,16 @@ class ExcelHelper {
             cellStyle = this.workbook.createCellStyle();
             cell = row.createCell(f.getKey());
             cell.setCellFormula("SUM(" + f.getValue() + ")");
+            cellStyle.setAlignment(HorizontalAlignment.CENTER);
+            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(sum.format()));
             cell.setCellStyle(cellStyle);
         }
         cell = row.createCell(0);
+        cellStyle = this.workbook.createCellStyle();
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cell.setCellStyle(cellStyle);
         cell.setCellValue("合计：");
     }
 }
