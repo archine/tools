@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * @author Gjing
  **/
-class DefaultExcelReadResolver implements ExcelReaderResolver, AutoCloseable {
+class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseable {
     private Workbook workbook;
     private Sheet sheet;
     private Map<String, Field> hasAnnotationFieldMap = new HashMap<>(16);
@@ -31,8 +31,9 @@ class DefaultExcelReadResolver implements ExcelReaderResolver, AutoCloseable {
     private Map<String, SimpleDateFormat> formatMap;
     private boolean isSave;
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int readLines, String sheetName) {
+    public void read(InputStream inputStream, Class<R> excelClass, Listener<List<R>> listener, int headerIndex, int readLines, String sheetName) {
         this.inputStream = inputStream;
         Excel excel = excelClass.getAnnotation(Excel.class);
         if (excel == null) {
@@ -89,9 +90,9 @@ class DefaultExcelReadResolver implements ExcelReaderResolver, AutoCloseable {
         }
     }
 
-    private void reader(Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int readLines, ReadCallback readCallback) {
-        List<Object> dataList = new ArrayList<>();
-        Object o = null;
+    private void reader(Class<R> excelClass, Listener<List<R>> listener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
+        List<R> dataList = new ArrayList<>();
+        R o = null;
         int realReadLines = readLines + headerIndex;
         for (Row row : sheet) {
             this.isSave = true;
@@ -144,7 +145,7 @@ class DefaultExcelReadResolver implements ExcelReaderResolver, AutoCloseable {
      * @param cell cell
      * @return value
      */
-    private String getValue(Cell cell, Field field, ExcelField excelField, ReadCallback readCallback) {
+    private String getValue(Cell cell, Field field, ExcelField excelField, ReadCallback<R> readCallback) {
         Object value = "";
         switch (cell.getCellType()) {
             case _NONE:
@@ -222,7 +223,7 @@ class DefaultExcelReadResolver implements ExcelReaderResolver, AutoCloseable {
         BeanUtils.setFieldValue(o, field, value);
     }
 
-    private void valid(ExcelField excelField, int rowIndex, int colIndex, ReadCallback readCallback) {
+    private void valid(ExcelField excelField, int rowIndex, int colIndex, ReadCallback<R> readCallback) {
         if (excelField.allowEmpty()) {
             return;
         }

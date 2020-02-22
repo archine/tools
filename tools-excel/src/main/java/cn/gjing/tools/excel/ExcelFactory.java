@@ -56,10 +56,10 @@ public class ExcelFactory {
      *
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity
-     * @param <T>         Entity type
+     * @param <R>         Entity type
      * @return ExcelReader
      */
-    public static <T> ExcelReader<T> createReader(InputStream inputStream, Class<T> excelClass) {
+    public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass) {
         Objects.requireNonNull(excelClass.getAnnotation(Excel.class), "@Excel was not found on the " + excelClass);
         return new ExcelReader<>(excelClass, inputStream);
     }

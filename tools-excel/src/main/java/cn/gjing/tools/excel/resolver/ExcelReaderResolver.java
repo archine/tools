@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author Gjing
  **/
-public interface ExcelReaderResolver {
+public interface ExcelReaderResolver<R> {
 
     /**
      * Read excel
@@ -22,5 +22,5 @@ public interface ExcelReaderResolver {
      * @param readLines   Read how many rows
      * @param sheetName   sheetName
      */
-    void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int readLines, String sheetName);
+    void read(InputStream inputStream, Class<R> excelClass, Listener<List<R>> listener, int headerIndex, int readLines, String sheetName);
 }

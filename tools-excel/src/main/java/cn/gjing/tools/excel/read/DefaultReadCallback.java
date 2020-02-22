@@ -5,5 +5,6 @@ import cn.gjing.tools.excel.ReadCallback;
 /**
  * @author Gjing
  **/
-public class DefaultReadCallback implements ReadCallback {
+public class DefaultReadCallback<R> implements ReadCallback<R> {
+
 }

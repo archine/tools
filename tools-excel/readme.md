@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，项目中可以便捷的进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.2.4</version>
+    <version>1.2.5</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -19,7 +19,7 @@
 |value|Excel导出的文件名，优先级``低``于方法传入|
 |type|Excel导出的文档类型，默认``XLS``|
 |style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
-|readCallback|导入excel的时候的回调|
+|readCallback|Excel导入回调类|
 ### 2、@ExcelField
 **在使用了``@Excel``注解的对象字段上使用，将字段与列表头绑定，以下称为列表头字段。没有使用该注释的字段将不会作为列表头。注解的参数如下**     
 
@@ -208,7 +208,7 @@ public class UserController {
     }
 }
 ```
-**重置当前导出的Excel映射实体，该操作要在每次需要调用``write()``写入之前**
+**重置当前导出的Excel映射实体，该操作要在每次需要调用``write()``之前**
 ```java
 /**
  * @author Gjing
@@ -259,7 +259,7 @@ public class UserController {
     }
 }
 ```
-**很多时候我们数据太多而写在了不同的sheet中，这时可能需要分开读取每个sheet，使用上面的``get()``方法获取导入的结果肯定是不行的，这时可以通过订阅方式获取成功导入后的数据，``read()``方法读取的结果并执行对应的操作**
+**很多时候我们数据太多而写在了不同的sheet中，这时可能需要分开读取每个sheet，使用上面的``get()``方法获取导入的结果肯定是不行的，这时可以通过订阅的方式去订阅导入后得到的数据并做自己的逻辑处理**
 ```java
 /**
  * @author Gjing
@@ -325,14 +325,14 @@ public class UserController {
     }
 }
 ```
-**导入时如果需要每次读取完一行获取到一个对象后做一些自己的处理，比如校验参数是否必填、记录数据等等，可以配置下读取回调**
+**导入时如果需要每次读取完一行获取到一个对象后做一些自己的处理，比如校验参数是否必填、记录数据等等，可以实现``ReadCallback``接口并将自己的逻辑写入到你需要的方法中，该接口支持泛型**
 ```java
 /**
  * 导入时候的回调
  *
  * @author Gjing
  **/
-public class MyReadCallback implements ReadCallback {
+public class MyReadCallback implements ReadCallback<Object> {
     /**
      * 读取完一行时发生的回调
      *
@@ -358,7 +358,7 @@ public class MyReadCallback implements ReadCallback {
     }
 }
 ```
-**在Excel注解上修改默认的回调class**
+**在Excel注解上修改默认的回调接口类**
 ```java
 @Excel(value = "用户列表",readCallback = MyReadCallback.class)
 public class User {
@@ -472,8 +472,7 @@ public class Order {
     private String orderName;
 }
 ```
-**指定序号后按照上一个使用方法在调用的时候通过参数传递，但是在设置参数的时候``key变成了你要关联上级的那个值``，下面演示给两个订单负责人分别增加其拥有的订单，
-``上级的每个值只允许设置一次下级``**
+**指定序号后按照上一个使用方法在调用的时候通过参数传递，但是在设置参数的时候``key变成了你要关联上级的那个值``，下面演示给两个订单负责人分别增加其拥有的订单，``上级的每个值只允许设置一次下级``**
 ```java
 /**
  * @author Gjing
