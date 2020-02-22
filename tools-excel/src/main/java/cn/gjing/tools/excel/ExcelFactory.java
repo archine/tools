@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Excel factory
@@ -16,6 +17,10 @@ import java.util.Objects;
  * @author Gjing
  **/
 public class ExcelFactory {
+
+    private ExcelFactory() {
+
+    }
 
     /**
      * Create an Excel write
@@ -40,9 +45,10 @@ public class ExcelFactory {
      */
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
-        Objects.requireNonNull(excel, "@Excel was not found on the excelClass");
+        Objects.requireNonNull(excel, "@Excel was not found on the " + excelClass);
         List<Field> hasExcelFieldList = BeanUtils.getFields(excelClass, ignores);
-        return new ExcelWriter(fileName == null ? excel.value() : fileName, excel, response, hasExcelFieldList);
+        return new ExcelWriter(fileName == null ? "".equals(excel.value()) ? UUID.randomUUID().toString().replaceAll("-", "") : excel.value() : fileName,
+                excel, response, hasExcelFieldList);
     }
 
     /**
@@ -54,6 +60,7 @@ public class ExcelFactory {
      * @return ExcelReader
      */
     public static <T> ExcelReader<T> createReader(InputStream inputStream, Class<T> excelClass) {
+        Objects.requireNonNull(excelClass.getAnnotation(Excel.class), "@Excel was not found on the " + excelClass);
         return new ExcelReader<>(excelClass, inputStream);
     }
 

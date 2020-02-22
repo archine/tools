@@ -119,6 +119,6 @@ public class BeanUtils {
                 return constant;
             }
         }
-        throw new NullPointerException("No found your enum");
+        throw new NullPointerException("Not found your enum");
     }
 }

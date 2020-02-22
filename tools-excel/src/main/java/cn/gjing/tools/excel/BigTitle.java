@@ -15,10 +15,10 @@ import lombok.*;
 public class BigTitle {
 
     /**
-     * Title last row
+     * How many lines
      */
     @Builder.Default
-    private int lastRow = 2;
+    private int lines = 2;
 
     /**
      * Title content

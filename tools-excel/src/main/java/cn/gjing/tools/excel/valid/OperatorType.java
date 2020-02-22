@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.valid;
 
 /**
  * Operation type
+ *
  * @author Gjing
  **/
 public enum OperatorType {

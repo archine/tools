@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.valid;
 
 /**
  * Check the type
+ *
  * @author Gjing
  **/
 public enum ValidType {

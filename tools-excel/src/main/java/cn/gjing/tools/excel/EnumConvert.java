@@ -5,20 +5,21 @@ package cn.gjing.tools.excel;
  *
  * @author Gjing
  **/
-public interface EnumConvert<T extends Enum<?>, E> {
+public interface EnumConvert<T extends Enum<?>, U> {
     /**
      * Converted to entity enum field
      *
-     * @param e Excel value
-     * @return Entity value
+     * @param u u
+     * @return enum
      */
-    T toEntityAttribute(E e);
+    T toEntityAttribute(U u);
 
     /**
      * Converted to excel value
      *
-     * @param t Entity value
-     * @return E Excel value
+     * @param t t
+     * @return u
      */
-    E toExcelAttribute(T t);
+    U toExcelAttribute(T t);
+
 }

@@ -93,7 +93,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data) {
-        return this.write(data, this.defaultSheet, this.metaStyle, new HashMap<>(16),null);
+        return this.write(data, this.defaultSheet, this.metaStyle, new HashMap<>(1),null);
     }
 
     /**
@@ -162,7 +162,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style) {
-        return this.write(data, sheetName, style, new HashMap<>(16), null);
+        return this.write(data, sheetName, style, new HashMap<>(1), null);
     }
 
     /**
@@ -174,8 +174,8 @@ public class ExcelWriter {
      * @param bigTitle Big title
      * @return this
      */
-    public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style,BigTitle bigTitle) {
-        return this.write(data, sheetName, style, new HashMap<>(16), bigTitle);
+    public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, BigTitle bigTitle) {
+        return this.write(data, sheetName, style, new HashMap<>(1), bigTitle);
     }
 
     /**
@@ -223,7 +223,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, BigTitle bigTitle) {
-        return this.write(data, this.defaultSheet, style, new HashMap<>(16), bigTitle);
+        return this.write(data, this.defaultSheet, style, new HashMap<>(1), bigTitle);
     }
 
     /**

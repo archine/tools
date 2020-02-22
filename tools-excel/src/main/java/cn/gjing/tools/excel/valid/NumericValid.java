@@ -19,7 +19,7 @@ public @interface NumericValid {
      *
      * @return ExcelValidation
      */
-    Class<? extends ExcelValidation> validClass() default DefaultNumericValidation.class;
+    Class<? extends ExcelNumericValidation> validClass() default DefaultNumericValidation.class;
 
     /**
      * Check the number of rows
@@ -75,19 +75,12 @@ public @interface NumericValid {
      *
      * @return title
      */
-    String errorTitle() default "错误提示: ";
+    String errorTitle() default "错误提示";
 
     /**
      * Error content
      *
      * @return content
      */
-    String errorContent() default "无效的文本长度";
-
-    /**
-     * Whether it pops up immediately
-     *
-     * @return boolean
-     */
-    boolean showPromptBox() default true;
+    String errorContent() default "请输入正确的文本长度";
 }

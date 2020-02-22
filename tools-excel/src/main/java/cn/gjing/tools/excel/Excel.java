@@ -1,12 +1,11 @@
 package cn.gjing.tools.excel;
 
+import cn.gjing.tools.excel.read.DefaultReadCallback;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import static cn.gjing.tools.excel.Type.XLS;
-
 /**
  * Excel mapped entity annotation
  *
@@ -27,7 +26,7 @@ public @interface Excel {
      *
      * @return Type
      */
-    Type type() default XLS;
+    Type type() default Type.XLS;
 
     /**
      * Excel style
@@ -35,4 +34,10 @@ public @interface Excel {
      * @return ExcelStyle
      */
     Class<? extends ExcelStyle> style() default DefaultExcelStyle.class;
+
+    /**
+     * Read each line for a callback
+     * @return CallBacker
+     */
+    Class<? extends ReadCallback> readCallback() default DefaultReadCallback.class;
 }

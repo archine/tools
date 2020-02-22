@@ -1,11 +1,8 @@
 package cn.gjing.tools.excel.read;
 
-
 import cn.gjing.tools.excel.Listener;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,7 @@ public class ExcelReader<T> {
     private List<T> data;
     private InputStream inputStream;
     private int headerIndex;
-    private int endIndex;
+    private int readLines;
 
     private ExcelReader() {
 
@@ -31,8 +28,8 @@ public class ExcelReader<T> {
     public ExcelReader(Class<T> excelClass, InputStream inputStream) {
         this.excelClass = excelClass;
         this.inputStream = inputStream;
-        try (final DefaultExcelReadResolver defaultExcelReadResolver = new DefaultExcelReadResolver()) {
-            this.readerResolver = defaultExcelReadResolver;
+        try (final DefaultExcelReadResolver excelReadResolver = new DefaultExcelReadResolver()) {
+            this.readerResolver = excelReadResolver;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,7 +42,7 @@ public class ExcelReader<T> {
      */
     private void init() {
         this.headerIndex = 0;
-        this.endIndex = 0;
+        this.readLines = 0;
     }
 
     /**
@@ -55,7 +52,7 @@ public class ExcelReader<T> {
      */
     @SuppressWarnings("unchecked")
     public ExcelReader<T> read() {
-        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = (List<T>) listener, this.headerIndex, this.endIndex, "sheet1");
+        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = (List<T>) listener, this.headerIndex, this.readLines, "sheet1");
         this.init();
         return this;
     }
@@ -68,7 +65,7 @@ public class ExcelReader<T> {
      */
     @SuppressWarnings("unchecked")
     public ExcelReader<T> read(String sheetName) {
-        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = (List<T>) listener, this.headerIndex, this.endIndex, sheetName);
+        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = (List<T>) listener, this.headerIndex, this.readLines, sheetName);
         this.init();
         return this;
     }
@@ -85,24 +82,24 @@ public class ExcelReader<T> {
     }
 
     /**
-     * Excel header index
+     * Excel header starter index
      *
      * @param index List header, which is the number to the left of the excel file list header
      * @return this
      */
     public ExcelReader<T> headerIndex(int index) {
-        this.headerIndex = index - 1;
+        this.headerIndex = index;
         return this;
     }
 
     /**
-     * Read the cutoff index
+     * Read how many rows
      *
-     * @param index cutoff index
+     * @param lines Number of lines read
      * @return this
      */
-    public ExcelReader<T> endIndex(int index) {
-        this.endIndex = index;
+    public ExcelReader<T> readLines(int lines) {
+        this.readLines = lines;
         return this;
     }
 
@@ -121,7 +118,7 @@ public class ExcelReader<T> {
      * @param resultListener Result listener
      * @return this
      */
-    public ExcelReader<T> listener(Listener<List<T>> resultListener) {
+    public ExcelReader<T> subscribe(Listener<List<T>> resultListener) {
         resultListener.notify(this.data);
         return this;
     }

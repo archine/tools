@@ -19,7 +19,7 @@ public @interface ExplicitValid {
      *
      * @return ExcelValidation
      */
-    Class<? extends ExcelValidation> validClass() default DefaultExplicitValidation.class;
+    Class<? extends ExcelExplicitValidation> validClass() default DefaultExplicitValidation.class;
 
     /**
      * The value in the drop-down box
@@ -50,24 +50,22 @@ public @interface ExplicitValid {
     Rank rank() default Rank.STOP;
 
     /**
+     * Number of parent cell index
+     * @return link
+     */
+    String link() default "";
+
+    /**
      * Error box title
      *
      * @return title
      */
-    String errorTitle() default "错误提示：";
+    String errorTitle() default "错误提示";
 
     /**
      * Error content
      *
      * @return content
      */
-    String errorContent() default "请选择下拉框中的内容";
-
-    /**
-     * Whether it pops up immediately
-     *
-     * @return boolean
-     */
-    boolean showPromptBox() default true;
-
+    String errorContent() default "请选择下拉框内的值";
 }

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，项目中可以便捷的进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -19,6 +19,7 @@
 |value|Excel导出的文件名，优先级``低``于方法传入|
 |type|Excel导出的文档类型，默认``XLS``|
 |style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
+|readCallback|导入excel的时候的回调|
 ### 2、@ExcelField
 **在使用了``@Excel``注解的对象字段上使用，将字段与列表头绑定，以下称为列表头字段。没有使用该注释的字段将不会作为列表头。注解的参数如下**     
 
@@ -35,7 +36,7 @@
 |sum|是否需要统计，默认``false``。可以通过``format``设置保存的数字格式，默认保存``整数``，需要统计的字段``不要出现在第一列``|
 |sort|列表头排序，序号``越小越靠前``，当序号相同时会默认按实体类的字段顺序进行排序|
 ### 3、@DateValid
-**对该列表头下方的单元格加入时间校验，使用在列表头字段，``XLSX``类型文档不支持，``只在导出模板时有效``，注解参数如下**     
+**对该列表头下方的单元格加入时间校验，使用在列表头字段，``只在导出模板时有效``，注解参数如下**     
 
 |参数|描述|
 |---|---|
@@ -46,7 +47,6 @@
 |expr1|表达式1，默认``1970-01-01``|
 |expr2|表达式2，默认``2999-01-01``|
 |showErrorBox|是否弹出错误框，默认``true``|
-|showPromptBox|是否立即弹出，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
@@ -59,8 +59,8 @@
 |combobox|下拉框中的内容，可在注解直接配置也可以在方法中设置，``方法设置优先级高于此处配置``|
 |boxLastRow|加入多少行，默认只给正文第一行加入|
 |showErrorBox|是否弹出错误框，默认``true``|
-|showPromptBox|是否立即弹出，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
+|link|指定该列表头的上级单元格序号, 一般为你``指定列表头的序号-1``，比如上级是第一个单元格，那么link就是``0``|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
 #### 5、@NumericValid
@@ -75,7 +75,6 @@
 |expr1|表达式1，在表达式2前面，默认``0``|
 |expr2|表达式2，在操作类型为``BETWEEN``和``NOT_BETWEEN``情况下必填|
 |showErrorBox|是否弹出错误框，默认``true``|
-|showPromptBox|是否立即弹出，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
@@ -95,7 +94,7 @@ public class User {
     @ExcelField("用户Id")
     private Long id;
 
-    @ExcelField("用户名")
+    @ExcelField(value = "用户名", sort = 1)
     private String userName;
 
     @ExcelField(value = "性别", autoMerge= true)
@@ -118,9 +117,9 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse response) {
+    public void exportUser(HttpServletResponse resultVO) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, response)
+        ExcelFactory.createWriter(User.class, resultVO)
                 .write(users)
                 .flush();
     }
@@ -138,9 +137,9 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse response) {
+    public void exportUser(HttpServletResponse resultVO) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, response,"id","createTime")
+        ExcelFactory.createWriter(User.class, resultVO,"id","createTime")
                 .write(users)
                 .flush();
     }
@@ -158,9 +157,9 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse response) {
+    public void exportUser(HttpServletResponse resultVO) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, response)
+        ExcelFactory.createWriter(User.class, resultVO)
                 .write(users,"用户sheet")
                 .flush();
     }
@@ -178,10 +177,10 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse response) {
+    public void exportUser(HttpServletResponse resultVO) {
         List<User> users = userService.userList();
         List<User> users2 = userService.userList();
-        ExcelFactory.createWriter(User.class, response)
+        ExcelFactory.createWriter(User.class, resultVO)
                 .write(users)
                 .write(users2,"sheet2")
                 .flush();   
@@ -200,9 +199,9 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse response) {
+    public void exportUser(HttpServletResponse resultVO) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, response)
+        ExcelFactory.createWriter(User.class, resultVO)
                 //指定大标题占用的行数和内容
                 .write(users,new BigTitle(3,"我是大标题"))
                 .flush();
@@ -223,10 +222,10 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse response) {
+    public void exportUser(HttpServletResponse resultVO) {
         List<User> users = userService.userList();
         List<Order> orderList = orderService.orderList();
-        ExcelFactory.createWriter(User.class, response)
+        ExcelFactory.createWriter(User.class, resultVO)
                 .write(users)
                 //重置，如果要忽略某些字段不导出，在该方法 ignores 参数指定即可
                 //注意点和上文介绍的导出一致
@@ -246,7 +245,7 @@ public class UserController {
 @RestController
 public class UserController {
     @Resource
-    private UserService userSerivce;
+    private UserService userService;
 
     @PostMapping("/user_import")
     @ApiOperation("导入")
@@ -260,7 +259,7 @@ public class UserController {
     }
 }
 ```
-**很多时候我们数据太多而写在了不同的sheet中，这时可能需要分开读取每个sheet，使用上面的``get()``方法获取导入的结果肯定是不行的，这时可以通过创建监听者去监听每次调用``read()``方法读取的结果并执行对应的操作**
+**很多时候我们数据太多而写在了不同的sheet中，这时可能需要分开读取每个sheet，使用上面的``get()``方法获取导入的结果肯定是不行的，这时可以通过订阅方式获取成功导入后的数据，``read()``方法读取的结果并执行对应的操作**
 ```java
 /**
  * @author Gjing
@@ -275,14 +274,14 @@ public class UserController {
     public ResponseEntity userImport(MultipartFile file) throws IOException {
         ExcelFactory.createReader(file.getInputStream(), User.class)
                 .read()
-                .listener(e -> userService.saveUserList(e))
+                .subscribe(e -> userService.saveUserList(e))
                 .read("sheet2")
-                .listener(e -> userService.saveUserList(e));
+                .subscribe(e -> userService.saveUserList(e));
         return ResponseEntity.ok("导入成功");
     }
 }
 ```
-**导入的Excel存在大标题的话，需要指定列表头开始的下标，对应Excel列表头那一行``左边的数字序号``或者是导出该对应模板你设置的``大标题行数+1``，要在调用``read()``读取前设置**
+**导入的Excel存在大标题的话，需要指定列表头开始的下标，下标你为你导出这个模板时设置的大标题的行数，该操作要在调用``read()``读取前设置**
 ```java
 /**
  * @author Gjing
@@ -304,7 +303,7 @@ public class UserController {
     }
 }
 ```
-**限制读取行数，该行数为你要截止读取到Excel文件的哪一行(包括本行)，该操作要在调用``read()``读取前进行设置**
+**设置你要读取多少行数据，该操作要在调用``read()``读取前进行设置**
 ```java
 /**
  * @author Gjing
@@ -318,12 +317,53 @@ public class UserController {
     @ApiOperation("导入")
     public ResponseEntity userImport(MultipartFile file) throws IOException {
         List<User> users = ExcelFactory.createReader(file.getInputStream(), User.class)
-                .endIndex(5)
+                .readLines(5)
                 .read()
                 .get();
         userService.saveUserList(users);
         return ResponseEntity.ok("导入成功");
     }
+}
+```
+**导入时如果需要每次读取完一行获取到一个对象后做一些自己的处理，比如校验参数是否必填、记录数据等等，可以配置下读取回调**
+```java
+/**
+ * 导入时候的回调
+ *
+ * @author Gjing
+ **/
+public class MyReadCallback implements ReadCallback {
+    /**
+     * 读取完一行时发生的回调
+     *
+     * @param value    这一行读完得到的对象
+     * @param rowIndex 这行的下标，下标是从0开始的
+     * @return Object 将该value原样返回
+     */
+    @Override
+    public Object readLine(Object value, int rowIndex) {
+        System.out.println("当前这行的对象：" + value.toString());
+        return value;
+    }
+
+    /**
+     * 当读取到某个列表头下的单元格是空的时候，同时该列表头设置了不允许为空，会产生该回调
+     *
+     * @param rowIndex 当前单元格所在的行数下标，下标是从0开始的
+     * @param colIndex 当前单元格所在的列数，下标是从0开始的
+     */
+    @Override
+    public void readJump(int rowIndex, int colIndex) {
+        System.out.println("当前错误的是第：" + (rowIndex + 1) + "行，第: " + (colIndex + 1) + "列");
+    }
+}
+```
+**在Excel注解上修改默认的回调class**
+```java
+@Excel(value = "用户列表",readCallback = MyReadCallback.class)
+public class User {
+    @ExcelField(value = "用户名", sort = 1)
+    private String userName;
 }
 ```
 ### 4、枚举转换器
@@ -386,55 +426,93 @@ public class User {
     private GenderEnum genderEnum;
 }
 ```
-### 5、数据校验
-**在导出模板时，有时候需要让用户填写指定规则的内容，这时可以进行数据格式校验**
+### 5、加入下拉框
+**在实体属性直接通过注解的``combobox``指定下拉框中的内容**
 ```java
 @Excel("用户列表")
 public class User {
-    @ExcelField("用户Id")
-    private Long id;
-
-    @ExcelField("用户名")
-    //在当前列表头下方的十行单元格进行数据校验，必须输入长度大于等于3的文本
-    @NumericValid(validationType = TEXT_LENGTH, expr1 = "3", operatorType = GREATER_OR_EQUAL,boxLastRow = 10)
-    private String userName;
 
     @ExcelField("性别")
-    //指定该列表头下的第一行单元格只能选取这两个值
     @ExplicitValid(combobox = {"男","女"})
     @ExcelEnumConvert(convert = GenderEnum.MyExcelEnumConvert.class)
     private GenderEnum genderEnum;
-
-    @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
-    //在当前列表头下方的第一行单元格中，时间只能输入在2019-10-11至2019-10-13范围的时间
-    @DateValid(expr1 = "2019-10-11",expr2 = "2019-10-13")
-    private Date createTime;
 }
 ```
-**如果下拉框的值不是固定的，比如要通过数据库查询或者其他方式，这时候你可以通过方法的``explicitValues``参数进行设置，该参数是map类型，key为列表头字段名，value为下拉框的内容。下面演示了为列表头字段加入下拉框内容**
+**也可以在调用时通过方法的``explicitValues``参数进行设置，该参数为map类型，key为列表头字段名，value为下拉框的内容。下面演示了为列表头字段加入下拉框内容**
 ```java
 /**
  * @author Gjing
  **/
 @RestController
 public class UserController {
-    @Resource
-    private UserService userService;
 
     @GetMapping("/user_empty")
     @ApiOperation(value = "导出用户模板")
-    public void exportUserEmpty(HttpServletResponse response) {
-        String[] arr = new String[20];
-        for (int i = 0; i < 20; i++) {
-            arr[i] = "啦啦:" + i;
-        }
-        //构建下拉框内容，key为实体类对应标有@ExplicitValid注解的字段名称，value为下拉框内的值
+    public void exportUserEmpty(HttpServletResponse resultVO) {
+        String[] arr = new String[]{"男","女"};
         Map<String, String[]> map = new HashMap<>(16);
         map.put("genderEnum", arr);
-        ExcelFactory.createWriter(User.class, response)
+        ExcelFactory.createWriter(User.class, resultVO)
                 .write(null, map)
                 .flush();
     }
+}
+```
+**支持设置带级联关系的下拉框，需要在实体属性中通过``link``参数指定父级的``列表头序号-1``，比如父级是第一个单元格，那么link填的序号为``0``**     
+```java
+@Excel("订单列表")
+public class Order {
+
+    @ExplicitValid(combobox = {"小红","小花"},boxLastRow = 10)
+    @ExcelField(value = "订单负责人", sort = 1)
+    private String orderUser;
+
+    @ExplicitValid(link = "0")//指定父级为第一个单元格，也就是orderUser
+    @ExcelField(value = "订单名称", sort = 2)
+    private String orderName;
+}
+```
+**指定序号后按照上一个使用方法在调用的时候通过参数传递，但是在设置参数的时候``key变成了你要关联上级的那个值``，下面演示给两个订单负责人分别增加其拥有的订单，
+``上级的每个值只允许设置一次下级``**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class UserController {
+
+    @GetMapping("/order_template")
+    @ApiOperation("导出级联模板")
+    public void orderImportTemplate(HttpServletResponse response) {
+        Map<String, String[]> sonMap = new HashMap<>(16);
+        sonMap.put("小红", new String[]{"订单1", "订单2"});
+        sonMap.put("小花", new String[]{"订单3", "订单4"});
+        ExcelFactory.createWriter(Order.class, response)
+                .write(null, sonMap)
+                .flush();
+    }
+}
+```
+### 6、时间类型的校验
+**该注解默认采取的方式是设置时间范围，你也可以通过``operatorType``去修改，``expr2``只在操作类型为``between``或者``NotBetween``时需要设置，对于其他操作类型设置``expr1``即可**
+```java
+@Excel("用户列表")
+public class User {
+
+    @ExcelField(value = "创建时间", pattern = "yyyy-MM-dd")
+    @DateValid(boxLastRow = 10, expr1 = "2019-10-11", expr2 = "2019-10-13")
+    private Date createTime;
+}
+```
+### 7、值类型校验
+**对单元格进行值类型校验，下面演示了限制输入用户名的长度不能超过2位，对于其他判断方式可自行查看参数**
+```java
+@Excel("用户列表")
+public class User {
+
+    @ExcelField(value = "用户名",autoMerge = true,sort = 1)
+    @NumericValid(boxLastRow = 10,expr1 = "2")
+    private String userName;
 }
 ```
 ## 四、拓展
@@ -485,35 +563,25 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse response) {
+    public void exportUser(HttpServletResponse resultVO) {
         List<User> users = userService.userList(0);
-        ExcelFactory.createWriter(User.class, response)
+        ExcelFactory.createWriter(User.class, resultVO)
                 .write(users, MyExcelStyle::new)
                 .flush();
     }
 }
 ```
 ### 2、自定义校验注解的逻辑
-**通过上文的介绍，知道一共有三种校验的注解，这三个注解分别都可以自定义实现逻辑，实现``ExcelValidation``接口，并选择你需要自定义哪些注解的逻辑**
+**自定义校验注解的处理逻辑，可以实现``ExcelDateValidation``、``ExcelNumericValidation``、``ExcelExplicitValidation``接口，下面举例实现``ExcelExplicitValidation``接口**
 ```java
 /**
- * 自己实现校验逻辑
  * @author Gjing
  **/
-public class MyValid implements ExcelValidation {
+public class MyValid implements ExcelExplicitValidation {
     @Override
-    public void valid(DateValid dateValid, Sheet sheet, int firstRow, int firstCol, int lastCol) {
-
-    }
-
-    @Override
-    public void valid(NumericValid numericValid, Sheet sheet, int firstRow, int firstCol, int lastCol) {
-
-    }
-
-    @Override
-    public void valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int firstCol, int lastCol, int validIndex, String[] values) {
-        
+    public boolean valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, 
+        String fieldName, Map<String, String[]> values) {
+        return locked;
     }
 }
 ```
@@ -566,8 +634,8 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "使用自定义的导出处理器导出用户模板")
-    public void exportUser(HttpServletResponse response) {
-        ExcelFactory.createWriter(User.class, response)
+    public void exportUser(HttpServletResponse resultVO) {
+        ExcelFactory.createWriter(User.class, resultVO)
                 //重置处理器
                 .resetResolver(MyWriteResolver::new)
                 .write(null)
@@ -584,7 +652,7 @@ public class UserController {
  **/
 public class MyReaderResolver implements ExcelReaderResolver {
     @Override
-    public void read(InputStream inputStream, Class<?> aClass, Listener<List<Object>> listener, int i, int i1, String s) {
+    public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener,int headerIndex, int readLines, String sheetName) {
 
     }
 }
@@ -606,7 +674,7 @@ public class UserController {
         ExcelFactory.createReader(file.getInputStream(), User.class)
                 .resetResolver(MyReaderResolver::new)
                 .read()
-                .listener(e -> userService.saveUserList(e));
+                .subscribe(e -> userService.saveUserList(e));
         return ResponseEntity.ok("导入成功");
     }
 }

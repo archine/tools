@@ -1,7 +1,6 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.MetaObject;
-import cn.gjing.tools.excel.Type;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -17,7 +16,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 /**
- * XLSX处理器
+ * XLSX resolver
  *
  * @author Gjing
  **/
@@ -35,7 +34,7 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
             sheet = this.workbook.createSheet(sheetName);
         }
         if (excelHelper == null) {
-            this.excelHelper = new ExcelHelper(this.workbook, Type.XLSX);
+            this.excelHelper = new ExcelHelper(this.workbook);
         }
         int offset = this.excelHelper.setBigTitle(headFieldList, metaObject, sheet);
         this.excelHelper.setVal(data, headFieldList, sheet, changed, offset, metaObject);

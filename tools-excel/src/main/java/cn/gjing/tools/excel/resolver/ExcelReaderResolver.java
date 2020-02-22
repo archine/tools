@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel.resolver;
 
-
 import cn.gjing.tools.excel.Listener;
 
 import java.io.InputStream;
@@ -20,8 +19,8 @@ public interface ExcelReaderResolver {
      * @param excelClass  Excel mapped entity
      * @param listener    Result listener
      * @param headerIndex Excel header index
-     * @param endIndex    Read the cutoff index
+     * @param readLines   Read how many rows
      * @param sheetName   sheetName
      */
-    void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int endIndex, String sheetName);
+    void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener, int headerIndex, int readLines, String sheetName);
 }

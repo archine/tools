@@ -1,5 +1,7 @@
 package cn.gjing.tools.common.valid;
 
+import cn.gjing.tools.common.util.FileUtils;
+
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -19,7 +21,7 @@ class ToolsParamValidationServletRequest extends HttpServletRequestWrapper {
         super(request);
         this.request = request;
         this.map = request.getParameterMap();
-        this.body = this.readBytes(request.getInputStream());
+        this.body = FileUtils.readInputStream(request.getInputStream());
     }
 
     @Override
@@ -46,15 +48,5 @@ class ToolsParamValidationServletRequest extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String name) {
         return this.request.getParameter(name);
-    }
-
-    private byte[] readBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int length;
-        byte[] bytes = new byte[1024];
-        while ((length = inputStream.read(bytes)) != -1) {
-            byteArrayOutputStream.write(bytes, 0, length);
-        }
-        return byteArrayOutputStream.toByteArray();
     }
 }

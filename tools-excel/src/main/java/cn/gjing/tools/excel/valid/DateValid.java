@@ -19,7 +19,7 @@ public @interface DateValid {
      *
      * @return ExcelValidation
      */
-    Class<? extends ExcelValidation> validClass() default DefaultDateValidation.class;
+    Class<? extends ExcelDateValidation> validClass() default DefaultDateValidation.class;
 
     /**
      * Check the number of rows
@@ -68,26 +68,19 @@ public @interface DateValid {
      *
      * @return level
      */
-    Rank rank() default Rank.WARNING;
+    Rank rank() default Rank.STOP;
 
     /**
      * Error box title
      *
      * @return title
      */
-    String errorTitle() default "错误提示: ";
+    String errorTitle() default "错误提示";
 
     /**
      * Error content
      *
      * @return content
      */
-    String errorContent() default "请输入正确的时间范围及格式：1970-01-01至2999-01-01";
-
-    /**
-     * Whether it pops up immediately
-     *
-     * @return boolean
-     */
-    boolean showPromptBox() default true;
+    String errorContent() default "请输入1970-01-01到2999-01-01范围内的时间";
 }

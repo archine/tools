@@ -15,7 +15,7 @@ public @interface Sum {
      * Numeric format
      * @return format
      */
-    String format() default "#,#0";
+    String format() default "0";
 
     /**
      * Open the sum

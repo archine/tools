@@ -2,13 +2,14 @@ package cn.gjing.tools.excel.valid;
 
 /**
  * Tip grade
+ *
  * @author Gjing
  **/
 public enum Rank {
     /**
      * Tip grade
      */
-    WARNING(1),STOP(0),INFO(2);
+    WARNING(1), STOP(0), INFO(2);
     private int rank;
 
     Rank(int type) {
