@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>1.9.0</version>
+        <version>1.9.2</version>
     </parent>
     <artifactId>tools-common</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
     <name>tools-common</name>
     <description>Java开发常用基础工具包</description>
 
@@ -63,12 +63,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.10</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.30</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

@@ -17,7 +17,7 @@ class ToolsParamValidationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (MediaType.APPLICATION_JSON_VALUE.equals(servletRequest.getContentType())) {
+        if (servletRequest.getContentType() != null && servletRequest.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE)) {
             HttpServletRequest request = (HttpServletRequest) servletRequest;
             filterChain.doFilter(new ToolsParamValidationServletRequest(request), servletResponse);
         } else {
