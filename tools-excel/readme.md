@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，项目中可以便捷的进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -281,7 +281,7 @@ public class UserController {
     }
 }
 ```
-**导入的Excel存在大标题的话，需要指定列表头开始的下标，下标你为你导出这个模板时设置的大标题的行数，该操作要在调用``read()``读取前设置**
+**导入的Excel存在大标题的话，需要指定列表头开始的下标，下标你为你导出这个模板时设置的``大标题的行数``，该操作要在调用``read()``读取前设置**
 ```java
 /**
  * @author Gjing
@@ -325,7 +325,7 @@ public class UserController {
     }
 }
 ```
-**导入时如果需要每次读取完一行获取到一个对象后做一些自己的处理，比如校验参数是否必填、记录数据等等，可以实现``ReadCallback``接口并将自己的逻辑写入到你需要的方法中，该接口支持泛型**
+**配置导入回调，该回调会在每次读取完一行或者读取到您设置不允许为空的情况下发生，您可以通过回调进行参数校验、异常数据记录等等，可以实现``ReadCallback``接口并重写自己需要的回调，该接口支持泛型**
 ```java
 /**
  * 导入时候的回调
@@ -348,12 +348,13 @@ public class MyReadCallback implements ReadCallback<Object> {
 
     /**
      * 当读取到某个列表头下的单元格是空的时候，同时该列表头设置了不允许为空，会产生该回调
-     *
+     * @param field 当前为空的字段
+     * @param excelField 该字段上的@ExcelField注解
      * @param rowIndex 当前单元格所在的行数下标，下标是从0开始的
      * @param colIndex 当前单元格所在的列数，下标是从0开始的
      */
     @Override
-    public void readJump(int rowIndex, int colIndex) {
+    public void readJump(Field field, ExcelField excelField, int rowIndex, int colIndex) {
         System.out.println("当前错误的是第：" + (rowIndex + 1) + "行，第: " + (colIndex + 1) + "列");
     }
 }

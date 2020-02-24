@@ -129,7 +129,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                         this.setValue(o, field, value);
                     }
                 } else {
-                    this.valid(excelField, row.getRowNum(), c, readCallback);
+                    this.valid(field, excelField, row.getRowNum(), c, readCallback);
                 }
             }
             if (this.isSave) {
@@ -151,7 +151,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             case _NONE:
             case BLANK:
             case ERROR:
-                this.valid(excelField, cell.getRowIndex(), cell.getColumnIndex(), readCallback);
+                this.valid(field, excelField, cell.getRowIndex(), cell.getColumnIndex(), readCallback);
                 break;
             case BOOLEAN:
                 value = cell.getBooleanCellValue();
@@ -223,14 +223,14 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         BeanUtils.setFieldValue(o, field, value);
     }
 
-    private void valid(ExcelField excelField, int rowIndex, int colIndex, ReadCallback<R> readCallback) {
+    private void valid(Field field, ExcelField excelField, int rowIndex, int colIndex, ReadCallback<R> readCallback) {
         if (excelField.allowEmpty()) {
             return;
         }
         switch (excelField.strategy()) {
             case JUMP:
                 this.isSave = false;
-                readCallback.readJump(rowIndex, colIndex);
+                readCallback.readJump(field, excelField, rowIndex, colIndex);
                 break;
             case ERROR:
                 throw new NullPointerException(excelField.message());
