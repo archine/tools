@@ -103,7 +103,6 @@ class ExcelHelper {
             for (int j = 0, headSize = headFieldList.size(); j < headSize; j++) {
                 Field field = headFieldList.get(j);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
-                field.setAccessible(true);
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(j);
                 if (i == 0) {

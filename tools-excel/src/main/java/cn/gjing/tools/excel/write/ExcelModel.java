@@ -11,6 +11,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 class ExcelModel {
+    /**
+     * The last cell value
+     */
     private Object oldValue;
+    /**
+     * The last row index
+     */
     private int rowIndex;
 }

@@ -46,7 +46,7 @@ public class ExcelFactory {
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         Objects.requireNonNull(excel, "@Excel was not found on the " + excelClass);
-        List<Field> hasExcelFieldList = BeanUtils.getFields(excelClass, ignores);
+        List<Field> hasExcelFieldList = BeanUtils.getExcelFields(excelClass, ignores);
         return new ExcelWriter(fileName == null ? "".equals(excel.value()) ? UUID.randomUUID().toString().replaceAll("-", "") : excel.value() : fileName,
                 excel, response, hasExcelFieldList);
     }

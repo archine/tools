@@ -60,7 +60,7 @@ public class ExcelWriter {
                 }
                 break;
             case XLSX:
-                this.workbook = new SXSSFWorkbook();
+                this.workbook = new SXSSFWorkbook(excel.maxSize());
                 try (final ExcelWriteXLSXResolver xlsxResolver = new ExcelWriteXLSXResolver()) {
                     this.writerResolver = xlsxResolver;
                 } catch (Exception e) {
@@ -309,7 +309,7 @@ public class ExcelWriter {
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        this.headFieldList = BeanUtils.getFields(excelClass, ignores);
+        this.headFieldList = BeanUtils.getExcelFields(excelClass, ignores);
         this.changed = true;
         return this;
     }
@@ -319,6 +319,9 @@ public class ExcelWriter {
      */
     public void flush() {
         this.writerResolver.flush(this.response, this.fileName);
+        if (this.workbook instanceof SXSSFWorkbook) {
+            ((SXSSFWorkbook) this.workbook).dispose();
+        }
     }
 
     /**

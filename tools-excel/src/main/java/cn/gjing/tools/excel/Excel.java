@@ -1,11 +1,15 @@
 package cn.gjing.tools.excel;
 
+
 import cn.gjing.tools.excel.read.DefaultReadCallback;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static cn.gjing.tools.excel.Type.XLS;
+
 /**
  * Excel mapped entity annotation
  *
@@ -26,7 +30,19 @@ public @interface Excel {
      *
      * @return Type
      */
-    Type type() default Type.XLS;
+    Type type() default XLS;
+
+    /**
+     * The number of rows cached in memory
+     * @return 1000
+     */
+    int maxSize() default 1000;
+
+    /**
+     * The byte size cached to memory
+     * @return 10240
+     */
+    int bufferSize() default 10240;
 
     /**
      * Excel style

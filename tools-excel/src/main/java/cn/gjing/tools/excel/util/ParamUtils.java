@@ -18,6 +18,9 @@ public class ParamUtils {
      * @return boolean
      */
     public static boolean noContains(String[] arr, String val) {
+        if (arr == null || arr.length == 0) {
+            return true;
+        }
         for (String o : arr) {
             if (o.equals(val)) {
                 return false;

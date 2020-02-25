@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.2.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **采用注解方式的导入导出，项目中可以便捷的进行使用**
@@ -7,41 +7,43 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
 </dependency>
 ```
 ## 二、注解说明
 ### 1、@Excel
-**实体上使用，声明Excel与该实体存在映射，注解参数如下**     
+**在实体对象上使用，声明这是一个Excel实体，注解参数如下**     
 
 |参数|描述|
 |---|---|
 |value|Excel导出的文件名，优先级``低``于方法传入|
 |type|Excel导出的文档类型，默认``XLS``|
+|maxSize|当文档类型为``XLSX``时，保留在内存中的条数，超出会将其写入到本地|
+|bufferSize|当文档类型为``XLSX``时，允许在内存中保存的字节|
 |style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
-|readCallback|Excel导入回调类|
+|readCallback|Excel导入时的回调类|
 ### 2、@ExcelField
-**在使用了``@Excel``注解的对象字段上使用，将字段与列表头绑定，以下称为列表头字段。没有使用该注释的字段将不会作为列表头。注解的参数如下**     
+**在实体的字段上使用，该注解会将当前字段映射为Excel的列表头，``下文简称列表头``。没有使用该注释的字段将不会作为列表头出现在Excel中。注解的参数如下**     
 
 |参数|描述|
 |---|---|
 |value|列表头名称, ``必填``|
-|pattern|列表头字段属于时间类型且需要在导出的时候格式化的时候配置|
-|width|该列表头对应整列的单元格宽度，默认``5120``|
-|autoMerge|是否自动纵向合并多行相同的数据，默认``false``|
-|style|设置当前列表头样式，``优先级高于全局配置``|
-|allowEmpty|是否允许空值，默认``true``|
-|strategy|值为空时候的策略，策略有：``jump``(跳过当前这条数据)、``error``(抛出异常)|
-|message|执行``策略为error``的时候抛出的异常信息|
-|sum|是否需要统计，默认``false``。可以通过``format``设置保存的数字格式，默认保存``整数``，需要统计的字段``不要出现在第一列``|
-|sort|列表头排序，序号``越小越靠前``，当序号相同时会默认按实体类的字段顺序进行排序|
+|pattern|当前列表头属于时间类型且需要在导出的时候格式化的时候配置|
+|width|当前列表头所在列的整列单元格宽度，默认``5120``|
+|autoMerge|当前列表头所在列是否需要自动纵向合并相邻且值相同的单元格，默认``false``|
+|style|当前列表头的样式，``优先级高于全局配置``|
+|allowEmpty|当前列表头下的单元格是否允许空值，默认``true``|
+|strategy|导入时当前列表头下方单元格值为空时所执行的策略，策略有：``jump``(跳过当前这条数据，该策略会发起回调)、``error``(抛出异常，``本次导入终止``)|
+|message|执行策略为``error``的时候抛出的异常信息|
+|sort|当前单元格出现在Excel文件中的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
+|sum|当前列表头导出时整列是否需要求和，默认``false``。可以通过``format``设置保存的数字格式，默认保存``整数``，要统计的列表头``不要出现在第一列``|
 ### 3、@DateValid
-**对该列表头下方的单元格加入时间校验，使用在列表头字段，``只在导出模板时有效``，注解参数如下**     
+**列表头上使用，使用后会在导出模板时对该列表头下方的单元格加上时间校验，注解参数如下**     
 
 |参数|描述|
 |---|---|
-|validClass|校验器Class|
-|boxLastRow|加入多少行，默认只给正文第一行加入|
+|validClass|校验器|
+|boxLastRow|需要给多少行单元格加上校验，默认只加在第一行单元格|
 |pattern|校验的时间格式，默认``yyyy-MM-dd``|
 |operatorType|操作类型，默认``OperatorType.BETWEEN``|
 |expr1|表达式1，默认``1970-01-01``|
@@ -51,25 +53,25 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 ### 4、@ExplicitValid
-**对该列表头下方的单元格加入下拉框，使用在列表头字段，``只在导出模板时有效``，注解参数如下**     
+**列表头上使用，使用后会在导出模板时对该列表头下方的单元格增加下拉框，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
-|validClass|校验器Class|
-|combobox|下拉框中的内容，可在注解直接配置也可以在方法中设置，``方法设置优先级高于此处配置``|
-|boxLastRow|加入多少行，默认只给正文第一行加入|
+|validClass|校验器|
+|combobox|下拉框中的内容，``方法设置优先级高于注解配置``|
+|boxLastRow|需要给多少行单元格加上下拉框，默认只加在第一行单元格|
 |showErrorBox|是否弹出错误框，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
-|link|指定该列表头的上级单元格序号, 一般为你``指定列表头的序号-1``，比如上级是第一个单元格，那么link就是``0``|
+|link|指定当前列表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
 #### 5、@NumericValid
-**对该列表头下方的单元格加入数据类型校验，使用在列表头字段，可对文本长度、数字大小进行校验``只在导出模板时有效``，注解参数如下**     
+**列表头使用，会在导出模板时对该列表头下方的单元格加入文本长度、数字大小校验，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
 |validClass|校验器Class|
-|boxLastRow|加入多少行，默认只给正文第一行加入|
+|boxLastRow|需要给多少行单元格加上校验，默认只加在第一行单元格|
 |operatorType|操作类型，默认``OperatorType.LESS_OR_EQUAL``|
 |validType|校验类型，默认``ValidType.TEXT_LENGTH``|
 |expr1|表达式1，在表达式2前面，默认``0``|
@@ -79,13 +81,13 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 #### 6、@ExcelEnumConvert
-**枚举转换器，使用在枚举类型的列表头字段，导入导出时未检测到转换器会报错，注解参数如下**     
+**枚举转换器，在字段类型为枚举时需要配置，否则在导入导出时未检测到转换器会抛出未找到转换器异常，注解参数如下**     
 
 |参数|描述|
 |---|---|
-|convert|实现了``EnumConvert``接口的Class|
-## 三、使用说明
-### 1、定义Excel对应的实体
+|convert|实现了``EnumConvert``接口的类|
+## 三、导出
+### 1、定义Excel实体
 **只需要在实体类和字段上加上对应注解即可**
 ```java
 @Data //这是lombok的注解，帮完成get、set等方法
@@ -99,6 +101,7 @@ public class User {
 
     @ExcelField(value = "性别", autoMerge= true)
     private GenderEnum gender;
+
     //导出时按照设置的格式进行格式化时间
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
     private Date createTime;
@@ -125,7 +128,7 @@ public class UserController {
     }
 }
 ```
-**忽略某些列表头字段，只需在``createWriter()``方法中``ignores``参数指定你要忽略的列表头字段的名称，``字段名要与实体类中一致``**
+**忽略导出某些列表头，只需在``createWriter()``方法中``ignores``参数指定你要忽略的列表头对应的字段名，``字段名要与实体类中一致``**
 ```java
 /**
  * @author Gjing
@@ -165,7 +168,7 @@ public class UserController {
     }
 }
 ```
-**如果需要将不同规则数据导入到不同的sheet中或者是在同一个sheet中，可以多次调用``write()``方法，不指定sheet的名称则会写入到默认名称的sheet，如果导入在``同一个sheet中且映射的实体为同一个``，那么只会出现一次列表头**
+**导出到不同的sheet或导出多次到同一个sheet中，只需多次调用``write()``方法，不指定sheet的名称则会写入到默认名称的sheet。导出时如若Excel实体为同一个且导出在同一个sheet时，只会出现一次列表头**
 ```java
 /**
  * @author Gjing
@@ -187,7 +190,7 @@ public class UserController {
     }
 }
 ```
-**指定大标题，在``write()``方法的``bigTitlte``参数设置即可**
+**导出时指定大标题，在``write()``方法的``bigTitlte``参数设置即可**
 ```java
 /**
  * @author Gjing
@@ -208,7 +211,7 @@ public class UserController {
     }
 }
 ```
-**重置当前导出的Excel映射实体，该操作要在每次需要调用``write()``之前**
+**重置当前导出的Excel实体，该操作要在每次需要调用``write()``之前**
 ```java
 /**
  * @author Gjing
@@ -235,8 +238,8 @@ public class UserController {
     }
 }
 ```
-**在整个链式调用完毕后，一定要在最后调用``flush()``方法，否则数据不会写入到Excel文件中**
-### 3、Excel导入
+**整个链式调用完毕后，一定要在最后调用``flush()``方法，否则数据不会写入到Excel文件中**
+## 四、导入
 **通过``get()``方法获取导入的数据，该方法为``最终操作``，整个导入会结束**
 ```java
 /**
@@ -259,7 +262,7 @@ public class UserController {
     }
 }
 ```
-**很多时候我们数据太多而写在了不同的sheet中，这时可能需要分开读取每个sheet，使用上面的``get()``方法获取导入的结果肯定是不行的，这时可以通过订阅的方式去订阅导入后得到的数据并做自己的逻辑处理**
+**读取多个sheet中的数据时，无法通过``get()``方法进行获取数据，这时可以通过订阅的方式去订阅导入后的数据，该订阅方法时一个函数式接口，你可以自行做一些处理**
 ```java
 /**
  * @author Gjing
@@ -281,7 +284,7 @@ public class UserController {
     }
 }
 ```
-**导入的Excel存在大标题的话，需要指定列表头开始的下标，下标你为你导出这个模板时设置的``大标题的行数``，该操作要在调用``read()``读取前设置**
+**导入时Excel存在大标题的时候，需要指定列表头的下标，下标你为你导出这个模板时设置的大标题的行数(``boxLastRow``)，要在调用``read()``前配置**
 ```java
 /**
  * @author Gjing
@@ -289,7 +292,7 @@ public class UserController {
 @RestController
 public class UserController {
     @Resource
-    private UserService userSerivce;
+    private UserService userServce;
 
     @PostMapping("/user_import")
     @ApiOperation("导入")
@@ -303,7 +306,7 @@ public class UserController {
     }
 }
 ```
-**设置你要读取多少行数据，该操作要在调用``read()``读取前进行设置**
+**限制读取数据的条数，要在调用``read()``前配置**
 ```java
 /**
  * @author Gjing
@@ -311,7 +314,7 @@ public class UserController {
 @RestController
 public class UserController {
     @Resource
-    private UserService userSerivce;
+    private UserService userService;
 
     @PostMapping("/user_import")
     @ApiOperation("导入")
@@ -325,10 +328,10 @@ public class UserController {
     }
 }
 ```
-**配置导入回调，该回调会在每次读取完一行或者读取到您设置不允许为空的情况下发生，您可以通过回调进行参数校验、异常数据记录等等，可以实现``ReadCallback``接口并重写自己需要的回调，该接口支持泛型**
+**导入时会在每次读取完一行或者读取到您设置不允许为空的情况下发生回调，您可以通过回调进行参数校验、异常数据记录等等，可以实现``ReadCallback``接口并重写自己需要的回调方法，该接口支持泛型**
 ```java
 /**
- * 导入时候的回调
+ * 导入时的回调
  *
  * @author Gjing
  **/
@@ -359,7 +362,7 @@ public class MyReadCallback implements ReadCallback<Object> {
     }
 }
 ```
-**在Excel注解上修改默认的回调接口类**
+**实现回调接口后只需在Excel实体替换掉默认的回调即可**
 ```java
 @Excel(value = "用户列表",readCallback = MyReadCallback.class)
 public class User {
@@ -367,8 +370,9 @@ public class User {
     private String userName;
 }
 ```
-### 4、枚举转换器
-**列表头字段为枚举类型，在导入导出时需要指定枚举转换器，实现``EnumConvert``接口并重写其中方法**
+## 五、辅助功能
+### 1、枚举转换器
+**字段为枚举类型，在导入导出时需要指定枚举转换器，只需实现``EnumConvert``接口，然后在对应字段使用**
 ```java
 /**
  * 性别
@@ -417,7 +421,7 @@ public enum GenderEnum {
     }
 }
 ```
-**列表头字段上使用注解并指定你的转换类**
+**列表头字段上使用``@ExcelEnumConvert``注解并指定转换器**
 ```java
 @Excel("用户列表")
 public class User {
@@ -427,7 +431,8 @@ public class User {
     private GenderEnum genderEnum;
 }
 ```
-### 5、加入下拉框
+### 2、下拉框
+#### 1、注解指定
 **在实体属性直接通过注解的``combobox``指定下拉框中的内容**
 ```java
 @Excel("用户列表")
@@ -439,7 +444,8 @@ public class User {
     private GenderEnum genderEnum;
 }
 ```
-**也可以在调用时通过方法的``explicitValues``参数进行设置，该参数为map类型，key为列表头字段名，value为下拉框的内容。下面演示了为列表头字段加入下拉框内容**
+#### 2、方法参数设置
+**通过方法的``explicitValues``参数进行设置，该参数为map类型，key为列表头字段名，value为下拉框的内容。下面演示了为列表头字段加入下拉框内容**
 ```java
 /**
  * @author Gjing
@@ -459,7 +465,8 @@ public class UserController {
     }
 }
 ```
-**支持设置带级联关系的下拉框，需要在实体属性中通过``link``参数指定父级的``列表头序号-1``，比如父级是第一个单元格，那么link填的序号为``0``**     
+#### 3、级联下拉框
+**设置带级联关系的下拉框，需要在实体属性中通过``link``参数指定父级的``列表头序号-1``，比如父级是第一个单元格，那么link填的序号为``0``**     
 ```java
 @Excel("订单列表")
 public class Order {
@@ -473,7 +480,7 @@ public class Order {
     private String orderName;
 }
 ```
-**指定序号后按照上一个使用方法在调用的时候通过参数传递，但是在设置参数的时候``key变成了你要关联上级的那个值``，下面演示给两个订单负责人分别增加其拥有的订单，``上级的每个值只允许设置一次下级``**
+**指定序号后同样通过参数进行设置，但是在设置参数的时候``key变成了你要关联上级的那个值``，下面演示给两个订单负责人分别增加其拥有的订单，``上级的每个值只允许设置一次下级``**
 ```java
 /**
  * @author Gjing
@@ -493,7 +500,7 @@ public class UserController {
     }
 }
 ```
-### 6、时间类型的校验
+### 4、时间校验
 **该注解默认采取的方式是设置时间范围，你也可以通过``operatorType``去修改，``expr2``只在操作类型为``between``或者``NotBetween``时需要设置，对于其他操作类型设置``expr1``即可**
 ```java
 @Excel("用户列表")
@@ -504,7 +511,7 @@ public class User {
     private Date createTime;
 }
 ```
-### 7、值类型校验
+### 5、值校验
 **对单元格进行值类型校验，下面演示了限制输入用户名的长度不能超过2位，对于其他判断方式可自行查看参数**
 ```java
 @Excel("用户列表")
@@ -515,7 +522,7 @@ public class User {
     private String userName;
 }
 ```
-## 四、拓展
+## 六、自定义
 **之前讲解的使用的一些功能都是采取默认实现的，有时候有点自己的想法，也可以进行自定义其中的功能**
 ### 1、自定义Excel样式
 **实现``ExcelStyle``接口，里面有设置大标题、正文、列表头样式的三个方法，选择你要自定义的方法进行重写即可，以下演示了自定义大标题样式**
@@ -571,7 +578,7 @@ public class UserController {
     }
 }
 ```
-### 2、自定义校验注解的逻辑
+### 2、自定义校验注解的处理流程
 **自定义校验注解的处理逻辑，可以实现``ExcelDateValidation``、``ExcelNumericValidation``、``ExcelExplicitValidation``接口，下面举例实现``ExcelExplicitValidation``接口**
 ```java
 /**
@@ -600,83 +607,6 @@ public class User {
     //在当前列表头下方的第一行单元格中，时间只能输入在2019-10-11至2019-10-13范围的时间
     @DateValid(expr1 = "2019-10-11",expr2 = "2019-10-13")
     private Date createTime;
-}
-```
-### 3、自定义导出处理器
-**自定义导出的核心处理器，需实现``ExcelWriterResolver``接口并重写其中的方法**
-```java
-/**
- * 自定义导出处理器
- * @author Gjing
- **/
-public class MyWriteResolver implements ExcelWriterResolver {
-    @Override
-    public void write(List<?> list, Workbook workbook, String s, List<Field> list1, MetaStyle metaStyle, BigTitle bigTitle) {
-
-    }
-
-    @Override
-    public void flush(HttpServletResponse httpServletResponse, String s) {
-
-    }
-}
-```
-**在导出时重置处理器，该方法要在你调用``Write()``前设置**
-```java
-/**
- * @author Gjing
- **/
-@RestController
-@Api(tags = "用户")
-public class UserController {
-    @Resource
-    private UserService userService;
-
-    @GetMapping("/user")
-    @ApiOperation(value = "使用自定义的导出处理器导出用户模板")
-    public void exportUser(HttpServletResponse resultVO) {
-        ExcelFactory.createWriter(User.class, resultVO)
-                //重置处理器
-                .resetResolver(MyWriteResolver::new)
-                .write(null)
-                .flush();
-    }
-}
-```
-### 4、自定义导入处理器
-**自定义导入处理器，需实现``ExcelReaderResolver``接口并重写其中的方法**
-```java
-/**
- * 自定义导入处理器
- * @author Gjing
- **/
-public class MyReaderResolver implements ExcelReaderResolver {
-    @Override
-    public void read(InputStream inputStream, Class<?> excelClass, Listener<List<Object>> listener,int headerIndex, int readLines, String sheetName) {
-
-    }
-}
-
-```
-**在导出的方法中重置处理器，要在``所有链式操作前``设置**
-```java
-/**
- * @author Gjing
- **/
-@RestController
-public class UserController {
-    @Resource
-    private UserService userSerivce;
-
-    @PostMapping("/user_import")
-    @ApiOperation("导入")
-    public ResponseEntity userImport(MultipartFile file) throws IOException {
-        ExcelFactory.createReader(file.getInputStream(), User.class)
-                .resetResolver(MyReaderResolver::new)
-                .read()
-                .subscribe(e -> userService.saveUserList(e));
-        return ResponseEntity.ok("导入成功");
-    }
 }
 ```
 ---

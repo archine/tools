@@ -1,9 +1,9 @@
 package cn.gjing.tools.excel.util;
 
+
 import cn.gjing.tools.excel.ExcelField;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -18,22 +18,6 @@ import java.util.stream.Collectors;
  * @author Gjing
  **/
 public class BeanUtils {
-    /**
-     * Finds methods declared in a given class
-     *
-     * @param clazz      class
-     * @param methodName method name
-     * @param paramTypes param types
-     * @return Method
-     */
-    public static Method findDeclaredMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
-        try {
-            return clazz.getDeclaredMethod(methodName, paramTypes);
-        } catch (NoSuchMethodException var4) {
-            return clazz.getSuperclass() != null ? findDeclaredMethod(clazz.getSuperclass(), methodName, paramTypes) : null;
-        }
-    }
-
     /**
      * Sets the value of a field of an object
      *
@@ -73,7 +57,7 @@ public class BeanUtils {
      * @param ignores    The exported field is to be ignored
      * @return Annotated fields
      */
-    public static List<Field> getFields(Class<?> excelClass, String[] ignores) {
+    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores) {
         Field[] declaredFields = excelClass.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = excelClass.getSuperclass();

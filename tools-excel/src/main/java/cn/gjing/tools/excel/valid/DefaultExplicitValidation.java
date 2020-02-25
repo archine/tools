@@ -41,6 +41,7 @@ public class DefaultExplicitValidation implements ExcelExplicitValidation {
             }
             regions = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
             this.setValid(explicitValid, sheet, helper, constraint, regions);
+            values.remove(fieldName);
         } else {
             if (!locked) {
                 explicitSheet = workbook.getSheet("subsetSheet");

@@ -40,46 +40,35 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             throw new NullPointerException("@Excel was not found on the excelClass");
         }
         if (hasAnnotationFieldMap.isEmpty()) {
-            this.hasAnnotationFieldMap = Arrays.stream(excelClass.getDeclaredFields())
-                    .filter(f -> f.isAnnotationPresent(ExcelField.class))
-                    .collect(
-                            Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field)
-                    );
-            Class<?> superclass = excelClass.getSuperclass();
-            if (superclass != Object.class) {
-                Map<String, Field> supperFieldMap = Arrays.stream(superclass.getDeclaredFields())
-                        .filter(f -> f.isAnnotationPresent(ExcelField.class))
-                        .collect(
-                                Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field)
-                        );
-                this.hasAnnotationFieldMap.putAll(supperFieldMap);
-            }
-        }
-        switch (excel.type()) {
-            case XLS:
-                try {
+            List<Field> excelFields = BeanUtils.getExcelFields(excelClass, null);
+            this.hasAnnotationFieldMap = excelFields.stream()
+                    .collect(Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field));
+            switch (excel.type()) {
+                case XLS:
+                    try {
+                        if (this.workbook == null) {
+                            this.workbook = new HSSFWorkbook(inputStream);
+                        }
+                        this.sheet = this.workbook.getSheet(sheetName);
+                        this.reader(excelClass, listener, headerIndex, readLines, excel.readCallback().newInstance());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case XLSX:
                     if (this.workbook == null) {
-                        this.workbook = new HSSFWorkbook(inputStream);
+                        this.workbook = StreamingReader.builder().rowCacheSize(excel.maxSize()).bufferSize(excel.bufferSize()).open(inputStream);
                     }
                     this.sheet = this.workbook.getSheet(sheetName);
-                    this.reader(excelClass, listener, headerIndex, readLines, excel.readCallback().newInstance());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            case XLSX:
-                if (this.workbook == null) {
-                    this.workbook = StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(inputStream);
-                }
-                this.sheet = this.workbook.getSheet(sheetName);
-                try {
-                    this.reader(excelClass, listener, headerIndex, readLines, excel.readCallback().newInstance());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                throw new NullPointerException("Doc type was not found");
+                    try {
+                        this.reader(excelClass, listener, headerIndex, readLines, excel.readCallback().newInstance());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    throw new NullPointerException("Doc type was not found");
+            }
         }
     }
 
