@@ -253,19 +253,19 @@ public class CorsConfiguration {
 
 |参数|描述|
 |---|---|
-|str|参数|
+|param|参数|
 ### 2、isNotEmpty
 判断给定是否不为空，可以是字符串、包装类型、数组、集合等     
 
 |参数|描述|
 |---|---|
-|str|参数|
+|param|参数|
 ### 3、requireNotNull
 该参数不能为空，为空抛出NPE，否则返回原值     
 
 |参数|描述|
 |---|---|
-|str|参数|
+|param|参数|
 ### 4、ListHasEmpty
 判断集合里是否含有空值   
 
@@ -283,8 +283,8 @@ public class CorsConfiguration {
 
 |参数|描述|
 |---|---|
-|t|参数1|
-|u|参数2|
+|param1|参数1|
+|param2|参数2|
 ### 7、trim
 去除字符串的空格     
 
