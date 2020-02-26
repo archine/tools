@@ -17,19 +17,19 @@ public final class ParamUtils {
     /**
      * 检查参数是否为空
      *
-     * @param str 参数
-     * @return True 为空,false不为空
+     * @param param 参数
      * @param <T> 泛型参数
+     * @return True 为空,false不为空
      */
-    public static <T> boolean isEmpty(T str) {
-        if (str == null || "".equals(str)) {
+    public static <T> boolean isEmpty(T param) {
+        if (param == null || "".equals(param)) {
             return true;
-        } else if (str instanceof Collection) {
-            return ((Collection<?>) str).isEmpty();
-        } else if (str instanceof Map) {
-            return ((Map<?, ?>) str).isEmpty();
-        } else if (str.getClass().isArray()) {
-            return Array.getLength(str) == 0;
+        } else if (param instanceof Collection) {
+            return ((Collection<?>) param).isEmpty();
+        } else if (param instanceof Map) {
+            return ((Map<?, ?>) param).isEmpty();
+        } else if (param.getClass().isArray()) {
+            return Array.getLength(param) == 0;
         }
         return false;
     }
@@ -37,15 +37,30 @@ public final class ParamUtils {
     /**
      * 不为空返回原对象值,为空跑出NPE
      *
-     * @param str 参数
+     * @param param   参数
      * @param <T> 泛型
      * @return 原参数
      */
-    public static <T> T requireNotNull(T str) {
-        if (str == null) {
+    public static <T> T requireNotNull(T param) {
+        if (param == null) {
             throw new NullPointerException("Parameter cannot be null");
         }
-        return str;
+        return param;
+    }
+
+    /**
+     * 不为空返回原对象值,为空跑出NPE
+     *
+     * @param param     参数
+     * @param error 错误信息
+     * @param <T>   泛型
+     * @return 原参数
+     */
+    public static <T> T requireNotNull(T param, String error) {
+        if (param == null) {
+            throw new NullPointerException(error);
+        }
+        return param;
     }
 
     /**
@@ -72,23 +87,23 @@ public final class ParamUtils {
     /**
      * 参数不为空或者size=0或者isEmpty
      *
-     * @param str 参数
-     * @return true为不含有, false为含有
+     * @param param 参数
      * @param <T> 泛型参数
+     * @return true为不含有, false为含有
      */
-    public static <T> boolean isNotEmpty(T str) {
-        return !isEmpty(str);
+    public static <T> boolean isNotEmpty(T param) {
+        return !isEmpty(param);
     }
 
     /**
      * 判断两个参数是否相等
      *
-     * @param t 参数1
-     * @param u 参数2
+     * @param param1 参数1
+     * @param param2 参数2
      * @return true为相等
      */
-    public static boolean equals(Object t, Object u) {
-        return t == u || (requireNotNull(t).equals(u));
+    public static boolean equals(Object param1, Object param2) {
+        return param1 == param2 || (requireNotNull(param1).equals(param2));
     }
 
     /**
@@ -230,6 +245,9 @@ public final class ParamUtils {
      * @return 返回true为包含该值
      */
     public static boolean contains(String[] arr, String val) {
+        if (arr == null) {
+            return false;
+        }
         for (String s : arr) {
             if (equals(s, val)) {
                 return true;
@@ -256,7 +274,7 @@ public final class ParamUtils {
      * @return boolean
      */
     public static boolean isMobileNumber(String phone) {
-        String regex = "^1([3-8]){1}\\d{9}$";
+        String regex = "^1([3-8])\\d{9}$";
         return Pattern.compile(regex).matcher(phone).matches();
     }
 

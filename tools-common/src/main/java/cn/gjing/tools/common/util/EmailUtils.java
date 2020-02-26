@@ -14,7 +14,7 @@ import java.util.Properties;
 /**
  * @author Gjing
  **/
-public class EmailUtils {
+public final class EmailUtils {
 
     private String host;
     private String password;

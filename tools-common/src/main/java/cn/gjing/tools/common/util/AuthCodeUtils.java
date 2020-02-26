@@ -11,7 +11,7 @@ import java.util.Random;
 /**
  * @author Gjing
  **/
-public class AuthCodeUtils {
+public final class AuthCodeUtils {
     /**
      * 图片的宽度。
      */

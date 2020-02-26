@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.5.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.5.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 Java开发基础工具包
@@ -7,7 +7,7 @@ Java开发基础工具包
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.5.4</version>
+  <version>1.5.5</version>
 </dependency>
 ```
 ## 一、Rest接口参数校验注解
@@ -72,7 +72,7 @@ class Order{
 public class TestController{
     @PostMapping("/test")
     @NotNull
-    public void test(String param1，@Not String param2) {
+    public void test(String param1,@Not String param2) {
         System.out.println(param1);
     }
 }
@@ -82,7 +82,7 @@ public class TestController{
 @RestController
 public class TestController{
     @PostMapping("/test")
-    public void test(String param1，@NotNull(message = "参数不能为空") String param2) {
+    public void test(String param1,@NotNull(message = "参数不能为空") String param2) {
         System.out.println(param1);
     }
 }
@@ -868,6 +868,30 @@ public class Test{
         if (b) {
             System.out.println("发送成功");
         }
+    }
+}
+```
+## 十三、Spring Bean工具类
+**获取Spring Bean和ApplicationContext**
+### 1、获取Bean
+```java
+public class Test{
+    @GetMapping("/test")
+    public void test(){
+        //通过class获取
+        Test test = SpringBeanUtils.getBean(Test.class);
+        //通过bean name获取
+        Object o = SpringBeanUtils.getBean("test");
+    }
+}
+```
+### 2、获取ApplicationContext
+```java
+public class Test{
+    private ApplicationContext applicationContext;
+    
+    public Test(){
+        this.applicationContext = SpringBeanUtils.getApplicationContext();
     }
 }
 ```

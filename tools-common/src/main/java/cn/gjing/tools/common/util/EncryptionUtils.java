@@ -17,7 +17,7 @@ import java.security.SecureRandom;
 /**
  * @author Gjing
  **/
-public class EncryptionUtils {
+public final class EncryptionUtils {
     private EncryptionUtils() {
 
     }
