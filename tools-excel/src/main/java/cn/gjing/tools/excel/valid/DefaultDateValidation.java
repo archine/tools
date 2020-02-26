@@ -15,21 +15,21 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
  **/
 public class DefaultDateValidation implements ExcelDateValidation {
     @Override
-    public void valid(DateValid dateValid, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+    public void valid(ExcelDateValid excelDateValid, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint dvConstraint;
         if (sheet instanceof XSSFSheet) {
-            dvConstraint = helper.createDateConstraint(dateValid.operatorType().getType(), "date(" + dateValid.expr1().replaceAll("-", ",") + ")",
-                    "date(" + dateValid.expr2().replaceAll("-", ",") + ")", dateValid.pattern());
+            dvConstraint = helper.createDateConstraint(excelDateValid.operatorType().getType(), "date(" + excelDateValid.expr1().replaceAll("-", ",") + ")",
+                    "date(" + excelDateValid.expr2().replaceAll("-", ",") + ")", excelDateValid.pattern());
         } else {
-            dvConstraint = helper.createDateConstraint(dateValid.operatorType().getType(), dateValid.expr1(),
-                    dateValid.expr2(), dateValid.pattern());
+            dvConstraint = helper.createDateConstraint(excelDateValid.operatorType().getType(), excelDateValid.expr1(),
+                    excelDateValid.expr2(), excelDateValid.pattern());
         }
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
         DataValidation dataValidation = helper.createValidation(dvConstraint, regions);
-        dataValidation.setShowErrorBox(dateValid.showErrorBox());
-        dataValidation.setErrorStyle(dateValid.rank().getRank());
-        dataValidation.createErrorBox(dateValid.errorTitle(), dateValid.errorContent());
+        dataValidation.setShowErrorBox(excelDateValid.showErrorBox());
+        dataValidation.setErrorStyle(excelDateValid.rank().getRank());
+        dataValidation.createErrorBox(excelDateValid.errorTitle(), excelDateValid.errorContent());
         sheet.addValidationData(dataValidation);
     }
 }

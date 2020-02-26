@@ -11,18 +11,18 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-public class DefaultExplicitValidation implements ExcelExplicitValidation {
+public class DefaultDropdownBoxValidation implements ExcelDropdownBoxValidation {
 
     @Override
-    public boolean valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, String fieldName, Map<String, String[]> values) {
+    public boolean valid(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, String fieldName, Map<String, String[]> values) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint constraint;
         CellRangeAddressList regions;
         Sheet explicitSheet;
-        if (ParamUtils.equals("", explicitValid.link())) {
+        if (ParamUtils.equals("", excelDropdownBox.link())) {
             String[] explicitValues = values.get(fieldName);
             if (explicitValues == null) {
-                constraint = helper.createExplicitListConstraint(explicitValid.combobox());
+                constraint = helper.createExplicitListConstraint(excelDropdownBox.combobox());
             } else {
                 explicitSheet = workbook.getSheet("explicitSheet");
                 if (explicitSheet == null) {
@@ -40,7 +40,7 @@ public class DefaultExplicitValidation implements ExcelExplicitValidation {
                 workbook.setSheetHidden(workbook.getSheetIndex("explicitSheet"), true);
             }
             regions = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
-            this.setValid(explicitValid, sheet, helper, constraint, regions);
+            this.setValid(excelDropdownBox, sheet, helper, constraint, regions);
             values.remove(fieldName);
         } else {
             if (!locked) {
@@ -66,22 +66,22 @@ public class DefaultExplicitValidation implements ExcelExplicitValidation {
                 locked = true;
                 workbook.setSheetHidden(workbook.getSheetIndex("subsetSheet"), true);
             }
-            char parentIndex = (char) ('A' + Integer.parseInt(explicitValid.link()));
+            char parentIndex = (char) ('A' + Integer.parseInt(excelDropdownBox.link()));
             for (int i = firstRow; i <= lastRow; i++) {
                 String forMuaString = "INDIRECT($" + parentIndex + "$" + (i + 1) + ")";
                 constraint = helper.createFormulaListConstraint(forMuaString);
                 regions = new CellRangeAddressList(i, i, firstCol, lastCol);
-                this.setValid(explicitValid, sheet, helper, constraint, regions);
+                this.setValid(excelDropdownBox, sheet, helper, constraint, regions);
             }
         }
         return locked;
     }
 
-    private void setValid(ExplicitValid explicitValid, Sheet sheet, DataValidationHelper helper, DataValidationConstraint constraint, CellRangeAddressList regions) {
+    private void setValid(ExcelDropdownBox excelDropdownBox, Sheet sheet, DataValidationHelper helper, DataValidationConstraint constraint, CellRangeAddressList regions) {
         DataValidation dataValidation = helper.createValidation(constraint, regions);
-        dataValidation.setShowErrorBox(explicitValid.showErrorBox());
-        dataValidation.setErrorStyle(explicitValid.rank().getRank());
-        dataValidation.createErrorBox(explicitValid.errorTitle(), explicitValid.errorContent());
+        dataValidation.setShowErrorBox(excelDropdownBox.showErrorBox());
+        dataValidation.setErrorStyle(excelDropdownBox.rank().getRank());
+        dataValidation.createErrorBox(excelDropdownBox.errorTitle(), excelDropdownBox.errorContent());
         sheet.addValidationData(dataValidation);
     }
 }

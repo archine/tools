@@ -3,9 +3,9 @@ package cn.gjing.tools.excel.write;
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
-import cn.gjing.tools.excel.valid.DateValid;
-import cn.gjing.tools.excel.valid.ExplicitValid;
-import cn.gjing.tools.excel.valid.NumericValid;
+import cn.gjing.tools.excel.valid.ExcelDateValid;
+import cn.gjing.tools.excel.valid.ExcelDropdownBox;
+import cn.gjing.tools.excel.valid.ExcelNumericValid;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -13,10 +13,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Gjing
@@ -60,7 +57,7 @@ class ExcelHelper {
             Row headRow = sheet.createRow(rowIndex);
             MetaStyle metaStyle;
             ExcelStyle excelStyle;
-            for (int i = 0; i < headFieldList.size(); i++) {
+            for (int i = 0, headFieldSize = headFieldList.size(); i < headFieldSize; i++) {
                 Cell headCell = headRow.createCell(i);
                 Field field = headFieldList.get(i);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
@@ -162,27 +159,19 @@ class ExcelHelper {
         if (value == null) {
             cell.setCellValue("");
         } else {
-            if (ParamUtils.equals("", excelField.pattern())) {
-                if (field.getType().isEnum()) {
-                    ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-                    Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
-                    Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
-                    try {
-                        EnumConvert<Enum<?>, ?> enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
-                        cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String s = value.toString();
-                    int len = s.contains(".") ? s.substring(0, s.indexOf(".")).length() : s.length();
-                    if (field.getType() != String.class && ParamUtils.isNumber(s) && len < 17) {
-                        cell.setCellValue(new BigDecimal(s).doubleValue());
-                    } else {
-                        cell.setCellValue(s);
-                    }
+            if (field.getType().isEnum()) {
+                ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
+                Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
+                Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
+                try {
+                    EnumConvert<Enum<?>, ?> enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
+                    cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-            } else {
+                return;
+            }
+            if (field.getType() == Date.class) {
                 if (this.formatMap == null) {
                     this.formatMap = new HashMap<>(16);
                     SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
@@ -196,14 +185,22 @@ class ExcelHelper {
                     }
                     cell.setCellValue(format.format(value));
                 }
+                return;
+            }
+            String s = value.toString();
+            int len = s.contains(".") ? s.substring(0, s.indexOf(".")).length() : s.length();
+            if (field.getType() != String.class && ParamUtils.isNumber(s) && len < 17) {
+                cell.setCellValue(new BigDecimal(s).doubleValue());
+            } else {
+                cell.setCellValue(s);
             }
         }
     }
 
     private boolean addValid(Field field, Row row, int i, boolean locked, Sheet sheet, MetaObject metaObject) {
-        ExplicitValid ev = field.getAnnotation(ExplicitValid.class);
-        DateValid dv = field.getAnnotation(DateValid.class);
-        NumericValid nv = field.getAnnotation(NumericValid.class);
+        ExcelDropdownBox ev = field.getAnnotation(ExcelDropdownBox.class);
+        ExcelDateValid dv = field.getAnnotation(ExcelDateValid.class);
+        ExcelNumericValid nv = field.getAnnotation(ExcelNumericValid.class);
         if (ev != null) {
             try {
                 int firstRow = row.getRowNum() + 1;
@@ -247,7 +244,7 @@ class ExcelHelper {
             font.setBold(true);
             cellStyle.setFont(font);
             remarkCell.setCellStyle(cellStyle);
-            remarkCell.setCellValue("合计：");
+            remarkCell.setCellValue(sum.value());
         }
         Cell sumCell = row.createCell(colIndex);
         sumCell.setCellFormula("SUM(" + formula + ")");

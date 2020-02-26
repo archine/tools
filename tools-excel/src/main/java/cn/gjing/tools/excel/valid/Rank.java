@@ -7,7 +7,7 @@ package cn.gjing.tools.excel.valid;
  **/
 public enum Rank {
     /**
-     * Tip grade
+     * Tip rank
      */
     WARNING(1), STOP(0), INFO(2);
     private int rank;

@@ -1,8 +1,6 @@
 package cn.gjing.tools.excel;
 
 
-import cn.gjing.tools.excel.read.DefaultReadCallback;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -50,10 +48,4 @@ public @interface Excel {
      * @return ExcelStyle
      */
     Class<? extends ExcelStyle> style() default DefaultExcelStyle.class;
-
-    /**
-     * Read each line for a callback
-     * @return CallBacker
-     */
-    Class<? extends ReadCallback> readCallback() default DefaultReadCallback.class;
 }

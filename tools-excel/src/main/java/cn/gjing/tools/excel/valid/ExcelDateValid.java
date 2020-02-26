@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface DateValid {
+public @interface ExcelDateValid {
 
     /**
      * Validator Class
@@ -29,7 +29,7 @@ public @interface DateValid {
     int boxLastRow() default 0;
 
     /**
-     * Time format
+     * Time format of valid
      *
      * @return expr
      */

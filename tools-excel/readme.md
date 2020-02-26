@@ -1,13 +1,13 @@
-![](https://img.shields.io/badge/version-1.2.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
-**采用注解方式的导入导出，项目中可以便捷的进行使用**
+**Java版Excel导入导出，可以灵活的在项目中进行使用**
 ## 一、安装依赖
 ```xml
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.2.7</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -21,30 +21,29 @@
 |maxSize|当文档类型为``XLSX``时，保留在内存中的条数，超出会将其写入到本地|
 |bufferSize|当文档类型为``XLSX``时，允许在内存中保存的字节|
 |style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
-|readCallback|Excel导入时的回调类|
 ### 2、@ExcelField
-**在实体的字段上使用，该注解会将当前字段映射为Excel的列表头，``下文简称列表头``。没有使用该注释的字段将不会作为列表头出现在Excel中。注解的参数如下**     
+**在实体的字段上使用，该注解会将当前字段映射为Excel的表头，``下文简称表头``。没有使用该注释的字段将不会作为表头出现在Excel中。注解的参数如下**     
 
 |参数|描述|
 |---|---|
-|value|列表头名称, ``必填``|
-|pattern|当前列表头属于时间类型且需要在导出的时候格式化的时候配置|
-|width|当前列表头所在列的整列单元格宽度，默认``5120``|
-|autoMerge|当前列表头所在列是否需要自动纵向合并相邻且值相同的单元格，默认``false``|
-|style|当前列表头的样式，``优先级高于全局配置``|
-|allowEmpty|当前列表头下的单元格是否允许空值，默认``true``|
-|strategy|导入时当前列表头下方单元格值为空时所执行的策略，策略有：``jump``(跳过当前这条数据，该策略会发起回调)、``error``(抛出异常，``本次导入终止``)|
+|value|表头名称, ``必填``|
+|pattern|导入导出时会按配置的格式进行格式化时间，默认``yyyy-MM-dd HH:mm:ss``|
+|width|表头所在列的整列单元格宽度，默认``5120``|
+|autoMerge|表头所在列是否需要自动纵向合并相邻且值相同的单元格，默认``false``|
+|style|表头的样式，``优先级高于全局配置``|
+|allowEmpty|表头下方的单元格是否允许空值，默认``true``|
+|strategy|导入时表头下方单元格内容为空时所执行的策略，策略有：``jump``(跳过当前这条数据，该策略会发起回调)、``error``(抛出异常，``本次导入终止``)|
 |message|执行策略为``error``的时候抛出的异常信息|
-|sort|当前单元格出现在Excel文件中的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
-|sum|当前列表头导出时整列是否需要求和，默认``false``。可以通过``format``设置保存的数字格式，默认保存``整数``，要统计的列表头``不要出现在第一列``|
-### 3、@DateValid
-**列表头上使用，使用后会在导出模板时对该列表头下方的单元格加上时间校验，注解参数如下**     
+|sort|表头出现在Excel的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
+|sum|表头导出时整列是否需要求和，默认``false``。可以通过``format``设置保存的数字格式，默认保存``整数``，要统计的表头``不要出现在第一列``，求和的描述可以通过value设置，只取``第一个需要求和的表头中设置的对应值``|
+### 3、@ExcelDateValid
+**表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下**     
 
 |参数|描述|
 |---|---|
 |validClass|校验器|
 |boxLastRow|需要给多少行单元格加上校验，默认只加在第一行单元格|
-|pattern|校验的时间格式，默认``yyyy-MM-dd``|
+|pattern|校验的时间格式，默认``yyyy-MM-dd``，配置后只允许输入该格式|
 |operatorType|操作类型，默认``OperatorType.BETWEEN``|
 |expr1|表达式1，默认``1970-01-01``|
 |expr2|表达式2，默认``2999-01-01``|
@@ -52,8 +51,8 @@
 |rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
-### 4、@ExplicitValid
-**列表头上使用，使用后会在导出模板时对该列表头下方的单元格增加下拉框，注解参数如下**     
+### 4、@ExcelDropdownBox
+**表头上使用，使用后会在导出模板时对表头下方的单元格增加下拉框，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
@@ -62,11 +61,11 @@
 |boxLastRow|需要给多少行单元格加上下拉框，默认只加在第一行单元格|
 |showErrorBox|是否弹出错误框，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
-|link|指定当前列表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``|
+|link|指定当前表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
-#### 5、@NumericValid
-**列表头使用，会在导出模板时对该列表头下方的单元格加入文本长度、数字大小校验，注解参数如下**     
+#### 5、@ExcelNumericValid
+**表头使用，会在导出模板时对该表头下方的单元格加入文本长度、数字大小校验，注解参数如下**     
 
 |参数|描述|
 |-----|-----|
@@ -102,7 +101,7 @@ public class User {
     @ExcelField(value = "性别", autoMerge= true)
     private GenderEnum gender;
 
-    //导出时按照设置的格式进行格式化时间
+    //导入导出时按照设置的格式进行格式化时间
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
     private Date createTime;
 }
@@ -120,15 +119,15 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse resultVO) {
+    public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, resultVO)
+        ExcelFactory.createWriter(User.class, response)
                 .write(users)
                 .flush();
     }
 }
 ```
-**忽略导出某些列表头，只需在``createWriter()``方法中``ignores``参数指定你要忽略的列表头对应的字段名，``字段名要与实体类中一致``**
+**忽略导出某些表头，只需在``createWriter()``方法中``ignores``参数指定你要忽略的表头对应的字段名，``字段名要与实体类中一致``**
 ```java
 /**
  * @author Gjing
@@ -140,9 +139,9 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse resultVO) {
+    public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, resultVO,"id","createTime")
+        ExcelFactory.createWriter(User.class, response,"id","createTime")
                 .write(users)
                 .flush();
     }
@@ -160,15 +159,15 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse resultVO) {
+    public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, resultVO)
+        ExcelFactory.createWriter(User.class, response)
                 .write(users,"用户sheet")
                 .flush();
     }
 }
 ```
-**导出到不同的sheet或导出多次到同一个sheet中，只需多次调用``write()``方法，不指定sheet的名称则会写入到默认名称的sheet。导出时如若Excel实体为同一个且导出在同一个sheet时，只会出现一次列表头**
+**导出到不同的sheet或导出多次到同一个sheet中，只需多次调用``write()``方法，不指定sheet的名称则会写入到默认名称的sheet。导出时如若Excel实体为同一个且导出在同一个sheet时，只会出现一次表头**
 ```java
 /**
  * @author Gjing
@@ -180,10 +179,10 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse resultVO) {
+    public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
         List<User> users2 = userService.userList();
-        ExcelFactory.createWriter(User.class, resultVO)
+        ExcelFactory.createWriter(User.class, response)
                 .write(users)
                 .write(users2,"sheet2")
                 .flush();   
@@ -202,9 +201,9 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse resultVO) {
+    public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, resultVO)
+        ExcelFactory.createWriter(User.class, response)
                 //指定大标题占用的行数和内容
                 .write(users,new BigTitle(3,"我是大标题"))
                 .flush();
@@ -225,10 +224,10 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse resultVO) {
+    public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
         List<Order> orderList = orderService.orderList();
-        ExcelFactory.createWriter(User.class, resultVO)
+        ExcelFactory.createWriter(User.class, response)
                 .write(users)
                 //重置，如果要忽略某些字段不导出，在该方法 ignores 参数指定即可
                 //注意点和上文介绍的导出一致
@@ -270,7 +269,7 @@ public class UserController {
 @RestController
 public class UserController {
     @Resource
-    private UserService userSerivce;
+    private UserService userService;
 
     @PostMapping("/user_import")
     @ApiOperation("导入")
@@ -284,7 +283,7 @@ public class UserController {
     }
 }
 ```
-**导入时Excel存在大标题的时候，需要指定列表头的下标，下标你为你导出这个模板时设置的大标题的行数(``boxLastRow``)，要在调用``read()``前配置**
+**导入时Excel存在大标题的时候，需要指定表头的下标，下标你为你导出这个模板时设置的大标题的行数(``boxLastRow``)，要在调用``read()``前配置**
 ```java
 /**
  * @author Gjing
@@ -292,7 +291,7 @@ public class UserController {
 @RestController
 public class UserController {
     @Resource
-    private UserService userServce;
+    private UserService userService;
 
     @PostMapping("/user_import")
     @ApiOperation("导入")
@@ -350,7 +349,7 @@ public class MyReadCallback implements ReadCallback<Object> {
     }
 
     /**
-     * 当读取到某个列表头下的单元格是空的时候，同时该列表头设置了不允许为空，会产生该回调
+     * 当读取到某个表头下的单元格是空的时候，同时该表头设置了不允许为空，会产生该回调
      * @param field 当前为空的字段
      * @param excelField 该字段上的@ExcelField注解
      * @param rowIndex 当前单元格所在的行数下标，下标是从0开始的
@@ -362,12 +361,20 @@ public class MyReadCallback implements ReadCallback<Object> {
     }
 }
 ```
-**实现回调接口后只需在Excel实体替换掉默认的回调即可**
+**实现回调接口后可在调用``read()``方法时进行设置**
 ```java
-@Excel(value = "用户列表",readCallback = MyReadCallback.class)
-public class User {
-    @ExcelField(value = "用户名", sort = 1)
-    private String userName;
+@RestController
+public class TestController{
+    @Resource
+    private UserService userService;
+    
+    @PostMapping("/user_import")
+    public ResponseEntity<String> user1ImportLimit(MultipartFile file) throws IOException {
+        ExcelFactory.createReader(file.getInputStream(), User.class)
+                .read(MyReadCallback::new)
+                .subscribe(e -> this.userService.saveAllUser(e));
+        return ResponseEntity.ok("导入成功");
+    }
 }
 ```
 ## 五、辅助功能
@@ -421,7 +428,7 @@ public enum GenderEnum {
     }
 }
 ```
-**列表头字段上使用``@ExcelEnumConvert``注解并指定转换器**
+**表头字段上使用``@ExcelEnumConvert``注解并指定转换器**
 ```java
 @Excel("用户列表")
 public class User {
@@ -439,13 +446,13 @@ public class User {
 public class User {
 
     @ExcelField("性别")
-    @ExplicitValid(combobox = {"男","女"})
+    @ExcelDropdownBox(combobox = {"男","女"})
     @ExcelEnumConvert(convert = GenderEnum.MyExcelEnumConvert.class)
     private GenderEnum genderEnum;
 }
 ```
 #### 2、方法参数设置
-**通过方法的``explicitValues``参数进行设置，该参数为map类型，key为列表头字段名，value为下拉框的内容。下面演示了为列表头字段加入下拉框内容**
+**通过方法的``explicitValues``参数进行设置，该参数为map类型，key为表头字段名，value为下拉框的内容。下面演示了为表头字段加入下拉框内容**
 ```java
 /**
  * @author Gjing
@@ -455,27 +462,27 @@ public class UserController {
 
     @GetMapping("/user_empty")
     @ApiOperation(value = "导出用户模板")
-    public void exportUserEmpty(HttpServletResponse resultVO) {
+    public void exportUserEmpty(HttpServletResponse response) {
         String[] arr = new String[]{"男","女"};
         Map<String, String[]> map = new HashMap<>(16);
         map.put("genderEnum", arr);
-        ExcelFactory.createWriter(User.class, resultVO)
+        ExcelFactory.createWriter(User.class, response)
                 .write(null, map)
                 .flush();
     }
 }
 ```
 #### 3、级联下拉框
-**设置带级联关系的下拉框，需要在实体属性中通过``link``参数指定父级的``列表头序号-1``，比如父级是第一个单元格，那么link填的序号为``0``**     
+**设置带级联关系的下拉框，需要在实体属性中通过``link``参数指定父级的``表头序号-1``，比如父级是第一个单元格，那么link填的序号为``0``**     
 ```java
 @Excel("订单列表")
 public class Order {
 
-    @ExplicitValid(combobox = {"小红","小花"},boxLastRow = 10)
+    @ExcelDropdownBox(combobox = {"小红","小花"},boxLastRow = 10)
     @ExcelField(value = "订单负责人", sort = 1)
     private String orderUser;
 
-    @ExplicitValid(link = "0")//指定父级为第一个单元格，也就是orderUser
+    @ExcelDropdownBox(link = "0")//指定父级为第一个单元格，也就是orderUser
     @ExcelField(value = "订单名称", sort = 2)
     private String orderName;
 }
@@ -507,7 +514,7 @@ public class UserController {
 public class User {
 
     @ExcelField(value = "创建时间", pattern = "yyyy-MM-dd")
-    @DateValid(boxLastRow = 10, expr1 = "2019-10-11", expr2 = "2019-10-13")
+    @ExcelDateValid(boxLastRow = 10, expr1 = "2019-10-11", expr2 = "2019-10-13")
     private Date createTime;
 }
 ```
@@ -518,14 +525,14 @@ public class User {
 public class User {
 
     @ExcelField(value = "用户名",autoMerge = true,sort = 1)
-    @NumericValid(boxLastRow = 10,expr1 = "2")
+    @ExcelDropdownBox(boxLastRow = 10,expr1 = "2")
     private String userName;
 }
 ```
 ## 六、自定义
 **之前讲解的使用的一些功能都是采取默认实现的，有时候有点自己的想法，也可以进行自定义其中的功能**
 ### 1、自定义Excel样式
-**实现``ExcelStyle``接口，里面有设置大标题、正文、列表头样式的三个方法，选择你要自定义的方法进行重写即可，以下演示了自定义大标题样式**
+**实现``ExcelStyle``接口，里面有设置大标题、正文、表头样式的三个方法，选择你要自定义的方法进行重写即可，以下演示了自定义大标题样式**
 ```java
 /**
  * 自己定义的样式
@@ -570,29 +577,29 @@ public class UserController {
 
     @GetMapping("/user")
     @ApiOperation(value = "导出用户")
-    public void exportUser(HttpServletResponse resultVO) {
+    public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList(0);
-        ExcelFactory.createWriter(User.class, resultVO)
+        ExcelFactory.createWriter(User.class, response)
                 .write(users, MyExcelStyle::new)
                 .flush();
     }
 }
 ```
 ### 2、自定义校验注解的处理流程
-**自定义校验注解的处理逻辑，可以实现``ExcelDateValidation``、``ExcelNumericValidation``、``ExcelExplicitValidation``接口，下面举例实现``ExcelExplicitValidation``接口**
+**自定义校验注解的处理逻辑，可以实现``ExcelDateValidation``、``ExcelNumericValidation``、``ExcelDropdownBoxValidation``接口，下面举例实现``ExcelExplicitValidation``接口**
 ```java
 /**
  * @author Gjing
  **/
-public class MyValid implements ExcelExplicitValidation {
+public class MyValid implements ExcelDropdownBoxValidation {
     @Override
-    public boolean valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, 
+    public boolean valid(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, 
         String fieldName, Map<String, String[]> values) {
         return locked;
     }
 }
 ```
-**修改你实体类中对应注解的默认处理类``validClass``，没有指定的注解还是会走默认处理**
+**修改你实体类中对应注解的默认处理类，没有指定的注解还是会走默认处理**
 ```java
 @Excel("用户列表")
 public class User {
@@ -600,12 +607,12 @@ public class User {
     private Long id;
 
     @ExcelField("用户名")
-    @NumericValid(validClass = MyValid.class,validationType = TEXT_LENGTH, expr1 = "3", operatorType = GREATER_OR_EQUAL,boxLastRow = 10)
+    @ExcelNumericValid(validClass = MyValid.class,validationType = TEXT_LENGTH, expr1 = "3", operatorType = GREATER_OR_EQUAL,boxLastRow = 10)
     private String userName;
 
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
-    //在当前列表头下方的第一行单元格中，时间只能输入在2019-10-11至2019-10-13范围的时间
-    @DateValid(expr1 = "2019-10-11",expr2 = "2019-10-13")
+    //在当前表头下方的第一行单元格中，时间只能输入在2019-10-11至2019-10-13范围的时间
+    @ExcelDateValid(expr1 = "2019-10-11",expr2 = "2019-10-13")
     private Date createTime;
 }
 ```

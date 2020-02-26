@@ -3,7 +3,6 @@ package cn.gjing.tools.excel.read;
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
-import cn.gjing.tools.excel.valid.DateValid;
 import com.google.gson.Gson;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -31,14 +30,10 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private Map<String, SimpleDateFormat> formatMap;
     private boolean isSave;
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void read(InputStream inputStream, Class<R> excelClass, Listener<List<R>> listener, int headerIndex, int readLines, String sheetName) {
+    public void read(InputStream inputStream, Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, String sheetName, ReadCallback<R> callback) {
         this.inputStream = inputStream;
         Excel excel = excelClass.getAnnotation(Excel.class);
-        if (excel == null) {
-            throw new NullPointerException("@Excel was not found on the excelClass");
-        }
         if (hasAnnotationFieldMap.isEmpty()) {
             List<Field> excelFields = BeanUtils.getExcelFields(excelClass, null);
             this.hasAnnotationFieldMap = excelFields.stream()
@@ -50,7 +45,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             this.workbook = new HSSFWorkbook(inputStream);
                         }
                         this.sheet = this.workbook.getSheet(sheetName);
-                        this.reader(excelClass, listener, headerIndex, readLines, excel.readCallback().newInstance());
+                        this.reader(excelClass, readListener, headerIndex, readLines, callback);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -61,13 +56,13 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                     }
                     this.sheet = this.workbook.getSheet(sheetName);
                     try {
-                        this.reader(excelClass, listener, headerIndex, readLines, excel.readCallback().newInstance());
+                        this.reader(excelClass, readListener, headerIndex, readLines, callback);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 default:
-                    throw new NullPointerException("Doc type was not found");
+                    throw new NullPointerException("Excel type was not found");
             }
         }
     }
@@ -79,7 +74,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         }
     }
 
-    private void reader(Class<R> excelClass, Listener<List<R>> listener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
+    private void reader(Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
         List<R> dataList = new ArrayList<>();
         R o = null;
         int realReadLines = readLines + headerIndex;
@@ -125,7 +120,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 dataList.add(readCallback.readLine(o, row.getRowNum()));
             }
         }
-        listener.notify(dataList);
+        readListener.notify(dataList);
     }
 
     /**
@@ -147,16 +142,15 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 break;
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    DateValid valid = field.getAnnotation(DateValid.class);
                     if (this.formatMap == null) {
                         this.formatMap = new HashMap<>(16);
-                        SimpleDateFormat format = new SimpleDateFormat(valid == null ? "yyyy-MM-dd HH:mm:ss" : valid.pattern());
+                        SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
                         this.formatMap.put(field.getName(), format);
                         value = format.format(cell.getDateCellValue());
                     } else {
                         SimpleDateFormat format = this.formatMap.get(field.getName());
                         if (format == null) {
-                            format = new SimpleDateFormat(valid == null ? "yyyy-MM-dd HH:mm:ss" : valid.pattern());
+                            format = new SimpleDateFormat(excelField.pattern());
                             this.formatMap.put(field.getName(), format);
                         }
                         value = format.format(cell.getDateCellValue());
@@ -185,10 +179,10 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      * @param field field
      * @param value value
      */
-    private void setValue(Object o, Field field, String value) {
+    private void setValue(R o, Field field, String value) {
         if (field.getType().isEnum()) {
             ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-            Objects.requireNonNull(excelEnumConvert, "Enum convert cannot be null");
+            Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
             Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
             try {
                 EnumConvert<? extends Enum<?>, ?> enumConvert = excelEnumConvert.convert().newInstance();

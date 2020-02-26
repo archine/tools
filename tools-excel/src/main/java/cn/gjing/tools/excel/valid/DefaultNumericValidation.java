@@ -13,16 +13,16 @@ import org.apache.poi.ss.util.CellRangeAddressList;
  **/
 public class DefaultNumericValidation implements ExcelNumericValidation {
     @Override
-    public void valid(NumericValid numericValid, Sheet sheet, int firstRow,int lastRow, int firstCol, int lastCol) {
+    public void valid(ExcelNumericValid excelNumericValid, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
-        DataValidationConstraint numericConstraint = helper.createNumericConstraint(numericValid.validationType().getType(),
-                numericValid.operatorType().getType(), numericValid.expr1(), "".equals(numericValid.expr2()) ? null : numericValid.expr2());
+        DataValidationConstraint numericConstraint = helper.createNumericConstraint(excelNumericValid.validationType().getType(),
+                excelNumericValid.operatorType().getType(), excelNumericValid.expr1(), "".equals(excelNumericValid.expr2()) ? null : excelNumericValid.expr2());
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, lastRow,firstCol, lastCol);
         DataValidation dataValidation = helper.createValidation(numericConstraint, regions);
-        dataValidation.setShowErrorBox(numericValid.showErrorBox());
-        dataValidation.setErrorStyle(numericValid.rank().getRank());
-        dataValidation.createErrorBox(numericValid.errorTitle(), numericValid.errorContent());
-        dataValidation.createErrorBox(numericValid.errorTitle(), numericValid.errorContent());
+        dataValidation.setShowErrorBox(excelNumericValid.showErrorBox());
+        dataValidation.setErrorStyle(excelNumericValid.rank().getRank());
+        dataValidation.createErrorBox(excelNumericValid.errorTitle(), excelNumericValid.errorContent());
+        dataValidation.createErrorBox(excelNumericValid.errorTitle(), excelNumericValid.errorContent());
         sheet.addValidationData(dataValidation);
     }
 

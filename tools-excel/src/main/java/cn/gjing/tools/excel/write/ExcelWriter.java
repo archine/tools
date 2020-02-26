@@ -301,7 +301,7 @@ public class ExcelWriter {
      */
     public ExcelWriter resetExcelClass(Class<?> excelClass, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
-        Objects.requireNonNull(excel, "@Excel was not found on the excelClass");
+        Objects.requireNonNull(excel, "@Excel was not found on the " + excelClass);
         try {
             ExcelStyle excelStyle = excel.style().newInstance();
             this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook.createCellStyle()),

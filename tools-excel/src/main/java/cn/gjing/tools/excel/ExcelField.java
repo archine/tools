@@ -21,11 +21,11 @@ public @interface ExcelField {
     String value();
 
     /**
-     * The field is of time type. If the custom time format needs to be converted, it needs to be written, such as yyyy-mm-dd
+     * Time format when import and export
      *
      * @return pattern
      */
-    String pattern() default "";
+    String pattern() default "yyyy-MM-dd HH:mm:ss";
 
     /**
      * Excel header width

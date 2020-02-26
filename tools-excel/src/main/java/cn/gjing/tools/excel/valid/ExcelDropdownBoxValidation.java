@@ -8,11 +8,11 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-public interface ExcelExplicitValidation {
+public interface ExcelDropdownBoxValidation {
     /**
      * Drop-down check rule
      *
-     * @param explicitValid ExplicitValid
+     * @param excelDropdownBox ExplicitValid
      * @param workbook      workbook
      * @param sheet         The current sheet
      * @param firstRow      First row
@@ -24,7 +24,7 @@ public interface ExcelExplicitValidation {
      * @param fieldName     Current field name
      * @return locked
      */
-    default boolean valid(ExplicitValid explicitValid, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, String fieldName, Map<String, String[]> values) {
+    default boolean valid(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, String fieldName, Map<String, String[]> values) {
         return locked;
     }
 }

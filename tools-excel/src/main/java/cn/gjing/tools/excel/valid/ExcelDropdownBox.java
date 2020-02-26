@@ -12,14 +12,14 @@ import java.lang.annotation.Target;
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ExplicitValid {
+public @interface ExcelDropdownBox {
 
     /**
      * Validator Class
      *
      * @return ExcelValidation
      */
-    Class<? extends ExcelExplicitValidation> validClass() default DefaultExplicitValidation.class;
+    Class<? extends ExcelDropdownBoxValidation> validClass() default DefaultDropdownBoxValidation.class;
 
     /**
      * The value in the drop-down box

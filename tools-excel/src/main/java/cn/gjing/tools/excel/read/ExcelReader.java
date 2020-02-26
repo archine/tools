@@ -1,10 +1,10 @@
 package cn.gjing.tools.excel.read;
 
-import cn.gjing.tools.excel.Listener;
+import cn.gjing.tools.excel.ReadListener;
+import cn.gjing.tools.excel.ReadCallback;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -15,8 +15,9 @@ import java.util.function.Supplier;
  **/
 public class ExcelReader<R> {
     private Class<R> excelClass;
-    private ExcelReaderResolver<R> readerResolver;
     private List<R> data;
+    private ReadCallback<R> readCallback;
+    private ExcelReaderResolver<R> readerResolver;
     private InputStream inputStream;
     private int headerIndex;
     private int readLines;
@@ -33,14 +34,14 @@ public class ExcelReader<R> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.data = new ArrayList<>();
-        this.init();
+        this.readCallback = (R, rowIndex) -> R;
+        this.initSequence();
     }
 
     /**
-     * Initializes the sequence number
+     * Initializes the sequence number and resolver
      */
-    private void init() {
+    private void initSequence() {
         this.headerIndex = 0;
         this.readLines = 0;
     }
@@ -51,8 +52,22 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read() {
-        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = listener, this.headerIndex, this.readLines, "sheet1");
-        this.init();
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+                "sheet1", this.readCallback);
+        this.initSequence();
+        return this;
+    }
+
+    /**
+     * Read excel
+     *
+     * @param callback Excel import callback
+     * @return this
+     */
+    public ExcelReader<R> read(Supplier<? extends ReadCallback<R>> callback) {
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+                "sheet1", callback.get());
+        this.initSequence();
         return this;
     }
 
@@ -63,8 +78,23 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(String sheetName) {
-        this.readerResolver.read(this.inputStream, this.excelClass, listener -> data = listener, this.headerIndex, this.readLines, sheetName);
-        this.init();
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+                sheetName, this.readCallback);
+        this.initSequence();
+        return this;
+    }
+
+    /**
+     * Read the excel sheet
+     *
+     * @param sheetName sheet name
+     * @param callback  Excel import callback
+     * @return this
+     */
+    public ExcelReader<R> read(String sheetName, Supplier<? extends ReadCallback<R>> callback) {
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+                sheetName, callback.get());
+        this.initSequence();
         return this;
     }
 
@@ -113,11 +143,11 @@ public class ExcelReader<R> {
     /**
      * Listens for the return of the result through the listener
      *
-     * @param resultListener Result listener
+     * @param dataReadListener Result listener
      * @return this
      */
-    public ExcelReader<R> subscribe(Listener<List<R>> resultListener) {
-        resultListener.notify(this.data);
+    public ExcelReader<R> subscribe(ReadListener<List<R>> dataReadListener) {
+        dataReadListener.notify(this.data);
         return this;
     }
 }

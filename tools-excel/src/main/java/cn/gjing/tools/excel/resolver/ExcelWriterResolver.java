@@ -22,7 +22,7 @@ public interface ExcelWriterResolver {
      * @param workbook      workbook
      * @param data          data
      * @param metaObject    Excel meta object
-     * @param changed Changed mapping
+     * @param changed Is changed excel entity or sheet?
      */
     void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed);
 
