@@ -23,6 +23,7 @@ class ExcelHelper {
     private Map<String, SimpleDateFormat> formatMap;
     private Map<Integer, String> formulaMap;
     private Map<String, MetaStyle> customerMetaStyleMap;
+    private Map<String, EnumConvert<Enum<?>, ?>> enumConvertMap;
 
     public ExcelHelper(Workbook workbook) {
         this.workbook = workbook;
@@ -183,14 +184,23 @@ class ExcelHelper {
             cell.setCellValue("");
         } else {
             if (field.getType().isEnum()) {
-                ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-                Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
+                if (this.enumConvertMap == null) {
+                    this.enumConvertMap = new HashMap<>(16);
+                }
+                EnumConvert<Enum<?>, ?> enumConvert = this.enumConvertMap.get(field.getName());
                 Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
-                try {
-                    EnumConvert<Enum<?>, ?> enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
+                if (enumConvert == null) {
+                    ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
+                    Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
+                    try {
+                        enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
+                        cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
+                        this.enumConvertMap.put(field.getName(), enumConvert);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                } else {
                     cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
                 }
                 return;
             }

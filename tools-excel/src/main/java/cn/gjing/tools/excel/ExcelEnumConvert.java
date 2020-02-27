@@ -18,5 +18,5 @@ public @interface ExcelEnumConvert {
      *
      * @return EnumConvert
      */
-    Class<? extends EnumConvert<?,?>> convert();
+    Class<? extends EnumConvert<? extends Enum<?>,?>> convert();
 }
