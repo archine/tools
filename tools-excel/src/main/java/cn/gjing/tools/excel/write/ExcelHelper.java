@@ -102,46 +102,69 @@ class ExcelHelper {
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(j);
-                if (i == 0) {
-                    if (excelField.sum().open()) {
-                        if (formulaMap == null) {
-                            this.formulaMap = new HashMap<>(16);
+                this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell);
+                this.setCellVal(excelField, field, valueCell, value);
+            }
+        }
+    }
+
+    private void sumOrMerge(Sheet sheet, Map<Object, ExcelModel> excelModelMap, int i, int dataSize, Row valueRow, int j, ExcelField excelField, Object value, Cell valueCell) {
+        if (i == 0) {
+            if (excelField.sum().open()) {
+                if (formulaMap == null) {
+                    this.formulaMap = new HashMap<>(16);
+                }
+                this.formulaMap.put(j, valueCell.getAddress().formatAsString() + ":");
+            }
+            if (excelField.autoMerge()) {
+                this.putExcelModel(valueRow, value, excelModelMap, i + "-" + j);
+            }
+        } else {
+            if (excelField.autoMerge()) {
+                String mergeKey = i + "-" + j;
+                String oldKey = (i - 1) + "-" + j;
+                ExcelModel excelModel = excelModelMap.get(oldKey);
+                if (excelModel != null) {
+                    if (ParamUtils.equals(value, excelModel.getOldValue())) {
+                        if (i == dataSize - 1) {
+                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), valueRow.getRowNum(), j, j));
+                        } else {
+                            excelModelMap.put(mergeKey, excelModel);
                         }
-                        this.formulaMap.put(j, valueCell.getAddress().formatAsString() + ":");
-                    }
-                    if (excelField.autoMerge()) {
-                        this.putExcelModel(valueRow, value, excelModelMap, i + "-" + j);
-                    }
-                } else {
-                    if (excelField.autoMerge()) {
-                        String mergeKey = i + "-" + j;
-                        String oldKey = (i - 1) + "-" + j;
-                        ExcelModel excelModel = excelModelMap.get(oldKey);
-                        if (excelModel != null) {
-                            if (ParamUtils.equals(value, excelModel.getOldValue())) {
-                                if (i == dataSize - 1) {
-                                    sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), valueRow.getRowNum(), j, j));
-                                } else {
-                                    excelModelMap.put(mergeKey, excelModel);
-                                }
-                            } else {
-                                if (excelModel.getRowIndex() + 1 < valueRow.getRowNum()) {
-                                    sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), valueRow.getRowNum() - 1, j, j));
-                                }
-                                if (i != dataSize - 1) {
-                                    this.putExcelModel(valueRow, value, excelModelMap, mergeKey);
-                                }
-                            }
+                    } else {
+                        if (excelModel.getRowIndex() + 1 < valueRow.getRowNum()) {
+                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), valueRow.getRowNum() - 1, j, j));
                         }
-                    }
-                    if (i == dataSize - 1) {
-                        if (excelField.sum().open()) {
-                            String formula = formulaMap.get(j) + valueCell.getAddress().formatAsString();
-                            this.sum(sheet, j, valueCell.getAddress().getRow() + 1, formula, excelField.sum());
+                        if (i != dataSize - 1) {
+                            this.putExcelModel(valueRow, value, excelModelMap, mergeKey);
                         }
                     }
                 }
-                this.setCellVal(excelField, field, valueCell, value);
+            }
+            if (i == dataSize - 1) {
+                if (excelField.sum().open()) {
+                    String formula = formulaMap.get(j) + valueCell.getAddress().formatAsString();
+                    Row row = sheet.getRow(valueCell.getAddress().getRow() + 1);
+                    if (row == null) {
+                        row = sheet.createRow(valueCell.getAddress().getRow() + 1);
+                        CellStyle cellStyle = this.workbook.createCellStyle();
+                        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+                        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                        Cell remarkCell = row.createCell(0);
+                        Font font = this.workbook.createFont();
+                        font.setBold(true);
+                        cellStyle.setFont(font);
+                        remarkCell.setCellStyle(cellStyle);
+                        remarkCell.setCellValue(excelField.sum().value());
+                    }
+                    Cell sumCell = row.createCell(j);
+                    sumCell.setCellFormula("SUM(" + formula + ")");
+                    CellStyle sumStyle = this.workbook.createCellStyle();
+                    sumStyle.setAlignment(HorizontalAlignment.CENTER);
+                    sumStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                    sumStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.sum().format()));
+                    sumCell.setCellStyle(sumStyle);
+                }
             }
         }
     }
@@ -187,12 +210,12 @@ class ExcelHelper {
                 }
                 return;
             }
-            String s = value.toString();
-            int len = s.contains(".") ? s.substring(0, s.indexOf(".")).length() : s.length();
-            if (field.getType() != String.class && ParamUtils.isNumber(s) && len < 17) {
-                cell.setCellValue(new BigDecimal(s).doubleValue());
+            String val = value.toString();
+            int len = val.contains(".") ? val.substring(0, val.indexOf(".")).length() : val.length();
+            if (field.getType() != String.class && ParamUtils.isNumber(val) && len < 17) {
+                cell.setCellValue(new BigDecimal(val).doubleValue());
             } else {
-                cell.setCellValue(s);
+                cell.setCellValue(val);
             }
         }
     }
@@ -230,28 +253,5 @@ class ExcelHelper {
             return locked;
         }
         return locked;
-    }
-
-    private void sum(Sheet sheet, int colIndex, int rowIndex, String formula, Sum sum) {
-        Row row = sheet.getRow(rowIndex);
-        if (row == null) {
-            row = sheet.createRow(rowIndex);
-            CellStyle cellStyle = this.workbook.createCellStyle();
-            cellStyle.setAlignment(HorizontalAlignment.CENTER);
-            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-            Cell remarkCell = row.createCell(0);
-            Font font = this.workbook.createFont();
-            font.setBold(true);
-            cellStyle.setFont(font);
-            remarkCell.setCellStyle(cellStyle);
-            remarkCell.setCellValue(sum.value());
-        }
-        Cell sumCell = row.createCell(colIndex);
-        sumCell.setCellFormula("SUM(" + formula + ")");
-        CellStyle sumStyle = this.workbook.createCellStyle();
-        sumStyle.setAlignment(HorizontalAlignment.CENTER);
-        sumStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        sumStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(sum.format()));
-        sumCell.setCellStyle(sumStyle);
     }
 }

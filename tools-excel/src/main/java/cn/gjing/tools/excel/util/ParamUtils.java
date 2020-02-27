@@ -32,12 +32,12 @@ public class ParamUtils {
     /**
      * Whether it's equal or not
      *
-     * @param t param1
-     * @param u param2
+     * @param param1 param1
+     * @param param2 param2
      * @return boolean
      */
-    public static boolean equals(Object t, Object u) {
-        return t == u || t.equals(u);
+    public static boolean equals(Object param1, Object param2) {
+        return param1 == param2 || param1.equals(param2);
     }
 
     /**

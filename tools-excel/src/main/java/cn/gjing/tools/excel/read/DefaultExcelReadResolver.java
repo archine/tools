@@ -22,13 +22,21 @@ import java.util.stream.Collectors;
 class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseable {
     private Workbook workbook;
     private Sheet sheet;
-    private Map<String, Field> hasAnnotationFieldMap = new HashMap<>(16);
-    private List<String> headNameList = new ArrayList<>();
     private int totalCol = 0;
     private InputStream inputStream;
-    private Gson gson = new Gson();
+    private Gson gson;
     private Map<String, SimpleDateFormat> formatMap;
+    private Map<String, EnumConvert<? extends Enum<?>, ?>> enumConvertMap;
+    private Map<String, Class<?>> enumInterfaceTypeMap;
+    private List<String> headNameList;
+    private Map<String, Field> hasAnnotationFieldMap;
     private boolean isSave;
+
+    public DefaultExcelReadResolver() {
+        this.hasAnnotationFieldMap = new HashMap<>(16);
+        this.headNameList =new ArrayList<>();
+        this.gson = new Gson();
+    }
 
     @Override
     public void read(InputStream inputStream, Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, String sheetName, ReadCallback<R> callback) {
@@ -108,8 +116,8 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 Cell valueCell = row.getCell(c);
                 if (valueCell != null) {
-                    String value = this.getValue(valueCell, field, excelField, readCallback);
-                    if (this.isSave) {
+                    Object value = this.getValue(valueCell, field, excelField, readCallback);
+                    if (this.isSave && value != null) {
                         this.setValue(o, field, value);
                     }
                 } else {
@@ -129,8 +137,8 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      * @param cell cell
      * @return value
      */
-    private String getValue(Cell cell, Field field, ExcelField excelField, ReadCallback<R> readCallback) {
-        Object value = "";
+    private Object getValue(Cell cell, Field field, ExcelField excelField, ReadCallback<R> readCallback) {
+        Object value = null;
         switch (cell.getCellType()) {
             case _NONE:
             case BLANK:
@@ -169,7 +177,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 value = cell.getStringCellValue();
                 break;
         }
-        return value.toString();
+        return value;
     }
 
     /**
@@ -179,31 +187,33 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      * @param field field
      * @param value value
      */
-    private void setValue(R o, Field field, String value) {
+    private void setValue(R o, Field field, Object value) {
         if (field.getType().isEnum()) {
-            ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-            Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
-            Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
-            try {
-                EnumConvert<? extends Enum<?>, ?> enumConvert = excelEnumConvert.convert().newInstance();
-                this.setField(field, o, enumConvert.toEntityAttribute(gson.fromJson(value, (java.lang.reflect.Type) interfaceType)));
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+            if (this.enumConvertMap == null) {
+                this.enumConvertMap = new HashMap<>(16);
             }
+            if (this.enumInterfaceTypeMap == null) {
+                this.enumInterfaceTypeMap = new HashMap<>(16);
+            }
+            EnumConvert<? extends Enum<?>, ?> enumConvert = this.enumConvertMap.get(field.getName());
+            if (enumConvert == null) {
+                ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
+                Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
+                Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
+                try {
+                    enumConvert = excelEnumConvert.convert().newInstance();
+                    BeanUtils.setFieldValue(o, field, enumConvert.toEntityAttribute(gson.fromJson(gson.toJson(value), (java.lang.reflect.Type) interfaceType)));
+                    this.enumConvertMap.put(field.getName(), enumConvert);
+                    this.enumInterfaceTypeMap.put(field.getName(), interfaceType);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+            BeanUtils.setFieldValue(o, field, enumConvert.toEntityAttribute(gson.fromJson(gson.toJson(value), (java.lang.reflect.Type) enumInterfaceTypeMap.get(field.getName()))));
         } else {
-            this.setField(field, o, gson.fromJson(gson.toJson(value), field.getType()));
+            BeanUtils.setFieldValue(o, field, gson.fromJson(gson.toJson(value), field.getType()));
         }
-    }
-
-    /**
-     * Set field value
-     *
-     * @param field field
-     * @param o     object
-     * @param value value
-     */
-    private void setField(Field field, Object o, Object value) {
-        BeanUtils.setFieldValue(o, field, value);
     }
 
     private void valid(Field field, ExcelField excelField, int rowIndex, int colIndex, ReadCallback<R> readCallback) {
