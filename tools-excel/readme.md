@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -525,7 +525,7 @@ public class User {
 public class User {
 
     @ExcelField(value = "用户名",autoMerge = true,sort = 1)
-    @ExcelDropdownBox(boxLastRow = 10,expr1 = "2")
+    @ExcelNumericValid(boxLastRow = 10,expr1 = "2")
     private String userName;
 }
 ```
@@ -586,7 +586,7 @@ public class UserController {
 }
 ```
 ### 2、自定义校验注解的处理流程
-**自定义校验注解的处理逻辑，可以实现``ExcelDateValidation``、``ExcelNumericValidation``、``ExcelDropdownBoxValidation``接口，下面举例实现``ExcelExplicitValidation``接口**
+**自定义校验注解的处理逻辑，可以实现``ExcelDateValidation``、``ExcelNumericValidation``、``ExcelDropdownBoxValidation``接口，下面举例实现``ExcelDropdownBoxValidation``接口**
 ```java
 /**
  * @author Gjing
@@ -607,7 +607,7 @@ public class User {
     private Long id;
 
     @ExcelField("用户名")
-    @ExcelNumericValid(validClass = MyValid.class,validationType = TEXT_LENGTH, expr1 = "3", operatorType = GREATER_OR_EQUAL,boxLastRow = 10)
+    @ExcelDropdownBoxValidation(validClass = MyValid.class,boxLastRow = 10)
     private String userName;
 
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
