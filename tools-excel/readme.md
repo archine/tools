@@ -607,7 +607,7 @@ public class User {
     private Long id;
 
     @ExcelField("用户名")
-    @ExcelDropdownBoxValid(validClass = MyValid.class,boxLastRow = 10)
+    @ExcelDropdownBox(validClass = MyValid.class,boxLastRow = 10)
     private String userName;
 
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
