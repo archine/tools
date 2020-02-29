@@ -130,6 +130,10 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 Cell valueCell = row.getCell(c);
                 if (valueCell != null) {
                     Object value = this.getValue(valueCell, field, excelField, readCallback);
+                    DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+                    if (dataConvert != null) {
+                        value = dataConvert.toEntityAttribute(value, field, excelField);
+                    }
                     if (this.isSave && value != null) {
                         this.setValue(o, field, value);
                     }
@@ -163,23 +167,18 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 break;
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
-                    if (dataConvert != null) {
-                        value = dataConvert.toEntityAttribute(cell.getDateCellValue(), field, excelField);
+                    if (this.formatMap == null) {
+                        this.formatMap = new HashMap<>(16);
+                        SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
+                        this.formatMap.put(field.getName(), format);
+                        value = format.format(cell.getDateCellValue());
                     } else {
-                        if (this.formatMap == null) {
-                            this.formatMap = new HashMap<>(16);
-                            SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
+                        SimpleDateFormat format = this.formatMap.get(field.getName());
+                        if (format == null) {
+                            format = new SimpleDateFormat(excelField.pattern());
                             this.formatMap.put(field.getName(), format);
-                            value = format.format(cell.getDateCellValue());
-                        } else {
-                            SimpleDateFormat format = this.formatMap.get(field.getName());
-                            if (format == null) {
-                                format = new SimpleDateFormat(excelField.pattern());
-                                this.formatMap.put(field.getName(), format);
-                            }
-                            value = format.format(cell.getDateCellValue());
                         }
+                        value = format.format(cell.getDateCellValue());
                     }
                     return value;
                 } else {
