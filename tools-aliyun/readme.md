@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.0.2-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.3-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)      
  
 > 阿里云OSS和短信工具
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-aliyun</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 ## 一、OSS
@@ -35,7 +35,7 @@ tools:
      connection-timeout: 50000
 ```
 ### 2、文件上传
-**如果有目录那么可以指定目录名称, 如果目录不存在会进行创建. 上传成功会返回``oss文件名``**
+**如果有目录那么可以指定目录名称, 如果目录不存在会进行创建. 上传成功会返回``oss文件名``，获取到文件名后前端只需将bucket域名与文件名拼接即可**
 ```java
 /**
  * @author Gjing

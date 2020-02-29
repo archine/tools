@@ -31,16 +31,28 @@ public final class SimpleOssUpload implements OssUpload {
     }
 
     @Override
-    public List<String> deleteFiles(List<String> fileUrls) {
-        if (fileUrls.size() > 1000) {
+    public List<String> deleteFiles(List<String> fileNames) {
+        return this.deleteFiles(fileNames, this.ossMeta.getBucket());
+    }
+
+    @Override
+    public List<String> deleteFiles(List<String> fileNames, String bucket) {
+        this.createBucket(bucket);
+        if (fileNames.size() > 1000) {
             throw new IllegalArgumentException("最多同时删除1000个");
         }
-        return this.ossClient.deleteObjects(new DeleteObjectsRequest(this.ossMeta.getBucket()).withKeys(fileUrls)).getDeletedObjects();
+        return this.ossClient.deleteObjects(new DeleteObjectsRequest(bucket).withKeys(fileNames)).getDeletedObjects();
     }
 
     @Override
     public void deleteFile(String fileName) {
-        this.ossClient.deleteObject(this.ossMeta.getBucket(), fileName);
+        this.deleteFile(fileName, this.ossMeta.getBucket());
+    }
+
+    @Override
+    public void deleteFile(String fileName, String bucket) {
+        this.createBucket(bucket);
+        this.ossClient.deleteObject(bucket, fileName);
     }
 
     @Override
@@ -50,7 +62,12 @@ public final class SimpleOssUpload implements OssUpload {
 
     @Override
     public String upload(MultipartFile file, String dir) {
-        this.createBucket();
+        return this.upload(file, dir, this.ossMeta.getBucket());
+    }
+
+    @Override
+    public String upload(MultipartFile file, String dir, String bucket) {
+        this.createBucket(bucket);
         if (file.getOriginalFilename() == null) {
             throw new NullPointerException("文件名不能为空");
         }
@@ -69,14 +86,24 @@ public final class SimpleOssUpload implements OssUpload {
 
     @Override
     public String upload(InputStream file, String fileName) {
-        this.createBucket();
+        return this.upload(file, fileName, this.ossMeta.getBucket());
+    }
+
+    @Override
+    public String upload(InputStream file, String fileName, String bucket) {
+        this.createBucket(bucket);
         this.ossClient.putObject(this.ossMeta.getBucket(), fileName, file);
         return fileName;
     }
 
     @Override
     public String upload(byte[] file, String fileName) {
-        this.createBucket();
+        return this.upload(file, fileName,this.ossMeta.getBucket());
+    }
+
+    @Override
+    public String upload(byte[] file, String fileName, String bucket) {
+        this.createBucket(bucket);
         this.ossClient.putObject(this.ossMeta.getBucket(), fileName, new ByteArrayInputStream(file));
         return fileName;
     }
@@ -90,10 +117,10 @@ public final class SimpleOssUpload implements OssUpload {
         this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.aliyunMeta.getAccessKey(), this.aliyunMeta.getAccessKeySecret(), conf);
     }
 
-    private void createBucket() {
+    private void createBucket(String bucket) {
         try {
-            if (!ossClient.doesBucketExist(this.ossMeta.getBucket())) {
-                this.ossClient.createBucket(this.ossMeta.getBucket());
+            if (!ossClient.doesBucketExist(bucket)) {
+                this.ossClient.createBucket(bucket);
             }
         } catch (Exception e) {
             throw new IllegalStateException("创建Bucket失败,请核对Bucket名称(规则：只能包含小写字母、数字和短横线，必须以小写字母和数字开头和结尾，长度在3-63之间)");

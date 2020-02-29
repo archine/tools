@@ -158,7 +158,7 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
                     throw new ParamValidException(length.message());
                 }
                 int l = value.toString().length();
-                if (l > length.max() || l < length.max()) {
+                if (l > length.max() || l < length.min()) {
                     throw new ParamValidException(length.message());
                 }
             }
