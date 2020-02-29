@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.2</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -36,6 +36,7 @@
 |message|执行策略为``error``的时候抛出的异常信息|
 |sort|表头出现在Excel的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
 |sum|表头导出时整列是否需要求和，默认``false``。可以通过``format``设置保存的数字格式，默认保存``整数``，要统计的表头``不要出现在第一列``，求和的描述可以通过value设置，只取``第一个需要求和的表头中设置的对应值``|
+|convert|数据转换器，对单个单元格内容进行数据处理|
 ### 3、@ExcelDateValid
 **表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下**     
 
@@ -438,7 +439,35 @@ public class User {
     private GenderEnum genderEnum;
 }
 ```
-### 2、下拉框
+### 2、数据转换器
+**该转换器主要提供导入导出时对某个单元格进行数据处理，比如时间转换、数据校验等。。只需实现``DataConvert``接口，该接口支持泛型，泛型为你的当前表头的字段类型**
+```java
+/**
+ * @author Gjing
+ **/
+public class MyDataConvert implements DataConvert<String> {
+    @Override
+    public String toEntityAttribute(Object o, Field field, ExcelField excelField) {
+        //为每个值前面加个拉拉
+        return "拉拉" + o.toString();
+    }
+
+    @Override
+    public void toExcelAttribute(Cell cell, Object o, Field field, ExcelField excelField) {
+        cell.setCellValue(o.toString());
+    }
+}
+```
+**在你要自定义数据转换器的表头使用**
+```java
+@Excel("用户列表")
+public class User {
+
+    @ExcelField(value = "备注",convert = MyDataConvert.class)
+    private String remark;
+}
+```
+### 3、下拉框
 #### 1、注解指定
 **在实体属性直接通过注解的``combobox``指定下拉框中的内容**
 ```java

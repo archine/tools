@@ -36,18 +36,21 @@ public @interface ExcelField {
 
     /**
      * The list headers are sorted by default by entity field if the Numbers are the same
+     *
      * @return sort index
      */
     int sort() default 99;
 
     /**
      * If a cell has the same number of rows, merge automatically
+     *
      * @return autoMerge
      */
     boolean autoMerge() default false;
 
     /**
      * Cell sum
+     *
      * @return Sum
      */
     Sum sum() default @Sum;
@@ -61,19 +64,29 @@ public @interface ExcelField {
 
     /**
      * Is allow empty
+     *
      * @return boolean
      */
     boolean allowEmpty() default true;
 
     /**
      * Equal to the policy executed when empty
+     *
      * @return EmptyStrategy
      */
     EmptyStrategy strategy() default EmptyStrategy.JUMP;
 
     /**
      * This message is read if the policy is error
+     *
      * @return String
      */
     String message() default "参数不能为空";
+
+    /**
+     * Data convert, Operate on the contents of a single cell
+     *
+     * @return DefaultDataConvert
+     */
+    Class<? extends DataConvert<?>> convert() default DefaultDataConvert.class;
 }

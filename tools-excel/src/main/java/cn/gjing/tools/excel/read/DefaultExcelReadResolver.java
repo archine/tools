@@ -30,11 +30,12 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private Map<String, Class<?>> enumInterfaceTypeMap;
     private List<String> headNameList;
     private Map<String, Field> hasAnnotationFieldMap;
+    private Map<String, DataConvert<?>> dataConvertMap;
     private boolean isSave;
 
     public DefaultExcelReadResolver() {
         this.hasAnnotationFieldMap = new HashMap<>(16);
-        this.headNameList =new ArrayList<>();
+        this.headNameList = new ArrayList<>();
         this.gson = new Gson();
     }
 
@@ -45,7 +46,19 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         if (hasAnnotationFieldMap.isEmpty()) {
             List<Field> excelFields = BeanUtils.getExcelFields(excelClass, null);
             this.hasAnnotationFieldMap = excelFields.stream()
-                    .collect(Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field));
+                    .peek(e -> {
+                        ExcelField excelField = e.getAnnotation(ExcelField.class);
+                        if (excelField.convert() != DefaultDataConvert.class) {
+                            if (this.dataConvertMap == null) {
+                                this.dataConvertMap = new HashMap<>(16);
+                            }
+                            try {
+                                this.dataConvertMap.put(e.getName(), excelField.convert().newInstance());
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }).collect(Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field));
             switch (excel.type()) {
                 case XLS:
                     try {
@@ -150,19 +163,25 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 break;
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    if (this.formatMap == null) {
-                        this.formatMap = new HashMap<>(16);
-                        SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
-                        this.formatMap.put(field.getName(), format);
-                        value = format.format(cell.getDateCellValue());
+                    DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+                    if (dataConvert != null) {
+                        value = dataConvert.toEntityAttribute(cell.getDateCellValue(), field, excelField);
                     } else {
-                        SimpleDateFormat format = this.formatMap.get(field.getName());
-                        if (format == null) {
-                            format = new SimpleDateFormat(excelField.pattern());
+                        if (this.formatMap == null) {
+                            this.formatMap = new HashMap<>(16);
+                            SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
                             this.formatMap.put(field.getName(), format);
+                            value = format.format(cell.getDateCellValue());
+                        } else {
+                            SimpleDateFormat format = this.formatMap.get(field.getName());
+                            if (format == null) {
+                                format = new SimpleDateFormat(excelField.pattern());
+                                this.formatMap.put(field.getName(), format);
+                            }
+                            value = format.format(cell.getDateCellValue());
                         }
-                        value = format.format(cell.getDateCellValue());
                     }
+                    return value;
                 } else {
                     NumberFormat numberFormat = NumberFormat.getInstance();
                     numberFormat.setMinimumFractionDigits(0);

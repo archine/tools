@@ -24,6 +24,7 @@ class ExcelHelper {
     private Map<Integer, String> formulaMap;
     private Map<String, MetaStyle> customerMetaStyleMap;
     private Map<String, EnumConvert<Enum<?>, ?>> enumConvertMap;
+    private Map<String, DataConvert<?>> dataConvertMap;
 
     public ExcelHelper(Workbook workbook) {
         this.workbook = workbook;
@@ -85,6 +86,18 @@ class ExcelHelper {
                 }
                 headCell.setCellValue(excelField.value());
                 sheet.setColumnWidth(i, excelField.width());
+                if (excelField.convert() != DefaultDataConvert.class) {
+                    if (this.dataConvertMap == null) {
+                        this.dataConvertMap = new HashMap<>(16);
+                    }
+                    if (dataConvertMap.get(field.getName()) == null) {
+                        try {
+                            this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 if (data == null || data.isEmpty()) {
                     locked = this.addValid(field, headRow, i, locked, sheet, metaObject);
                 }
@@ -179,6 +192,11 @@ class ExcelHelper {
 
     @SuppressWarnings("unchecked")
     private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value) {
+        DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+        if (dataConvert != null) {
+            dataConvert.toExcelAttribute(cell, value, field, excelField);
+            return;
+        }
         cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
         if (value == null) {
             cell.setCellValue("");
