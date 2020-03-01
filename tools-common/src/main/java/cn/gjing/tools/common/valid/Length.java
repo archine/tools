@@ -15,14 +15,17 @@ public @interface Length {
      * @return int
      */
     int min() default 0;
+
     /**
      * Max length
      * @return int
      */
-    int max() default 999999999;
+    int max();
+
     /**
      * Exception information
-     * @return String
+     *
+     * @return message
      */
     String message() default "无效的文本长度";
 }

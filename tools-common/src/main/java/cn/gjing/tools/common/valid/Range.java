@@ -7,14 +7,25 @@ import java.lang.annotation.Target;
 
 /**
  * @author Gjing
- * Method parameters are not null
  **/
-@Target({ElementType.METHOD,ElementType.PARAMETER,ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NotNull {
+@Target({ElementType.FIELD,ElementType.PARAMETER})
+public @interface Range {
+    /**
+     * Small integer
+     * @return min
+     */
+    int min() default 0;
+
+    /**
+     * Biggest integer
+     * @return max
+     */
+    long max();
+
     /**
      * Exception information
      * @return message
      */
-    String message() default "参数不能为Null";
+    String message() default "请输入正确范围的整数";
 }

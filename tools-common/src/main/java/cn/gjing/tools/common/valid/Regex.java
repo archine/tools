@@ -7,14 +7,19 @@ import java.lang.annotation.Target;
 
 /**
  * @author Gjing
- * Method parameters are not null
  **/
-@Target({ElementType.METHOD,ElementType.PARAMETER,ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NotNull {
+@Target({ElementType.FIELD,ElementType.PARAMETER})
+public @interface Regex {
+    /**
+     * Regular expression
+     * @return expression
+     */
+    String expr();
+
     /**
      * Exception information
      * @return message
      */
-    String message() default "参数不能为Null";
+    String message() default "请输入符合正则格式的内容";
 }

@@ -20,6 +20,7 @@ import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Gjing
@@ -94,7 +95,8 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
                 Field[] fields = parameter.getType().getDeclaredFields();
                 Map<String, Object> valueMap;
                 try {
-                    valueMap = new ObjectMapper().readValue(request.getInputStream(), new TypeReference<Map<String, Object>>() {});
+                    valueMap = new ObjectMapper().readValue(request.getInputStream(), new TypeReference<Map<String, Object>>() {
+                    });
                 } catch (IOException e) {
                     throw new ParamValidException("无效的Json对象");
                 }
@@ -131,7 +133,8 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
 
     private void jsonCheck(Field field, Object value) {
         this.emptyCheck(field.getAnnotation(NotNull.class), field.getAnnotation(NotEmpty.class), value);
-        this.expandCheck(field.getAnnotation(Length.class), field.getAnnotation(Email.class), field.getAnnotation(Mobile.class), value);
+        this.expandCheck(field.getAnnotation(Length.class), field.getAnnotation(Email.class), field.getAnnotation(Mobile.class),
+                field.getAnnotation(Decimal.class), field.getAnnotation(Range.class), field.getAnnotation(Regex.class), value);
     }
 
     private void emptyCheck(NotNull notNull, NotEmpty notEmpty, Object value) {
@@ -144,10 +147,11 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
     }
 
     private void expandCheck(Parameter parameter, Object value) {
-        this.expandCheck(parameter.getAnnotation(Length.class), parameter.getAnnotation(Email.class), parameter.getAnnotation(Mobile.class), value);
+        this.expandCheck(parameter.getAnnotation(Length.class), parameter.getAnnotation(Email.class), parameter.getAnnotation(Mobile.class), parameter.getAnnotation(Decimal.class),
+                parameter.getAnnotation(Range.class), parameter.getAnnotation(Regex.class), value);
     }
 
-    private void expandCheck(Length length, Email email, Mobile mobile, Object value) {
+    private void expandCheck(Length length, Email email, Mobile mobile, Decimal decimal, Range range, Regex regex, Object value) {
         if (length != null) {
             if (length.min() <= 0) {
                 if (value != null && value.toString().length() > length.max()) {
@@ -163,14 +167,36 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
                 }
             }
         }
-        if (email != null) {
-            if (value != null && !ParamUtils.isEmail(value.toString())) {
+        if (value != null) {
+            String valueStr = value.toString();
+            if (email != null && !ParamUtils.isEmail(valueStr)) {
                 throw new ParamValidException(email.message());
             }
-        }
-        if (mobile != null) {
-            if (value != null && !ParamUtils.isMobileNumber(value.toString())) {
+            if (mobile != null && !ParamUtils.isMobileNumber(valueStr)) {
                 throw new ParamValidException(mobile.message());
+            }
+            if (range != null) {
+                if (valueStr.contains(".") || !ParamUtils.isNumber(valueStr)) {
+                    throw new ParamValidException(range.message());
+                }
+                int valueInt = Integer.parseInt(valueStr);
+                if (valueInt < range.min() || valueInt > range.max()) {
+                    throw new ParamValidException(range.message());
+                }
+            }
+            if (decimal != null) {
+                if (!ParamUtils.isNumber(valueStr)) {
+                    throw new ParamValidException(decimal.message());
+                }
+                String[] valueArr = valueStr.split("\\.");
+                if (valueArr[0].length() > decimal.scale() || (valueArr.length == 2 && valueArr[1].length() > decimal.prec())) {
+                    throw new ParamValidException(decimal.message());
+                }
+            }
+            if (regex != null) {
+                if (!Pattern.compile(regex.expr()).matcher(value.toString()).matches()) {
+                    throw new ParamValidException(regex.message());
+                }
             }
         }
     }

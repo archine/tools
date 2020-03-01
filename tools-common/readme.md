@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.5.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.5.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 Java开发基础工具包
@@ -7,7 +7,7 @@ Java开发基础工具包
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.5.6</version>
+  <version>1.5.7</version>
 </dependency>
 ```
 ## 一、Rest接口参数校验注解
@@ -127,7 +127,7 @@ public class User {
 }
 ```
 ### 5、@Email
-**作用在对象的属性和方法参数, 对邮箱格式进行校验，错误信息可自定义**      
+**作用在对象的属性和方法参数, 对邮箱格式进行校验**      
 * **对象属性**
 ```java
 @Data
@@ -147,7 +147,7 @@ public class TestController {
 }
 ```
 ### 6、@Length
-**作用在方法参数和对象属性，可设置最小长度和最大长度，当``最小长度大于0``的时候会进行非null判断。可自定义错误信息**       
+**作用在方法参数和对象属性，可设置最小长度和最大长度，当``最小长度大于0``的时候会进行非null判断**       
 * **对象属性**
 ```java
 @Data
@@ -167,13 +167,13 @@ public class TestController {
 }
 ```
 ### 7、@Mobile
-**作用在对象属性和方法参数，对手机号格式进行校验，错误信息可自定义**      
+**作用在对象属性和方法参数，对手机号格式进行校验**      
 * **对象属性**
 ```java
 @Data
 public class User {
     @Mobile(message = "手机号格式错误")
-    private String name;
+    private String userPhone;
 }
 ```
 * **方法参数**
@@ -182,6 +182,66 @@ public class User {
 public class TestController {
     @PostMapping("/test")
     public void test(@Mobile String userPhone) {
+        System.out.println("ok");
+    }
+}
+```
+### 8、@Range
+**作用在对象属性和方法参数，对整数的取值范围进行校验**     
+* **对象属性**
+```java
+@Data
+public class User {
+    @Range(max = 100, message = "年龄不能大于100")
+    private Integer age;
+}
+```
+* **方法参数**
+```java
+@RestController
+public class TestController {
+    @PostMapping("/test")
+    public void test(@Range(max = 100, message = "岁数不能超过100") Integer age) {
+        System.out.println("ok");
+    }
+}
+```
+### 9、@Decimal
+**作用在对象属性和方法参数，对小数的位数进行限制**     
+* **对象属性**
+```java
+@Data
+public class User {
+    @Decimal(scale = 10, prec = 2, message = "整数部分不允许超过10位，小数部分不能超过2位")
+    private BigDecimal salary;
+}
+```
+* **方法参数**
+```java
+@RestController
+public class TestController {
+    @PostMapping("/test")
+    public void test(@Decimal(scale = 10, prec = 2, message = "整数部分不允许超过10位，小数部分不能超过2位") BigDecimal salary) {
+        System.out.println("ok");
+    }
+}
+```
+### 10、@Regex
+**作用在对象属性和方法参数，对参数的值进行正则校验**      
+* **对象属性**
+```java
+@Data
+public class User {
+    @Regex(expr = "^[1-9]\d*$", message = "请输入正整数")
+    private Integer number;
+}
+```
+* **方法参数**
+```java
+@RestController
+public class TestController {
+    @PostMapping("/test")
+    public void test(@Decimal(expr = "^[1-9]\d*$", message = "请输入正整数") Integer number) {
         System.out.println("ok");
     }
 }

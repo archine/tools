@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 public @interface Mobile {
     /**
      * Exception information
-     * @return String
+     * @return message
      */
     String message() default "无效的手机号格式";
 }

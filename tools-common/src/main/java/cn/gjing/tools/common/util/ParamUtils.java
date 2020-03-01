@@ -300,4 +300,14 @@ public final class ParamUtils {
         return Pattern.compile(regex).matcher(postCode).matches();
     }
 
+    /**
+     * Whether it's numeric
+     *
+     * @param param param
+     * @return true or false
+     */
+    public static boolean isNumber(String param) {
+        String regex = "^(-?\\d+)(\\.\\d+)?$";
+        return Pattern.compile(regex).matcher(param).matches();
+    }
 }

@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 public @interface Email {
     /**
      * Exception information
-     * @return String
+     * @return message
      */
     String message() default "无效的邮件地址";
 }

@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 public @interface NotEmpty {
     /**
      * Exception information
-     * @return String
+     * @return message
      */
     String message() default "参数不能为空";
 }

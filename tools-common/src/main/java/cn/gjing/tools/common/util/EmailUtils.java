@@ -1,7 +1,5 @@
 package cn.gjing.tools.common.util;
 
-import cn.gjing.tools.common.exception.HttpException;
-
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.mail.Message;
@@ -64,7 +62,7 @@ public final class EmailUtils {
             msg.saveChanges();
             startSend(session, msg);
         } catch (Exception e) {
-            throw new HttpException(e.getMessage());
+            e.printStackTrace();
         }
         return true;
     }

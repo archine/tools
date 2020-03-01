@@ -1,7 +1,5 @@
 package cn.gjing.tools.common.util;
 
-import cn.gjing.tools.common.exception.CastException;
-
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -64,8 +62,9 @@ public final class BeanUtils {
      * @return T
      */
     public static <T> T toBean(Map<String, ?> map, Class<T> bean) {
+        T object = null;
         try {
-            T object = bean.newInstance();
+            object = bean.newInstance();
             BeanInfo beaninfo = Introspector.getBeanInfo(bean, Object.class);
             PropertyDescriptor[] pro = beaninfo.getPropertyDescriptors();
             for (PropertyDescriptor property : pro) {
@@ -74,10 +73,10 @@ public final class BeanUtils {
                 Method set = property.getWriteMethod();
                 set.invoke(object, value);
             }
-            return object;
         } catch (Exception e) {
-            throw new CastException(e.getMessage());
+            e.printStackTrace();
         }
+        return object;
     }
 
     /**
@@ -97,10 +96,10 @@ public final class BeanUtils {
                 Object value = get.invoke(bean);
                 map.put(key, value);
             }
-            return map;
         } catch (Exception e) {
-            throw new CastException(e.getMessage());
+            e.printStackTrace();
         }
+        return map;
     }
 
     /**

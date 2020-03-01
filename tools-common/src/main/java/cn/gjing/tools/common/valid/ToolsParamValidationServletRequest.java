@@ -26,7 +26,7 @@ class ToolsParamValidationServletRequest extends HttpServletRequestWrapper {
 
     @Override
     public BufferedReader getReader() throws IOException {
-        return new BufferedReader(new InputStreamReader(this.request.getInputStream()));
+        return new BufferedReader(new InputStreamReader(this.getInputStream()));
     }
 
     @Override
