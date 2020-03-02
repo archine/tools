@@ -12,10 +12,11 @@ public interface ExcelStyle {
     /**
      * Big title style
      *
+     * @param workbook workbook
      * @param cellStyle cellStyle
      * @return CellStyle
      */
-    default CellStyle setTitleStyle(CellStyle cellStyle) {
+    default CellStyle setTitleStyle(Workbook workbook, CellStyle cellStyle) {
         cellStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setWrapText(true);
@@ -31,10 +32,11 @@ public interface ExcelStyle {
     /**
      * Header style
      *
+     * @param workbook workbook
      * @param cellStyle cellStyle
      * @return CellStyle
      */
-    default CellStyle setHeaderStyle(CellStyle cellStyle) {
+    default CellStyle setHeaderStyle(Workbook workbook, CellStyle cellStyle) {
         cellStyle.setFillForegroundColor(IndexedColors.SKY_BLUE.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setWrapText(true);
@@ -49,10 +51,11 @@ public interface ExcelStyle {
     /**
      * Body style
      *
+     * @param workbook workbook
      * @param cellStyle cellStyle
      * @return CellStyle
      */
-    default CellStyle setBodyStyle(CellStyle cellStyle) {
+    default CellStyle setBodyStyle(Workbook workbook, CellStyle cellStyle) {
         cellStyle.setFillForegroundColor(IndexedColors.WHITE.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);

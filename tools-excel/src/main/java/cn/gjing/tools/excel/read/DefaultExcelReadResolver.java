@@ -130,9 +130,11 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 Cell valueCell = row.getCell(c);
                 if (valueCell != null) {
                     Object value = this.getValue(valueCell, field, excelField, readCallback);
-                    DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
-                    if (dataConvert != null) {
-                        value = dataConvert.toEntityAttribute(value, field, excelField);
+                    if (this.dataConvertMap != null) {
+                        DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+                        if (dataConvert != null) {
+                            value = dataConvert.toEntityAttribute(value, field, excelField);
+                        }
                     }
                     if (this.isSave && value != null) {
                         this.setValue(o, field, value);

@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.write;
 
+
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
@@ -72,8 +73,8 @@ class ExcelHelper {
                         try {
                             excelStyle = excelField.style().newInstance();
                             metaStyle = new MetaStyle();
-                            metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook.createCellStyle()));
-                            CellStyle headerStyle = excelStyle.setHeaderStyle(this.workbook.createCellStyle());
+                            metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook,this.workbook.createCellStyle()));
+                            CellStyle headerStyle = excelStyle.setHeaderStyle(this.workbook,this.workbook.createCellStyle());
                             metaStyle.setHeadStyle(headerStyle);
                             this.customerMetaStyleMap.put(field.getName(), metaStyle);
                             headCell.setCellStyle(headerStyle);
@@ -192,10 +193,12 @@ class ExcelHelper {
 
     @SuppressWarnings("unchecked")
     private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value) {
-        DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
-        if (dataConvert != null) {
-            dataConvert.toExcelAttribute(cell, value, field, excelField);
-            return;
+        if (this.dataConvertMap != null) {
+            DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+            if (dataConvert != null) {
+                dataConvert.toExcelAttribute(cell, value, field, excelField);
+                return;
+            }
         }
         cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
         if (value == null) {

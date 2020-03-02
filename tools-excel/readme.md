@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.4</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -570,7 +570,7 @@ public class User {
 public class MyExcelStyle implements ExcelStyle {
 
     @Override
-    public CellStyle setTitleStyle(CellStyle cellStyle) {
+    public CellStyle setTitleStyle(Workbook workbook, CellStyle cellStyle) {
         cellStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setWrapText(true);
