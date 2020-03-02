@@ -1,12 +1,12 @@
 package cn.gjing.tools.excel.write;
 
-
 import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.valid.ExcelDateValid;
 import cn.gjing.tools.excel.valid.ExcelDropdownBox;
 import cn.gjing.tools.excel.valid.ExcelNumericValid;
+import com.google.gson.Gson;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -25,7 +25,8 @@ class ExcelHelper {
     private Map<Integer, String> formulaMap;
     private Map<String, MetaStyle> customerMetaStyleMap;
     private Map<String, EnumConvert<Enum<?>, ?>> enumConvertMap;
-    private Map<String, DataConvert<?>> dataConvertMap;
+    private Map<String, DataConvert<?,?>> dataConvertMap;
+    private Gson gson;
 
     public ExcelHelper(Workbook workbook) {
         this.workbook = workbook;
@@ -90,6 +91,7 @@ class ExcelHelper {
                 if (excelField.convert() != DefaultDataConvert.class) {
                     if (this.dataConvertMap == null) {
                         this.dataConvertMap = new HashMap<>(16);
+                        this.gson = new Gson();
                     }
                     if (dataConvertMap.get(field.getName()) == null) {
                         try {
@@ -118,7 +120,7 @@ class ExcelHelper {
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(j);
                 this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell);
-                this.setCellVal(excelField, field, valueCell, value);
+                this.setCellVal(excelField, field, valueCell, value, o);
             }
         }
     }
@@ -192,15 +194,15 @@ class ExcelHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value) {
+    private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value,Object obj) {
+        cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
         if (this.dataConvertMap != null) {
-            DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+            DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
             if (dataConvert != null) {
-                dataConvert.toExcelAttribute(cell, value, field, excelField);
+                dataConvert.toExcelAttribute(cell, this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()),value, field, excelField);
                 return;
             }
         }
-        cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
         if (value == null) {
             cell.setCellValue("");
         } else {

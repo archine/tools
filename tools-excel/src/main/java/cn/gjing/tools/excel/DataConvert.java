@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 /**
  * @author Gjing
  **/
-public interface DataConvert<T> {
+public interface DataConvert<F,E> {
     /**
      * Convert to an entity field
      *
@@ -16,14 +16,16 @@ public interface DataConvert<T> {
      * @param field      Current field
      * @return T
      */
-    T toEntityAttribute(Object value, Field field, ExcelField excelField);
+    F toEntityAttribute(Object value, Field field, ExcelField excelField);
 
     /**
      * Convert to excel cell value
-     * @param cell Excel cell
-     * @param value The value of the current field
-     * @param field Current field
+     *
+     * @param cell       Excel cell
+     * @param obj        Current excel entity
+     * @param value      The value of the current field
+     * @param field      Current field
      * @param excelField ExcelField
      */
-    void toExcelAttribute(Cell cell, Object value, Field field, ExcelField excelField);
+    void toExcelAttribute(Cell cell, E obj, Object value, Field field, ExcelField excelField);
 }

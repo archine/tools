@@ -7,14 +7,14 @@ import java.lang.reflect.Field;
 /**
  * @author Gjing
  **/
-public class DefaultDataConvert implements DataConvert<Object> {
+public class DefaultDataConvert implements DataConvert<Object,Object> {
     @Override
     public Object toEntityAttribute(Object value, Field field, ExcelField excelField) {
         return null;
     }
 
     @Override
-    public void toExcelAttribute(Cell cell, Object value, Field field, ExcelField excelField) {
+    public void toExcelAttribute(Cell cell, Object obj, Object value, Field field, ExcelField excelField) {
 
     }
 }

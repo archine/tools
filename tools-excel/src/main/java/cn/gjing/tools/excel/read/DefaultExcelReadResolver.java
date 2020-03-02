@@ -30,7 +30,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private Map<String, Class<?>> enumInterfaceTypeMap;
     private List<String> headNameList;
     private Map<String, Field> hasAnnotationFieldMap;
-    private Map<String, DataConvert<?>> dataConvertMap;
+    private Map<String, DataConvert<?,?>> dataConvertMap;
     private boolean isSave;
 
     public DefaultExcelReadResolver() {
@@ -131,7 +131,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 if (valueCell != null) {
                     Object value = this.getValue(valueCell, field, excelField, readCallback);
                     if (this.dataConvertMap != null) {
-                        DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+                        DataConvert<?,?> dataConvert = this.dataConvertMap.get(field.getName());
                         if (dataConvert != null) {
                             value = dataConvert.toEntityAttribute(value, field, excelField);
                         }

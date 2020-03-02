@@ -88,5 +88,5 @@ public @interface ExcelField {
      *
      * @return DefaultDataConvert
      */
-    Class<? extends DataConvert<?>> convert() default DefaultDataConvert.class;
+    Class<? extends DataConvert<?,?>> convert() default DefaultDataConvert.class;
 }

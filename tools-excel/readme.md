@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -440,21 +440,20 @@ public class User {
 }
 ```
 ### 2、数据转换器
-**该转换器主要提供导入导出时对某个单元格进行数据处理，比如时间转换、数据校验等。。只需实现``DataConvert``接口，该接口支持泛型，泛型为你的当前表头的字段类型**
+**该转换器主要提供导入导出时对某个单元格进行数据处理，比如时间转换、数据校验等。。实现``DataConvert``接口，该接口支持泛型，泛型为你的当前表头的字段和实体类型**
 ```java
 /**
  * @author Gjing
  **/
-public class MyDataConvert implements DataConvert<String> {
+public class MyDataConvert implements DataConvert<String,User> {
     @Override
     public String toEntityAttribute(Object o, Field field, ExcelField excelField) {
-        //为每个值前面加个拉拉
-        return "拉拉" + o.toString();
+        return null;
     }
 
     @Override
-    public void toExcelAttribute(Cell cell, Object o, Field field, ExcelField excelField) {
-        cell.setCellValue(o.toString());
+    public void toExcelAttribute(Cell cell, User o, Object o1, Field field, ExcelField excelField) {
+        
     }
 }
 ```
