@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.5</version>
+    <version>1.3.6</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -35,10 +35,26 @@
 |strategy|导入时表头下方单元格内容为空时所执行的策略，策略有：``jump``(跳过当前这条数据，该策略会发起回调)、``error``(抛出异常，``本次导入终止``)|
 |message|执行策略为``error``的时候抛出的异常信息|
 |sort|表头出现在Excel的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
-|sum|表头导出时整列是否需要求和，默认``false``。可以通过``format``设置保存的数字格式，默认保存``整数``，要统计的表头``不要出现在第一列``，求和的描述可以通过value设置，只取``第一个需要求和的表头中设置的对应值``|
-|convert|数据转换器，对单个单元格内容进行数据处理|
-### 3、@ExcelDateValid
-**表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下**     
+|sum|表头导出时整列是否需要求和，默认``false``|
+|convert|数据转换器，对单元格内容进行数据处理的时候使用|
+### 3、@Sum
+**在@ExcelField注解的sum参数使用，该注解会对所在表头下的整列进行末尾求和，``要求和的表头不应为第一列``** 
+    
+|参数|描述|
+|---|---|
+|open|是否开启，默认``false``|
+|value|求和的描述，整个Excel实体中只会找``第一个开启``了求和的表头中设置的描述|
+|format|求和后的数字格式，默认整数|
+### 4、@Merge
+**在@ExcelFiled注解的autoMerge参数使用，使用该注解后会自动纵向合并当前表头下相邻且值相同的单元格。``示例用法可参考第五节：辅助功能``**     
+
+|参数|描述|
+|---|---|
+|open|是否开启，默认``false``|
+|empty|null值或者空字符串是否也要合并，默认``false``|
+|callback|合并回调接口类，可以通过回调进行自定义设置合并规则|
+### 5、@ExcelDateValid
+**表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
 |---|---|
@@ -52,8 +68,8 @@
 |rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
-### 4、@ExcelDropdownBox
-**表头上使用，使用后会在导出模板时对表头下方的单元格增加下拉框，注解参数如下**     
+### 6、@ExcelDropdownBox
+**表头上使用，使用后会在导出模板时对表头下方的单元格增加下拉框，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
 |-----|-----|
@@ -62,11 +78,11 @@
 |boxLastRow|需要给多少行单元格加上下拉框，默认只加在第一行单元格|
 |showErrorBox|是否弹出错误框，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
-|link|指定当前表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``|
+|link|指定当前表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``。，``示例用法可参考第五节：辅助功能``|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
-#### 5、@ExcelNumericValid
-**表头使用，会在导出模板时对该表头下方的单元格加入文本长度、数字大小校验，注解参数如下**     
+### 7、@ExcelNumericValid
+**表头使用，会在导出模板时对该表头下方的单元格加入文本长度、数字大小校验，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
 |-----|-----|
@@ -80,8 +96,8 @@
 |rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
-#### 6、@ExcelEnumConvert
-**枚举转换器，在字段类型为枚举时需要配置，否则在导入导出时未检测到转换器会抛出未找到转换器异常，注解参数如下**     
+### 8、@ExcelEnumConvert
+**枚举转换器，在字段类型为枚举时需要配置，否则在导入导出时未检测到转换器会抛出未找到转换器异常，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
 |---|---|
@@ -99,7 +115,7 @@ public class User {
     @ExcelField(value = "用户名", sort = 1)
     private String userName;
 
-    @ExcelField(value = "性别", autoMerge= true)
+    @ExcelField(value = "性别")
     private GenderEnum gender;
 
     //导入导出时按照设置的格式进行格式化时间
@@ -535,7 +551,29 @@ public class UserController {
     }
 }
 ```
-### 4、时间校验
+### 4、自定义设置合并规则
+**如若Excel实体中每个表头都想有独立的纵向合并规则，那么可使用合并回调的方式进行设置，需实现``MergeCalback``接口，该接口需指定当前Excel实体**
+```java
+/**
+ * 如果名字是张三，我才需要合并，否则不需要
+ * @author Gjing
+ **/
+public class MyMergeCallback implements MergeCallback<User1> {
+    @Override
+    public boolean toMerge(User1 user1, Field field, int i, int i1) {
+        return "张三".equals(user1.getUserName());
+    }
+}
+```
+**在Excel实体的表头指定**
+```java
+@Excel("测试自定义合并导出")
+public class User1 {
+    @ExcelField(value = "用户名", autoMerge = @Merge(open = true,callback = MyMergeCallback.class))
+    private String userName;
+}
+```
+### 5、时间校验
 **该注解默认采取的方式是设置时间范围，你也可以通过``operatorType``去修改，``expr2``只在操作类型为``between``或者``NotBetween``时需要设置，对于其他操作类型设置``expr1``即可**
 ```java
 @Excel("用户列表")
@@ -546,7 +584,7 @@ public class User {
     private Date createTime;
 }
 ```
-### 5、值校验
+### 6、值校验
 **对单元格进行值类型校验，下面演示了限制输入用户名的长度不能超过2位，对于其他判断方式可自行查看参数**
 ```java
 @Excel("用户列表")
@@ -569,7 +607,7 @@ public class User {
 public class MyExcelStyle implements ExcelStyle {
 
     @Override
-    public CellStyle setTitleStyle(Workbook workbook, CellStyle cellStyle) {
+    public CellStyle setTitleStyle(CellStyle cellStyle) {
         cellStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setWrapText(true);

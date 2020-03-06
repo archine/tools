@@ -34,9 +34,19 @@ public class ParamUtils {
      *
      * @param param1 param1
      * @param param2 param2
+     * @param allEmpty Whether allow empty？
      * @return boolean
      */
-    public static boolean equals(Object param1, Object param2) {
+    public static boolean equals(Object param1, Object param2, boolean allEmpty) {
+        if (allEmpty) {
+            if (param1 == param2) {
+                return true;
+            }
+            return param1 != null && param1.equals(param2);
+        }
+        if (param1 == null || "".equals(param1)) {
+            return false;
+        }
         return param1 == param2 || param1.equals(param2);
     }
 

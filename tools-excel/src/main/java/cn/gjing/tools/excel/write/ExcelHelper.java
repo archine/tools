@@ -1,6 +1,10 @@
 package cn.gjing.tools.excel.write;
 
+
 import cn.gjing.tools.excel.*;
+import cn.gjing.tools.excel.listen.DataConvert;
+import cn.gjing.tools.excel.listen.EnumConvert;
+import cn.gjing.tools.excel.listen.MergeCallback;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.valid.ExcelDateValid;
@@ -25,11 +29,13 @@ class ExcelHelper {
     private Map<Integer, String> formulaMap;
     private Map<String, MetaStyle> customerMetaStyleMap;
     private Map<String, EnumConvert<Enum<?>, ?>> enumConvertMap;
-    private Map<String, DataConvert<?,?>> dataConvertMap;
+    private Map<String, DataConvert<?, ?>> dataConvertMap;
+    private Map<String, MergeCallback<?>> mergeCallbackMap;
     private Gson gson;
 
     public ExcelHelper(Workbook workbook) {
         this.workbook = workbook;
+        this.gson = new Gson();
         this.customerMetaStyleMap = new HashMap<>(16);
     }
 
@@ -74,8 +80,8 @@ class ExcelHelper {
                         try {
                             excelStyle = excelField.style().newInstance();
                             metaStyle = new MetaStyle();
-                            metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook,this.workbook.createCellStyle()));
-                            CellStyle headerStyle = excelStyle.setHeaderStyle(this.workbook,this.workbook.createCellStyle());
+                            metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()));
+                            CellStyle headerStyle = excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle());
                             metaStyle.setHeadStyle(headerStyle);
                             this.customerMetaStyleMap.put(field.getName(), metaStyle);
                             headCell.setCellStyle(headerStyle);
@@ -91,11 +97,22 @@ class ExcelHelper {
                 if (excelField.convert() != DefaultDataConvert.class) {
                     if (this.dataConvertMap == null) {
                         this.dataConvertMap = new HashMap<>(16);
-                        this.gson = new Gson();
                     }
                     if (dataConvertMap.get(field.getName()) == null) {
                         try {
                             this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (excelField.autoMerge().open()) {
+                    if (this.mergeCallbackMap == null) {
+                        this.mergeCallbackMap = new HashMap<>(16);
+                    }
+                    if (this.mergeCallbackMap.get(field.getName()) == null) {
+                        try {
+                            this.mergeCallbackMap.put(field.getName(), excelField.autoMerge().callback().newInstance());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -119,13 +136,14 @@ class ExcelHelper {
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(j);
-                this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell);
+                this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell, field, o);
                 this.setCellVal(excelField, field, valueCell, value, o);
             }
         }
     }
 
-    private void sumOrMerge(Sheet sheet, Map<Object, ExcelModel> excelModelMap, int i, int dataSize, Row valueRow, int j, ExcelField excelField, Object value, Cell valueCell) {
+    private void sumOrMerge(Sheet sheet, Map<Object, ExcelModel> excelModelMap, int i, int dataSize, Row valueRow, int j, ExcelField excelField, Object value,
+                            Cell valueCell, Field field, Object obj) {
         if (i == 0) {
             if (excelField.sum().open()) {
                 if (formulaMap == null) {
@@ -133,29 +151,35 @@ class ExcelHelper {
                 }
                 this.formulaMap.put(j, valueCell.getAddress().formatAsString() + ":");
             }
-            if (excelField.autoMerge()) {
-                this.putExcelModel(valueRow, value, excelModelMap, i + "-" + j);
+            if (excelField.autoMerge().open()) {
+                this.putExcelModel(valueRow, value, excelModelMap, j);
             }
         } else {
-            if (excelField.autoMerge()) {
-                String mergeKey = i + "-" + j;
-                String oldKey = (i - 1) + "-" + j;
-                ExcelModel excelModel = excelModelMap.get(oldKey);
+            if (excelField.autoMerge().open()) {
+                MergeCallback<?> mergeCallback = this.mergeCallbackMap.get(field.getName());
+                ExcelModel excelModel = excelModelMap.get(j);
                 if (excelModel != null) {
-                    if (ParamUtils.equals(value, excelModel.getOldValue())) {
-                        if (i == dataSize - 1) {
-                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), valueRow.getRowNum(), j, j));
+                    if (mergeCallback.toMerge(this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), field, j, i)) {
+                        if (ParamUtils.equals(value, excelModel.getOldValue(),excelField.autoMerge().empty())) {
+                            if (i == dataSize - 1) {
+                                sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum(), j, j));
+                            }
                         } else {
-                            excelModelMap.put(mergeKey, excelModel);
+                            if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
+                                sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
+                            }
+                            if (i != dataSize - 1) {
+                                this.putExcelModel(valueRow, value, excelModelMap, j);
+                            }
                         }
-                    } else {
-                        if (excelModel.getRowIndex() + 1 < valueRow.getRowNum()) {
-                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getRowIndex(), valueRow.getRowNum() - 1, j, j));
-                        }
-                        if (i != dataSize - 1) {
-                            this.putExcelModel(valueRow, value, excelModelMap, mergeKey);
-                        }
+                        return;
                     }
+                    if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
+                        sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
+                    }
+                    excelModel.setOldValue(value);
+                    excelModel.setOldRowIndex(valueRow.getRowNum());
+                    excelModelMap.put(j, excelModel);
                 }
             }
             if (i == dataSize - 1) {
@@ -186,20 +210,20 @@ class ExcelHelper {
         }
     }
 
-    private void putExcelModel(Row row, Object value, Map<Object, ExcelModel> excelModelMap, String key) {
+    private void putExcelModel(Row row, Object value, Map<Object, ExcelModel> excelModelMap, int key) {
         excelModelMap.put(key, ExcelModel.builder()
                 .oldValue(value)
-                .rowIndex(row.getRowNum())
+                .oldRowIndex(row.getRowNum())
                 .build());
     }
 
     @SuppressWarnings("unchecked")
-    private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value,Object obj) {
+    private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value, Object obj) {
         cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
         if (this.dataConvertMap != null) {
             DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
             if (dataConvert != null) {
-                dataConvert.toExcelAttribute(cell, this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()),value, field, excelField);
+                dataConvert.toExcelAttribute(cell, this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), value, field, excelField);
                 return;
             }
         }

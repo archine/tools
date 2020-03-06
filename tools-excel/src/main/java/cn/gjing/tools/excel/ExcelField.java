@@ -1,5 +1,7 @@
 package cn.gjing.tools.excel;
 
+import cn.gjing.tools.excel.listen.DataConvert;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,7 +48,7 @@ public @interface ExcelField {
      *
      * @return autoMerge
      */
-    boolean autoMerge() default false;
+    Merge autoMerge() default @Merge;
 
     /**
      * Cell sum
@@ -84,9 +86,9 @@ public @interface ExcelField {
     String message() default "参数不能为空";
 
     /**
-     * Data convert, Operate on the contents of a single cell
+     * Data convert
      *
-     * @return DefaultDataConvert
+     * @return DefaultDataConvert.class
      */
     Class<? extends DataConvert<?,?>> convert() default DefaultDataConvert.class;
 }

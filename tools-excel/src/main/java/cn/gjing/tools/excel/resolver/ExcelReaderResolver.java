@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.resolver;
 
-import cn.gjing.tools.excel.ReadListener;
-import cn.gjing.tools.excel.ReadCallback;
+import cn.gjing.tools.excel.listen.ReadCallback;
+import cn.gjing.tools.excel.listen.ReadListener;
 
 import java.io.InputStream;
 import java.util.List;

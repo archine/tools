@@ -19,7 +19,7 @@ public class DefaultDropdownBoxValidation implements ExcelDropdownBoxValidation 
         DataValidationConstraint constraint;
         CellRangeAddressList regions;
         Sheet explicitSheet;
-        if (ParamUtils.equals("", excelDropdownBox.link())) {
+        if (ParamUtils.equals("", excelDropdownBox.link(), true)) {
             String[] explicitValues = values.get(fieldName);
             if (explicitValues == null) {
                 constraint = helper.createExplicitListConstraint(excelDropdownBox.combobox());

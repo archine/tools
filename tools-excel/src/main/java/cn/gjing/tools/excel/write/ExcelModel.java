@@ -16,7 +16,7 @@ class ExcelModel {
      */
     private Object oldValue;
     /**
-     * The last row index
+     * The ord row index
      */
-    private int rowIndex;
+    private int oldRowIndex;
 }

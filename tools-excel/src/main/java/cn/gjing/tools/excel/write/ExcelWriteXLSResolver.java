@@ -16,7 +16,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 /**
- * XLS resolver
+ * XLS处理器
  *
  * @author Gjing
  **/
