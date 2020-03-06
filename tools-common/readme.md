@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.5.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.5.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)   
  
 Java开发基础工具包
@@ -7,7 +7,7 @@ Java开发基础工具包
 <dependency>
   <groupId>cn.gjing</groupId>
   <artifactId>tools-common</artifactId>
-  <version>1.5.7</version>
+  <version>1.5.8</version>
 </dependency>
 ```
 ## 一、Rest接口参数校验注解

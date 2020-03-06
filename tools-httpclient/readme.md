@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.6-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
+![](https://img.shields.io/badge/version-1.2.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
   
 **Http请求工具**
 ## 一、添加依赖
@@ -6,7 +6,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-httpclient</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
 </dependency>
 ```
 ## 二、使用说明

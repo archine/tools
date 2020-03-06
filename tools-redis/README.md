@@ -1,5 +1,5 @@
 ### SpringBoot分布式锁和缓存
-![](https://img.shields.io/badge/version-1.2.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.2.1-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)      
 ## 分布式锁的使用
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-redis</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 ### 二. 启动类标注注解
