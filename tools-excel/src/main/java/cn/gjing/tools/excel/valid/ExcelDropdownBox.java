@@ -31,9 +31,9 @@ public @interface ExcelDropdownBox {
     /**
      * Check the number of rows
      *
-     * @return rows
+     * @return 200
      */
-    int boxLastRow() default 0;
+    int boxLastRow() default 200;
 
     /**
      * Whether the error box pops up

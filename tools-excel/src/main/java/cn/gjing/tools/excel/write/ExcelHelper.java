@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write;
 
 
 import cn.gjing.tools.excel.*;
+import cn.gjing.tools.excel.exception.ExcelException;
 import cn.gjing.tools.excel.listen.DataConvert;
 import cn.gjing.tools.excel.listen.EnumConvert;
 import cn.gjing.tools.excel.listen.MergeCallback;
@@ -60,40 +61,45 @@ class ExcelHelper {
         }
     }
 
-    public void setVal(List<?> data, List<Field> headFieldList, Sheet sheet, boolean changed, int rowIndex, MetaObject metaObject) {
+    public int setHead(List<?> data, List<Field> headFieldList, Sheet sheet, boolean changed, int rowIndex, MetaObject metaObject, Excel excel) {
         boolean locked = false;
         if (changed) {
             rowIndex = rowIndex == 0 ? 0 : rowIndex + 1;
             Row headRow = sheet.createRow(rowIndex);
+            headRow.setHeight(excel.headHeight());
             MetaStyle metaStyle;
             ExcelStyle excelStyle;
             for (int i = 0, headFieldSize = headFieldList.size(); i < headFieldSize; i++) {
                 Cell headCell = headRow.createCell(i);
                 Field field = headFieldList.get(i);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
+                if (data == null || data.isEmpty()) {
+                    locked = this.addValid(field, headRow, i, locked, sheet, metaObject);
+                    if (!"".equals(excelField.format())) {
+                        CellStyle defaultColumnStyle = this.workbook.createCellStyle();
+                        defaultColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.format()));
+                        sheet.setDefaultColumnStyle(i, defaultColumnStyle);
+                    }
+                }
                 if (excelField.style() == DefaultExcelStyle.class) {
-                    headCell.setCellStyle(metaObject.getMetaStyle().getHeadStyle());
-                    this.customerMetaStyleMap.put(field.getName(), metaObject.getMetaStyle());
+                    metaStyle = metaObject.getMetaStyle();
                 } else {
                     metaStyle = this.customerMetaStyleMap.get(field.getName());
                     if (metaStyle == null) {
                         try {
                             excelStyle = excelField.style().newInstance();
-                            metaStyle = new MetaStyle();
-                            metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()));
-                            CellStyle headerStyle = excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle());
-                            metaStyle.setHeadStyle(headerStyle);
-                            this.customerMetaStyleMap.put(field.getName(), metaStyle);
-                            headCell.setCellStyle(headerStyle);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            throw new ExcelException("Init excel style error " + field.getName() + ", " + e.getMessage());
                         }
-                    } else {
-                        headCell.setCellStyle(metaStyle.getHeadStyle());
+                        metaStyle = new MetaStyle();
+                        metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()));
+                        metaStyle.setHeadStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()));
                     }
                 }
-                headCell.setCellValue(excelField.value());
+                headCell.setCellStyle(metaStyle.getHeadStyle());
                 sheet.setColumnWidth(i, excelField.width());
+                headCell.setCellValue(excelField.value());
+                this.customerMetaStyleMap.put(field.getName(), metaStyle);
                 if (excelField.convert() != DefaultDataConvert.class) {
                     if (this.dataConvertMap == null) {
                         this.dataConvertMap = new HashMap<>(16);
@@ -102,7 +108,7 @@ class ExcelHelper {
                         try {
                             this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            throw new ExcelException("Init data convert error " + field.getName() + ", " + e.getMessage());
                         }
                     }
                 }
@@ -114,23 +120,22 @@ class ExcelHelper {
                         try {
                             this.mergeCallbackMap.put(field.getName(), excelField.autoMerge().callback().newInstance());
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            throw new ExcelException("Init merge callback error " + field.getName() + ", " + e.getMessage());
                         }
                     }
                 }
-                if (data == null || data.isEmpty()) {
-                    locked = this.addValid(field, headRow, i, locked, sheet, metaObject);
-                }
             }
         }
-        if (data == null || data.isEmpty()) {
-            return;
-        }
+        return rowIndex;
+    }
+
+    public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, int rowIndex,Excel excel) {
         rowIndex++;
         Map<Object, ExcelModel> excelModelMap = new HashMap<>(16);
         for (int i = 0, dataSize = data.size(); i < dataSize; i++) {
             Object o = data.get(i);
             Row valueRow = sheet.createRow(rowIndex + i);
+            valueRow.setHeight(excel.bodyHeight());
             for (int j = 0, headSize = headFieldList.size(); j < headSize; j++) {
                 Field field = headFieldList.get(j);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
@@ -154,67 +159,61 @@ class ExcelHelper {
             if (excelField.autoMerge().open()) {
                 this.putExcelModel(valueRow, value, excelModelMap, j);
             }
-        } else {
-            if (excelField.autoMerge().open()) {
-                MergeCallback<?> mergeCallback = this.mergeCallbackMap.get(field.getName());
-                ExcelModel excelModel = excelModelMap.get(j);
-                if (excelModel != null) {
-                    if (mergeCallback.toMerge(this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), field, j, i)) {
-                        if (ParamUtils.equals(value, excelModel.getOldValue(),excelField.autoMerge().empty())) {
-                            if (i == dataSize - 1) {
-                                sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum(), j, j));
-                            }
-                        } else {
-                            if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
-                                sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
-                            }
-                            if (i != dataSize - 1) {
-                                this.putExcelModel(valueRow, value, excelModelMap, j);
-                            }
+            return;
+        }
+        if (excelField.autoMerge().open()) {
+            MergeCallback<?> mergeCallback = this.mergeCallbackMap.get(field.getName());
+            ExcelModel excelModel = excelModelMap.get(j);
+            if (excelModel != null) {
+                if (mergeCallback.toMerge(this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), field, j, i)) {
+                    if (ParamUtils.equals(value, excelModel.getOldValue(), excelField.autoMerge().empty())) {
+                        if (i == dataSize - 1) {
+                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum(), j, j));
                         }
-                        return;
+                    } else {
+                        if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
+                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
+                        }
+                        if (i != dataSize - 1) {
+                            this.putExcelModel(valueRow, value, excelModelMap, j);
+                        }
                     }
-                    if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
-                        sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
-                    }
-                    excelModel.setOldValue(value);
-                    excelModel.setOldRowIndex(valueRow.getRowNum());
-                    excelModelMap.put(j, excelModel);
+                    return;
                 }
-            }
-            if (i == dataSize - 1) {
-                if (excelField.sum().open()) {
-                    String formula = formulaMap.get(j) + valueCell.getAddress().formatAsString();
-                    Row row = sheet.getRow(valueCell.getAddress().getRow() + 1);
-                    if (row == null) {
-                        row = sheet.createRow(valueCell.getAddress().getRow() + 1);
-                        CellStyle cellStyle = this.workbook.createCellStyle();
-                        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-                        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-                        Cell remarkCell = row.createCell(0);
-                        Font font = this.workbook.createFont();
-                        font.setBold(true);
-                        cellStyle.setFont(font);
-                        remarkCell.setCellStyle(cellStyle);
-                        remarkCell.setCellValue(excelField.sum().value());
-                    }
-                    Cell sumCell = row.createCell(j);
-                    sumCell.setCellFormula("SUM(" + formula + ")");
-                    CellStyle sumStyle = this.workbook.createCellStyle();
-                    sumStyle.setAlignment(HorizontalAlignment.CENTER);
-                    sumStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-                    sumStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.sum().format()));
-                    sumCell.setCellStyle(sumStyle);
+                if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
+                    sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
                 }
+                excelModel.setOldValue(value);
+                excelModel.setOldRowIndex(valueRow.getRowNum());
+                excelModelMap.put(j, excelModel);
             }
         }
-    }
-
-    private void putExcelModel(Row row, Object value, Map<Object, ExcelModel> excelModelMap, int key) {
-        excelModelMap.put(key, ExcelModel.builder()
-                .oldValue(value)
-                .oldRowIndex(row.getRowNum())
-                .build());
+        if (i == dataSize - 1) {
+            if (excelField.sum().open()) {
+                String formula = formulaMap.get(j) + valueCell.getAddress().formatAsString();
+                Row row = sheet.getRow(valueCell.getAddress().getRow() + 1);
+                if (row == null) {
+                    row = sheet.createRow(valueCell.getAddress().getRow() + 1);
+                    row.setHeight(excelField.sum().height());
+                    CellStyle cellStyle = this.workbook.createCellStyle();
+                    cellStyle.setAlignment(HorizontalAlignment.CENTER);
+                    cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                    Cell remarkCell = row.createCell(0);
+                    Font font = this.workbook.createFont();
+                    font.setBold(true);
+                    cellStyle.setFont(font);
+                    remarkCell.setCellStyle(cellStyle);
+                    remarkCell.setCellValue(excelField.sum().value());
+                }
+                Cell sumCell = row.createCell(j);
+                sumCell.setCellFormula("SUM(" + formula + ")");
+                CellStyle sumStyle = this.workbook.createCellStyle();
+                sumStyle.setAlignment(HorizontalAlignment.CENTER);
+                sumStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                sumStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.sum().format()));
+                sumCell.setCellStyle(sumStyle);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -229,51 +228,51 @@ class ExcelHelper {
         }
         if (value == null) {
             cell.setCellValue("");
-        } else {
-            if (field.getType().isEnum()) {
-                if (this.enumConvertMap == null) {
-                    this.enumConvertMap = new HashMap<>(16);
-                }
-                EnumConvert<Enum<?>, ?> enumConvert = this.enumConvertMap.get(field.getName());
-                Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
-                if (enumConvert == null) {
-                    ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-                    Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
-                    try {
-                        enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
-                        cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
-                        this.enumConvertMap.put(field.getName(), enumConvert);
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                } else {
+            return;
+        }
+        if (field.getType().isEnum()) {
+            if (this.enumConvertMap == null) {
+                this.enumConvertMap = new HashMap<>(16);
+            }
+            EnumConvert<Enum<?>, ?> enumConvert = this.enumConvertMap.get(field.getName());
+            Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
+            if (enumConvert == null) {
+                ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
+                Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
+                try {
+                    enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
                     cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
+                    this.enumConvertMap.put(field.getName(), enumConvert);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-                return;
-            }
-            if (field.getType() == Date.class) {
-                if (this.formatMap == null) {
-                    this.formatMap = new HashMap<>(16);
-                    SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
-                    this.formatMap.put(field.getName(), format);
-                    cell.setCellValue(format.format(value));
-                } else {
-                    SimpleDateFormat format = formatMap.get(field.getName());
-                    if (format == null) {
-                        format = new SimpleDateFormat(excelField.pattern());
-                        this.formatMap.put(field.getName(), format);
-                    }
-                    cell.setCellValue(format.format(value));
-                }
-                return;
-            }
-            String val = value.toString();
-            int len = val.contains(".") ? val.substring(0, val.indexOf(".")).length() : val.length();
-            if (field.getType() != String.class && ParamUtils.isNumber(val) && len < 17) {
-                cell.setCellValue(new BigDecimal(val).doubleValue());
             } else {
-                cell.setCellValue(val);
+                cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
             }
+            return;
+        }
+        if (field.getType() == Date.class) {
+            if (this.formatMap == null) {
+                this.formatMap = new HashMap<>(16);
+                SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
+                this.formatMap.put(field.getName(), format);
+                cell.setCellValue(format.format(value));
+            } else {
+                SimpleDateFormat format = formatMap.get(field.getName());
+                if (format == null) {
+                    format = new SimpleDateFormat(excelField.pattern());
+                    this.formatMap.put(field.getName(), format);
+                }
+                cell.setCellValue(format.format(value));
+            }
+            return;
+        }
+        String val = value.toString();
+        int len = val.contains(".") ? val.substring(0, val.indexOf(".")).length() : val.length();
+        if (field.getType() != String.class && ParamUtils.isNumber(val) && len < 17) {
+            cell.setCellValue(new BigDecimal(val).doubleValue());
+        } else {
+            cell.setCellValue(val);
         }
     }
 
@@ -281,34 +280,36 @@ class ExcelHelper {
         ExcelDropdownBox ev = field.getAnnotation(ExcelDropdownBox.class);
         ExcelDateValid dv = field.getAnnotation(ExcelDateValid.class);
         ExcelNumericValid nv = field.getAnnotation(ExcelNumericValid.class);
+        int firstRow = row.getRowNum() + 1;
         if (ev != null) {
             try {
-                int firstRow = row.getRowNum() + 1;
                 locked = ev.validClass().newInstance().valid(ev, this.workbook, sheet, firstRow, ev.boxLastRow() == 0 ? firstRow : ev.boxLastRow() + firstRow - 1, i, i, locked, field.getName()
                         , metaObject.getExplicitValues());
             } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+                throw new ExcelException("Add dropdown box error " + field.getName() + ", " + e.getMessage());
             }
-            return locked;
         }
         if (dv != null) {
-            int firstRow = row.getRowNum() + 1;
             try {
                 dv.validClass().newInstance().valid(dv, sheet, firstRow, dv.boxLastRow() == 0 ? firstRow : dv.boxLastRow() + firstRow - 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+                throw new ExcelException("Add date valid error " + field.getName() + ", " + e.getMessage());
             }
-            return locked;
         }
         if (nv != null) {
-            int firstRow = row.getRowNum() + 1;
             try {
                 nv.validClass().newInstance().valid(nv, sheet, firstRow, nv.boxLastRow() == 0 ? firstRow : nv.boxLastRow() + firstRow - 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+                throw new ExcelException("Add numeric valid error " + field.getName() + ", " + e.getMessage());
             }
-            return locked;
         }
         return locked;
+    }
+
+    private void putExcelModel(Row row, Object value, Map<Object, ExcelModel> excelModelMap, int key) {
+        excelModelMap.put(key, ExcelModel.builder()
+                .oldValue(value)
+                .oldRowIndex(row.getRowNum())
+                .build());
     }
 }

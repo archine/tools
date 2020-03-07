@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.6</version>
+    <version>1.3.7</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -18,6 +18,8 @@
 |---|---|
 |value|Excel导出的文件名，优先级``低``于方法传入|
 |type|Excel导出的文档类型，默认``XLS``|
+|headHeight|列表头的行高，默认``350``|
+|bodyHeight|正文的行高，默认``300``|
 |maxSize|当文档类型为``XLSX``时，保留在内存中的条数，超出会将其写入到本地|
 |bufferSize|当文档类型为``XLSX``时，允许在内存中保存的字节|
 |style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
@@ -29,12 +31,13 @@
 |value|表头名称, ``必填``|
 |pattern|导入导出时会按配置的格式进行格式化时间，默认``yyyy-MM-dd HH:mm:ss``|
 |width|表头所在列的整列单元格宽度，默认``5120``|
-|autoMerge|表头所在列是否需要自动纵向合并相邻且值相同的单元格，默认``false``|
 |style|表头的样式，``优先级高于全局配置``|
+|sort|表头出现在Excel的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
+|format|导出Excel模板时表头下方的单元格数据格式|
+|autoMerge|表头所在列是否需要自动纵向合并相邻且值相同的单元格，默认``false``|
 |allowEmpty|表头下方的单元格是否允许空值，默认``true``|
 |strategy|导入时表头下方单元格内容为空时所执行的策略，策略有：``jump``(跳过当前这条数据，该策略会发起回调)、``error``(抛出异常，``本次导入终止``)|
 |message|执行策略为``error``的时候抛出的异常信息|
-|sort|表头出现在Excel的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
 |sum|表头导出时整列是否需要求和，默认``false``|
 |convert|数据转换器，对单元格内容进行数据处理的时候使用|
 ### 3、@Sum
@@ -45,6 +48,7 @@
 |open|是否开启，默认``false``|
 |value|求和的描述，整个Excel实体中只会找``第一个开启``了求和的表头中设置的描述|
 |format|求和后的数字格式，默认整数|
+|height|行高，默认``300``|
 ### 4、@Merge
 **在@ExcelFiled注解的autoMerge参数使用，使用该注解后会自动纵向合并当前表头下相邻且值相同的单元格。``示例用法可参考第五节：辅助功能``**     
 
@@ -59,7 +63,7 @@
 |参数|描述|
 |---|---|
 |validClass|校验器|
-|boxLastRow|需要给多少行单元格加上校验，默认只加在第一行单元格|
+|boxLastRow|需要给多少行单元格加上校验，默认``200``|
 |pattern|校验的时间格式，默认``yyyy-MM-dd``，配置后只允许输入该格式|
 |operatorType|操作类型，默认``OperatorType.BETWEEN``|
 |expr1|表达式1，默认``1970-01-01``|
@@ -75,7 +79,7 @@
 |-----|-----|
 |validClass|校验器|
 |combobox|下拉框中的内容，``方法设置优先级高于注解配置``|
-|boxLastRow|需要给多少行单元格加上下拉框，默认只加在第一行单元格|
+|boxLastRow|需要给多少行单元格加上下拉框，默认``200``|
 |showErrorBox|是否弹出错误框，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
 |link|指定当前表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``。，``示例用法可参考第五节：辅助功能``|
@@ -87,7 +91,7 @@
 |参数|描述|
 |-----|-----|
 |validClass|校验器Class|
-|boxLastRow|需要给多少行单元格加上校验，默认只加在第一行单元格|
+|boxLastRow|需要给多少行单元格加上校验，默认``200``|
 |operatorType|操作类型，默认``OperatorType.LESS_OR_EQUAL``|
 |validType|校验类型，默认``ValidType.TEXT_LENGTH``|
 |expr1|表达式1，在表达式2前面，默认``0``|

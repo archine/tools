@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.write;
 
+import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.MetaObject;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -26,7 +27,7 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
     private ExcelHelper excelHelper;
 
     @Override
-    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed) {
+    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed, Excel excel) {
         this.workbook = (HSSFWorkbook) workbook;
         HSSFSheet sheet = this.workbook.getSheet(sheetName);
         if (sheet == null) {
@@ -37,7 +38,11 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
             this.excelHelper = new ExcelHelper(this.workbook);
         }
         int rowIndex = this.excelHelper.setBigTitle(headFieldList, metaObject, sheet);
-        this.excelHelper.setVal(data, headFieldList, sheet, changed, rowIndex, metaObject);
+        rowIndex = this.excelHelper.setHead(data, headFieldList, sheet, changed, rowIndex, metaObject, excel);
+        if (data == null || data.isEmpty()) {
+            return;
+        }
+        this.excelHelper.setValue(data, headFieldList, sheet, rowIndex, excel);
     }
 
     @Override

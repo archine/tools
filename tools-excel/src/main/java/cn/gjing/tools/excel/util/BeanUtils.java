@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  *
  * @author Gjing
  **/
-public class BeanUtils {
+public final class BeanUtils {
     /**
      * Sets the value of a field of an object
      *
@@ -66,8 +66,8 @@ public class BeanUtils {
         }
         return fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .filter(e -> ParamUtils.noContains(ignores, e.getName()))
-                .sorted(Comparator.comparing(e->e.getAnnotation(ExcelField.class).sort()))
+                .filter(e -> ParamUtils.noContains(ignores, e.getAnnotation(ExcelField.class).value()))
+                .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).sort()))
                 .collect(Collectors.toList());
     }
 
@@ -92,8 +92,9 @@ public class BeanUtils {
 
     /**
      * Gets the corresponding enum by value
+     *
      * @param enumClass The enum class to get
-     * @param value Enum value
+     * @param value     Enum value
      * @return Enum
      */
     public static Enum<?> getEnum(Class<? extends Enum<?>> enumClass, String value) {

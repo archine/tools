@@ -1,5 +1,7 @@
 package cn.gjing.tools.excel.util;
 
+import cn.gjing.tools.excel.exception.ExcelException;
+
 import java.util.regex.Pattern;
 
 /**
@@ -7,7 +9,7 @@ import java.util.regex.Pattern;
  *
  * @author Gjing
  **/
-public class ParamUtils {
+public final class ParamUtils {
     private static Pattern pattern = Pattern.compile("^(-?\\d+)(\\.\\d+)?$");
 
     /**
@@ -48,6 +50,20 @@ public class ParamUtils {
             return false;
         }
         return param1 == param2 || param1.equals(param2);
+    }
+
+    /**
+     * Whether obj is null
+     * @param obj obj
+     * @param message error message
+     * @param <T> T
+     * @return obj
+     */
+    public static <T> T requireNonNull(T obj, String message) {
+        if (obj == null) {
+            throw new ExcelException(message);
+        }
+        return obj;
     }
 
     /**

@@ -36,7 +36,8 @@ public class DefaultDropdownBoxValidation implements ExcelDropdownBoxValidation 
                     explicitSheetRow.createCell(firstCol).setCellValue(explicitValues[i]);
                 }
                 char colOffset = (char) ('A' + firstCol);
-                constraint = helper.createFormulaListConstraint(explicitSheet.getSheetName() + "!$" + colOffset + "$1:$" + colOffset + "$" + explicitValues.length);
+                int length = explicitValues.length;
+                constraint = helper.createFormulaListConstraint(explicitSheet.getSheetName() + "!$" + colOffset + "$1:$" + colOffset + "$" + (length == 0 ? 1 : length));
                 workbook.setSheetHidden(workbook.getSheetIndex("explicitSheet"), true);
             }
             regions = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);

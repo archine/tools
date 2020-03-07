@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.resolver;
 
+import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.MetaObject;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -23,8 +24,9 @@ public interface ExcelWriterResolver {
      * @param data          data
      * @param metaObject    Excel meta object
      * @param changed Is changed excel entity or sheet?
+     * @param excel Excel annotation
      */
-    void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed);
+    void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed, Excel excel);
 
     /**
      * Output the contents of the cache

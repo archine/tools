@@ -23,6 +23,12 @@ public @interface Sum {
     String format() default "0";
 
     /**
+     * Sum row height
+     * @return 300
+     */
+    short height() default 300;
+
+    /**
      * Open the sum
      * @return boolean
      */

@@ -44,6 +44,12 @@ public @interface ExcelField {
     int sort() default 99;
 
     /**
+     * Column format
+     * @return format
+     */
+    String format() default "";
+
+    /**
      * If a cell has the same number of rows, merge automatically
      *
      * @return autoMerge

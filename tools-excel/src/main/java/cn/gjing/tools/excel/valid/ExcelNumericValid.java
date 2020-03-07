@@ -24,9 +24,9 @@ public @interface ExcelNumericValid {
     /**
      * Check the number of rows
      *
-     * @return rows
+     * @return 200
      */
-    int boxLastRow() default 0;
+    int boxLastRow() default 200;
 
     /**
      * Operator type

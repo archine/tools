@@ -31,6 +31,18 @@ public @interface Excel {
     Type type() default XLS;
 
     /**
+     * Excel head row height
+     * @return 350
+     */
+    short headHeight() default 350;
+
+    /**
+     * Excel body row height
+     * @return 280
+     */
+    short bodyHeight() default 300;
+
+    /**
      * The number of rows cached in memory
      * @return 1000
      */

@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write;
 
-
 import cn.gjing.tools.excel.*;
+import cn.gjing.tools.excel.exception.ExcelException;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -29,6 +29,7 @@ public class ExcelWriter {
     private HttpServletResponse response;
     private ExcelWriterResolver writerResolver;
     private List<Field> headFieldList;
+    private Excel excel;
     private boolean changed = true;
     private String defaultSheet = "sheet1";
 
@@ -40,6 +41,7 @@ public class ExcelWriter {
         this.fileName = fileName;
         this.response = response;
         this.headFieldList = headFieldList;
+        this.excel = excel;
         this.initResolver(excel);
         this.initStyle(excel, this.workbook);
     }
@@ -56,7 +58,7 @@ public class ExcelWriter {
                 try (final ExcelWriteXLSResolver xlsResolver = new ExcelWriteXLSResolver()) {
                     this.writerResolver = xlsResolver;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new ExcelException("Init write resolver error, " + e.getMessage());
                 }
                 break;
             case XLSX:
@@ -64,7 +66,7 @@ public class ExcelWriter {
                 try (final ExcelWriteXLSXResolver xlsxResolver = new ExcelWriteXLSXResolver()) {
                     this.writerResolver = xlsxResolver;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new ExcelException("Init write resolver error, " + e.getMessage());
                 }
                 break;
             default:
@@ -79,8 +81,8 @@ public class ExcelWriter {
     private void initStyle(Excel excel, Workbook workbook) {
         try {
             ExcelStyle excelStyle = excel.style().newInstance();
-            this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook,workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook,workbook.createCellStyle()),
-                    excelStyle.setTitleStyle(this.workbook,workbook.createCellStyle()));
+            this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, workbook.createCellStyle()),
+                    excelStyle.setTitleStyle(this.workbook, workbook.createCellStyle()));
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -93,7 +95,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data) {
-        return this.write(data, this.defaultSheet, this.metaStyle, new HashMap<>(1),null);
+        return this.write(data, this.defaultSheet, this.metaStyle, new HashMap<>(1), null);
     }
 
     /**
@@ -104,7 +106,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Map<String, String[]> explicitValues) {
-        return this.write(data, this.defaultSheet, this.metaStyle, explicitValues,null);
+        return this.write(data, this.defaultSheet, this.metaStyle, explicitValues, null);
     }
 
     /**
@@ -115,7 +117,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName) {
-        return this.write(data, sheetName, this.metaStyle, new HashMap<>(1),null);
+        return this.write(data, sheetName, this.metaStyle, new HashMap<>(1), null);
     }
 
     /**
@@ -127,7 +129,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Map<String, String[]> explicitValues) {
-        return this.write(data, sheetName, this.metaStyle, explicitValues,null);
+        return this.write(data, sheetName, this.metaStyle, explicitValues, null);
     }
 
     /**
@@ -171,7 +173,7 @@ public class ExcelWriter {
      * @param data      data
      * @param sheetName Excel sheet name
      * @param style     Excel style
-     * @param bigTitle Big title
+     * @param bigTitle  Big title
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, BigTitle bigTitle) {
@@ -194,7 +196,7 @@ public class ExcelWriter {
     /**
      * Write excel
      *
-     * @param data           data
+     * @param data     data
      * @param bigTitle Big title
      * @return this
      */
@@ -205,9 +207,9 @@ public class ExcelWriter {
     /**
      * Write to the specified excel
      *
-     * @param data           data
-     * @param sheetName      Excel sheet name
-     * @param bigTitle Big title
+     * @param data      data
+     * @param sheetName Excel sheet name
+     * @param bigTitle  Big title
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, BigTitle bigTitle) {
@@ -217,8 +219,8 @@ public class ExcelWriter {
     /**
      * Write excel
      *
-     * @param data           data
-     * @param style          Excel style
+     * @param data     data
+     * @param style    Excel style
      * @param bigTitle Big title
      * @return this
      */
@@ -231,7 +233,7 @@ public class ExcelWriter {
      *
      * @param data           data
      * @param explicitValues The value in the drop-down box
-     * @param bigTitle Big title
+     * @param bigTitle       Big title
      * @return this
      */
     public ExcelWriter write(List<?> data, Map<String, String[]> explicitValues, BigTitle bigTitle) {
@@ -244,7 +246,7 @@ public class ExcelWriter {
      * @param data           data
      * @param style          Excel style
      * @param explicitValues The value in the drop-down box
-     * @param bigTitle Big title
+     * @param bigTitle       Big title
      * @return this
      */
     public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, BigTitle bigTitle) {
@@ -257,7 +259,7 @@ public class ExcelWriter {
      * @param data           data
      * @param sheetName      Excel sheet name
      * @param explicitValues The value in the drop-down box
-     * @param bigTitle Big title
+     * @param bigTitle       Big title
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Map<String, String[]> explicitValues, BigTitle bigTitle) {
@@ -271,13 +273,13 @@ public class ExcelWriter {
      * @param sheetName      Excel sheet name
      * @param style          Excel style
      * @param explicitValues The value in the drop-down box
-     * @param bigTitle Big title
+     * @param bigTitle       Big title
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, BigTitle bigTitle) {
         ExcelStyle excelStyle = style.get();
-        MetaStyle metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook,this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook,this.workbook.createCellStyle()),
-                excelStyle.setTitleStyle(this.workbook,this.workbook.createCellStyle()));
+        MetaStyle metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()),
+                excelStyle.setTitleStyle(this.workbook, this.workbook.createCellStyle()));
         return this.write(data, sheetName, metaStyle, explicitValues, bigTitle);
     }
 
@@ -302,15 +304,17 @@ public class ExcelWriter {
     public ExcelWriter resetExcelClass(Class<?> excelClass, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         Objects.requireNonNull(excel, "@Excel was not found on the " + excelClass);
+        ExcelStyle excelStyle;
         try {
-            ExcelStyle excelStyle = excel.style().newInstance();
-            this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook,this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook,this.workbook.createCellStyle()),
-                    excelStyle.setTitleStyle(this.workbook,this.workbook.createCellStyle()));
+            excelStyle = excel.style().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            throw new ExcelException("Reset excel class error, " + e.getMessage());
         }
+        this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()),
+                excelStyle.setTitleStyle(this.workbook, this.workbook.createCellStyle()));
         this.headFieldList = BeanUtils.getExcelFields(excelClass, ignores);
         this.changed = true;
+        this.excel = excel;
         return this;
     }
 
@@ -331,10 +335,11 @@ public class ExcelWriter {
      * @param sheetName      Excel sheet name
      * @param metaStyle      Excel style
      * @param explicitValues The value in the drop-down box
+     * @param bigTitle       Big title
      * @return this
      */
     private ExcelWriter write(List<?> data, String sheetName, MetaStyle metaStyle, Map<String, String[]> explicitValues, BigTitle bigTitle) {
-        this.writerResolver.write(data, this.workbook, sheetName, this.headFieldList, new MetaObject(bigTitle, metaStyle, explicitValues), this.changed);
+        this.writerResolver.write(data, this.workbook, sheetName, this.headFieldList, new MetaObject(bigTitle, metaStyle, explicitValues), this.changed, this.excel);
         this.changed = false;
         return this;
     }

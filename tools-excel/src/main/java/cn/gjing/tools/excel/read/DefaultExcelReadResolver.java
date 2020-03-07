@@ -4,12 +4,15 @@ import cn.gjing.tools.excel.DefaultDataConvert;
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.ExcelEnumConvert;
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.exception.ExcelException;
+import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.listen.DataConvert;
 import cn.gjing.tools.excel.listen.EnumConvert;
 import cn.gjing.tools.excel.listen.ReadCallback;
 import cn.gjing.tools.excel.listen.ReadListener;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
+import cn.gjing.tools.excel.util.ParamUtils;
 import com.google.gson.Gson;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -20,7 +23,10 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +43,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private Map<String, Class<?>> enumInterfaceTypeMap;
     private List<String> headNameList;
     private Map<String, Field> hasAnnotationFieldMap;
-    private Map<String, DataConvert<?,?>> dataConvertMap;
+    private Map<String, DataConvert<?, ?>> dataConvertMap;
     private boolean isSave;
 
     public DefaultExcelReadResolver() {
@@ -62,7 +68,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             try {
                                 this.dataConvertMap.put(e.getName(), excelField.convert().newInstance());
                             } catch (Exception ex) {
-                                ex.printStackTrace();
+                                throw new ExcelException("Init data convert error " + e.getName() + ", " + ex.getMessage());
                             }
                         }
                     }).collect(Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field));
@@ -72,10 +78,14 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                         if (this.workbook == null) {
                             this.workbook = new HSSFWorkbook(inputStream);
                         }
-                        this.sheet = this.workbook.getSheet(sheetName);
+                    } catch (Exception e) {
+                        throw new ExcelException("Init workbook error, " + e.getMessage());
+                    }
+                    this.sheet = this.workbook.getSheet(sheetName);
+                    try {
                         this.reader(excelClass, readListener, headerIndex, readLines, callback);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new ExcelException(e.getMessage());
                     }
                     break;
                 case XLSX:
@@ -86,11 +96,11 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                     try {
                         this.reader(excelClass, readListener, headerIndex, readLines, callback);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new ExcelException(e.getMessage());
                     }
                     break;
                 default:
-                    throw new NullPointerException("Excel type was not found");
+                    throw new ExcelException("Excel type was not found on " + excelClass);
             }
         }
     }
@@ -126,19 +136,19 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             try {
                 o = excelClass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+                throw new ExcelException("Excel model Instantiation failure, " + e.getMessage());
             }
             for (int c = 0; c < totalCol && this.isSave; c++) {
                 Field field = hasAnnotationFieldMap.get(headNameList.get(c));
                 if (field == null) {
-                    continue;
+                    throw new ExcelTemplateException();
                 }
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 Cell valueCell = row.getCell(c);
                 if (valueCell != null) {
                     Object value = this.getValue(valueCell, field, excelField, readCallback);
                     if (this.dataConvertMap != null) {
-                        DataConvert<?,?> dataConvert = this.dataConvertMap.get(field.getName());
+                        DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
                         if (dataConvert != null) {
                             value = dataConvert.toEntityAttribute(value, field, excelField);
                         }
@@ -225,7 +235,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             EnumConvert<? extends Enum<?>, ?> enumConvert = this.enumConvertMap.get(field.getName());
             if (enumConvert == null) {
                 ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-                Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
+                ParamUtils.requireNonNull(excelEnumConvert, field.getName() + " was not found enum convert");
                 Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
                 try {
                     enumConvert = excelEnumConvert.convert().newInstance();
@@ -233,7 +243,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                     this.enumConvertMap.put(field.getName(), enumConvert);
                     this.enumInterfaceTypeMap.put(field.getName(), interfaceType);
                 } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    throw new ExcelException("Enum convert Instantiation failure " + field.getName() + ", " + e.getMessage());
                 }
                 return;
             }
@@ -253,7 +263,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 readCallback.readJump(field, excelField, rowIndex, colIndex);
                 break;
             case ERROR:
-                throw new NullPointerException(excelField.message());
+                throw new ExcelException(excelField.message());
             default:
         }
     }
