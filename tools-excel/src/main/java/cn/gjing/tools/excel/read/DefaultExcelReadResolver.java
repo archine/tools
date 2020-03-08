@@ -1,9 +1,6 @@
 package cn.gjing.tools.excel.read;
 
-import cn.gjing.tools.excel.DefaultDataConvert;
-import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.ExcelEnumConvert;
-import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.*;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
@@ -18,6 +15,10 @@ import com.google.gson.Gson;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,6 +111,8 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private void reader(Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
         List<R> dataList = new ArrayList<>();
         R o;
+        ExpressionParser parser = null;
+        EvaluationContext context = null;
         int realReadLines = readLines + headerIndex;
         for (Row row : sheet) {
             this.isSave = true;
@@ -139,6 +142,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                     throw new ExcelTemplateException();
                 }
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
+                ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
                 Cell valueCell = row.getCell(c);
                 try {
                     if (valueCell != null) {
@@ -147,6 +151,17 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
                             if (dataConvert != null) {
                                 value = dataConvert.toEntityAttribute(value, field, excelField);
+                            }
+                        }
+                        if (excelAssert != null) {
+                            if (parser == null) {
+                                parser = new SpelExpressionParser();
+                                context = new StandardEvaluationContext();
+                            }
+                            context.setVariable(field.getName(), value);
+                            Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
+                            if (test != null && !test) {
+                                throw new ExcelResolverException(excelAssert.message());
                             }
                         }
                         if (this.isSave && value != null) {
@@ -231,8 +246,6 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         if (field.getType().isEnum()) {
             if (this.enumConvertMap == null) {
                 this.enumConvertMap = new HashMap<>(16);
-            }
-            if (this.enumInterfaceTypeMap == null) {
                 this.enumInterfaceTypeMap = new HashMap<>(16);
             }
             EnumConvert<? extends Enum<?>, ?> enumConvert = this.enumConvertMap.get(field.getName());

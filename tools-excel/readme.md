@@ -57,7 +57,14 @@
 |open|是否开启，默认``false``|
 |empty|null值或者空字符串是否也要合并，默认``false``|
 |callback|合并回调接口类，可以通过回调进行自定义设置合并规则|
-### 5、@ExcelDateValid
+### 5、@ExcelAssert
+**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空等等。。注解参数如下**       
+
+|参数|描述|
+|---|---|
+|expr|EL表达式，``#号后面的字段名称一定要正确``|
+|empty|数据不符合时的异常信息|
+### 6、@ExcelDateValid
 **表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
@@ -72,7 +79,7 @@
 |rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
-### 6、@ExcelDropdownBox
+### 7、@ExcelDropdownBox
 **表头上使用，使用后会在导出模板时对表头下方的单元格增加下拉框，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
@@ -85,7 +92,7 @@
 |link|指定当前表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``。，``示例用法可参考第五节：辅助功能``|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
-### 7、@ExcelNumericValid
+### 8、@ExcelNumericValid
 **表头使用，会在导出模板时对该表头下方的单元格加入文本长度、数字大小校验，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
@@ -100,7 +107,7 @@
 |rank|提示框级别，默认``Rank.STOP``级别|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
-### 8、@ExcelEnumConvert
+### 9、@ExcelEnumConvert
 **枚举转换器，在字段类型为枚举时需要配置，否则在导入导出时未检测到转换器会抛出未找到转换器异常，注解参数如下。``示例用法可参考第五节：辅助功能``**     
 
 |参数|描述|
@@ -148,7 +155,7 @@ public class UserController {
     }
 }
 ```
-**忽略导出某些表头，只需在``createWriter()``方法中``ignores``参数指定你要忽略的表头对应的字段名，``字段名要与实体类中一致``**
+**忽略导出某些表头，只需在``createWriter()``方法中``ignores``参数指定你要忽略的表头**
 ```java
 /**
  * @author Gjing
@@ -162,7 +169,7 @@ public class UserController {
     @ApiOperation(value = "导出用户")
     public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
-        ExcelFactory.createWriter(User.class, response,"id","createTime")
+        ExcelFactory.createWriter(User.class, response,"用户id","创建时间")
                 .write(users)
                 .flush();
     }
@@ -597,6 +604,16 @@ public class User {
     @ExcelField(value = "用户名",autoMerge = true,sort = 1)
     @ExcelNumericValid(boxLastRow = 10,expr1 = "2")
     private String userName;
+}
+```
+### 7、表头断言
+**只需要在表头上使用注解即可，然后填写正确的EL表达式，下面示例中设置了订单名称不能为空**
+```java
+@Excel("订单列表")
+public class Order {
+    @ExcelField("订单名称")
+    @ExcelAssert(expr = "#orderName != null", message = "订单名称不能为空")
+    private String orderName;
 }
 ```
 ## 六、自定义
