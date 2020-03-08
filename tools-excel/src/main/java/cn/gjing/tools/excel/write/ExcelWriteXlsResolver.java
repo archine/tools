@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.MetaObject;
+import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author Gjing
  **/
-class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
+class ExcelWriteXlsResolver implements ExcelWriterResolver, Closeable {
     private HSSFWorkbook workbook;
     private OutputStream outputStream;
     private ExcelHelper excelHelper;
@@ -51,14 +51,10 @@ class ExcelWriteXLSResolver implements ExcelWriterResolver, Closeable {
         try {
             response.setHeader("Content-disposition",
                     "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8") + ".xls");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        try {
             this.outputStream = response.getOutputStream();
             this.workbook.write(this.outputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ExcelResolverException("Excel cache data refresh failure");
         }
     }
 

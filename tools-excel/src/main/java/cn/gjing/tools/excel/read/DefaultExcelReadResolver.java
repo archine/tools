@@ -4,7 +4,8 @@ import cn.gjing.tools.excel.DefaultDataConvert;
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.ExcelEnumConvert;
 import cn.gjing.tools.excel.ExcelField;
-import cn.gjing.tools.excel.exception.ExcelException;
+import cn.gjing.tools.excel.exception.ExcelInitException;
+import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.listen.DataConvert;
 import cn.gjing.tools.excel.listen.EnumConvert;
@@ -68,7 +69,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             try {
                                 this.dataConvertMap.put(e.getName(), excelField.convert().newInstance());
                             } catch (Exception ex) {
-                                throw new ExcelException("Init data convert error " + e.getName() + ", " + ex.getMessage());
+                                throw new ExcelInitException("Init specified excel header data convert error " + e.getName() + ", " + ex.getMessage());
                             }
                         }
                     }).collect(Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field));
@@ -79,28 +80,19 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             this.workbook = new HSSFWorkbook(inputStream);
                         }
                     } catch (Exception e) {
-                        throw new ExcelException("Init workbook error, " + e.getMessage());
+                        throw new ExcelInitException("Init workbook error, " + e.getMessage());
                     }
                     this.sheet = this.workbook.getSheet(sheetName);
-                    try {
-                        this.reader(excelClass, readListener, headerIndex, readLines, callback);
-                    } catch (Exception e) {
-                        throw new ExcelException(e.getMessage());
-                    }
+                    this.reader(excelClass, readListener, headerIndex, readLines, callback);
                     break;
                 case XLSX:
                     if (this.workbook == null) {
                         this.workbook = StreamingReader.builder().rowCacheSize(excel.maxSize()).bufferSize(excel.bufferSize()).open(inputStream);
                     }
                     this.sheet = this.workbook.getSheet(sheetName);
-                    try {
-                        this.reader(excelClass, readListener, headerIndex, readLines, callback);
-                    } catch (Exception e) {
-                        throw new ExcelException(e.getMessage());
-                    }
+                    this.reader(excelClass, readListener, headerIndex, readLines, callback);
                     break;
                 default:
-                    throw new ExcelException("Excel type was not found on " + excelClass);
             }
         }
     }
@@ -110,11 +102,14 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         if (this.inputStream != null) {
             this.inputStream.close();
         }
+        if (this.workbook != null) {
+            this.workbook.close();
+        }
     }
 
     private void reader(Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
         List<R> dataList = new ArrayList<>();
-        R o = null;
+        R o;
         int realReadLines = readLines + headerIndex;
         for (Row row : sheet) {
             this.isSave = true;
@@ -136,7 +131,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             try {
                 o = excelClass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new ExcelException("Excel model Instantiation failure, " + e.getMessage());
+                throw new ExcelInitException("Excel model init failure, " + e.getMessage());
             }
             for (int c = 0; c < totalCol && this.isSave; c++) {
                 Field field = hasAnnotationFieldMap.get(headNameList.get(c));
@@ -145,23 +140,31 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 }
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 Cell valueCell = row.getCell(c);
-                if (valueCell != null) {
-                    Object value = this.getValue(valueCell, field, excelField, readCallback);
-                    if (this.dataConvertMap != null) {
-                        DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
-                        if (dataConvert != null) {
-                            value = dataConvert.toEntityAttribute(value, field, excelField);
+                try {
+                    if (valueCell != null) {
+                        Object value = this.getValue(valueCell, field, excelField, readCallback);
+                        if (this.dataConvertMap != null) {
+                            DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
+                            if (dataConvert != null) {
+                                value = dataConvert.toEntityAttribute(value, field, excelField);
+                            }
                         }
+                        if (this.isSave && value != null) {
+                            this.setValue(o, field, value);
+                        }
+                    } else {
+                        this.valid(field, excelField, row.getRowNum(), c, readCallback);
                     }
-                    if (this.isSave && value != null) {
-                        this.setValue(o, field, value);
-                    }
-                } else {
-                    this.valid(field, excelField, row.getRowNum(), c, readCallback);
+                } catch (Exception e) {
+                    throw new ExcelResolverException(e.getMessage());
                 }
             }
             if (this.isSave) {
-                dataList.add(readCallback.readLine(o, row.getRowNum()));
+                try {
+                    dataList.add(readCallback.readLine(o, row.getRowNum()));
+                } catch (Exception e) {
+                    throw new ExcelResolverException(e.getMessage());
+                }
             }
         }
         readListener.notify(dataList);
@@ -218,7 +221,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     }
 
     /**
-     * Sets values for the fields of the object
+     * Set values for the fields of the object
      *
      * @param o     object
      * @param field field
@@ -243,7 +246,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                     this.enumConvertMap.put(field.getName(), enumConvert);
                     this.enumInterfaceTypeMap.put(field.getName(), interfaceType);
                 } catch (InstantiationException | IllegalAccessException e) {
-                    throw new ExcelException("Enum convert Instantiation failure " + field.getName() + ", " + e.getMessage());
+                    throw new ExcelInitException("Enum convert init failure " + field.getName() + ", " + e.getMessage());
                 }
                 return;
             }
@@ -263,7 +266,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 readCallback.readJump(field, excelField, rowIndex, colIndex);
                 break;
             case ERROR:
-                throw new ExcelException(excelField.message());
+                throw new ExcelResolverException(excelField.message());
             default:
         }
     }

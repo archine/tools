@@ -1,6 +1,6 @@
 package cn.gjing.tools.excel.util;
 
-import cn.gjing.tools.excel.exception.ExcelException;
+import cn.gjing.tools.excel.exception.ExcelResolverException;
 
 import java.util.regex.Pattern;
 
@@ -57,13 +57,11 @@ public final class ParamUtils {
      * @param obj obj
      * @param message error message
      * @param <T> T
-     * @return obj
      */
-    public static <T> T requireNonNull(T obj, String message) {
+    public static <T> void requireNonNull(T obj, String message) {
         if (obj == null) {
-            throw new ExcelException(message);
+            throw new ExcelResolverException(message);
         }
-        return obj;
     }
 
     /**

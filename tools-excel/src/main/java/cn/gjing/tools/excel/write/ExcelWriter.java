@@ -1,9 +1,10 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.*;
-import cn.gjing.tools.excel.exception.ExcelException;
+import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
+import cn.gjing.tools.excel.util.ParamUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -13,7 +14,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -55,18 +55,18 @@ public class ExcelWriter {
         switch (excel.type()) {
             case XLS:
                 this.workbook = new HSSFWorkbook();
-                try (final ExcelWriteXLSResolver xlsResolver = new ExcelWriteXLSResolver()) {
+                try (final ExcelWriteXlsResolver xlsResolver = new ExcelWriteXlsResolver()) {
                     this.writerResolver = xlsResolver;
                 } catch (Exception e) {
-                    throw new ExcelException("Init write resolver error, " + e.getMessage());
+                    throw new ExcelInitException("Init write resolver failure, " + e.getMessage());
                 }
                 break;
             case XLSX:
                 this.workbook = new SXSSFWorkbook(excel.maxSize());
-                try (final ExcelWriteXLSXResolver xlsxResolver = new ExcelWriteXLSXResolver()) {
+                try (final ExcelWriteXlsxResolver xlsxResolver = new ExcelWriteXlsxResolver()) {
                     this.writerResolver = xlsxResolver;
                 } catch (Exception e) {
-                    throw new ExcelException("Init write resolver error, " + e.getMessage());
+                    throw new ExcelInitException("Init write resolver failure, " + e.getMessage());
                 }
                 break;
             default:
@@ -84,7 +84,7 @@ public class ExcelWriter {
             this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, workbook.createCellStyle()),
                     excelStyle.setTitleStyle(this.workbook, workbook.createCellStyle()));
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            throw new ExcelInitException("Init excel style failure " + e.getMessage());
         }
     }
 
@@ -303,12 +303,12 @@ public class ExcelWriter {
      */
     public ExcelWriter resetExcelClass(Class<?> excelClass, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
-        Objects.requireNonNull(excel, "@Excel was not found on the " + excelClass);
+        ParamUtils.requireNonNull(excel, "Failed to reset Excel class, the @Excel annotation was not found on the " + excelClass);
         ExcelStyle excelStyle;
         try {
             excelStyle = excel.style().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new ExcelException("Reset excel class error, " + e.getMessage());
+            throw new ExcelInitException("Failed to reset Excel class, init excel style failure, " + e.getMessage());
         }
         this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()),
                 excelStyle.setTitleStyle(this.workbook, this.workbook.createCellStyle()));

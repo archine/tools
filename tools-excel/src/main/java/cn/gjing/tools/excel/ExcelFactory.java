@@ -2,13 +2,13 @@ package cn.gjing.tools.excel;
 
 import cn.gjing.tools.excel.read.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
+import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriter;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -45,7 +45,7 @@ public class ExcelFactory {
      */
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
-        Objects.requireNonNull(excel, "@Excel was not found on the " + excelClass);
+        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
         List<Field> hasExcelFieldList = BeanUtils.getExcelFields(excelClass, ignores);
         return new ExcelWriter(fileName == null ? "".equals(excel.value()) ? UUID.randomUUID().toString().replaceAll("-", "") : excel.value() : fileName,
                 excel, response, hasExcelFieldList);
@@ -60,7 +60,7 @@ public class ExcelFactory {
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass) {
-        Objects.requireNonNull(excelClass.getAnnotation(Excel.class), "@Excel was not found on the " + excelClass);
+        ParamUtils.requireNonNull(excelClass.getAnnotation(Excel.class), "@Excel annotation was not found on the " + excelClass);
         return new ExcelReader<>(excelClass, inputStream);
     }
 

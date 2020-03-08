@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.MetaObject;
+import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author Gjing
  **/
-class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
+class ExcelWriteXlsxResolver implements ExcelWriterResolver, Closeable {
     private SXSSFWorkbook workbook;
     private OutputStream outputStream;
     private ExcelHelper excelHelper;
@@ -31,8 +31,8 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
         this.workbook = (SXSSFWorkbook) workbook;
         SXSSFSheet sheet = this.workbook.getSheet(sheetName);
         if (sheet == null) {
-            changed = true;
             sheet = this.workbook.createSheet(sheetName);
+            changed = true;
         }
         if (excelHelper == null) {
             this.excelHelper = new ExcelHelper(this.workbook);
@@ -51,14 +51,10 @@ class ExcelWriteXLSXResolver implements ExcelWriterResolver, Closeable {
         try {
             response.setHeader("Content-disposition",
                     "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8") + ".xlsx");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        try {
             this.outputStream = response.getOutputStream();
             this.workbook.write(outputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ExcelResolverException("Excel cache data refresh failure");
         }
     }
 

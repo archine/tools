@@ -6,6 +6,7 @@ import java.util.Map;
 
 /**
  * Meta object
+ *
  * @author Gjing
  **/
 @Getter

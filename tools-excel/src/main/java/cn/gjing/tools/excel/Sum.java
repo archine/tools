@@ -13,23 +13,28 @@ import java.lang.annotation.Target;
 public @interface Sum {
     /**
      * The description of the sum will only take the value that appears for the first time in the Excel entity
+     *
      * @return 合计
      */
     String value() default "合计: ";
+
     /**
      * Numeric format
+     *
      * @return format
      */
     String format() default "0";
 
     /**
      * Sum row height
+     *
      * @return 300
      */
     short height() default 300;
 
     /**
      * Open the sum
+     *
      * @return boolean
      */
     boolean open() default false;

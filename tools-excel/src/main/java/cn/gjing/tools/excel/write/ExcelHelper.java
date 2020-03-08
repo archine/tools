@@ -1,8 +1,8 @@
 package cn.gjing.tools.excel.write;
 
-
 import cn.gjing.tools.excel.*;
-import cn.gjing.tools.excel.exception.ExcelException;
+import cn.gjing.tools.excel.exception.ExcelInitException;
+import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.listen.DataConvert;
 import cn.gjing.tools.excel.listen.EnumConvert;
 import cn.gjing.tools.excel.listen.MergeCallback;
@@ -19,7 +19,10 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Gjing
@@ -89,7 +92,7 @@ class ExcelHelper {
                         try {
                             excelStyle = excelField.style().newInstance();
                         } catch (Exception e) {
-                            throw new ExcelException("Init excel style error " + field.getName() + ", " + e.getMessage());
+                            throw new ExcelInitException("Init specified excel header style failure " + field.getName() + ", " + e.getMessage());
                         }
                         metaStyle = new MetaStyle();
                         metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()));
@@ -108,7 +111,7 @@ class ExcelHelper {
                         try {
                             this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
                         } catch (Exception e) {
-                            throw new ExcelException("Init data convert error " + field.getName() + ", " + e.getMessage());
+                            throw new ExcelInitException("Init specified excel header data convert failure " + field.getName() + ", " + e.getMessage());
                         }
                     }
                 }
@@ -120,7 +123,7 @@ class ExcelHelper {
                         try {
                             this.mergeCallbackMap.put(field.getName(), excelField.autoMerge().callback().newInstance());
                         } catch (Exception e) {
-                            throw new ExcelException("Init merge callback error " + field.getName() + ", " + e.getMessage());
+                            throw new ExcelInitException("Init specified excel header merge callback failure " + field.getName() + ", " + e.getMessage());
                         }
                     }
                 }
@@ -129,9 +132,9 @@ class ExcelHelper {
         return rowIndex;
     }
 
-    public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, int rowIndex,Excel excel) {
+    public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, int rowIndex, Excel excel) {
         rowIndex++;
-        Map<Object, ExcelModel> excelModelMap = new HashMap<>(16);
+        Map<Object, ExcelOldModel> excelModelMap = new HashMap<>(16);
         for (int i = 0, dataSize = data.size(); i < dataSize; i++) {
             Object o = data.get(i);
             Row valueRow = sheet.createRow(rowIndex + i);
@@ -141,13 +144,17 @@ class ExcelHelper {
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(j);
-                this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell, field, o);
-                this.setCellVal(excelField, field, valueCell, value, o);
+                try {
+                    this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell, field, o);
+                    this.setCellVal(excelField, field, valueCell, value, o);
+                } catch (Exception e) {
+                    throw new ExcelResolverException(e.getMessage());
+                }
             }
         }
     }
 
-    private void sumOrMerge(Sheet sheet, Map<Object, ExcelModel> excelModelMap, int i, int dataSize, Row valueRow, int j, ExcelField excelField, Object value,
+    private void sumOrMerge(Sheet sheet, Map<Object, ExcelOldModel> excelModelMap, int i, int dataSize, Row valueRow, int j, ExcelField excelField, Object value,
                             Cell valueCell, Field field, Object obj) {
         if (i == 0) {
             if (excelField.sum().open()) {
@@ -163,16 +170,16 @@ class ExcelHelper {
         }
         if (excelField.autoMerge().open()) {
             MergeCallback<?> mergeCallback = this.mergeCallbackMap.get(field.getName());
-            ExcelModel excelModel = excelModelMap.get(j);
-            if (excelModel != null) {
+            ExcelOldModel excelOldModel = excelModelMap.get(j);
+            if (excelOldModel != null) {
                 if (mergeCallback.toMerge(this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), field, j, i)) {
-                    if (ParamUtils.equals(value, excelModel.getOldValue(), excelField.autoMerge().empty())) {
+                    if (ParamUtils.equals(value, excelOldModel.getOldValue(), excelField.autoMerge().empty())) {
                         if (i == dataSize - 1) {
-                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum(), j, j));
+                            sheet.addMergedRegion(new CellRangeAddress(excelOldModel.getOldRowIndex(), valueRow.getRowNum(), j, j));
                         }
                     } else {
-                        if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
-                            sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
+                        if (excelOldModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
+                            sheet.addMergedRegion(new CellRangeAddress(excelOldModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
                         }
                         if (i != dataSize - 1) {
                             this.putExcelModel(valueRow, value, excelModelMap, j);
@@ -180,12 +187,12 @@ class ExcelHelper {
                     }
                     return;
                 }
-                if (excelModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
-                    sheet.addMergedRegion(new CellRangeAddress(excelModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
+                if (excelOldModel.getOldRowIndex() + 1 < valueRow.getRowNum()) {
+                    sheet.addMergedRegion(new CellRangeAddress(excelOldModel.getOldRowIndex(), valueRow.getRowNum() - 1, j, j));
                 }
-                excelModel.setOldValue(value);
-                excelModel.setOldRowIndex(valueRow.getRowNum());
-                excelModelMap.put(j, excelModel);
+                excelOldModel.setOldValue(value);
+                excelOldModel.setOldRowIndex(valueRow.getRowNum());
+                excelModelMap.put(j, excelOldModel);
             }
         }
         if (i == dataSize - 1) {
@@ -238,7 +245,7 @@ class ExcelHelper {
             Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
             if (enumConvert == null) {
                 ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-                Objects.requireNonNull(excelEnumConvert, field.getName() + " was not found enum converter");
+                ParamUtils.requireNonNull(excelEnumConvert, field.getName() + " was not found enum convert");
                 try {
                     enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
                     cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
@@ -286,28 +293,28 @@ class ExcelHelper {
                 locked = ev.validClass().newInstance().valid(ev, this.workbook, sheet, firstRow, ev.boxLastRow() == 0 ? firstRow : ev.boxLastRow() + firstRow - 1, i, i, locked, field.getName()
                         , metaObject.getExplicitValues());
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new ExcelException("Add dropdown box error " + field.getName() + ", " + e.getMessage());
+                throw new ExcelResolverException("Add specified excel header dropdown box failure " + field.getName() + ", " + e.getMessage());
             }
         }
         if (dv != null) {
             try {
                 dv.validClass().newInstance().valid(dv, sheet, firstRow, dv.boxLastRow() == 0 ? firstRow : dv.boxLastRow() + firstRow - 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new ExcelException("Add date valid error " + field.getName() + ", " + e.getMessage());
+                throw new ExcelResolverException("Add specified excel header date validation failure " + field.getName() + ", " + e.getMessage());
             }
         }
         if (nv != null) {
             try {
                 nv.validClass().newInstance().valid(nv, sheet, firstRow, nv.boxLastRow() == 0 ? firstRow : nv.boxLastRow() + firstRow - 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new ExcelException("Add numeric valid error " + field.getName() + ", " + e.getMessage());
+                throw new ExcelResolverException("Add specified excel header numeric validation failure " + field.getName() + ", " + e.getMessage());
             }
         }
         return locked;
     }
 
-    private void putExcelModel(Row row, Object value, Map<Object, ExcelModel> excelModelMap, int key) {
-        excelModelMap.put(key, ExcelModel.builder()
+    private void putExcelModel(Row row, Object value, Map<Object, ExcelOldModel> excelModelMap, int key) {
+        excelModelMap.put(key, ExcelOldModel.builder()
                 .oldValue(value)
                 .oldRowIndex(row.getRowNum())
                 .build());

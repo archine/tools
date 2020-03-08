@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.read;
 
+import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.listen.ReadCallback;
 import cn.gjing.tools.excel.listen.ReadListener;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
@@ -32,7 +33,7 @@ public class ExcelReader<R> {
         try (final DefaultExcelReadResolver<R> excelReadResolver = new DefaultExcelReadResolver<>()) {
             this.readerResolver = excelReadResolver;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ExcelInitException("Init read resolver error " + e.getMessage());
         }
         this.readCallback = (R, rowIndex) -> R;
         this.initSequence();
