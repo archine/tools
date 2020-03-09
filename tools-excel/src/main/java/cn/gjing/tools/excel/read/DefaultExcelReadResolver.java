@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.read;
 
 import cn.gjing.tools.excel.*;
+import cn.gjing.tools.excel.exception.ExcelDataValidException;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
@@ -111,8 +112,8 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private void reader(Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
         List<R> dataList = new ArrayList<>();
         R o;
-        ExpressionParser parser = null;
-        EvaluationContext context = null;
+        ExpressionParser parser = new SpelExpressionParser();
+        EvaluationContext context = new StandardEvaluationContext();
         int realReadLines = readLines + headerIndex;
         for (Row row : sheet) {
             this.isSave = true;
@@ -154,23 +155,29 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             }
                         }
                         if (excelAssert != null) {
-                            if (parser == null) {
-                                parser = new SpelExpressionParser();
-                                context = new StandardEvaluationContext();
-                            }
                             context.setVariable(field.getName(), value);
                             Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
                             if (test != null && !test) {
-                                throw new ExcelResolverException(excelAssert.message());
+                                throw new ExcelDataValidException(excelAssert.message(), excelField, field, row.getRowNum(), c);
                             }
                         }
                         if (this.isSave && value != null) {
                             this.setValue(o, field, value);
                         }
                     } else {
+                        if (excelAssert != null) {
+                            context.setVariable(field.getName(), null);
+                            Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
+                            if (test != null && !test) {
+                                throw new ExcelDataValidException(excelAssert.message(), excelField, field, row.getRowNum(), c);
+                            }
+                        }
                         this.valid(field, excelField, row.getRowNum(), c, readCallback);
                     }
                 } catch (Exception e) {
+                    if (e instanceof ExcelDataValidException) {
+                        throw (ExcelDataValidException) e;
+                    }
                     throw new ExcelResolverException(e.getMessage());
                 }
             }
