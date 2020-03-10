@@ -47,7 +47,7 @@ class ExcelWriteXlsResolver implements ExcelWriterResolver, Closeable {
         if (data == null || data.isEmpty()) {
             return;
         }
-        this.excelHelper.setValue(data, headFieldList, sheet, rowIndex, excel);
+        this.excelHelper.setValue(data, headFieldList, sheet, rowIndex);
     }
 
     @Override
@@ -60,7 +60,7 @@ class ExcelWriteXlsResolver implements ExcelWriterResolver, Closeable {
             } else {
                 fileName = URLEncoder.encode(fileName, "UTF-8");
             }
-            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xls");
             this.outputStream = response.getOutputStream();
             this.workbook.write(this.outputStream);
         } catch (IOException e) {

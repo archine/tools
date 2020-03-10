@@ -132,13 +132,12 @@ class ExcelHelper {
         return rowIndex;
     }
 
-    public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, int rowIndex, Excel excel) {
+    public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, int rowIndex) {
         rowIndex++;
         Map<Object, ExcelOldModel> excelModelMap = new HashMap<>(16);
         for (int i = 0, dataSize = data.size(); i < dataSize; i++) {
             Object o = data.get(i);
             Row valueRow = sheet.createRow(rowIndex + i);
-            valueRow.setHeight(excel.bodyHeight());
             for (int j = 0, headSize = headFieldList.size(); j < headSize; j++) {
                 Field field = headFieldList.get(j);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);

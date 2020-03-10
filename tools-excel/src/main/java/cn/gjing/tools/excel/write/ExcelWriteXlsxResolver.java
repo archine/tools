@@ -47,7 +47,7 @@ class ExcelWriteXlsxResolver implements ExcelWriterResolver, Closeable {
         if (data == null || data.isEmpty()) {
             return;
         }
-        this.excelHelper.setValue(data, headFieldList, sheet, rowIndex, excel);
+        this.excelHelper.setValue(data, headFieldList, sheet, rowIndex);
     }
 
     @Override

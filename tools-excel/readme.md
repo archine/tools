@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.3.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.7</version>
+    <version>1.3.8</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -19,7 +19,6 @@
 |value|Excel导出的文件名，优先级``低``于方法传入|
 |type|Excel导出的文档类型，默认``XLS``|
 |headHeight|列表头的行高，默认``350``|
-|bodyHeight|正文的行高，默认``300``|
 |maxSize|当文档类型为``XLSX``时，保留在内存中的条数，超出会将其写入到本地|
 |bufferSize|当文档类型为``XLSX``时，允许在内存中保存的字节|
 |style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
