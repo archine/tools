@@ -17,7 +17,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -220,6 +219,14 @@ class ExcelHelper {
         if (value == null) {
             return;
         }
+        if (value instanceof Number) {
+            cell.setCellValue(Double.parseDouble(value.toString()));
+            return;
+        }
+        if (value instanceof String) {
+            cell.setCellValue(value.toString());
+            return;
+        }
         if (field.getType().isEnum()) {
             if (this.enumConvertMap == null) {
                 this.enumConvertMap = new HashMap<>(16);
@@ -253,14 +260,6 @@ class ExcelHelper {
         }
         if (value instanceof LocalDate) {
             cell.setCellValue((LocalDate) value);
-            return;
-        }
-        String val = value.toString();
-        int len = val.contains(".") ? val.substring(0, val.indexOf(".")).length() : val.length();
-        if (field.getType() != String.class && ParamUtils.isNumber(val) && len < 17) {
-            cell.setCellValue(new BigDecimal(val).doubleValue());
-        } else {
-            cell.setCellValue(val);
         }
     }
 

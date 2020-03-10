@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.read;
 
 import cn.gjing.tools.excel.*;
-import cn.gjing.tools.excel.exception.ExcelDataValidException;
+import cn.gjing.tools.excel.exception.ExcelAssertException;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.Temporal;
 import java.util.*;
@@ -163,8 +164,8 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                         this.valid(field, excelField, row.getRowNum(), c, readCallback);
                     }
                 } catch (Exception e) {
-                    if (e instanceof ExcelDataValidException) {
-                        throw (ExcelDataValidException) e;
+                    if (e instanceof ExcelAssertException) {
+                        throw (ExcelAssertException) e;
                     }
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -261,6 +262,10 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             }
             if (field.getType() == LocalDate.class) {
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()).toLocalDate());
+                return;
+            }
+            if (field.getType() == LocalTime.class) {
+                BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()).toLocalTime());
             }
         }
     }
@@ -285,7 +290,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             context.setVariable(field.getName(), value);
             Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
             if (test != null && !test) {
-                throw new ExcelDataValidException(excelAssert.message(), excelField, field, row.getRowNum(), c);
+                throw new ExcelAssertException(excelAssert.message(), excelField, field, row.getRowNum(), c);
             }
         }
     }
