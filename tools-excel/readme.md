@@ -28,11 +28,10 @@
 |参数|描述|
 |---|---|
 |value|表头名称, ``必填``|
-|pattern|导入导出时会按配置的格式进行格式化时间，默认``yyyy-MM-dd HH:mm:ss``|
 |width|表头所在列的整列单元格宽度，默认``5120``|
 |style|表头的样式，``优先级高于全局配置``|
 |sort|表头出现在Excel的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
-|format|导出Excel模板时表头下方的单元格数据格式|
+|format|导出Excel时表头下方的单元格格式，``优先级高于设置样式时指定``|
 |autoMerge|表头所在列是否需要自动纵向合并相邻且值相同的单元格，默认``false``|
 |allowEmpty|表头下方的单元格是否允许空值，默认``true``|
 |strategy|导入时表头下方单元格内容为空时所执行的策略，策略有：``jump``(跳过当前这条数据，该策略会发起回调)、``error``(抛出异常，``本次导入终止``)|
@@ -57,7 +56,7 @@
 |empty|null值或者空字符串是否也要合并，默认``false``|
 |callback|合并回调接口类，可以通过回调进行自定义设置合并规则|
 ### 5、@ExcelAssert
-**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空等等。。使用``断言方式先于ExcelField的非空策略``，注解参数如下**       
+**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空、正则匹配等等。。使用``断言方式先于ExcelField的非空策略``，注解参数如下**       
 
 |参数|描述|
 |---|---|
@@ -128,8 +127,7 @@ public class User {
     @ExcelField(value = "性别")
     private GenderEnum gender;
 
-    //导入导出时按照设置的格式进行格式化时间
-    @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
+    @ExcelField(value = "创建时间",format = "yyyy-MM-dd")
     private Date createTime;
 }
 ```
@@ -589,7 +587,7 @@ public class User1 {
 @Excel("用户列表")
 public class User {
 
-    @ExcelField(value = "创建时间", pattern = "yyyy-MM-dd")
+    @ExcelField(value = "创建时间",format = "yyyy-MM-dd")
     @ExcelDateValid(rows = 10, expr1 = "2019-10-11", expr2 = "2019-10-13")
     private Date createTime;
 }
@@ -606,12 +604,12 @@ public class User {
 }
 ```
 ### 7、表头断言
-**只需要在表头上使用注解即可，然后填写正确的EL表达式，下面示例中设置了订单名称长度限制**
+**只需要在表头上使用注解即可，然后填写正确的EL表达式，下面示例中设置了订单名称不能为空**
 ```java
 @Excel("订单列表")
 public class Order {
     @ExcelField("订单名称")
-    @ExcelAssert(expr = "#orderName.length() < 10", message = "订单名称长度不能大于10")
+    @ExcelAssert(expr = "#orderName != null", message = "订单名称不能为空")
     private String orderName;
 }
 ```
@@ -647,7 +645,7 @@ public class User {
     @ExcelField("用户名")
     private String userName;
 
-    @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
+    @ExcelField(value = "创建时间",format = "yyyy-MM-dd")
     private Date createTime;
 }
 ```
@@ -696,7 +694,7 @@ public class User {
     @ExcelDropdownBox(validClass = MyValid.class,rows = 10)
     private String userName;
 
-    @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
+    @ExcelField(value = "创建时间",format = "yyyy-MM-dd")
     //在当前表头下方的第一行单元格中，时间只能输入在2019-10-11至2019-10-13范围的时间
     @ExcelDateValid(expr1 = "2019-10-11",expr2 = "2019-10-13")
     private Date createTime;

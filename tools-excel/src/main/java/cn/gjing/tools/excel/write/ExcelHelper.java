@@ -18,7 +18,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,6 @@ import java.util.Map;
  **/
 class ExcelHelper {
     private Workbook workbook;
-    private Map<String, SimpleDateFormat> formatMap;
     private Map<Integer, String> formulaMap;
     private Map<String, MetaStyle> customerMetaStyleMap;
     private Map<String, EnumConvert<Enum<?>, ?>> enumConvertMap;
@@ -71,7 +71,6 @@ class ExcelHelper {
             Row headRow = sheet.createRow(rowIndex);
             headRow.setHeight(excel.headHeight());
             MetaStyle metaStyle;
-            ExcelStyle excelStyle;
             for (int i = 0, headFieldSize = headFieldList.size(); i < headFieldSize; i++) {
                 Cell headCell = headRow.createCell(i);
                 Field field = headFieldList.get(i);
@@ -80,25 +79,11 @@ class ExcelHelper {
                     locked = this.addValid(field, headRow, i, locked, sheet, metaObject);
                     if (!"".equals(excelField.format())) {
                         CellStyle defaultColumnStyle = this.workbook.createCellStyle();
-                        defaultColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.format()));
+                        defaultColumnStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
                         sheet.setDefaultColumnStyle(i, defaultColumnStyle);
                     }
                 }
-                if (excelField.style() == DefaultExcelStyle.class) {
-                    metaStyle = metaObject.getMetaStyle();
-                } else {
-                    metaStyle = this.customerMetaStyleMap.get(field.getName());
-                    if (metaStyle == null) {
-                        try {
-                            excelStyle = excelField.style().newInstance();
-                        } catch (Exception e) {
-                            throw new ExcelInitException("Init specified excel header style failure " + field.getName() + ", " + e.getMessage());
-                        }
-                        metaStyle = new MetaStyle();
-                        metaStyle.setBodyStyle(excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()));
-                        metaStyle.setHeadStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()));
-                    }
-                }
+                metaStyle = this.initStyle(metaObject, field, excelField);
                 headCell.setCellStyle(metaStyle.getHeadStyle());
                 sheet.setColumnWidth(i, excelField.width());
                 headCell.setCellValue(excelField.value());
@@ -259,19 +244,15 @@ class ExcelHelper {
             return;
         }
         if (field.getType() == Date.class) {
-            if (this.formatMap == null) {
-                this.formatMap = new HashMap<>(16);
-                SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
-                this.formatMap.put(field.getName(), format);
-                cell.setCellValue(format.format(value));
-            } else {
-                SimpleDateFormat format = formatMap.get(field.getName());
-                if (format == null) {
-                    format = new SimpleDateFormat(excelField.pattern());
-                    this.formatMap.put(field.getName(), format);
-                }
-                cell.setCellValue(format.format(value));
-            }
+            cell.setCellValue((Date) value);
+            return;
+        }
+        if (value instanceof LocalDateTime) {
+            cell.setCellValue((LocalDateTime) value);
+            return;
+        }
+        if (value instanceof LocalDate) {
+            cell.setCellValue((LocalDate) value);
             return;
         }
         String val = value.toString();
@@ -311,6 +292,40 @@ class ExcelHelper {
             }
         }
         return locked;
+    }
+
+    private MetaStyle initStyle(MetaObject metaObject, Field field, ExcelField excelField) {
+        MetaStyle metaStyle;
+        if (excelField.style() == DefaultExcelStyle.class) {
+            if (!"".equals(excelField.format())) {
+                metaStyle = new MetaStyle();
+                metaStyle.setHeadStyle(metaObject.getMetaStyle().getHeadStyle());
+                CellStyle formatStyle = this.workbook.createCellStyle();
+                formatStyle.cloneStyleFrom(metaObject.getMetaStyle().getBodyStyle());
+                formatStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
+                metaStyle.setBodyStyle(formatStyle);
+            } else {
+                metaStyle = metaObject.getMetaStyle();
+            }
+        } else {
+            metaStyle = this.customerMetaStyleMap.get(field.getName());
+            ExcelStyle excelStyle;
+            if (metaStyle == null) {
+                try {
+                    excelStyle = excelField.style().newInstance();
+                } catch (Exception e) {
+                    throw new ExcelInitException("Init specified excel header style failure " + field.getName() + ", " + e.getMessage());
+                }
+                metaStyle = new MetaStyle();
+                CellStyle formatStyle = excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle());
+                if (!"".equals(excelField.format())) {
+                    formatStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
+                }
+                metaStyle.setBodyStyle(formatStyle);
+                metaStyle.setHeadStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()));
+            }
+        }
+        return metaStyle;
     }
 
     private void putExcelModel(Row row, Object value, Map<Object, ExcelOldModel> excelModelMap, int key) {

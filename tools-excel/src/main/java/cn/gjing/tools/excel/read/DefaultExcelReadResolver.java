@@ -13,6 +13,7 @@ import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -25,11 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.Temporal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +42,6 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private int totalCol = 0;
     private InputStream inputStream;
     private Gson gson;
-    private Map<String, SimpleDateFormat> formatMap;
     private Map<String, EnumConvert<? extends Enum<?>, ?>> enumConvertMap;
     private Map<String, Class<?>> enumInterfaceTypeMap;
     private List<String> headNameList;
@@ -199,20 +199,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 break;
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    if (this.formatMap == null) {
-                        this.formatMap = new HashMap<>(16);
-                        SimpleDateFormat format = new SimpleDateFormat(excelField.pattern());
-                        this.formatMap.put(field.getName(), format);
-                        value = format.format(cell.getDateCellValue());
-                    } else {
-                        SimpleDateFormat format = this.formatMap.get(field.getName());
-                        if (format == null) {
-                            format = new SimpleDateFormat(excelField.pattern());
-                            this.formatMap.put(field.getName(), format);
-                        }
-                        value = format.format(cell.getDateCellValue());
-                    }
-                    return value;
+                    return cell.getDateCellValue();
                 } else {
                     NumberFormat numberFormat = NumberFormat.getInstance();
                     numberFormat.setMinimumFractionDigits(0);
@@ -259,8 +246,22 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 return;
             }
             BeanUtils.setFieldValue(o, field, enumConvert.toEntityAttribute(gson.fromJson(gson.toJson(value), (java.lang.reflect.Type) enumInterfaceTypeMap.get(field.getName()))));
-        } else {
+            return;
+        }
+        try {
             BeanUtils.setFieldValue(o, field, gson.fromJson(gson.toJson(value), field.getType()));
+        } catch (JsonSyntaxException e) {
+            if (value instanceof Temporal) {
+                BeanUtils.setFieldValue(o, field, value);
+                return;
+            }
+            if (field.getType() == LocalDateTime.class) {
+                BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
+                return;
+            }
+            if (field.getType() == LocalDate.class) {
+                BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()).toLocalDate());
+            }
         }
     }
 

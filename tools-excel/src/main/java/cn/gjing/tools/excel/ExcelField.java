@@ -23,13 +23,6 @@ public @interface ExcelField {
     String value();
 
     /**
-     * Time format when import and export
-     *
-     * @return pattern
-     */
-    String pattern() default "yyyy-MM-dd HH:mm:ss";
-
-    /**
      * Excel header width
      *
      * @return cell width
