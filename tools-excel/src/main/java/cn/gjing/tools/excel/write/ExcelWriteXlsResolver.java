@@ -7,14 +7,19 @@ import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * XLS处理器
@@ -48,9 +53,14 @@ class ExcelWriteXlsResolver implements ExcelWriterResolver, Closeable {
     @Override
     public void flush(HttpServletResponse response, String fileName) {
         response.setContentType("application/vnd.ms-excel");
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         try {
-            response.setHeader("Content-disposition",
-                    "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8") + ".xls");
+            if (request.getHeader("User-Agent").toLowerCase().indexOf("firefox") > 0) {
+                fileName = new String(fileName.getBytes(StandardCharsets.UTF_8), "ISO8859-1");
+            } else {
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            }
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
             this.outputStream = response.getOutputStream();
             this.workbook.write(this.outputStream);
         } catch (IOException e) {

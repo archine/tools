@@ -26,7 +26,7 @@ public @interface ExcelNumericValid {
      *
      * @return 200
      */
-    int boxLastRow() default 200;
+    int rows() default 200;
 
     /**
      * Operator type

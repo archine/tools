@@ -234,7 +234,6 @@ class ExcelHelper {
             }
         }
         if (value == null) {
-            cell.setCellValue("");
             return;
         }
         if (field.getType().isEnum()) {
@@ -248,13 +247,15 @@ class ExcelHelper {
                 ParamUtils.requireNonNull(excelEnumConvert, field.getName() + " was not found enum convert");
                 try {
                     enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
-                    cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
+                    value = enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString()));
+                    cell.setCellValue(value == null ? "" : value.toString());
                     this.enumConvertMap.put(field.getName(), enumConvert);
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             } else {
-                cell.setCellValue(enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString())).toString());
+                value = enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString()));
+                cell.setCellValue(value == null ? "" : value.toString());
             }
             return;
         }
@@ -290,7 +291,7 @@ class ExcelHelper {
         int firstRow = row.getRowNum() + 1;
         if (ev != null) {
             try {
-                locked = ev.validClass().newInstance().valid(ev, this.workbook, sheet, firstRow, ev.boxLastRow() == 0 ? firstRow : ev.boxLastRow() + firstRow - 1, i, i, locked, field.getName()
+                locked = ev.validClass().newInstance().valid(ev, this.workbook, sheet, firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, i, i, locked, field.getName()
                         , metaObject.getExplicitValues());
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelResolverException("Add specified excel header dropdown box failure " + field.getName() + ", " + e.getMessage());
@@ -298,14 +299,14 @@ class ExcelHelper {
         }
         if (dv != null) {
             try {
-                dv.validClass().newInstance().valid(dv, sheet, firstRow, dv.boxLastRow() == 0 ? firstRow : dv.boxLastRow() + firstRow - 1, i, i);
+                dv.validClass().newInstance().valid(dv, sheet, firstRow, dv.rows() == 0 ? firstRow : dv.rows() + firstRow - 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelResolverException("Add specified excel header date validation failure " + field.getName() + ", " + e.getMessage());
             }
         }
         if (nv != null) {
             try {
-                nv.validClass().newInstance().valid(nv, sheet, firstRow, nv.boxLastRow() == 0 ? firstRow : nv.boxLastRow() + firstRow - 1, i, i);
+                nv.validClass().newInstance().valid(nv, sheet, firstRow, nv.rows() == 0 ? firstRow : nv.rows() + firstRow - 1, i, i);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelResolverException("Add specified excel header numeric validation failure " + field.getName() + ", " + e.getMessage());
             }

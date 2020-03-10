@@ -1,12 +1,14 @@
 package cn.gjing.tools.excel.exception;
 
 import cn.gjing.tools.excel.ExcelField;
+import lombok.Getter;
 
 import java.lang.reflect.Field;
 
 /**
  * @author Gjing
  **/
+@Getter
 public class ExcelDataValidException extends RuntimeException {
     private ExcelField excelField;
     private Field field;

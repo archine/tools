@@ -26,7 +26,7 @@ public @interface ExcelDateValid {
      *
      * @return 200
      */
-    int boxLastRow() default 200;
+    int rows() default 200;
 
     /**
      * Time format of valid

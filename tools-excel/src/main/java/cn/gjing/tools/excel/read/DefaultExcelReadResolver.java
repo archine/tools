@@ -154,24 +154,12 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                                 value = dataConvert.toEntityAttribute(value, field, excelField);
                             }
                         }
-                        if (excelAssert != null) {
-                            context.setVariable(field.getName(), value);
-                            Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
-                            if (test != null && !test) {
-                                throw new ExcelDataValidException(excelAssert.message(), excelField, field, row.getRowNum(), c);
-                            }
-                        }
+                        this.assertValue(parser, context, row, c, field, excelField, excelAssert, value);
                         if (this.isSave && value != null) {
                             this.setValue(o, field, value);
                         }
                     } else {
-                        if (excelAssert != null) {
-                            context.setVariable(field.getName(), null);
-                            Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
-                            if (test != null && !test) {
-                                throw new ExcelDataValidException(excelAssert.message(), excelField, field, row.getRowNum(), c);
-                            }
-                        }
+                        this.assertValue(parser, context, row, c, field, excelField, excelAssert, null);
                         this.valid(field, excelField, row.getRowNum(), c, readCallback);
                     }
                 } catch (Exception e) {
@@ -262,12 +250,12 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
                 try {
                     enumConvert = excelEnumConvert.convert().newInstance();
-                    BeanUtils.setFieldValue(o, field, enumConvert.toEntityAttribute(gson.fromJson(gson.toJson(value), (java.lang.reflect.Type) interfaceType)));
-                    this.enumConvertMap.put(field.getName(), enumConvert);
-                    this.enumInterfaceTypeMap.put(field.getName(), interfaceType);
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new ExcelInitException("Enum convert init failure " + field.getName() + ", " + e.getMessage());
                 }
+                BeanUtils.setFieldValue(o, field, enumConvert.toEntityAttribute(gson.fromJson(gson.toJson(value), (java.lang.reflect.Type) interfaceType)));
+                this.enumConvertMap.put(field.getName(), enumConvert);
+                this.enumInterfaceTypeMap.put(field.getName(), interfaceType);
                 return;
             }
             BeanUtils.setFieldValue(o, field, enumConvert.toEntityAttribute(gson.fromJson(gson.toJson(value), (java.lang.reflect.Type) enumInterfaceTypeMap.get(field.getName()))));
@@ -288,6 +276,16 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             case ERROR:
                 throw new ExcelResolverException(excelField.message());
             default:
+        }
+    }
+
+    private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField, ExcelAssert excelAssert, Object value) {
+        if (excelAssert != null) {
+            context.setVariable(field.getName(), value);
+            Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
+            if (test != null && !test) {
+                throw new ExcelDataValidException(excelAssert.message(), excelField, field, row.getRowNum(), c);
+            }
         }
     }
 }

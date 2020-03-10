@@ -33,7 +33,7 @@ public @interface ExcelDropdownBox {
      *
      * @return 200
      */
-    int boxLastRow() default 200;
+    int rows() default 200;
 
     /**
      * Whether the error box pops up

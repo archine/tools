@@ -50,7 +50,7 @@
 |format|求和后的数字格式，默认整数|
 |height|行高，默认``300``|
 ### 4、@Merge
-**在@ExcelFiled注解的autoMerge参数使用，使用该注解后会自动纵向合并当前表头下相邻且值相同的单元格。``示例用法可参考第五节：辅助功能``**     
+**在@ExcelFiled注解的autoMerge参数使用，使用该注解后会自动纵向合并当前表头下相邻且值相同的单元格。``示例用法可参考第五节：注解的使用``**     
 
 |参数|描述|
 |---|---|
@@ -58,19 +58,19 @@
 |empty|null值或者空字符串是否也要合并，默认``false``|
 |callback|合并回调接口类，可以通过回调进行自定义设置合并规则|
 ### 5、@ExcelAssert
-**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空等等。。``断言先于ExcelField中的非空策略``, 注解参数如下**       
+**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空等等。。使用``断言方式先于ExcelField的非空策略``，注解参数如下**       
 
 |参数|描述|
 |---|---|
-|expr|EL表达式，``#号后面的字段名称一定要正确``|
+|expr|EL表达式，``#号后面的字段名称一定要正确``，表达式结果必须为``boolean``|
 |empty|数据不符合时的异常信息|
 ### 6、@ExcelDateValid
-**表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下。``示例用法可参考第五节：辅助功能``**     
+**表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下。``示例用法可参考第五节：注解的使用``**     
 
 |参数|描述|
 |---|---|
 |validClass|校验器|
-|boxLastRow|需要给多少行单元格加上校验，默认``200``|
+|rows|需要给多少行单元格加上校验，默认``200``|
 |pattern|校验的时间格式，默认``yyyy-MM-dd``，配置后只允许输入该格式|
 |operatorType|操作类型，默认``OperatorType.BETWEEN``|
 |expr1|表达式1，默认``1970-01-01``|
@@ -80,25 +80,25 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 ### 7、@ExcelDropdownBox
-**表头上使用，使用后会在导出模板时对表头下方的单元格增加下拉框，注解参数如下。``示例用法可参考第五节：辅助功能``**     
+**表头上使用，使用后会在导出模板时对表头下方的单元格增加下拉框，注解参数如下。``示例用法可参考第五节：注解的使用``**     
 
 |参数|描述|
 |-----|-----|
 |validClass|校验器|
 |combobox|下拉框中的内容，``方法设置优先级高于注解配置``|
-|boxLastRow|需要给多少行单元格加上下拉框，默认``200``|
+|rows|需要给多少行单元格加上下拉框，默认``200``|
 |showErrorBox|是否弹出错误框，默认``true``|
 |rank|提示框级别，默认``Rank.STOP``级别|
-|link|指定当前表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``。，``示例用法可参考第五节：辅助功能``|
+|link|指定当前表头的父级序号，指定后会与父级形成级联关系，该序号为要关联的父级单元格``序号-1``，具体序号可参考``@ExcelField``注解中sort参数的描述。例：父级是第一个单元格，那么link序号为``0``。，``示例用法可参考第五节：注解的使用``|
 |errorTitle|错误框标题|
 |errorContent|详细错误内容|
 ### 8、@ExcelNumericValid
-**表头使用，会在导出模板时对该表头下方的单元格加入文本长度、数字大小校验，注解参数如下。``示例用法可参考第五节：辅助功能``**     
+**表头使用，会在导出模板时对该表头下方的单元格加入文本长度、数字大小校验，注解参数如下。``示例用法可参考第五节：注解的使用``**     
 
 |参数|描述|
 |-----|-----|
 |validClass|校验器Class|
-|boxLastRow|需要给多少行单元格加上校验，默认``200``|
+|rows|需要给多少行单元格加上校验，默认``200``|
 |operatorType|操作类型，默认``OperatorType.LESS_OR_EQUAL``|
 |validType|校验类型，默认``ValidType.TEXT_LENGTH``|
 |expr1|表达式1，在表达式2前面，默认``0``|
@@ -108,7 +108,7 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 ### 9、@ExcelEnumConvert
-**枚举转换器，在字段类型为枚举时需要配置，否则在导入导出时未检测到转换器会抛出未找到转换器异常，注解参数如下。``示例用法可参考第五节：辅助功能``**     
+**枚举转换器，在字段类型为枚举时需要配置，否则在导入导出时未检测到转换器会抛出未找到转换器异常，注解参数如下。``示例用法可参考第五节：注解的使用``**     
 
 |参数|描述|
 |---|---|
@@ -311,7 +311,7 @@ public class UserController {
     }
 }
 ```
-**导入时Excel存在大标题的时候，需要指定表头的下标，下标你为你导出这个模板时设置的大标题的行数(``boxLastRow``)，要在调用``read()``前配置**
+**导入时Excel存在大标题的时候，需要指定表头的下标，下标你为你导出这个模板时设置的大标题的行数(``rows``)，要在调用``read()``前配置**
 ```java
 /**
  * @author Gjing
@@ -533,7 +533,7 @@ public class UserController {
 @Excel("订单列表")
 public class Order {
 
-    @ExcelDropdownBox(combobox = {"小红","小花"},boxLastRow = 10)
+    @ExcelDropdownBox(combobox = {"小红","小花"}, rows = 10)
     @ExcelField(value = "订单负责人", sort = 1)
     private String orderUser;
 
@@ -591,7 +591,7 @@ public class User1 {
 public class User {
 
     @ExcelField(value = "创建时间", pattern = "yyyy-MM-dd")
-    @ExcelDateValid(boxLastRow = 10, expr1 = "2019-10-11", expr2 = "2019-10-13")
+    @ExcelDateValid(rows = 10, expr1 = "2019-10-11", expr2 = "2019-10-13")
     private Date createTime;
 }
 ```
@@ -602,17 +602,17 @@ public class User {
 public class User {
 
     @ExcelField(value = "用户名",autoMerge = true,sort = 1)
-    @ExcelNumericValid(boxLastRow = 10,expr1 = "2")
+    @ExcelNumericValid(rows = 10,expr1 = "2")
     private String userName;
 }
 ```
 ### 7、表头断言
-**只需要在表头上使用注解即可，然后填写正确的EL表达式，下面示例中设置了订单名称不能为空**
+**只需要在表头上使用注解即可，然后填写正确的EL表达式，下面示例中设置了订单名称长度限制**
 ```java
 @Excel("订单列表")
 public class Order {
     @ExcelField("订单名称")
-    @ExcelAssert(expr = "#orderName != null", message = "订单名称不能为空")
+    @ExcelAssert(expr = "#orderName.length() < 10", message = "订单名称长度不能大于10")
     private String orderName;
 }
 ```
@@ -694,7 +694,7 @@ public class User {
     private Long id;
 
     @ExcelField("用户名")
-    @ExcelDropdownBox(validClass = MyValid.class,boxLastRow = 10)
+    @ExcelDropdownBox(validClass = MyValid.class,rows = 10)
     private String userName;
 
     @ExcelField(value = "创建时间",pattern = "yyyy-MM-dd")
