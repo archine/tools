@@ -16,4 +16,12 @@ public interface MergeCallback<T> {
      * @return boolean
      */
     boolean toMerge(T t, Field field, int colIndex, int rowIndex);
+
+    /**
+     * The first object
+     * @param t Current object
+     */
+    default void init(T t){
+
+    }
 }

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.4.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.4.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -613,6 +613,13 @@ public class UserController {
  * @author Gjing
  **/
 public class MyMergeCallback implements MergeCallback<User1> {
+    //该方法是导出的数据第一条触发该回调
+    @Override
+    public void init(Object o) {
+        
+    }
+    
+    //第二条数据开始会连续触发该回调
     @Override
     public boolean toMerge(User1 user1, Field field, int i, int i1) {
         return "张三".equals(user1.getUserName());

@@ -170,6 +170,7 @@ class ExcelHelper {
                 this.formulaMap.put(j, valueCell.getAddress().formatAsString() + ":");
             }
             if (excelField.autoMerge().open()) {
+                this.mergeCallbackMap.get(field.getName()).init(this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()));
                 this.putExcelModel(valueRow, value, excelModelMap, j);
             }
             return;
