@@ -168,8 +168,8 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                     } else {
                         Object value = this.changeData(field, null, parser, excelDataConvert, context);
                         if (value == null) {
-                            this.assertValue(parser, context, row, c, field, excelField, excelAssert, null);
                             this.valid(field, excelField, row.getRowNum(), c, readCallback);
+                            this.assertValue(parser, context, row, c, field, excelField, excelAssert, null);
                             continue;
                         }
                         this.setValue(o, field, value);
@@ -261,6 +261,10 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      */
     private void setValue(R o, Field field, Object value) {
         if (field.getType().isEnum()) {
+            if (value instanceof Enum) {
+                BeanUtils.setFieldValue(o, field, value);
+                return;
+            }
             if (this.enumConvertMap == null) {
                 this.enumConvertMap = new HashMap<>(16);
                 this.enumInterfaceTypeMap = new HashMap<>(16);
