@@ -216,6 +216,32 @@ public final class ParamUtils {
     }
 
     /**
+     * 参数转map
+     *
+     * @param paramStr 参数字符串
+     * @return map
+     */
+    public static Map<String, String[]> paramToMap(String paramStr) {
+        if (paramStr == null) {
+            return new HashMap<>(16);
+        }
+        String[] params = paramStr.split("&");
+        Map<String, String[]> resMap = new HashMap<>(16);
+        for (String s : params) {
+            String[] param = s.split("=");
+            if (param.length >= 2) {
+                String key = param[0];
+                StringBuilder value = new StringBuilder(param[1]);
+                for (int j = 2; j < param.length; j++) {
+                    value.append("=").append(param[j]);
+                }
+                resMap.put(key, new String[]{value.toString()});
+            }
+        }
+        return resMap;
+    }
+
+    /**
      * 删除字符串里的符号
      *
      * @param str    字符串

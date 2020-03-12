@@ -1,10 +1,9 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.*;
+import cn.gjing.tools.excel.convert.*;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
-import cn.gjing.tools.excel.listen.DataConvert;
-import cn.gjing.tools.excel.listen.EnumConvert;
 import cn.gjing.tools.excel.listen.MergeCallback;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
@@ -15,6 +14,10 @@ import com.google.gson.Gson;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -32,7 +35,7 @@ class ExcelHelper {
     private Map<Integer, String> formulaMap;
     private Map<String, MetaStyle> customerMetaStyleMap;
     private Map<String, EnumConvert<Enum<?>, ?>> enumConvertMap;
-    private Map<String, DataConvert<?, ?>> dataConvertMap;
+    private Map<String, DataConvert<?>> dataConvertMap;
     private Map<String, MergeCallback<?>> mergeCallbackMap;
     private Gson gson;
 
@@ -119,17 +122,23 @@ class ExcelHelper {
     public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, int rowIndex) {
         rowIndex++;
         Map<Object, ExcelOldModel> excelModelMap = new HashMap<>(16);
+        ExpressionParser parser = new SpelExpressionParser();
+        EvaluationContext context = new StandardEvaluationContext();
         for (int i = 0, dataSize = data.size(); i < dataSize; i++) {
             Object o = data.get(i);
+            context.setVariable(o.getClass().getSimpleName(), o);
             Row valueRow = sheet.createRow(rowIndex + i);
             for (int j = 0, headSize = headFieldList.size(); j < headSize; j++) {
                 Field field = headFieldList.get(j);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
+                ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(j);
+                context.setVariable(field.getName(), value);
                 try {
+                    value = this.changeData(field, value, o, parser, excelDataConvert, context);
                     this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell, field, o);
-                    this.setCellVal(excelField, field, valueCell, value, o);
+                    this.setCellValue(field, valueCell, value);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -137,6 +146,20 @@ class ExcelHelper {
         }
     }
 
+    /**
+     * Summation and merge cells
+     * @param sheet Current sheet
+     * @param excelModelMap Excel model map
+     * @param i Current row index
+     * @param dataSize Excel data
+     * @param valueRow Current row
+     * @param j Current col index
+     * @param excelField ExcelField annotation on current field
+     * @param value Current attribute value
+     * @param valueCell Current cell
+     * @param field Current field
+     * @param obj Current object
+     */
     private void sumOrMerge(Sheet sheet, Map<Object, ExcelOldModel> excelModelMap, int i, int dataSize, Row valueRow, int j, ExcelField excelField, Object value,
                             Cell valueCell, Field field, Object obj) {
         if (i == 0) {
@@ -206,16 +229,39 @@ class ExcelHelper {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void setCellVal(ExcelField excelField, Field field, Cell cell, Object value, Object obj) {
-        cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
+    /**
+     * Data converter
+     *
+     * @param field            Current field
+     * @param value            Attribute values
+     * @param obj              Current object
+     * @param parser           El parser
+     * @param excelDataConvert excelDataConvert
+     * @param context          EL context
+     * @return new value
+     */
+    private Object changeData(Field field, Object value, Object obj, ExpressionParser parser, ExcelDataConvert excelDataConvert, EvaluationContext context) {
+        if (excelDataConvert != null && !"".equals(excelDataConvert.expr1())) {
+            return parser.parseExpression(excelDataConvert.expr1()).getValue(context);
+        }
         if (this.dataConvertMap != null) {
-            DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
+            DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
             if (dataConvert != null) {
-                dataConvert.toExcelAttribute(cell, this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), value, field, excelField);
-                return;
+                return dataConvert.toExcelAttribute(this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), value, field);
             }
         }
+        return value;
+    }
+
+    /**
+     * To the cell assignment
+     * @param field Current field
+     * @param cell Current cell
+     * @param value Attribute values
+     */
+    @SuppressWarnings("unchecked")
+    private void setCellValue(Field field, Cell cell, Object value) {
+        cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
         if (value == null) {
             return;
         }
@@ -263,6 +309,16 @@ class ExcelHelper {
         }
     }
 
+    /**
+     * The cell increase check
+     * @param field Current field
+     * @param row Current row
+     * @param i Current col index
+     * @param locked Level drop-down box interlocking living state
+     * @param sheet Current sheet
+     * @param metaObject Excel meta object
+     * @return lock status
+     */
     private boolean addValid(Field field, Row row, int i, boolean locked, Sheet sheet, MetaObject metaObject) {
         ExcelDropdownBox ev = field.getAnnotation(ExcelDropdownBox.class);
         ExcelDateValid dv = field.getAnnotation(ExcelDateValid.class);
@@ -293,6 +349,13 @@ class ExcelHelper {
         return locked;
     }
 
+    /**
+     * Init excel style
+     * @param metaObject Excel meta object
+     * @param field Current field
+     * @param excelField ExcelField annotation on current filed
+     * @return MetaStyle
+     */
     private MetaStyle initStyle(MetaObject metaObject, Field field, ExcelField excelField) {
         MetaStyle metaStyle;
         if (excelField.style() == DefaultExcelStyle.class) {
@@ -327,6 +390,13 @@ class ExcelHelper {
         return metaStyle;
     }
 
+    /**
+     * Set last row object
+     * @param row Current row
+     * @param value Current attribute value
+     * @param excelModelMap Excel model map
+     * @param key key
+     */
     private void putExcelModel(Row row, Object value, Map<Object, ExcelOldModel> excelModelMap, int key) {
         excelModelMap.put(key, ExcelOldModel.builder()
                 .oldValue(value)

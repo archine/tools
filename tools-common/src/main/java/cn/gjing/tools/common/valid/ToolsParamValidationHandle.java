@@ -33,13 +33,16 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
             Method method = handlerMethod.getMethod();
             Parameter[] parameters = method.getParameters();
             NotEmpty notEmpty = method.getAnnotation(NotEmpty.class);
+            NotNull notNull = method.getAnnotation(NotNull.class);
+            Object value;
+            boolean isFile;
             if (notEmpty != null) {
                 for (Parameter parameter : parameters) {
                     if (this.isJson(request, parameter)) {
                         continue;
                     }
-                    boolean isFile = parameter.getType() == MultipartFile.class;
-                    Object value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
+                    isFile = parameter.getType() == MultipartFile.class;
+                    value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameterValues(parameter.getName());
                     if (!parameter.isAnnotationPresent(Not.class)) {
                         if (ParamUtils.isEmpty(value)) {
                             throw new ParamValidException(parameter.getName() + "不能为空");
@@ -51,14 +54,13 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
                 }
                 return true;
             }
-            NotNull notNull = method.getAnnotation(NotNull.class);
             if (notNull != null) {
                 for (Parameter parameter : parameters) {
                     if (this.isJson(request, parameter)) {
                         continue;
                     }
-                    boolean isFile = parameter.getType() == MultipartFile.class;
-                    Object value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
+                    isFile = parameter.getType() == MultipartFile.class;
+                    value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameterValues(parameter.getName());
                     if (!parameter.isAnnotationPresent(Not.class)) {
                         if (value == null) {
                             throw new ParamValidException(parameter.getName() + "不能为Null");
@@ -74,8 +76,8 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
                 if (this.isJson(request, parameter)) {
                     continue;
                 }
-                boolean isFile = parameter.getType() == MultipartFile.class;
-                Object value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameter(parameter.getName());
+                isFile = parameter.getType() == MultipartFile.class;
+                value = isFile ? ((StandardMultipartHttpServletRequest) request).getMultiFileMap().get(parameter.getName()) : request.getParameterValues(parameter.getName());
                 notEmpty = parameter.getAnnotation(NotEmpty.class);
                 notNull = parameter.getAnnotation(NotNull.class);
                 this.emptyCheck(notNull, notEmpty, value);

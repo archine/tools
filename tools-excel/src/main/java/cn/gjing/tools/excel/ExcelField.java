@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel;
 
-import cn.gjing.tools.excel.listen.DataConvert;
+import cn.gjing.tools.excel.convert.DataConvert;
+import cn.gjing.tools.excel.convert.DefaultDataConvert;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -89,5 +90,5 @@ public @interface ExcelField {
      *
      * @return DefaultDataConvert.class
      */
-    Class<? extends DataConvert<?,?>> convert() default DefaultDataConvert.class;
+    Class<? extends DataConvert<?>> convert() default DefaultDataConvert.class;
 }

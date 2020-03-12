@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.3.9-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.4.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.3.9</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -37,7 +37,7 @@
 |strategy|导入时表头下方单元格内容为空时所执行的策略，策略有：``jump``(跳过当前这条数据，该策略会发起回调)、``error``(抛出异常，``本次导入终止``)|
 |message|执行策略为``error``的时候抛出的异常信息|
 |sum|表头导出时整列是否需要求和，默认``false``|
-|convert|数据转换器，对单元格内容进行数据处理的时候使用|
+|convert|数据转换器，对单元格内容进行数据加工的时候使用|
 ### 3、@Sum
 **在@ExcelField注解的sum参数使用，该注解会对所在表头下的整列进行末尾求和，``要求和的表头不应为第一列``** 
     
@@ -56,12 +56,12 @@
 |empty|null值或者空字符串是否也要合并，默认``false``|
 |callback|合并回调接口类，可以通过回调进行自定义设置合并规则|
 ### 5、@ExcelAssert
-**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空、正则匹配等等。。使用``断言方式先于ExcelField的非空策略``，注解参数如下**       
+**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空、正则匹配等等。。``先于ExcelField的非空策略``，注解参数如下**       
 
 |参数|描述|
 |---|---|
 |expr|EL表达式，``#号后面的字段名称一定要正确``，表达式结果必须为``boolean``|
-|empty|数据不符合时的异常信息|
+|message|数据不符合时的异常信息|
 ### 6、@ExcelDateValid
 **表头上使用，使用后会在导出模板时对表头下方的单元格加上时间校验，注解参数如下。``示例用法可参考第五节：注解的使用``**     
 
@@ -111,6 +111,13 @@
 |参数|描述|
 |---|---|
 |convert|实现了``EnumConvert``接口的类|
+### 10、@ExcelDataConvert
+**数据转换器，导入导出时需要对数据进行加工处理的时候使用**     
+
+|参数|描述|
+|---|---|
+|expr1|导出时的EL表达式|
+|expr2|导入时的EL表达式|
 ## 三、导出
 ### 1、定义Excel实体
 **只需要在实体类和字段上加上对应注解即可**
@@ -384,6 +391,19 @@ public class MyReadCallback implements ReadCallback<Object> {
     public void readJump(Field field, ExcelField excelField, int rowIndex, int colIndex) {
         System.out.println("当前错误的是第：" + (rowIndex + 1) + "行，第: " + (colIndex + 1) + "列");
     }
+
+     /**
+      * 读取到每一个非空单元格时会触发该回调
+      * @param val 单元格内容
+      * @param field 当前字段
+      * @param rowIndex 当前单元格所在的行数下标，下标是从0开始的
+      * @param colIndex 当前单元格所在的列数，下标是从0开始的
+      * @return 加工后的val
+      */
+     @Override
+     public Object readCol(Object val, Field field, int rowIndex, int colIndex) {
+         return val;
+     }
 }
 ```
 **实现回调接口后可在调用``read()``方法时进行设置**
@@ -464,20 +484,35 @@ public class User {
 }
 ```
 ### 2、数据转换器
-**该转换器主要提供导入导出时对某个单元格进行数据处理，比如时间转换、数据校验等。。实现``DataConvert``接口，该接口支持泛型，泛型为你的当前表头的字段和实体类型**
+**该转换器主要提供导入导出时对某个单元格进行数据加工，如数据替换、默认值设置。。转换器一共有接口方式与注解方式，``同时出现只取其一``**
+#### a、实现接口方式
+**实现``DataConvert``接口，该接口支持泛型，泛型为你的实体类型**
 ```java
 /**
  * @author Gjing
  **/
-public class MyDataConvert implements DataConvert<String,User> {
+public class MyDataConvert implements DataConvert<User> {
+    /**
+     * 转实体的时候会触发
+     * @param o 当前单元格的值
+     * @param field 当前属性
+     * @return 加工后的单元格值
+     */
     @Override
-    public String toEntityAttribute(Object o, Field field, ExcelField excelField) {
-        return null;
+    public Object toEntityAttribute(Object o, Field field) {
+        return o;
     }
 
+    /**
+     * 写入Excel的时候会触发
+     * @param user1 当前对象
+     * @param o 当前属性的值
+     * @param field  当前属性
+     * @return 加工后的属性值
+     */
     @Override
-    public void toExcelAttribute(Cell cell, User o, Object o1, Field field, ExcelField excelField) {
-        
+    public Object toExcelAttribute(User1 user1, Object o, Field field) {
+        return o;
     }
 }
 ```
@@ -490,8 +525,19 @@ public class User {
     private String remark;
 }
 ```
+#### b、注解方式
+**通过使用``@ExcelDataConvert``注解进行设置表达式，以下演示了设置默认值**
+```java
+@Excel("用户列表")
+public class User {
+
+    @ExcelField(value = "备注")
+    @ExcelDataConvert(expr1 = "'我是备注'")
+    private String remark;
+}
+```
 ### 3、下拉框
-#### 1、注解指定
+#### a、注解指定
 **在实体属性直接通过注解的``combobox``指定下拉框中的内容**
 ```java
 @Excel("用户列表")
@@ -503,7 +549,7 @@ public class User {
     private GenderEnum genderEnum;
 }
 ```
-#### 2、方法参数设置
+#### b、方法参数设置
 **通过方法的``explicitValues``参数进行设置，该参数为map类型，key为表头字段名，value为下拉框的内容。下面演示了为表头字段加入下拉框内容**
 ```java
 /**
@@ -524,7 +570,7 @@ public class UserController {
     }
 }
 ```
-#### 3、级联下拉框
+#### c、级联下拉框
 **设置带级联关系的下拉框，需要在实体属性中通过``link``参数指定父级的``表头序号-1``，比如父级是第一个单元格，那么link填的序号为``0``**     
 ```java
 @Excel("订单列表")
@@ -559,7 +605,7 @@ public class UserController {
     }
 }
 ```
-### 4、自定义设置合并规则
+### 4、动态设置合并规则
 **如若Excel实体中每个表头都想有独立的纵向合并规则，那么可使用合并回调的方式进行设置，需实现``MergeCalback``接口，该接口需指定当前Excel实体**
 ```java
 /**
@@ -603,8 +649,8 @@ public class User {
     private String userName;
 }
 ```
-### 7、表头断言
-**只需要在表头上使用注解即可，然后填写正确的EL表达式，下面示例中设置了订单名称不能为空**
+### 7、单元格内容校验
+**在表头增加``@ExcelAssert``注解，导入时会对该表头下的单元格内容进行校验，下面示例中设置了订单名称不能为空**
 ```java
 @Excel("订单列表")
 public class Order {

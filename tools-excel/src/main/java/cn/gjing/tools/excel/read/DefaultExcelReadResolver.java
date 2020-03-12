@@ -1,17 +1,18 @@
 package cn.gjing.tools.excel.read;
 
-import cn.gjing.tools.excel.*;
+import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.convert.*;
 import cn.gjing.tools.excel.exception.ExcelAssertException;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
-import cn.gjing.tools.excel.listen.DataConvert;
-import cn.gjing.tools.excel.listen.EnumConvert;
 import cn.gjing.tools.excel.listen.ReadCallback;
 import cn.gjing.tools.excel.listen.ReadListener;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
+import cn.gjing.tools.excel.valid.ExcelAssert;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.monitorjbl.xlsx.StreamingReader;
@@ -47,7 +48,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private Map<String, Class<?>> enumInterfaceTypeMap;
     private List<String> headNameList;
     private Map<String, Field> hasAnnotationFieldMap;
-    private Map<String, DataConvert<?, ?>> dataConvertMap;
+    private Map<String, DataConvert<?>> dataConvertMap;
     private boolean isSave;
 
     public DefaultExcelReadResolver() {
@@ -110,6 +111,14 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         }
     }
 
+    /**
+     * Start read
+     * @param excelClass Current excel class
+     * @param readListener Read listener
+     * @param headerIndex Excel header index
+     * @param readLines Read lines
+     * @param readCallback Read callback
+     */
     private void reader(Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
         List<R> dataList = new ArrayList<>();
         R o;
@@ -145,23 +154,25 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 }
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
+                ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
                 Cell valueCell = row.getCell(c);
                 try {
                     if (valueCell != null) {
                         Object value = this.getValue(valueCell, field, excelField, readCallback);
-                        if (this.dataConvertMap != null) {
-                            DataConvert<?, ?> dataConvert = this.dataConvertMap.get(field.getName());
-                            if (dataConvert != null) {
-                                value = dataConvert.toEntityAttribute(value, field, excelField);
-                            }
-                        }
                         this.assertValue(parser, context, row, c, field, excelField, excelAssert, value);
+                        value = readCallback.readCol(value, field, row.getRowNum(), c);
+                        value = this.changeData(field, value, parser, excelDataConvert, context);
                         if (this.isSave && value != null) {
                             this.setValue(o, field, value);
                         }
                     } else {
-                        this.assertValue(parser, context, row, c, field, excelField, excelAssert, null);
-                        this.valid(field, excelField, row.getRowNum(), c, readCallback);
+                        Object value = this.changeData(field, null, parser, excelDataConvert, context);
+                        if (value == null) {
+                            this.assertValue(parser, context, row, c, field, excelField, excelAssert, null);
+                            this.valid(field, excelField, row.getRowNum(), c, readCallback);
+                            continue;
+                        }
+                        this.setValue(o, field, value);
                     }
                 } catch (Exception e) {
                     if (e instanceof ExcelAssertException) {
@@ -219,6 +230,29 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     }
 
     /**
+     * Data converter
+     *
+     * @param field            Current field
+     * @param value            Attribute values
+     * @param parser           El parser
+     * @param excelDataConvert excelDataConvert
+     * @param context          EL context
+     * @return new value
+     */
+    private Object changeData(Field field, Object value, ExpressionParser parser, ExcelDataConvert excelDataConvert, EvaluationContext context) {
+        if (excelDataConvert != null && !"".equals(excelDataConvert.expr2())) {
+            return parser.parseExpression(excelDataConvert.expr2()).getValue(context);
+        }
+        if (this.dataConvertMap != null) {
+            DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+            if (dataConvert != null) {
+                return dataConvert.toEntityAttribute(value, field);
+            }
+        }
+        return value;
+    }
+
+    /**
      * Set values for the fields of the object
      *
      * @param o     object
@@ -270,6 +304,14 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         }
     }
 
+    /**
+     * Check is not empty strategy
+     * @param field Current field
+     * @param excelField ExcelFiled annotation on current filed
+     * @param rowIndex Current row index
+     * @param colIndex Current col index
+     * @param readCallback Read callback
+     */
     private void valid(Field field, ExcelField excelField, int rowIndex, int colIndex, ReadCallback<R> readCallback) {
         if (excelField.allowEmpty()) {
             return;
@@ -285,6 +327,17 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         }
     }
 
+    /**
+     * Cell value assert
+     * @param parser El parser
+     * @param context EL context
+     * @param row Current row
+     * @param c Current col index
+     * @param field Current field
+     * @param excelField ExcelFiled annotation on current filed
+     * @param excelAssert Excel Assert on current field
+     * @param value Current attribute value
+     */
     private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField, ExcelAssert excelAssert, Object value) {
         if (excelAssert != null) {
             context.setVariable(field.getName(), value);

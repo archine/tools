@@ -10,9 +10,11 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.*;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 /**
  * @author Gjing
@@ -111,25 +113,34 @@ public final class EncryptionUtils {
     }
 
     /**
-     * AES加密字符串
+     * 加密
      *
-     * @param content  需要被加密的字符串
-     * @param password 加密需要的密码
-     * @return 密文
+     * @param content 待加密内容
+     * @param key     加密的密钥
+     * @return 加密后字符串
      */
-    public static String encodeAes(String content, String password) {
+    public static String encodeAes(String content, String key) {
         try {
             KeyGenerator kgen = KeyGenerator.getInstance("AES");
-            kgen.init(128, new SecureRandom(password.getBytes()));
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            random.setSeed(key.getBytes(StandardCharsets.UTF_8));
+            kgen.init(128, random);
             SecretKey secretKey = kgen.generateKey();
             byte[] enCodeFormat = secretKey.getEncoded();
-            SecretKeySpec key = new SecretKeySpec(enCodeFormat, "AES");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(enCodeFormat, "AES");
             Cipher cipher = Cipher.getInstance("AES");
-
             byte[] byteContent = content.getBytes(StandardCharsets.UTF_8);
-            // 初始化为加密模式的密码器
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            return Base64.encodeBase64String(cipher.doFinal(byteContent));
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            byte[] byteRresult = cipher.doFinal(byteContent);
+            StringBuilder sb = new StringBuilder();
+            for (byte b : byteRresult) {
+                String hex = Integer.toHexString(b & 0xFF);
+                if (hex.length() == 1) {
+                    hex = '0' + hex;
+                }
+                sb.append(hex.toUpperCase());
+            }
+            return sb.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -137,26 +148,84 @@ public final class EncryptionUtils {
     }
 
     /**
-     * 解密AES加密过的字符串
+     * 解密
      *
-     * @param content  AES加密过过的内容
-     * @param password 加密时的密码
-     * @return 明文
+     * @param content 待解密内容
+     * @param key     解密的密钥
+     * @return 解密后
      */
-    public static String decodeAes(String content, String password) {
+    public static String decodeAes(String content, String key) {
+        if (content.length() < 1) {
+            return null;
+        }
+        byte[] byteResult = new byte[content.length() / 2];
+        for (int i = 0; i < content.length() / 2; i++) {
+            int high = Integer.parseInt(content.substring(i * 2, i * 2 + 1), 16);
+            int low = Integer.parseInt(content.substring(i * 2 + 1, i * 2 + 2), 16);
+            byteResult[i] = (byte) (high * 16 + low);
+        }
         try {
             KeyGenerator kgen = KeyGenerator.getInstance("AES");
-            kgen.init(128, new SecureRandom(password.getBytes()));
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            random.setSeed(key.getBytes(StandardCharsets.UTF_8));
+            kgen.init(128, random);
             SecretKey secretKey = kgen.generateKey();
             byte[] enCodeFormat = secretKey.getEncoded();
-            SecretKeySpec key = new SecretKeySpec(enCodeFormat, "AES");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(enCodeFormat, "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            return new String(cipher.doFinal(Base64.decodeBase64(content)), StandardCharsets.UTF_8);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            byte[] result = cipher.doFinal(byteResult);
+            return new String(result, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 生成密钥对
+     */
+    public static void genRsaKeyPair() throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+        keyPairGen.initialize(1024, new SecureRandom());
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+        RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
+        RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
+        System.out.println("公钥: " + new String(Base64.encodeBase64(rsaPublicKey.getEncoded())));
+        System.out.println("私钥：" + new String(Base64.encodeBase64((rsaPrivateKey.getEncoded()))));
+    }
+
+    /**
+     * 加密
+     *
+     * @param str       字符串
+     * @param publicKey 公钥
+     * @return 密文
+     */
+    public static String encodeRsa(String str, String publicKey) throws Exception {
+        byte[] decoded = Base64.decodeBase64(publicKey);
+        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance("RSA")
+                .generatePublic(new X509EncodedKeySpec(decoded));
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+        return Base64.encodeBase64String(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * 解密
+     *
+     * @param str        字符串
+     * @param privateKey 私钥
+     * @return 解密后字符串
+     */
+    public static String decodeRsa(String str, String privateKey) throws Exception {
+        byte[] inputByte = Base64.decodeBase64(str.getBytes(StandardCharsets.UTF_8));
+        byte[] decoded = Base64.decodeBase64(privateKey);
+        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance("RSA")
+                .generatePrivate(new PKCS8EncodedKeySpec(decoded));
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, priKey);
+        return new String(cipher.doFinal(inputByte));
     }
 
     /**

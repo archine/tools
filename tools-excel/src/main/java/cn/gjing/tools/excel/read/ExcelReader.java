@@ -35,7 +35,7 @@ public class ExcelReader<R> {
         } catch (Exception e) {
             throw new ExcelInitException("Init read resolver error " + e.getMessage());
         }
-        this.readCallback = (R, rowIndex) -> R;
+        this.readCallback = (r, rowIndex) -> r;
         this.initSequence();
     }
 

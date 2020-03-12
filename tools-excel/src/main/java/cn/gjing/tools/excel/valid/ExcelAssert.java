@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel;
+package cn.gjing.tools.excel.valid;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +13,6 @@ import java.lang.annotation.Target;
 public @interface ExcelAssert {
     /**
      * EL expression
-     * @return expr
      */
     String expr();
 
