@@ -221,12 +221,12 @@ public final class ParamUtils {
      * @param paramStr 参数字符串
      * @return map
      */
-    public static Map<String, String[]> paramToMap(String paramStr) {
+    public static Map<String, String> paramToMap(String paramStr) {
         if (paramStr == null) {
             return new HashMap<>(16);
         }
         String[] params = paramStr.split("&");
-        Map<String, String[]> resMap = new HashMap<>(16);
+        Map<String, String> resMap = new HashMap<>(16);
         for (String s : params) {
             String[] param = s.split("=");
             if (param.length >= 2) {
@@ -235,7 +235,7 @@ public final class ParamUtils {
                 for (int j = 2; j < param.length; j++) {
                     value.append("=").append(param[j]);
                 }
-                resMap.put(key, new String[]{value.toString()});
+                resMap.put(key, value.toString());
             }
         }
         return resMap;

@@ -14,7 +14,6 @@ import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.valid.ExcelAssert;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -26,12 +25,10 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -158,7 +155,8 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 Cell valueCell = row.getCell(c);
                 try {
                     if (valueCell != null) {
-                        Object value = this.getValue(valueCell, field, excelField, readCallback);
+                        Object value = this.getValue(valueCell, field, excelField, readCallback, gson);
+                        context.setVariable(field.getName(), value);
                         this.assertValue(parser, context, row, c, field, excelField, excelAssert, value);
                         value = readCallback.readCol(value, field, row.getRowNum(), c);
                         value = this.changeData(field, value, parser, excelDataConvert, context);
@@ -198,8 +196,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      * @param cell cell
      * @return value
      */
-    private Object getValue(Cell cell, Field field, ExcelField excelField, ReadCallback<R> readCallback) {
-        Object value = null;
+    private Object getValue(Cell cell, Field field, ExcelField excelField, ReadCallback<R> readCallback, Gson gson) {
         switch (cell.getCellType()) {
             case _NONE:
             case BLANK:
@@ -207,26 +204,18 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 this.valid(field, excelField, cell.getRowIndex(), cell.getColumnIndex(), readCallback);
                 break;
             case BOOLEAN:
-                value = cell.getBooleanCellValue();
-                break;
+                return cell.getBooleanCellValue();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
-                } else {
-                    NumberFormat numberFormat = NumberFormat.getInstance();
-                    numberFormat.setMinimumFractionDigits(0);
-                    numberFormat.setGroupingUsed(false);
-                    value = numberFormat.format(cell.getNumericCellValue());
                 }
-                break;
+                return gson.fromJson(gson.toJson(cell.getNumericCellValue()), field.getType());
             case FORMULA:
-                value = cell.getCellFormula();
-                break;
+                return cell.getCellFormula();
             default:
-                value = cell.getStringCellValue();
-                break;
+                return cell.getStringCellValue();
         }
-        return value;
+        return null;
     }
 
     /**
@@ -289,18 +278,14 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             return;
         }
         try {
-            BeanUtils.setFieldValue(o, field, gson.fromJson(gson.toJson(value), field.getType()));
-        } catch (JsonSyntaxException e) {
-            if (value instanceof Temporal) {
-                BeanUtils.setFieldValue(o, field, value);
+            BeanUtils.setFieldValue(o, field, value);
+        } catch (RuntimeException e) {
+            if (field.getType() == LocalDate.class) {
+                BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()).toLocalDate());
                 return;
             }
             if (field.getType() == LocalDateTime.class) {
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
-                return;
-            }
-            if (field.getType() == LocalDate.class) {
-                BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()).toLocalDate());
                 return;
             }
             if (field.getType() == LocalTime.class) {
@@ -340,7 +325,6 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      */
     private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField, ExcelAssert excelAssert, Object value) {
         if (excelAssert != null) {
-            context.setVariable(field.getName(), value);
             Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
             if (test != null && !test) {
                 throw new ExcelAssertException(excelAssert.message(), excelField, field, row.getRowNum(), c);

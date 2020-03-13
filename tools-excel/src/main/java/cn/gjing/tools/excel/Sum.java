@@ -1,5 +1,8 @@
 package cn.gjing.tools.excel;
 
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,6 +34,25 @@ public @interface Sum {
      * @return 300
      */
     short height() default 300;
+
+    /**
+     * Horizontal alignment
+     *
+     * @return CENTER
+     */
+    HorizontalAlignment align() default HorizontalAlignment.CENTER;
+
+    /**
+     * Vertical alignment
+     * @return CENTER
+     */
+    VerticalAlignment verticalAlign() default VerticalAlignment.CENTER;
+
+    /**
+     * Font bold
+     * @return false
+     */
+    boolean bold() default false;
 
     /**
      * Open the sum

@@ -210,21 +210,15 @@ class ExcelHelper {
                 if (row == null) {
                     row = sheet.createRow(valueCell.getAddress().getRow() + 1);
                     row.setHeight(excelField.sum().height());
-                    CellStyle cellStyle = this.workbook.createCellStyle();
-                    cellStyle.setAlignment(HorizontalAlignment.CENTER);
-                    cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
                     Cell remarkCell = row.createCell(0);
-                    Font font = this.workbook.createFont();
-                    font.setBold(true);
-                    cellStyle.setFont(font);
+                    CellStyle cellStyle = this.setSumCellStyle(excelField);
                     remarkCell.setCellStyle(cellStyle);
                     remarkCell.setCellValue(excelField.sum().value());
+                    return;
                 }
                 Cell sumCell = row.createCell(j);
                 sumCell.setCellFormula("SUM(" + formula + ")");
-                CellStyle sumStyle = this.workbook.createCellStyle();
-                sumStyle.setAlignment(HorizontalAlignment.CENTER);
-                sumStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                CellStyle sumStyle = this.setSumCellStyle(excelField);
                 sumStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.sum().format()));
                 sumCell.setCellStyle(sumStyle);
             }
@@ -408,5 +402,20 @@ class ExcelHelper {
                 .oldValue(value)
                 .oldRowIndex(row.getRowNum())
                 .build());
+    }
+
+    /**
+     * Set sum cell style
+     * @param excelField ExcelField
+     * @return CellStyle
+     */
+    private CellStyle setSumCellStyle(ExcelField excelField) {
+        CellStyle sumStyle = this.workbook.createCellStyle();
+        sumStyle.setAlignment(excelField.sum().align());
+        sumStyle.setVerticalAlignment(excelField.sum().verticalAlign());
+        Font font = this.workbook.createFont();
+        font.setBold(excelField.sum().bold());
+        sumStyle.setFont(font);
+        return sumStyle;
     }
 }
