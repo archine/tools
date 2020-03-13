@@ -43,7 +43,6 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     private Sheet sheet;
     private int totalCol = 0;
     private InputStream inputStream;
-    private Gson gson;
     private Map<String, EnumConvert<? extends Enum<?>, ?>> enumConvertMap;
     private Map<String, Class<?>> enumInterfaceTypeMap;
     private List<String> headNameList;
@@ -54,7 +53,6 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
     public DefaultExcelReadResolver() {
         this.hasAnnotationFieldMap = new HashMap<>(16);
         this.headNameList = new ArrayList<>();
-        this.gson = new Gson();
     }
 
     @Override
@@ -113,10 +111,11 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
 
     /**
      * Start read
-     * @param excelClass Current excel class
+     *
+     * @param excelClass   Current excel class
      * @param readListener Read listener
-     * @param headerIndex Excel header index
-     * @param readLines Read lines
+     * @param headerIndex  Excel header index
+     * @param readLines    Read lines
      * @param readCallback Read callback
      */
     private void reader(Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
@@ -124,6 +123,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
         R o;
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
+        Gson gson = new Gson();
         int realReadLines = readLines + headerIndex;
         for (Row row : sheet) {
             this.isSave = true;
@@ -163,7 +163,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                         value = readCallback.readCol(value, field, row.getRowNum(), c);
                         value = this.changeData(field, value, parser, excelDataConvert, context);
                         if (this.isSave && value != null) {
-                            this.setValue(o, field, value);
+                            this.setValue(o, field, value, gson);
                         }
                     } else {
                         Object value = this.changeData(field, null, parser, excelDataConvert, context);
@@ -172,7 +172,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             this.assertValue(parser, context, row, c, field, excelField, excelAssert, null);
                             continue;
                         }
-                        this.setValue(o, field, value);
+                        this.setValue(o, field, value, gson);
                     }
                 } catch (Exception e) {
                     if (e instanceof ExcelAssertException) {
@@ -258,8 +258,9 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      * @param o     object
      * @param field field
      * @param value value
+     * @param gson  Json convert
      */
-    private void setValue(R o, Field field, Object value) {
+    private void setValue(R o, Field field, Object value, Gson gson) {
         if (field.getType().isEnum()) {
             if (value instanceof Enum) {
                 BeanUtils.setFieldValue(o, field, value);
@@ -310,37 +311,32 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
 
     /**
      * Check is not empty strategy
-     * @param field Current field
-     * @param excelField ExcelFiled annotation on current filed
-     * @param rowIndex Current row index
-     * @param colIndex Current col index
+     *
+     * @param field        Current field
+     * @param excelField   ExcelFiled annotation on current filed
+     * @param rowIndex     Current row index
+     * @param colIndex     Current col index
      * @param readCallback Read callback
      */
     private void valid(Field field, ExcelField excelField, int rowIndex, int colIndex, ReadCallback<R> readCallback) {
         if (excelField.allowEmpty()) {
             return;
         }
-        switch (excelField.strategy()) {
-            case JUMP:
-                this.isSave = false;
-                readCallback.readJump(field, excelField, rowIndex, colIndex);
-                break;
-            case ERROR:
-                throw new ExcelResolverException(excelField.message());
-            default:
-        }
+        this.isSave = false;
+        readCallback.readJump(field, excelField, rowIndex, colIndex);
     }
 
     /**
      * Cell value assert
-     * @param parser El parser
-     * @param context EL context
-     * @param row Current row
-     * @param c Current col index
-     * @param field Current field
-     * @param excelField ExcelFiled annotation on current filed
+     *
+     * @param parser      El parser
+     * @param context     EL context
+     * @param row         Current row
+     * @param c           Current col index
+     * @param field       Current field
+     * @param excelField  ExcelFiled annotation on current filed
      * @param excelAssert Excel Assert on current field
-     * @param value Current attribute value
+     * @param value       Current attribute value
      */
     private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField, ExcelAssert excelAssert, Object value) {
         if (excelAssert != null) {

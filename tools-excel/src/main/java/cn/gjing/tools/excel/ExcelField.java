@@ -72,20 +72,6 @@ public @interface ExcelField {
     boolean allowEmpty() default true;
 
     /**
-     * Equal to the policy executed when empty
-     *
-     * @return EmptyStrategy
-     */
-    EmptyStrategy strategy() default EmptyStrategy.JUMP;
-
-    /**
-     * This message is read if the policy is error
-     *
-     * @return String
-     */
-    String message() default "参数不能为空";
-
-    /**
      * Data convert
      *
      * @return DefaultDataConvert.class

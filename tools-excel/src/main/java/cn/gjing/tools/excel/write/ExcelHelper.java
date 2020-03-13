@@ -148,17 +148,18 @@ class ExcelHelper {
 
     /**
      * Summation and merge cells
-     * @param sheet Current sheet
+     *
+     * @param sheet         Current sheet
      * @param excelModelMap Excel model map
-     * @param i Current row index
-     * @param dataSize Excel data
-     * @param valueRow Current row
-     * @param j Current col index
-     * @param excelField ExcelField annotation on current field
-     * @param value Current attribute value
-     * @param valueCell Current cell
-     * @param field Current field
-     * @param obj Current object
+     * @param i             Current row index
+     * @param dataSize      Excel data
+     * @param valueRow      Current row
+     * @param j             Current col index
+     * @param excelField    ExcelField annotation on current field
+     * @param value         Current attribute value
+     * @param valueCell     Current cell
+     * @param field         Current field
+     * @param obj           Current object
      */
     private void sumOrMerge(Sheet sheet, Map<Object, ExcelOldModel> excelModelMap, int i, int dataSize, Row valueRow, int j, ExcelField excelField, Object value,
                             Cell valueCell, Field field, Object obj) {
@@ -256,8 +257,9 @@ class ExcelHelper {
 
     /**
      * To the cell assignment
+     *
      * @param field Current field
-     * @param cell Current cell
+     * @param cell  Current cell
      * @param value Attribute values
      */
     @SuppressWarnings("unchecked")
@@ -266,15 +268,19 @@ class ExcelHelper {
         if (value == null) {
             return;
         }
-        if (value instanceof Number) {
-            cell.setCellValue(Double.parseDouble(value.toString()));
-            return;
-        }
         if (value instanceof String) {
             cell.setCellValue(value.toString());
             return;
         }
-        if (field.getType().isEnum()) {
+        if (value instanceof Number) {
+            cell.setCellValue(Double.parseDouble(value.toString()));
+            return;
+        }
+        if (value instanceof Date) {
+            cell.setCellValue((Date) value);
+            return;
+        }
+        if (value instanceof Enum) {
             if (this.enumConvertMap == null) {
                 this.enumConvertMap = new HashMap<>(16);
             }
@@ -297,10 +303,6 @@ class ExcelHelper {
             }
             return;
         }
-        if (field.getType() == Date.class) {
-            cell.setCellValue((Date) value);
-            return;
-        }
         if (value instanceof LocalDateTime) {
             cell.setCellValue((LocalDateTime) value);
             return;
@@ -312,11 +314,12 @@ class ExcelHelper {
 
     /**
      * The cell increase check
-     * @param field Current field
-     * @param row Current row
-     * @param i Current col index
-     * @param locked Level drop-down box interlocking living state
-     * @param sheet Current sheet
+     *
+     * @param field      Current field
+     * @param row        Current row
+     * @param i          Current col index
+     * @param locked     Level drop-down box interlocking living state
+     * @param sheet      Current sheet
      * @param metaObject Excel meta object
      * @return lock status
      */
@@ -352,8 +355,9 @@ class ExcelHelper {
 
     /**
      * Init excel style
+     *
      * @param metaObject Excel meta object
-     * @param field Current field
+     * @param field      Current field
      * @param excelField ExcelField annotation on current filed
      * @return MetaStyle
      */
@@ -393,10 +397,11 @@ class ExcelHelper {
 
     /**
      * Set last row object
-     * @param row Current row
-     * @param value Current attribute value
+     *
+     * @param row           Current row
+     * @param value         Current attribute value
      * @param excelModelMap Excel model map
-     * @param key key
+     * @param key           key
      */
     private void putExcelModel(Row row, Object value, Map<Object, ExcelOldModel> excelModelMap, int key) {
         excelModelMap.put(key, ExcelOldModel.builder()
