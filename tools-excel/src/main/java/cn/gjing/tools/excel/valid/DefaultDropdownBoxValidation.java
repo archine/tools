@@ -42,7 +42,6 @@ public class DefaultDropdownBoxValidation implements ExcelDropdownBoxValidation 
             }
             regions = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
             this.setValid(excelDropdownBox, sheet, helper, constraint, regions);
-            values.remove(fieldName);
         } else {
             if (!locked) {
                 explicitSheet = workbook.getSheet("subsetSheet");
