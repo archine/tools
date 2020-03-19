@@ -77,15 +77,17 @@ class ExcelHelper {
                 Cell headCell = headRow.createCell(i);
                 Field field = headFieldList.get(i);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
+                metaStyle = this.initStyle(metaObject, field, excelField);
                 if (data == null || data.isEmpty()) {
                     locked = this.addValid(field, headRow, i, locked, sheet, metaObject);
+                    CellStyle bodyStyle = metaStyle.getBodyStyle();
                     if (!"".equals(excelField.format())) {
-                        CellStyle defaultColumnStyle = this.workbook.createCellStyle();
-                        defaultColumnStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
-                        sheet.setDefaultColumnStyle(i, defaultColumnStyle);
+                        short nowFormat = bodyStyle.getDataFormat();
+                        bodyStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
+                        bodyStyle.setDataFormat(nowFormat);
                     }
+                    sheet.setDefaultColumnStyle(i, bodyStyle);
                 }
-                metaStyle = this.initStyle(metaObject, field, excelField);
                 headCell.setCellStyle(metaStyle.getHeadStyle());
                 sheet.setColumnWidth(i, excelField.width());
                 headCell.setCellValue(excelField.value());
@@ -406,6 +408,7 @@ class ExcelHelper {
 
     /**
      * Set sum cell style
+     *
      * @param excelField ExcelField
      * @return CellStyle
      */

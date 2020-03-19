@@ -59,12 +59,7 @@ public interface ExcelStyle {
         cellStyle.setFillForegroundColor(IndexedColors.WHITE.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         cellStyle.setWrapText(true);
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setBorderTop(BorderStyle.THIN);
         return cellStyle;
     }
 }
