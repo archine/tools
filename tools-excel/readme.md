@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.4.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.4.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.4.5</version>
+    <version>1.4.6</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -45,9 +45,6 @@
 |value|求和的描述，整个Excel实体中只会找``第一个开启``了求和的表头中设置的描述|
 |format|求和后的数字格式，默认整数|
 |height|行高，默认``300``|
-|bold|是否加粗|
-|align|水平位置，默认居中|
-|verticalAlign|垂直位置，默认居中|
 ### 4、@Merge
 **在@ExcelFiled注解的autoMerge参数使用，使用该注解后会自动纵向合并当前表头下相邻且值相同的单元格。``示例用法可参考第五节：注解的使用``**     
 
@@ -311,7 +308,8 @@ public class UserController {
                 .read()
                 .subscribe(e -> userService.saveUserList(e))
                 .read("sheet2")
-                .subscribe(e -> userService.saveUserList(e));
+                .subscribe(e -> userService.saveUserList(e))
+                .end();
         return ResponseEntity.ok("导入成功");
     }
 }
@@ -394,7 +392,7 @@ public class MyReadCallback implements ReadCallback<Object> {
     }
 
      /**
-      * 读取到每一个非空单元格时会触发该回调
+      * 读取到每一个非空单元格时会触发该回调，如果未设置不允许为空，空字符串也会触发该回调
       * @param val 单元格内容
       * @param field 当前字段
       * @param rowIndex 当前单元格所在的行数下标，下标是从0开始的
@@ -405,6 +403,17 @@ public class MyReadCallback implements ReadCallback<Object> {
      public Object readCol(Object val, Field field, int rowIndex, int colIndex) {
          return val;
      }
+
+    /**
+     * 当前读到的所有数据
+     * @param dataList 数据集合
+     * @param rowIndex 当前下标，下标是从0开始的
+     * @return 是否清空当前读到的所有数据
+     */
+    @Override
+    public boolean currentData(List<User1> dataList, int rowIndex) {
+        return false;
+    }
 }
 ```
 **实现回调接口后可在调用``read()``方法时进行设置**

@@ -182,6 +182,10 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             if (this.isSave) {
                 try {
                     dataList.add(readCallback.readLine(o, row.getRowNum()));
+                    boolean reset = readCallback.currentData(dataList, row.getRowNum());
+                    if (reset) {
+                        dataList.clear();
+                    }
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }

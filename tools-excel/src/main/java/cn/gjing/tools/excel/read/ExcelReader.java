@@ -151,4 +151,11 @@ public class ExcelReader<R> {
         dataReadListener.notify(this.data);
         return this;
     }
+
+    /**
+     * Excel import end
+     */
+    public void end() {
+        this.data = null;
+    }
 }

@@ -19,7 +19,7 @@ public @interface Sum {
      *
      * @return 合计
      */
-    String value() default "合计: ";
+    String value() default "合计:";
 
     /**
      * Numeric format

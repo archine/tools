@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.listen;
 
 import cn.gjing.tools.excel.ExcelField;
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * @author Gjing
@@ -16,6 +17,16 @@ public interface ReadCallback<R> {
      * @return R
      */
     R readLine(R val, int rowIndex);
+
+    /**
+     * All data current read, including the current
+     * @param dataList Current all data
+     * @param rowIndex The index of the current row
+     * @return resetData
+     */
+    default boolean currentData(List<R> dataList, int rowIndex) {
+        return false;
+    }
 
     /**
      * The method callback occurs when the cell data is empty and the policy is set to jump

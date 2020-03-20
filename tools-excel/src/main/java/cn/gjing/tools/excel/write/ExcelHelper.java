@@ -78,7 +78,7 @@ class ExcelHelper {
                 Field field = headFieldList.get(i);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 metaStyle = this.initStyle(metaObject, field, excelField);
-                if (data == null || data.isEmpty()) {
+                if (data == null) {
                     locked = this.addValid(field, headRow, i, locked, sheet, metaObject);
                     CellStyle bodyStyle = metaStyle.getBodyStyle();
                     if (!"".equals(excelField.format())) {
@@ -87,35 +87,41 @@ class ExcelHelper {
                         bodyStyle.setDataFormat(nowFormat);
                     }
                     sheet.setDefaultColumnStyle(i, bodyStyle);
+                } else {
+                    this.customerMetaStyleMap.put(field.getName(), metaStyle);
+                    if (excelField.convert() != DefaultDataConvert.class) {
+                        if (this.dataConvertMap == null) {
+                            this.dataConvertMap = new HashMap<>(16);
+                        }
+                        if (dataConvertMap.get(field.getName()) == null) {
+                            try {
+                                this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
+                            } catch (Exception e) {
+                                throw new ExcelInitException("Init specified excel header data convert failure " + field.getName() + ", " + e.getMessage());
+                            }
+                        }
+                    }
+                    if (excelField.autoMerge().open()) {
+                        if (this.mergeCallbackMap == null) {
+                            this.mergeCallbackMap = new HashMap<>(16);
+                        }
+                        if (this.mergeCallbackMap.get(field.getName()) == null) {
+                            try {
+                                this.mergeCallbackMap.put(field.getName(), excelField.autoMerge().callback().newInstance());
+                            } catch (Exception e) {
+                                throw new ExcelInitException("Init specified excel header merge callback failure " + field.getName() + ", " + e.getMessage());
+                            }
+                        }
+                    }
+                    if (excelField.sum().open()) {
+                        if (this.formulaMap == null) {
+                            this.formulaMap = new HashMap<>(16);
+                        }
+                    }
                 }
                 headCell.setCellStyle(metaStyle.getHeadStyle());
                 sheet.setColumnWidth(i, excelField.width());
                 headCell.setCellValue(excelField.value());
-                this.customerMetaStyleMap.put(field.getName(), metaStyle);
-                if (excelField.convert() != DefaultDataConvert.class) {
-                    if (this.dataConvertMap == null) {
-                        this.dataConvertMap = new HashMap<>(16);
-                    }
-                    if (dataConvertMap.get(field.getName()) == null) {
-                        try {
-                            this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
-                        } catch (Exception e) {
-                            throw new ExcelInitException("Init specified excel header data convert failure " + field.getName() + ", " + e.getMessage());
-                        }
-                    }
-                }
-                if (excelField.autoMerge().open()) {
-                    if (this.mergeCallbackMap == null) {
-                        this.mergeCallbackMap = new HashMap<>(16);
-                    }
-                    if (this.mergeCallbackMap.get(field.getName()) == null) {
-                        try {
-                            this.mergeCallbackMap.put(field.getName(), excelField.autoMerge().callback().newInstance());
-                        } catch (Exception e) {
-                            throw new ExcelInitException("Init specified excel header merge callback failure " + field.getName() + ", " + e.getMessage());
-                        }
-                    }
-                }
             }
         }
         return rowIndex;
@@ -167,9 +173,6 @@ class ExcelHelper {
                             Cell valueCell, Field field, Object obj) {
         if (i == 0) {
             if (excelField.sum().open()) {
-                if (formulaMap == null) {
-                    this.formulaMap = new HashMap<>(16);
-                }
                 this.formulaMap.put(j, valueCell.getAddress().formatAsString() + ":");
             }
             if (excelField.autoMerge().open()) {
@@ -216,7 +219,6 @@ class ExcelHelper {
                     CellStyle cellStyle = this.setSumCellStyle(excelField);
                     remarkCell.setCellStyle(cellStyle);
                     remarkCell.setCellValue(excelField.sum().value());
-                    return;
                 }
                 Cell sumCell = row.createCell(j);
                 sumCell.setCellFormula("SUM(" + formula + ")");
