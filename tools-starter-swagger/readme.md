@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-1.5.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-1.6.0-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 **快速在SpringBoot项目中集成Swagger**
@@ -8,27 +8,20 @@
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>1.5.0</version>
+     <version>1.6.0</version>
 </dependency>
 ```
-## 二、使用@EnableSwagger注解
-**如果不手动配置swagger相关的配置会启用``默认配置``**  
-```java
-@SpringBootApplication
-@EnableDiscoveryClient
-@EnableSwagger
-public class DemoApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-    }
-}
-```
-**``此时你无需做任何配置，已经可以开始愉快的使用Swagger啦,如果需要自定义配置就继续往下``**
+## 二、注解说明
+### 1、@EnableSingleDoc
+**使用在启动类上，开启单项目的接口文档**
+### 2、@EnableGroupDoc
+**使用在启动类上，开启多项目文档聚合**    
 ## 三、自定义配置
+**在启动类指定了第二块介绍的注解后，会采用默认的配置。本段落介绍如何自定义设置一些属性**
 ### 1、配置说明
 ```yaml
 tools:
-  swagger:
+  doc:
     contact:
       # 联系邮箱
       email:
@@ -36,13 +29,13 @@ tools:
       name:
       # 联系人地址
       url:
-    # 是否开启swagger，默认true
+    # 是否开启文档，默认true
     enable: true
     # 标题
     title: 
     # 描述
     description: 
-    # 接口所在包路径
+    # 接口所在包路径，如果未填写会默认找所有带@ApiOperation注解的接口
     base-package:
     # 接口选择规则类型, 共分为: REGEX(正则匹配), ANT(路径匹配), 默认ANT
     path-type:
@@ -71,11 +64,11 @@ tools:
         # 请求头名称
       - name: token
         # 请求头描述
-        description: 登录的token
+        desc: 登录的token
         # 是否必须, 默认为false
         required: true
       - name: token2
-        description: 登录的token2
+        desc: 登录的token2
         required: false
 ```
 ### 2、注意点
@@ -105,23 +98,48 @@ zuul:
       serviceId: web1
       path: /demo/**
 tools:
-  swagger:
-    resources:
+  doc:
+    group:
       # 是否开启聚合模式, 默认 False
       enable: false
-      # 当前项目的文档是否也要加入聚合, 默认 true
-      register-me: true
+      # 聚合类型，可用值有url(文档地址)、name(服务名，一般用在zuul网关等)
+      type: name
       # 服务列表
       service-list:
-        # projectA或者projectB这个可以随意写, 只是为了区分
-        - projectA:
-            # 下拉选择时展示的名称
-            view: 项目A
-            # 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
-            service: demo
-        - projectB:
-            view: 项目B
-            service: demo 
+          # 下拉选择时展示的名称
+          - desc: 项目A
+          # 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
+            url: demo
+          # 下拉选择时展示的名称
+          - desc: 项目B
+          # 跟随zuul网关路由的path而定，如上为：/demo/**，那么这里应该填demo
+            url: demo
+```
+### 2、自定义聚合逻辑
+**实现``DocGroupHandler``接口，并重写其方法，最后将其交给Spring管理**
+```java
+/**
+ * @author Gjing
+ **/
+public class MyHandler implements DocGroupHandler {
+  
+    @Override
+    public List<SwaggerResource> get() {
+        return null;
+    }
+}
+```
+**这里需要注意的是要使用``@Primary``注解**
+```java
+@Configuration
+public class MyConfiguration {
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean
+    public DocGroupHandler myGroupHandler() {
+       return new MyHandler();
+    }
+}
 ```
 ## 五、效果图
 ### 1、全局响应信息以及全局请求头

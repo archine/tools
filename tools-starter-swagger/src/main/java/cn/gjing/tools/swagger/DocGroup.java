@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Gjing
@@ -19,24 +18,23 @@ import java.util.Map;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("tools.swagger.resources")
-public class SwaggerResources {
-
+@ConfigurationProperties("tools.doc.group")
+public class DocGroup {
     /**
-     * 是否开启Swagger资源列表
+     * 是否开启文档聚合
      */
     @Builder.Default
     private boolean enable = false;
+
     /**
-     * 是否注册本服务,默认true
+     * 聚合类型
      */
     @Builder.Default
-    private boolean registerMe = true;
+    private GroupType type = GroupType.URL;
+
     /**
      * 服务列表
      */
     @Builder.Default
-    private List<Map<String, SwaggerService>> serviceList = new ArrayList<>();
-
+    private List<GroupService> serviceList = new ArrayList<>();
 }
-

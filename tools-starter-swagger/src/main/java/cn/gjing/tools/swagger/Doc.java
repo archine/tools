@@ -18,8 +18,8 @@ import java.util.List;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("tools.swagger")
-public class SwaggerBean {
+@ConfigurationProperties("tools.doc")
+public class Doc {
     /**
      * 开启Swagger文档
      */

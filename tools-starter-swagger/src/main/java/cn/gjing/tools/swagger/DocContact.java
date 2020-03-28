@@ -15,13 +15,21 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-@ConfigurationProperties("tools.swagger.contact")
-public class Contact {
-
+@ConfigurationProperties("tools.doc.contact")
+public class DocContact {
+    /**
+     * 联系人姓名
+     */
     @Builder.Default
     private String name = "";
+    /**
+     * 联系人个人url
+     */
     @Builder.Default
     private String url = "";
+    /**
+     * 联系人邮箱
+     */
     @Builder.Default
     private String email = "";
 }

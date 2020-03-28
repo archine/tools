@@ -20,7 +20,7 @@ public class RequestHeader {
     /**
      * 描述
      */
-    private String description;
+    private String desc;
     /**
      * 是否必填, 默认true
      */
