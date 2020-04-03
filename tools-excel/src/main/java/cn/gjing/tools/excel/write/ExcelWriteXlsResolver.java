@@ -77,7 +77,7 @@ class ExcelWriteXlsResolver implements ExcelWriterResolver, Closeable {
             this.outputStream = response.getOutputStream();
             this.workbook.write(this.outputStream);
         } catch (IOException e) {
-            throw new ExcelResolverException("Excel cache data refresh failure");
+            throw new ExcelResolverException("Excel cache data refresh failure, " + e.getMessage());
         }
     }
 
@@ -86,9 +86,6 @@ class ExcelWriteXlsResolver implements ExcelWriterResolver, Closeable {
         if (this.outputStream != null) {
             this.outputStream.flush();
             this.outputStream.close();
-        }
-        if (this.workbook != null) {
-            this.workbook.close();
         }
     }
 }
