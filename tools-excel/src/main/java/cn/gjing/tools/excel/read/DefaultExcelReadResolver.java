@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseable {
     private Workbook workbook;
     private Sheet sheet;
-    private int totalCol = 0;
     private InputStream inputStream;
     private Map<String, EnumConvert<? extends Enum<?>, ?>> enumConvertMap;
     private Map<String, Class<?>> enumInterfaceTypeMap;
@@ -130,7 +129,6 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             if (row.getRowNum() == headerIndex) {
                 if (this.headNameList.isEmpty()) {
                     for (Cell cell : row) {
-                        this.totalCol++;
                         headNameList.add(cell.getStringCellValue());
                     }
                 }
@@ -144,7 +142,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelInitException("Excel model init failure, " + e.getMessage());
             }
-            for (int c = 0; c < totalCol && this.isSave; c++) {
+            for (int c = 0; c < row.getLastCellNum() && this.isSave; c++) {
                 Field field = hasAnnotationFieldMap.get(headNameList.get(c));
                 if (field == null) {
                     throw new ExcelTemplateException();
@@ -182,10 +180,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             if (this.isSave) {
                 try {
                     dataList.add(readCallback.readLine(o, row.getRowNum()));
-                    boolean reset = readCallback.currentData(dataList, row.getRowNum());
-                    if (reset) {
-                        dataList.clear();
-                    }
+                    readCallback.currentData(dataList, row.getRowNum(), row.getRowNum() < sheet.getLastRowNum());
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }

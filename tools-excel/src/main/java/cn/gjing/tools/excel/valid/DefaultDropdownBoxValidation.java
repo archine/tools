@@ -7,28 +7,29 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import java.util.Map;
 
 /**
- * Default dropdown box verifier
+ * Default dropdown box validation
  *
  * @author Gjing
  **/
 public class DefaultDropdownBoxValidation implements ExcelDropdownBoxValidation {
 
     @Override
-    public boolean valid(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, String fieldName, Map<String, String[]> values) {
+    public boolean valid(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked,
+                         String fieldName, Map<String, String[]> values) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint constraint;
         CellRangeAddressList regions;
         Sheet explicitSheet;
         if (ParamUtils.equals("", excelDropdownBox.link(), true)) {
-            String[] explicitValues = values.get(fieldName);
-            if (explicitValues == null) {
+            if (values == null || values.get(fieldName) == null) {
                 constraint = helper.createExplicitListConstraint(excelDropdownBox.combobox());
             } else {
+                String[] explicitValues = values.get(fieldName);
                 explicitSheet = workbook.getSheet("explicitSheet");
                 if (explicitSheet == null) {
                     explicitSheet = workbook.createSheet("explicitSheet");
                 }
-                for (int i = 0; i < explicitValues.length; i++) {
+                for (int i = 0, valueLength = explicitValues.length; i < valueLength; i++) {
                     Row explicitSheetRow = explicitSheet.getRow(i);
                     if (explicitSheetRow == null) {
                         explicitSheetRow = explicitSheet.createRow(i);
@@ -39,25 +40,26 @@ public class DefaultDropdownBoxValidation implements ExcelDropdownBoxValidation 
                 int length = explicitValues.length;
                 constraint = helper.createFormulaListConstraint(explicitSheet.getSheetName() + "!$" + colOffset + "$1:$" + colOffset + "$" + (length == 0 ? 1 : length));
                 workbook.setSheetHidden(workbook.getSheetIndex("explicitSheet"), true);
+                ParamUtils.deleteMapKey(values, fieldName);
             }
             regions = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
             this.setValid(excelDropdownBox, sheet, helper, constraint, regions);
         } else {
-            if (!locked) {
+            if (!locked && values != null) {
                 explicitSheet = workbook.getSheet("subsetSheet");
                 if (explicitSheet == null) {
                     explicitSheet = workbook.createSheet("subsetSheet");
                 }
                 for (Map.Entry<String, String[]> valueMap : values.entrySet()) {
-                    int rowIndex = explicitSheet.getPhysicalNumberOfRows();
-                    Row subsetSheetRow = explicitSheet.createRow(rowIndex);
-                    subsetSheetRow.createCell(0).setCellValue(valueMap.getKey());
-                    for (int i = 0, length = valueMap.getValue().length; i < length; i++) {
-                        subsetSheetRow.createCell(i + 1).setCellValue(valueMap.getValue()[i]);
-                    }
-                    String formula = ParamUtils.createFormula(1, rowIndex + 1, valueMap.getValue().length);
                     Name name = workbook.getName(valueMap.getKey());
                     if (name == null) {
+                        int rowIndex = explicitSheet.getPhysicalNumberOfRows();
+                        Row subsetSheetRow = explicitSheet.createRow(rowIndex);
+                        subsetSheetRow.createCell(0).setCellValue(valueMap.getKey());
+                        for (int i = 0, length = valueMap.getValue().length; i < length; i++) {
+                            subsetSheetRow.createCell(i + 1).setCellValue(valueMap.getValue()[i]);
+                        }
+                        String formula = ParamUtils.createFormula(1, rowIndex + 1, valueMap.getValue().length);
                         name = workbook.createName();
                         name.setNameName(valueMap.getKey());
                         name.setRefersToFormula("subsetSheet!" + formula);

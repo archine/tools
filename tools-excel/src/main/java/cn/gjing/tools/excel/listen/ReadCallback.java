@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.listen;
 
 import cn.gjing.tools.excel.ExcelField;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -20,12 +21,13 @@ public interface ReadCallback<R> {
 
     /**
      * All data current read, including the current
+     *
      * @param dataList Current all data
      * @param rowIndex The index of the current row
-     * @return resetData
+     * @param hasNext Have next one
      */
-    default boolean currentData(List<R> dataList, int rowIndex) {
-        return false;
+    default void currentData(List<R> dataList, int rowIndex, boolean hasNext) {
+
     }
 
     /**

@@ -37,7 +37,7 @@ public interface ExcelStyle {
      * @return CellStyle
      */
     default CellStyle setHeaderStyle(Workbook workbook, CellStyle cellStyle) {
-        cellStyle.setFillForegroundColor(IndexedColors.SKY_BLUE.index);
+        cellStyle.setFillForegroundColor(IndexedColors.SEA_GREEN.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setWrapText(true);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -45,6 +45,10 @@ public interface ExcelStyle {
         cellStyle.setBorderLeft(BorderStyle.THIN);
         cellStyle.setBorderRight(BorderStyle.THIN);
         cellStyle.setBorderBottom(BorderStyle.THIN);
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setColor(IndexedColors.WHITE.index);
+        cellStyle.setFont(font);
         return cellStyle;
     }
 
@@ -56,10 +60,10 @@ public interface ExcelStyle {
      * @return CellStyle
      */
     default CellStyle setBodyStyle(Workbook workbook, CellStyle cellStyle) {
-        cellStyle.setFillForegroundColor(IndexedColors.WHITE.index);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setWrapText(true);
+        cellStyle.setLocked(false);
         return cellStyle;
     }
 }

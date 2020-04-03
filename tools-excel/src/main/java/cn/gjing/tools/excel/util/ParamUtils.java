@@ -2,6 +2,8 @@ package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -34,13 +36,13 @@ public final class ParamUtils {
     /**
      * Whether it's equal or not
      *
-     * @param param1 param1
-     * @param param2 param2
-     * @param allEmpty Whether allow empty？
+     * @param param1     param1
+     * @param param2     param2
+     * @param allowEmpty Whether allow empty？
      * @return boolean
      */
-    public static boolean equals(Object param1, Object param2, boolean allEmpty) {
-        if (allEmpty) {
+    public static boolean equals(Object param1, Object param2, boolean allowEmpty) {
+        if (allowEmpty) {
             if (param1 == param2) {
                 return true;
             }
@@ -54,9 +56,10 @@ public final class ParamUtils {
 
     /**
      * Whether obj is null
-     * @param obj obj
+     *
+     * @param obj     obj
      * @param message error message
-     * @param <T> T
+     * @param <T>     T
      */
     public static <T> void requireNonNull(T obj, String message) {
         if (obj == null) {
@@ -114,4 +117,20 @@ public final class ParamUtils {
         }
     }
 
+    /**
+     * Delete specified key on HashMap
+     *
+     * @param map HashMap
+     * @param key Specified key
+     */
+    public static void deleteMapKey(Map<?, ?> map, String key) {
+        Iterator<? extends Map.Entry<?, ?>> iterator = map.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<?, ?> next = iterator.next();
+            if (next.getKey().equals(key)) {
+                iterator.remove();
+                break;
+            }
+        }
+    }
 }

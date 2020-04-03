@@ -14,7 +14,7 @@ import java.util.List;
 public interface ExcelReaderResolver<R> {
 
     /**
-     * Read excel
+     * Import excel
      *
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity

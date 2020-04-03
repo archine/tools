@@ -45,42 +45,56 @@ class ExcelHelper {
         this.customerMetaStyleMap = new HashMap<>(16);
     }
 
-    public int setBigTitle(List<Field> headFieldList, MetaObject metaObject, Sheet sheet) {
-        if (metaObject.getBigTitle() != null) {
+    /**
+     * Set Excel big title
+     * @param totalCol How many columns are merged
+     * @param bigTitle Big title
+     * @param metaStyle Meta style
+     * @param sheet Current sheet
+     */
+    public void setBigTitle(int totalCol, BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet) {
+        if (bigTitle != null) {
             Row row;
             Cell cell;
             int offset = sheet.getPhysicalNumberOfRows();
-            int titleOffset = offset + metaObject.getBigTitle().getLines() - 1;
-            sheet.addMergedRegion(new CellRangeAddress(offset, titleOffset, 0, headFieldList.size() - 1));
-            for (int i = 0; i < metaObject.getBigTitle().getLines(); i++) {
+            int titleOffset = offset + bigTitle.getLines() - 1;
+            sheet.addMergedRegion(new CellRangeAddress(offset, titleOffset, 0, totalCol - 1));
+            for (int i = 0; i < bigTitle.getLines(); i++) {
                 row = sheet.createRow(offset + i);
-                for (int j = 0; j < headFieldList.size(); j++) {
+                for (int j = 0; j < totalCol; j++) {
                     cell = row.createCell(j);
-                    cell.setCellValue(metaObject.getBigTitle().getContent());
-                    cell.setCellStyle(metaObject.getMetaStyle().getTitleStyle());
+                    cell.setCellValue(bigTitle.getContent());
+                    cell.setCellStyle(metaStyle.getTitleStyle());
                 }
             }
-            return titleOffset;
-        } else {
-            return sheet.getLastRowNum();
         }
     }
 
-    public int setHead(List<?> data, List<Field> headFieldList, Sheet sheet, boolean changed, int rowIndex, MetaObject metaObject, Excel excel) {
+    /**
+     * Set excel header
+     * @param noContent Whether there is data export
+     * @param headFieldList Excel head field list
+     * @param sheet Current sheet
+     * @param needHead Whether to set header
+     * @param metaStyle Meta style
+     * @param dropdownBoxValues Excel dropdown box value
+     * @param excel Excel map annotation on entity
+     */
+    public void setHead(boolean noContent, List<Field> headFieldList, Sheet sheet, boolean needHead, MetaStyle metaStyle, Map<String, String[]> dropdownBoxValues, Excel excel) {
         boolean locked = false;
-        if (changed) {
-            rowIndex = rowIndex == 0 ? 0 : rowIndex + 1;
+        if (needHead) {
+            int rowIndex = sheet.getLastRowNum() == 0 ? 0 : sheet.getLastRowNum() + 1;
             Row headRow = sheet.createRow(rowIndex);
             headRow.setHeight(excel.headHeight());
-            MetaStyle metaStyle;
+            MetaStyle realMetaStyle;
             for (int i = 0, headFieldSize = headFieldList.size(); i < headFieldSize; i++) {
                 Cell headCell = headRow.createCell(i);
                 Field field = headFieldList.get(i);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
-                metaStyle = this.initStyle(metaObject, field, excelField);
-                if (data == null) {
-                    locked = this.addValid(field, headRow, i, locked, sheet, metaObject);
-                    CellStyle bodyStyle = metaStyle.getBodyStyle();
+                realMetaStyle = this.initStyle(metaStyle, field, excelField);
+                if (noContent) {
+                    locked = this.addValid(field, headRow, i, locked, sheet, dropdownBoxValues);
+                    CellStyle bodyStyle = realMetaStyle.getBodyStyle();
                     if (!"".equals(excelField.format())) {
                         short nowFormat = bodyStyle.getDataFormat();
                         bodyStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
@@ -88,50 +102,33 @@ class ExcelHelper {
                     }
                     sheet.setDefaultColumnStyle(i, bodyStyle);
                 } else {
-                    this.customerMetaStyleMap.put(field.getName(), metaStyle);
-                    if (excelField.convert() != DefaultDataConvert.class) {
-                        if (this.dataConvertMap == null) {
-                            this.dataConvertMap = new HashMap<>(16);
-                        }
-                        if (dataConvertMap.get(field.getName()) == null) {
-                            try {
-                                this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
-                            } catch (Exception e) {
-                                throw new ExcelInitException("Init specified excel header data convert failure " + field.getName() + ", " + e.getMessage());
-                            }
-                        }
-                    }
-                    if (excelField.autoMerge().open()) {
-                        if (this.mergeCallbackMap == null) {
-                            this.mergeCallbackMap = new HashMap<>(16);
-                        }
-                        if (this.mergeCallbackMap.get(field.getName()) == null) {
-                            try {
-                                this.mergeCallbackMap.put(field.getName(), excelField.autoMerge().callback().newInstance());
-                            } catch (Exception e) {
-                                throw new ExcelInitException("Init specified excel header merge callback failure " + field.getName() + ", " + e.getMessage());
-                            }
-                        }
-                    }
-                    if (excelField.sum().open()) {
-                        if (this.formulaMap == null) {
-                            this.formulaMap = new HashMap<>(16);
-                        }
-                    }
+                    this.customerMetaStyleMap.put(field.getName(), realMetaStyle);
+                    this.initExtension(field, excelField);
                 }
-                headCell.setCellStyle(metaStyle.getHeadStyle());
+                headCell.setCellStyle(realMetaStyle.getHeadStyle());
                 sheet.setColumnWidth(i, excelField.width());
                 headCell.setCellValue(excelField.value());
             }
         }
-        return rowIndex;
     }
 
-    public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, int rowIndex) {
-        rowIndex++;
+    /**
+     * Set excel body
+     * @param data Export data
+     * @param headFieldList Excel head field list
+     * @param sheet Current sheet
+     * @param metaStyle Meta style
+     * @param initExtension Whether to initialize the extension function
+     */
+    public void setValue(List<?> data, List<Field> headFieldList, Sheet sheet, MetaStyle metaStyle, boolean initExtension) {
+        if (data == null) {
+            return;
+        }
+        int rowIndex = sheet.getLastRowNum() + 1;
         Map<Object, ExcelOldModel> excelModelMap = new HashMap<>(16);
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
+        MetaStyle realMetaStyle;
         for (int i = 0, dataSize = data.size(); i < dataSize; i++) {
             Object o = data.get(i);
             context.setVariable(o.getClass().getSimpleName(), o);
@@ -139,6 +136,14 @@ class ExcelHelper {
             for (int j = 0, headSize = headFieldList.size(); j < headSize; j++) {
                 Field field = headFieldList.get(j);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
+                realMetaStyle = this.customerMetaStyleMap.get(field.getName());
+                if (i == 0 && initExtension) {
+                    if (realMetaStyle == null) {
+                        realMetaStyle = this.initStyle(metaStyle, field, excelField);
+                        this.customerMetaStyleMap.put(field.getName(), realMetaStyle);
+                    }
+                    this.initExtension(field, excelField);
+                }
                 ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(j);
@@ -146,10 +151,47 @@ class ExcelHelper {
                 try {
                     value = this.changeData(field, value, o, parser, excelDataConvert, context);
                     this.sumOrMerge(sheet, excelModelMap, i, dataSize, valueRow, j, excelField, value, valueCell, field, o);
-                    this.setCellValue(field, valueCell, value);
+                    this.setCellValue(field, valueCell, value, realMetaStyle.getBodyStyle());
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
+            }
+        }
+    }
+
+    /**
+     * initialize extension function
+     * @param field Current field
+     * @param excelField ExcelField annotation on current field
+     */
+    private void initExtension(Field field, ExcelField excelField) {
+        if (excelField.convert() != DefaultDataConvert.class) {
+            if (this.dataConvertMap == null) {
+                this.dataConvertMap = new HashMap<>(16);
+            }
+            if (dataConvertMap.get(field.getName()) == null) {
+                try {
+                    this.dataConvertMap.put(field.getName(), excelField.convert().newInstance());
+                } catch (Exception e) {
+                    throw new ExcelInitException("Init specified excel header data convert failure " + field.getName() + ", " + e.getMessage());
+                }
+            }
+        }
+        if (excelField.autoMerge().open()) {
+            if (this.mergeCallbackMap == null) {
+                this.mergeCallbackMap = new HashMap<>(16);
+            }
+            if (this.mergeCallbackMap.get(field.getName()) == null) {
+                try {
+                    this.mergeCallbackMap.put(field.getName(), excelField.autoMerge().callback().newInstance());
+                } catch (Exception e) {
+                    throw new ExcelInitException("Init specified excel header merge callback failure " + field.getName() + ", " + e.getMessage());
+                }
+            }
+        }
+        if (excelField.sum().open()) {
+            if (this.formulaMap == null) {
+                this.formulaMap = new HashMap<>(16);
             }
         }
     }
@@ -230,7 +272,7 @@ class ExcelHelper {
     }
 
     /**
-     * Data converter
+     * Data convert
      *
      * @param field            Current field
      * @param value            Attribute values
@@ -256,13 +298,14 @@ class ExcelHelper {
     /**
      * To the cell assignment
      *
-     * @param field Current field
-     * @param cell  Current cell
-     * @param value Attribute values
+     * @param field     Current field
+     * @param cell      Current cell
+     * @param value     Attribute values
+     * @param bodyStyle Excel body style
      */
     @SuppressWarnings("unchecked")
-    private void setCellValue(Field field, Cell cell, Object value) {
-        cell.setCellStyle(this.customerMetaStyleMap.get(field.getName()).getBodyStyle());
+    private void setCellValue(Field field, Cell cell, Object value, CellStyle bodyStyle) {
+        cell.setCellStyle(bodyStyle);
         if (value == null) {
             return;
         }
@@ -311,17 +354,17 @@ class ExcelHelper {
     }
 
     /**
-     * The cell increase check
+     * Call the macro to set Excel data validation
      *
-     * @param field      Current field
-     * @param row        Current row
-     * @param i          Current col index
-     * @param locked     Level drop-down box interlocking living state
-     * @param sheet      Current sheet
-     * @param metaObject Excel meta object
+     * @param field             Current field
+     * @param row               Current row
+     * @param i                 Current col index
+     * @param locked            Level drop-down box interlocking living state
+     * @param sheet             Current sheet
+     * @param dropdownBoxValues Excel dropdown box values
      * @return lock status
      */
-    private boolean addValid(Field field, Row row, int i, boolean locked, Sheet sheet, MetaObject metaObject) {
+    private boolean addValid(Field field, Row row, int i, boolean locked, Sheet sheet, Map<String, String[]> dropdownBoxValues) {
         ExcelDropdownBox ev = field.getAnnotation(ExcelDropdownBox.class);
         ExcelDateValid dv = field.getAnnotation(ExcelDateValid.class);
         ExcelNumericValid nv = field.getAnnotation(ExcelNumericValid.class);
@@ -329,7 +372,7 @@ class ExcelHelper {
         if (ev != null) {
             try {
                 locked = ev.validClass().newInstance().valid(ev, this.workbook, sheet, firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, i, i, locked, field.getName()
-                        , metaObject.getExplicitValues());
+                        , dropdownBoxValues);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelResolverException("Add specified excel header dropdown box failure " + field.getName() + ", " + e.getMessage());
             }
@@ -352,49 +395,49 @@ class ExcelHelper {
     }
 
     /**
-     * Init excel style
+     * Init specified excel head style
      *
-     * @param metaObject Excel meta object
+     * @param metaStyle  Excel meta style
      * @param field      Current field
      * @param excelField ExcelField annotation on current filed
      * @return MetaStyle
      */
-    private MetaStyle initStyle(MetaObject metaObject, Field field, ExcelField excelField) {
-        MetaStyle metaStyle;
+    private MetaStyle initStyle(MetaStyle metaStyle, Field field, ExcelField excelField) {
+        MetaStyle realMetaStyle;
         if (excelField.style() == DefaultExcelStyle.class) {
             if (!"".equals(excelField.format())) {
-                metaStyle = new MetaStyle();
-                metaStyle.setHeadStyle(metaObject.getMetaStyle().getHeadStyle());
+                realMetaStyle = new MetaStyle();
+                realMetaStyle.setHeadStyle(metaStyle.getHeadStyle());
                 CellStyle formatStyle = this.workbook.createCellStyle();
-                formatStyle.cloneStyleFrom(metaObject.getMetaStyle().getBodyStyle());
+                formatStyle.cloneStyleFrom(metaStyle.getBodyStyle());
                 formatStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
-                metaStyle.setBodyStyle(formatStyle);
+                realMetaStyle.setBodyStyle(formatStyle);
             } else {
-                metaStyle = metaObject.getMetaStyle();
+                realMetaStyle = metaStyle;
             }
         } else {
-            metaStyle = this.customerMetaStyleMap.get(field.getName());
+            realMetaStyle = this.customerMetaStyleMap.get(field.getName());
             ExcelStyle excelStyle;
-            if (metaStyle == null) {
+            if (realMetaStyle == null) {
                 try {
                     excelStyle = excelField.style().newInstance();
                 } catch (Exception e) {
                     throw new ExcelInitException("Init specified excel header style failure " + field.getName() + ", " + e.getMessage());
                 }
-                metaStyle = new MetaStyle();
+                realMetaStyle = new MetaStyle();
                 CellStyle formatStyle = excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle());
                 if (!"".equals(excelField.format())) {
                     formatStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
                 }
-                metaStyle.setBodyStyle(formatStyle);
-                metaStyle.setHeadStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()));
+                realMetaStyle.setBodyStyle(formatStyle);
+                realMetaStyle.setHeadStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()));
             }
         }
-        return metaStyle;
+        return realMetaStyle;
     }
 
     /**
-     * Set last row object
+     * save last row object
      *
      * @param row           Current row
      * @param value         Current attribute value

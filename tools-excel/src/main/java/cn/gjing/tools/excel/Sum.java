@@ -3,14 +3,12 @@ package cn.gjing.tools.excel;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author Gjing
  **/
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface Sum {
@@ -52,7 +50,7 @@ public @interface Sum {
      * Font bold
      * @return false
      */
-    boolean bold() default false;
+    boolean bold() default true;
 
     /**
      * Open the sum

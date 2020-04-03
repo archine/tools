@@ -1,11 +1,12 @@
 package cn.gjing.tools.excel.write;
 
+import cn.gjing.tools.excel.BigTitle;
 import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.MetaObject;
+import cn.gjing.tools.excel.MetaStyle;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
+import cn.gjing.tools.excel.listen.CustomWrite;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -19,10 +20,11 @@ import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
- * XLSX处理器
+ * Xlsx resolver
  *
  * @author Gjing
  **/
@@ -31,23 +33,34 @@ class ExcelWriteXlsxResolver implements ExcelWriterResolver, Closeable {
     private OutputStream outputStream;
     private ExcelHelper excelHelper;
 
+    ExcelWriteXlsxResolver(SXSSFWorkbook workbook) {
+        this.workbook = workbook;
+        this.excelHelper = new ExcelHelper(workbook);
+    }
+
     @Override
-    public void write(List<?> data, Workbook workbook, String sheetName, List<Field> headFieldList, MetaObject metaObject, boolean changed, Excel excel) {
-        this.workbook = (SXSSFWorkbook) workbook;
-        SXSSFSheet sheet = this.workbook.getSheet(sheetName);
-        if (sheet == null) {
-            sheet = this.workbook.createSheet(sheetName);
-            changed = true;
-        }
-        if (excelHelper == null) {
-            this.excelHelper = new ExcelHelper(this.workbook);
-        }
-        int rowIndex = this.excelHelper.setBigTitle(headFieldList, metaObject, sheet);
-        rowIndex = this.excelHelper.setHead(data, headFieldList, sheet, changed, rowIndex, metaObject, excel);
-        if (data == null || data.isEmpty()) {
-            return;
-        }
-        this.excelHelper.setValue(data, headFieldList, sheet, rowIndex);
+    public ExcelWriterResolver writeTitle(int totalCol, BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet) {
+        this.excelHelper.setBigTitle(totalCol, bigTitle, metaStyle, sheet);
+        return this;
+    }
+
+    @Override
+    public ExcelWriterResolver writeHead(boolean noContent, List<Field> headFieldList, Sheet sheet, boolean needHead, MetaStyle metaStyle,
+                                         Map<String, String[]> dropdownBoxValues, Excel excel) {
+        this.excelHelper.setHead(noContent, headFieldList, sheet, needHead, metaStyle, dropdownBoxValues, excel);
+        return this;
+    }
+
+    @Override
+    public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList, MetaStyle metaStyle, boolean initExtension) {
+        this.excelHelper.setValue(data, headFieldList, sheet, metaStyle, initExtension);
+        return this;
+    }
+
+    @Override
+    public ExcelWriterResolver customWrite(CustomWrite processor) {
+        processor.process();
+        return this;
     }
 
     @Override

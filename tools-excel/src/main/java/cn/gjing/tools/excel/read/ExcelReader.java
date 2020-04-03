@@ -53,7 +53,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read() {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
                 "sheet1", this.readCallback);
         this.initSequence();
         return this;
@@ -66,7 +66,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(Supplier<? extends ReadCallback<R>> callback) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
                 "sheet1", callback.get());
         this.initSequence();
         return this;
@@ -79,7 +79,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(String sheetName) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
                 sheetName, this.readCallback);
         this.initSequence();
         return this;
@@ -93,8 +93,64 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(String sheetName, Supplier<? extends ReadCallback<R>> callback) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> data = readData, this.headerIndex, this.readLines,
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
                 sheetName, callback.get());
+        this.initSequence();
+        return this;
+    }
+
+    /**
+     * Read the excel sheet
+     *
+     * @param headerIndex Excel header starter index
+     * @return this
+     */
+    public ExcelReader<R> read(int headerIndex) {
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
+                "sheet1", this.readCallback);
+        this.initSequence();
+        return this;
+    }
+
+    /**
+     * Read the excel sheet
+     *
+     * @param headerIndex Excel header starter index
+     * @param callback Excel import callback
+     * @return this
+     */
+    public ExcelReader<R> read(int headerIndex, Supplier<? extends ReadCallback<R>> callback) {
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
+                "sheet1", callback.get());
+        this.initSequence();
+        return this;
+    }
+
+    /**
+     * Read the excel sheet
+     *
+     * @param headerIndex Excel header starter index
+     * @param sheet Excel Sheet name
+     * @return this
+     */
+    public ExcelReader<R> read(int headerIndex, String sheet) {
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
+                sheet, this.readCallback);
+        this.initSequence();
+        return this;
+    }
+
+    /**
+     * Read the excel sheet
+     *
+     * @param headerIndex Excel header starter index
+     * @param callback Excel import callback
+     * @param sheet Sheet name
+     * @return this
+     */
+    public ExcelReader<R> read(int headerIndex, String sheet, Supplier<? extends ReadCallback<R>> callback) {
+        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
+                sheet, callback.get());
         this.initSequence();
         return this;
     }
@@ -116,6 +172,7 @@ public class ExcelReader<R> {
      * @param index List header, which is the number to the left of the excel file list header
      * @return this
      */
+    @Deprecated
     public ExcelReader<R> headerIndex(int index) {
         this.headerIndex = index;
         return this;

@@ -1,10 +1,7 @@
 package cn.gjing.tools.excel;
 
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 import static cn.gjing.tools.excel.Type.XLS;
 
@@ -13,6 +10,7 @@ import static cn.gjing.tools.excel.Type.XLS;
  *
  * @author Gjing
  **/
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Excel {
@@ -54,4 +52,16 @@ public @interface Excel {
      * @return ExcelStyle
      */
     Class<? extends ExcelStyle> style() default DefaultExcelStyle.class;
+
+    /**
+     * Lock sheet
+     * @return false
+     */
+    boolean lock() default false;
+
+    /**
+     * Unlock password
+     * @return ""
+     */
+    String secret() default "";
 }

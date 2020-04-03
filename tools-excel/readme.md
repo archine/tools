@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.4.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.4.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.4.6</version>
+    <version>1.4.7</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -22,6 +22,8 @@
 |maxSize|当文档类型为``XLSX``时，保留在内存中的条数，超出会将其写入到本地|
 |bufferSize|当文档类型为``XLSX``时，允许在内存中保存的字节|
 |style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
+|lock|是否开启锁|
+|secret|解锁密码|
 ### 2、@ExcelField
 **在实体的字段上使用，该注解会将当前字段映射为Excel的表头，``下文简称表头``。没有使用该注释的字段将不会作为表头出现在Excel中。注解的参数如下**     
 
@@ -314,7 +316,7 @@ public class UserController {
     }
 }
 ```
-**导入时Excel存在大标题的时候，需要指定表头的下标，下标你为你导出这个模板时设置的大标题的行数(``rows``)，要在调用``read()``前配置**
+**导入时Excel存在大标题的时候，需要指定表头的下标，下标你为你导出这个模板时设置的大标题的行数(``rows``)，要在调用``read()``前配置，也可以通过``read()``方法设置**
 ```java
 /**
  * @author Gjing
@@ -328,8 +330,8 @@ public class UserController {
     @ApiOperation("导入")
     public ResponseEntity userImport(MultipartFile file) throws IOException {
         List<User> users = ExcelFactory.createReader(file.getInputStream(), User.class)
-                .headerIndex(2)
-                .read()
+                //.headerIndex(2)
+                .read(2)
                 .get();
         userService.saveUserList(users);
         return ResponseEntity.ok("导入成功");
@@ -408,10 +410,11 @@ public class MyReadCallback implements ReadCallback<Object> {
      * 当前读到的所有数据
      * @param dataList 数据集合
      * @param rowIndex 当前下标，下标是从0开始的
+     * @param hasNext 是否还有数据
      * @return 是否清空当前读到的所有数据
      */
     @Override
-    public boolean currentData(List<User1> dataList, int rowIndex) {
+    public boolean currentData(List<User1> dataList, int rowIndex,  boolean hasNext) {
         return false;
     }
 }
@@ -615,6 +618,8 @@ public class UserController {
     }
 }
 ```
+**在使用Map传递下拉框的值时，如果Excel实体``普通下拉框和级联下拉框同时存在，那么不应将这个Map缓存``，可考虑将两个类型的下拉框值分成两个Map，级联下拉框进行缓存，普通下拉框在调用时手动Put进去，否则``第二次write时
+会丢失普通下拉框的数据``**
 ### 4、动态设置合并规则
 **如若Excel实体中每个表头都想有独立的纵向合并规则，那么可使用合并回调的方式进行设置，需实现``MergeCalback``接口，该接口需指定当前Excel实体**
 ```java
@@ -763,5 +768,61 @@ public class User {
     private Date createTime;
 }
 ```
+### 3、自定义导出
+**自定义导出，针对于导出复杂表头或者Excel表头、正文和大标题非正常流程的场景。由于该方式``代码量较大``且需要对``POI有一定的了解``，对于通用场景，为了避免导出时失败或者扩展功能失效，建议还是``采用ExcelWriter进行调用``。使用时同之前一样，需要绑定一个Excel实体，用于初始化处理器，初始化完成之后可以随意使用其他实体，以下演示了一个自定义导出，样式随便弄的，不要在意**
+```java
+@RestController
+public class TestController {
+    @GetMapping("/user1_export_custom")
+    @ApiOperation("自定义导出")
+    public void user1ExportCustom(HttpServletResponse response) {
+        // 通过Excel工厂创建一个Excel导出助手(初始化你传入的Excel实体对应的核心处理器、workbook对象、元样式、列表头字段)
+        ExcelWriter writer = ExcelFactory.createWriter(User1.class, response);
+        // 通过助手获取到核心处理器
+        ExcelWriterResolver resolver = writer.getWriterResolver();
+        // 模拟数据
+        List<User1> user1List = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            user1List.add(User1.builder()
+                    .userName("用户" + i)
+                    .birthday(new Date())
+                    .genderEnum(GenderEnum.MAN)
+                    .userSalary(new BigDecimal(i))
+            .build());
+        }
+        // 通过核心处理器调用内部的自定义导出
+        resolver.customWrite(() -> {
+            // 通过助手获取到workbook对象
+            Workbook workbook = writer.getWorkbook();
+            // 创建一个sheet（因为没有通过助手直接导出，所以没有初始化默认的sheet）
+            Sheet sheet = workbook.createSheet("自定义sheet");
+            //先直接导出一个大标题
+            resolver.writeTitle(4, new BigTitle(2, "自定义导出"), writer.getMetaStyle(), sheet);
+            //创建列表头
+            Row head1Row = sheet.createRow(sheet.getPhysicalNumberOfRows());
+            Cell head1RowCell1 = head1Row.createCell(0);
+            head1RowCell1.setCellValue("名称");
+            head1RowCell1.setCellStyle(writer.getMetaStyle().getHeadStyle());
+            Cell head1RowCell2 = head1Row.createCell(1);
+            head1RowCell2.setCellValue("基本信息");
+            head1RowCell2.setCellStyle(writer.getMetaStyle().getHeadStyle());
+            sheet.addMergedRegion(new CellRangeAddress(head1Row.getRowNum(), head1Row.getRowNum(), 1, 2));
+            Cell head1RowCell = head1Row.createCell(3);
+            head1RowCell.setCellValue("生日");
+            head1RowCell.setCellStyle(writer.getMetaStyle().getHeadStyle());
+            resolver.writeHead(false, writer.getHeadFieldList(), sheet, true, writer.getMetaStyle(), null, writer.getExcel());
+            //合并
+            sheet.addMergedRegion(new CellRangeAddress(head1Row.getRowNum(), head1Row.getRowNum() + 1, 0, 0));
+            sheet.addMergedRegion(new CellRangeAddress(head1Row.getRowNum(), head1Row.getRowNum() + 1, 3, 3));
+            //将模拟的数据导出
+            resolver.write(user1List, sheet, writer.getHeadFieldList(), writer.getMetaStyle(), false);
+            //最后在来一个大标题
+            resolver.writeTitle(4, new BigTitle(1, "实现自定义"), writer.getMetaStyle(), sheet);
+        }).flush(response, "测试");
+    }
+}
+```
+* 效果图     
+![1585910979_1_](https://yqfile.alicdn.com/652522949afc276e88982a87f1c6f43383c2c129.jpeg)
 ---
 **Demo地址：[excel-demo](https://github.com/archine/excel-demo)**
