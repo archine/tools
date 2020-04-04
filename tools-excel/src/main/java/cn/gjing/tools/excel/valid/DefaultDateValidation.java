@@ -6,7 +6,7 @@ import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 
 /**
  * Default time verifier
@@ -18,7 +18,7 @@ public class DefaultDateValidation implements ExcelDateValidation {
     public void valid(ExcelDateValid excelDateValid, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint dvConstraint;
-        if (sheet instanceof XSSFSheet) {
+        if (sheet instanceof SXSSFSheet) {
             dvConstraint = helper.createDateConstraint(excelDateValid.operatorType().getType(), "date(" + excelDateValid.expr1().replaceAll("-", ",") + ")",
                     "date(" + excelDateValid.expr2().replaceAll("-", ",") + ")", excelDateValid.pattern());
         } else {

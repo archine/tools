@@ -46,9 +46,9 @@ public class ExcelFactory {
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<Field> hasExcelFieldList = BeanUtils.getExcelFields(excelClass, ignores);
+        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, ignores);
         return new ExcelWriter(fileName == null ? "".equals(excel.value()) ? UUID.randomUUID().toString().replaceAll("-", "") : excel.value() : fileName,
-                excel, response, hasExcelFieldList);
+                excel, response, excelFieldList);
     }
 
     /**
@@ -60,8 +60,10 @@ public class ExcelFactory {
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass) {
-        ParamUtils.requireNonNull(excelClass.getAnnotation(Excel.class), "@Excel annotation was not found on the " + excelClass);
-        return new ExcelReader<>(excelClass, inputStream);
+        Excel excel = excelClass.getAnnotation(Excel.class);
+        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
+        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, null);
+        return new ExcelReader<>(excelClass, inputStream, excel, excelFieldList);
     }
 
 }

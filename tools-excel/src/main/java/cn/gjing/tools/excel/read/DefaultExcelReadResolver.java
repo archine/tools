@@ -11,23 +11,18 @@ import cn.gjing.tools.excel.listen.ReadCallback;
 import cn.gjing.tools.excel.listen.ReadListener;
 import cn.gjing.tools.excel.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
-import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.valid.ExcelAssert;
 import com.google.gson.Gson;
-import com.monitorjbl.xlsx.StreamingReader;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,29 +30,26 @@ import java.util.stream.Collectors;
 /**
  * @author Gjing
  **/
-class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseable {
-    private Workbook workbook;
-    private Sheet sheet;
-    private InputStream inputStream;
+class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R> {
     private Map<String, EnumConvert<? extends Enum<?>, ?>> enumConvertMap;
     private Map<String, Class<?>> enumInterfaceTypeMap;
     private List<String> headNameList;
-    private Map<String, Field> hasAnnotationFieldMap;
+    private Map<String, Field> excelFieldMap;
     private Map<String, DataConvert<?>> dataConvertMap;
+    private List<R> dataList;
     private boolean isSave;
 
     public DefaultExcelReadResolver() {
-        this.hasAnnotationFieldMap = new HashMap<>(16);
+        this.excelFieldMap = new HashMap<>(16);
         this.headNameList = new ArrayList<>();
+        this.dataList = new ArrayList<>();
     }
 
     @Override
-    public void read(InputStream inputStream, Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, String sheetName, ReadCallback<R> callback) {
-        this.inputStream = inputStream;
-        Excel excel = excelClass.getAnnotation(Excel.class);
-        if (hasAnnotationFieldMap.isEmpty()) {
-            List<Field> excelFields = BeanUtils.getExcelFields(excelClass, null);
-            this.hasAnnotationFieldMap = excelFields.stream()
+    public void read(InputStream inputStream, Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, String sheetName,
+                     ReadCallback<R> callback, Workbook workbook, List<Field> excelFieldList, Excel excel) {
+        if (excelFieldMap.isEmpty()) {
+            this.excelFieldMap = excelFieldList.stream()
                     .peek(e -> {
                         ExcelField excelField = e.getAnnotation(ExcelField.class);
                         if (excelField.convert() != DefaultDataConvert.class) {
@@ -71,51 +63,25 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                             }
                         }
                     }).collect(Collectors.toMap(field -> field.getAnnotation(ExcelField.class).value(), field -> field));
-            switch (excel.type()) {
-                case XLS:
-                    try {
-                        if (this.workbook == null) {
-                            this.workbook = new HSSFWorkbook(inputStream);
-                        }
-                    } catch (Exception e) {
-                        throw new ExcelInitException("Init workbook error, " + e.getMessage());
-                    }
-                    this.sheet = this.workbook.getSheet(sheetName);
-                    this.reader(excelClass, readListener, headerIndex, readLines, callback);
-                    break;
-                case XLSX:
-                    if (this.workbook == null) {
-                        this.workbook = StreamingReader.builder().rowCacheSize(excel.maxSize()).bufferSize(excel.bufferSize()).open(inputStream);
-                    }
-                    this.sheet = this.workbook.getSheet(sheetName);
-                    this.reader(excelClass, readListener, headerIndex, readLines, callback);
-                    break;
-                default:
-            }
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (this.inputStream != null) {
-            this.inputStream.close();
+        Sheet sheet = workbook.getSheet(sheetName);
+        if (sheet == null) {
+            throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
         }
-        if (this.workbook != null) {
-            this.workbook.close();
-        }
+        this.reader(sheet, excelClass, readListener, headerIndex, readLines, callback);
     }
 
     /**
      * Start read
      *
+     * @param sheet        Current sheet
      * @param excelClass   Current excel class
      * @param readListener Read listener
      * @param headerIndex  Excel header index
      * @param readLines    Read lines
      * @param readCallback Read callback
      */
-    private void reader(Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
-        List<R> dataList = new ArrayList<>();
+    private void reader(Sheet sheet, Class<R> excelClass, ReadListener<List<R>> readListener, int headerIndex, int readLines, ReadCallback<R> readCallback) {
         R o;
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
@@ -135,6 +101,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 continue;
             }
             if (readLines != 0 && row.getRowNum() > realReadLines) {
+                readCallback.currentData(this.dataList, row.getRowNum() - 1, false);
                 break;
             }
             try {
@@ -143,7 +110,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 throw new ExcelInitException("Excel model init failure, " + e.getMessage());
             }
             for (int c = 0; c < row.getLastCellNum() && this.isSave; c++) {
-                Field field = hasAnnotationFieldMap.get(headNameList.get(c));
+                Field field = excelFieldMap.get(headNameList.get(c));
                 if (field == null) {
                     throw new ExcelTemplateException();
                 }
@@ -179,20 +146,24 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             }
             if (this.isSave) {
                 try {
-                    dataList.add(readCallback.readLine(o, row.getRowNum()));
-                    readCallback.currentData(dataList, row.getRowNum(), row.getRowNum() < sheet.getLastRowNum());
+                    this.dataList.add(readCallback.readLine(o, row.getRowNum()));
+                    readCallback.currentData(this.dataList, row.getRowNum(), row.getRowNum() < sheet.getLastRowNum());
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
             }
         }
-        readListener.notify(dataList);
+        readListener.notify(this.dataList);
     }
 
     /**
-     * Gets the value of the cell
+     * Get the value of the cell
      *
-     * @param cell cell
+     * @param cell         cell
+     * @param excelField   Excel field of current field
+     * @param field        Current field
+     * @param gson         Gson
+     * @param readCallback read callback
      * @return value
      */
     private Object getValue(Cell cell, Field field, ExcelField excelField, ReadCallback<R> readCallback, Gson gson) {
@@ -246,7 +217,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
      * @param o     object
      * @param field field
      * @param value value
-     * @param gson  Json convert
+     * @param gson  gson
      */
     private void setValue(R o, Field field, Object value, Gson gson) {
         if (field.getType().isEnum()) {
@@ -261,7 +232,9 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
             EnumConvert<? extends Enum<?>, ?> enumConvert = this.enumConvertMap.get(field.getName());
             if (enumConvert == null) {
                 ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-                ParamUtils.requireNonNull(excelEnumConvert, field.getName() + " was not found enum convert");
+                if (excelEnumConvert == null) {
+                    return;
+                }
                 Class<?> interfaceType = BeanUtils.getInterfaceType(excelEnumConvert.convert(), EnumConvert.class, 1);
                 try {
                     enumConvert = excelEnumConvert.convert().newInstance();
@@ -287,9 +260,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R>, AutoCloseab
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
                 return;
             }
-            if (field.getType() == LocalTime.class) {
-                BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()).toLocalTime());
-            }
+            throw new IllegalArgumentException("Unsupported data type");
         }
     }
 

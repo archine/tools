@@ -22,10 +22,6 @@ public interface ExcelStyle {
         cellStyle.setWrapText(true);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setBorderTop(BorderStyle.THIN);
         return cellStyle;
     }
 
@@ -42,9 +38,6 @@ public interface ExcelStyle {
         cellStyle.setWrapText(true);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setBorderBottom(BorderStyle.THIN);
         Font font = workbook.createFont();
         font.setBold(true);
         font.setColor(IndexedColors.WHITE.index);

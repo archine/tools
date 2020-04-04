@@ -27,7 +27,6 @@ import java.util.function.Supplier;
  **/
 @Getter
 public class ExcelWriter {
-
     private String fileName;
     private MetaStyle metaStyle;
     private Workbook workbook;
@@ -60,21 +59,14 @@ public class ExcelWriter {
         switch (excel.type()) {
             case XLS:
                 this.workbook = new HSSFWorkbook();
-                try (final ExcelWriteXlsResolver xlsResolver = new ExcelWriteXlsResolver((HSSFWorkbook) workbook)) {
-                    this.writerResolver = xlsResolver;
-                } catch (Exception e) {
-                    throw new ExcelInitException("Init write resolver failure, " + e.getMessage());
-                }
+                this.writerResolver = new ExcelWriteXlsResolver((HSSFWorkbook) workbook);
                 break;
             case XLSX:
                 this.workbook = new SXSSFWorkbook(excel.maxSize());
-                try (final ExcelWriteXlsxResolver xlsxResolver = new ExcelWriteXlsxResolver((SXSSFWorkbook) workbook)) {
-                    this.writerResolver = xlsxResolver;
-                } catch (Exception e) {
-                    throw new ExcelInitException("Init write resolver failure, " + e.getMessage());
-                }
+                this.writerResolver = new ExcelWriteXlsxResolver((SXSSFWorkbook) workbook);
                 break;
             default:
+                throw new ExcelInitException("No corresponding processor was found");
         }
     }
 

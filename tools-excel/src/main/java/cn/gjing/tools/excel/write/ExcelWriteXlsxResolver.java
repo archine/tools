@@ -13,7 +13,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -28,7 +27,7 @@ import java.util.Objects;
  *
  * @author Gjing
  **/
-class ExcelWriteXlsxResolver implements ExcelWriterResolver, Closeable {
+class ExcelWriteXlsxResolver implements ExcelWriterResolver {
     private SXSSFWorkbook workbook;
     private OutputStream outputStream;
     private ExcelHelper excelHelper;
@@ -78,14 +77,18 @@ class ExcelWriteXlsxResolver implements ExcelWriterResolver, Closeable {
             this.workbook.write(outputStream);
         } catch (IOException e) {
             throw new ExcelResolverException("Excel cache data refresh failure, " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (this.outputStream != null) {
-            this.outputStream.flush();
-            this.outputStream.close();
+        }finally {
+            try {
+                if (this.outputStream != null) {
+                    this.outputStream.flush();
+                    this.outputStream.close();
+                }
+                if (this.workbook != null) {
+                    this.workbook.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

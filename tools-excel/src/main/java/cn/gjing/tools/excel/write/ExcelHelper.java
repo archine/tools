@@ -329,7 +329,10 @@ class ExcelHelper {
             Class<? extends Enum<?>> enumType = (Class<? extends Enum<?>>) field.getType();
             if (enumConvert == null) {
                 ExcelEnumConvert excelEnumConvert = field.getAnnotation(ExcelEnumConvert.class);
-                ParamUtils.requireNonNull(excelEnumConvert, field.getName() + " was not found enum convert");
+                if (excelEnumConvert == null) {
+                    cell.setCellValue(value.toString());
+                    return;
+                }
                 try {
                     enumConvert = (EnumConvert<Enum<?>, ?>) excelEnumConvert.convert().newInstance();
                     value = enumConvert.toExcelAttribute(BeanUtils.getEnum(enumType, value.toString()));
@@ -350,7 +353,9 @@ class ExcelHelper {
         }
         if (value instanceof LocalDate) {
             cell.setCellValue((LocalDate) value);
+            return;
         }
+        throw new IllegalArgumentException("Unsupported data type");
     }
 
     /**
