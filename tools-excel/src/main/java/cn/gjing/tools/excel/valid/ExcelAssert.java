@@ -11,6 +11,7 @@ import java.lang.annotation.*;
 public @interface ExcelAssert {
     /**
      * EL expression
+     * @return boolean expression
      */
     String expr();
 
