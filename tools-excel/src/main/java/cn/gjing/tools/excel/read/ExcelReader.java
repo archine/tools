@@ -31,6 +31,7 @@ public class ExcelReader<R> {
     private Workbook workbook;
     private int headerIndex;
     private int readLines;
+    private String defaultSheetName = "sheet1";
 
     private ExcelReader() {
 
@@ -63,7 +64,7 @@ public class ExcelReader<R> {
                 }
                 break;
             case XLSX:
-                this.workbook = StreamingReader.builder().rowCacheSize(excel.maxSize()).bufferSize(excel.bufferSize()).open(inputStream);
+                this.workbook = StreamingReader.builder().rowCacheSize(excel.cacheRowSize()).bufferSize(excel.bufferSize()).open(inputStream);
                 break;
             default:
                 throw new ExcelInitException("No corresponding processor was found");
@@ -85,7 +86,7 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> read() {
         this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
-                "sheet1", this.readCallback, this.workbook, this.excelFieldList, excel);
+                this.defaultSheetName, this.readCallback, this.workbook, this.excelFieldList, excel);
         this.initSequence();
         return this;
     }
@@ -98,13 +99,13 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> read(Supplier<? extends ReadCallback<R>> callback) {
         this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
-                "sheet1", callback.get(), this.workbook, this.excelFieldList, excel);
+                this.defaultSheetName, callback.get(), this.workbook, this.excelFieldList, excel);
         this.initSequence();
         return this;
     }
 
     /**
-     * Read the excel sheet
+     * Read the specified sheet
      *
      * @param sheetName sheet name
      * @return this
@@ -117,7 +118,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Read the excel sheet
+     * Read the specified sheet
      *
      * @param sheetName sheet name
      * @param callback  Excel import callback
@@ -138,13 +139,13 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> read(int headerIndex) {
         this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
-                "sheet1", this.readCallback, this.workbook, this.excelFieldList, excel);
+                this.defaultSheetName, this.readCallback, this.workbook, this.excelFieldList, excel);
         this.initSequence();
         return this;
     }
 
     /**
-     * Read the excel sheet
+     * Read the specified sheet
      *
      * @param headerIndex Excel header starter index
      * @param callback    Excel import callback
@@ -152,13 +153,13 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> read(int headerIndex, Supplier<? extends ReadCallback<R>> callback) {
         this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
-                "sheet1", callback.get(), this.workbook, this.excelFieldList, excel);
+                this.defaultSheetName, callback.get(), this.workbook, this.excelFieldList, excel);
         this.initSequence();
         return this;
     }
 
     /**
-     * Read the excel sheet
+     * Read the specified sheet
      *
      * @param headerIndex Excel header starter index
      * @param sheetName   Excel Sheet name
@@ -172,7 +173,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Read the excel sheet
+     * Read the specified sheet
      *
      * @param headerIndex Excel header starter index
      * @param callback    Excel import callback
@@ -231,7 +232,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Listens for the return of the result through the listener
+     * Listen for the return of the result through the listener
      *
      * @param dataReadListener Result listener
      * @return this
@@ -243,7 +244,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Listens for the return of the result through the listener
+     * Listen for the return of the result through the listener
      *
      * @param dataReadListener Result listener
      * @return this

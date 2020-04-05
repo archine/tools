@@ -107,7 +107,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R> {
             try {
                 o = excelClass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new ExcelInitException("Excel model init failure, " + e.getMessage());
+                throw new ExcelInitException("Excel entity init failure, " + e.getMessage());
             }
             for (int c = 0; c < row.getLastCellNum() && this.isSave; c++) {
                 Field field = excelFieldMap.get(headNameList.get(c));
@@ -125,6 +125,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R> {
                         this.assertValue(parser, context, row, c, field, excelField, excelAssert, value);
                         value = readCallback.readCol(value, field, row.getRowNum(), c);
                         value = this.changeData(field, value, parser, excelDataConvert, context);
+                        context.setVariable(field.getName(), value);
                         if (this.isSave && value != null) {
                             this.setValue(o, field, value, gson);
                         }
@@ -260,7 +261,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R> {
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
                 return;
             }
-            throw new IllegalArgumentException("Unsupported data type");
+            throw new IllegalArgumentException("Unsupported data type, you can use a data converter");
         }
     }
 
@@ -277,8 +278,7 @@ class DefaultExcelReadResolver<R> implements ExcelReaderResolver<R> {
         if (excelField.allowEmpty()) {
             return;
         }
-        this.isSave = false;
-        readCallback.readJump(field, excelField, rowIndex, colIndex);
+        this.isSave = readCallback.readEmpty(field, excelField, rowIndex, colIndex);
     }
 
     /**

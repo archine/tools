@@ -5,6 +5,7 @@ import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.ExcelStyle;
 import cn.gjing.tools.excel.MetaStyle;
 import cn.gjing.tools.excel.exception.ExcelInitException;
+import cn.gjing.tools.excel.listen.CustomWrite;
 import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
@@ -25,17 +26,23 @@ import java.util.function.Supplier;
  *
  * @author Gjing
  **/
-@Getter
 public class ExcelWriter {
+    @Getter
     private String fileName;
+    @Getter
     private MetaStyle metaStyle;
+    @Getter
     private Workbook workbook;
+    @Getter
     private HttpServletResponse response;
-    private ExcelWriterResolver writerResolver;
+    @Getter
     private List<Field> headFieldList;
+    @Getter
     private Excel excel;
-    private boolean needHead = true;
-    private Sheet currentSheet;
+    @Getter
+    private String defaultSheetName = "sheet1";
+    private ExcelWriterResolver writerResolver;
+    private boolean needInit;
 
     private ExcelWriter() {
 
@@ -62,7 +69,7 @@ public class ExcelWriter {
                 this.writerResolver = new ExcelWriteXlsResolver((HSSFWorkbook) workbook);
                 break;
             case XLSX:
-                this.workbook = new SXSSFWorkbook(excel.maxSize());
+                this.workbook = new SXSSFWorkbook(excel.windowSize());
                 this.writerResolver = new ExcelWriteXlsxResolver((SXSSFWorkbook) workbook);
                 break;
             default:
@@ -92,7 +99,18 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data) {
-        return this.write(data, "sheet1", this.metaStyle, null, null);
+        return this.write(data, this.defaultSheetName, this.metaStyle, null, null, true);
+    }
+
+    /**
+     * Write Excel
+     *
+     * @param data     data
+     * @param needHead whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, boolean needHead) {
+        return this.write(data, this.defaultSheetName, this.metaStyle, null, null, needHead);
     }
 
     /**
@@ -103,7 +121,19 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Map<String, String[]> explicitValues) {
-        return this.write(data, "sheet1", this.metaStyle, explicitValues, null);
+        return this.write(data, this.defaultSheetName, this.metaStyle, explicitValues, null, true);
+    }
+
+    /**
+     * Write Excel
+     *
+     * @param data           data
+     * @param explicitValues The value in the drop-down box
+     * @param needHead       whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Map<String, String[]> explicitValues, boolean needHead) {
+        return this.write(data, this.defaultSheetName, this.metaStyle, explicitValues, null, needHead);
     }
 
     /**
@@ -114,7 +144,19 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName) {
-        return this.write(data, sheetName, this.metaStyle, null, null);
+        return this.write(data, sheetName, this.metaStyle, null, null, true);
+    }
+
+    /**
+     * Write to the specified sheet
+     *
+     * @param data      data
+     * @param sheetName sheetName
+     * @param needHead  whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, boolean needHead) {
+        return this.write(data, sheetName, this.metaStyle, null, null, needHead);
     }
 
     /**
@@ -126,7 +168,20 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Map<String, String[]> explicitValues) {
-        return this.write(data, sheetName, this.metaStyle, explicitValues, null);
+        return this.write(data, sheetName, this.metaStyle, explicitValues, null, true);
+    }
+
+    /**
+     * Write to the specified sheet
+     *
+     * @param data           data
+     * @param sheetName      sheetName
+     * @param explicitValues The value in the drop-down box
+     * @param needHead       whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, Map<String, String[]> explicitValues, boolean needHead) {
+        return this.write(data, sheetName, this.metaStyle, explicitValues, null, needHead);
     }
 
     /**
@@ -137,7 +192,19 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style) {
-        return this.write(data, "sheet1", style, null, null);
+        return this.write(data, this.defaultSheetName, style, null, null, true);
+    }
+
+    /**
+     * Write excel
+     *
+     * @param data     data
+     * @param style    Excel style
+     * @param needHead whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, boolean needHead) {
+        return this.write(data, this.defaultSheetName, style, null, null, needHead);
     }
 
     /**
@@ -149,7 +216,20 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues) {
-        return this.write(data, "sheet1", style, explicitValues, null);
+        return this.write(data, this.defaultSheetName, style, explicitValues, null, true);
+    }
+
+    /**
+     * Write excel
+     *
+     * @param data           data
+     * @param style          Excel style
+     * @param explicitValues The value in the drop-down box
+     * @param needHead       whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, boolean needHead) {
+        return this.write(data, this.defaultSheetName, style, explicitValues, null, needHead);
     }
 
     /**
@@ -161,7 +241,20 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style) {
-        return this.write(data, sheetName, style, null, null);
+        return this.write(data, sheetName, style, null, null, true);
+    }
+
+    /**
+     * Write to the specified excel
+     *
+     * @param data      data
+     * @param sheetName Excel sheet name
+     * @param style     Excel style
+     * @param needHead  whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, boolean needHead) {
+        return this.write(data, sheetName, style, null, null, needHead);
     }
 
     /**
@@ -174,7 +267,21 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, BigTitle bigTitle) {
-        return this.write(data, sheetName, style, null, bigTitle);
+        return this.write(data, sheetName, style, null, bigTitle, true);
+    }
+
+    /**
+     * Write to the specified excel
+     *
+     * @param data      data
+     * @param sheetName Excel sheet name
+     * @param style     Excel style
+     * @param bigTitle  Big title
+     * @param needHead  whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, BigTitle bigTitle, boolean needHead) {
+        return this.write(data, sheetName, style, null, bigTitle, needHead);
     }
 
     /**
@@ -187,7 +294,21 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues) {
-        return this.write(data, sheetName, style, explicitValues, null);
+        return this.write(data, sheetName, style, explicitValues, null, true);
+    }
+
+    /**
+     * Write to the specified excel
+     *
+     * @param data           data
+     * @param sheetName      Excel sheet name
+     * @param style          Excel style
+     * @param explicitValues The value in the drop-down box
+     * @param needHead       whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, boolean needHead) {
+        return this.write(data, sheetName, style, explicitValues, null, needHead);
     }
 
     /**
@@ -198,11 +319,23 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, BigTitle bigTitle) {
-        return this.write(data, "sheet1", this.metaStyle, null, bigTitle);
+        return this.write(data, this.defaultSheetName, this.metaStyle, null, bigTitle, true);
     }
 
     /**
-     * Write to the specified excel
+     * Write excel
+     *
+     * @param data     data
+     * @param bigTitle Big title
+     * @param needHead whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, BigTitle bigTitle, boolean needHead) {
+        return this.write(data, this.defaultSheetName, this.metaStyle, null, bigTitle, needHead);
+    }
+
+    /**
+     * Write to the specified sheet
      *
      * @param data      data
      * @param sheetName Excel sheet name
@@ -210,7 +343,20 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, BigTitle bigTitle) {
-        return this.write(data, sheetName, this.metaStyle, null, bigTitle);
+        return this.write(data, sheetName, this.metaStyle, null, bigTitle, true);
+    }
+
+    /**
+     * Write to the specified sheet
+     *
+     * @param data      data
+     * @param sheetName Excel sheet name
+     * @param bigTitle  Big title
+     * @param needHead  whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, BigTitle bigTitle, boolean needHead) {
+        return this.write(data, sheetName, this.metaStyle, null, bigTitle, needHead);
     }
 
     /**
@@ -222,7 +368,20 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, BigTitle bigTitle) {
-        return this.write(data, "sheet1", style, null, bigTitle);
+        return this.write(data, this.defaultSheetName, style, null, bigTitle, true);
+    }
+
+    /**
+     * Write excel
+     *
+     * @param data     data
+     * @param style    Excel style
+     * @param bigTitle Big title
+     * @param needHead whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, BigTitle bigTitle, boolean needHead) {
+        return this.write(data, this.defaultSheetName, style, null, bigTitle, needHead);
     }
 
     /**
@@ -234,7 +393,20 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Map<String, String[]> explicitValues, BigTitle bigTitle) {
-        return this.write(data, "sheet1", this.metaStyle, explicitValues, bigTitle);
+        return this.write(data, this.defaultSheetName, this.metaStyle, explicitValues, bigTitle, true);
+    }
+
+    /**
+     * Write excel
+     *
+     * @param data           data
+     * @param explicitValues The value in the drop-down box
+     * @param bigTitle       Big title
+     * @param needHead       whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Map<String, String[]> explicitValues, BigTitle bigTitle, boolean needHead) {
+        return this.write(data, this.defaultSheetName, this.metaStyle, explicitValues, bigTitle, needHead);
     }
 
     /**
@@ -247,11 +419,25 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, BigTitle bigTitle) {
-        return this.write(data, "sheet1", style, explicitValues, bigTitle);
+        return this.write(data, this.defaultSheetName, style, explicitValues, bigTitle, true);
     }
 
     /**
-     * Write to the specified excel
+     * Write excel
+     *
+     * @param data           data
+     * @param style          Excel style
+     * @param explicitValues The value in the drop-down box
+     * @param bigTitle       Big title
+     * @param needHead       whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, BigTitle bigTitle, boolean needHead) {
+        return this.write(data, this.defaultSheetName, style, explicitValues, bigTitle, needHead);
+    }
+
+    /**
+     * Write to the specified sheet
      *
      * @param data           data
      * @param sheetName      sheet name
@@ -260,17 +446,84 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter write(List<?> data, String sheetName, Map<String, String[]> explicitValues, BigTitle bigTitle) {
-        return this.write(data, sheetName, this.metaStyle, explicitValues, bigTitle);
+        return this.write(data, sheetName, this.metaStyle, explicitValues, bigTitle, true);
     }
 
     /**
-     * Reset the processor before any other operation
+     * Write to the specified sheet
+     *
+     * @param data           data
+     * @param sheetName      sheet name
+     * @param explicitValues The value in the drop-down box
+     * @param bigTitle       Big title
+     * @param needHead       whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, Map<String, String[]> explicitValues, BigTitle bigTitle, boolean needHead) {
+        return this.write(data, sheetName, this.metaStyle, explicitValues, bigTitle, needHead);
+    }
+
+    /**
+     * Reset the processor before write operation
      *
      * @param excelWriteResolver Excel write Resolver
      * @return this
      */
     public ExcelWriter resetResolver(Supplier<? extends ExcelWriterResolver> excelWriteResolver) {
         this.writerResolver = excelWriteResolver.get();
+        return this;
+    }
+
+    /**
+     * Write to the specified sheet
+     *
+     * @param data           data
+     * @param sheetName      sheet name
+     * @param style          Excel style
+     * @param explicitValues The value in the drop-down box
+     * @param bigTitle       Big title
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, BigTitle bigTitle, boolean needHead) {
+        ExcelStyle excelStyle = style.get();
+        MetaStyle metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()),
+                excelStyle.setTitleStyle(this.workbook, this.workbook.createCellStyle()));
+        return this.write(data, sheetName, metaStyle, explicitValues, bigTitle, needHead);
+    }
+
+    /**
+     * User defined export
+     *
+     * @param customWrite export logic
+     * @return this
+     */
+    public ExcelWriter customWrite(CustomWrite customWrite) {
+        this.writerResolver.customWrite(customWrite);
+        return this;
+    }
+
+    /**
+     * To write
+     *
+     * @param data           data
+     * @param sheetName      sheet name
+     * @param metaStyle      Excel style
+     * @param explicitValues The value in the drop-down box
+     * @param bigTitle       Big title
+     * @return this
+     */
+    private ExcelWriter write(List<?> data, String sheetName, MetaStyle metaStyle, Map<String, String[]> explicitValues, BigTitle bigTitle, boolean needHead) {
+        Sheet sheet = this.initSheet(sheetName);
+        if (bigTitle != null && bigTitle.getCols() < 1) {
+            bigTitle.setCols(this.headFieldList.size());
+        }
+        if (needHead) {
+            this.needInit = false;
+        }
+        this.writerResolver.writeTitle(bigTitle, metaStyle, sheet)
+                .writeHead(data == null, this.headFieldList, sheet, needHead, metaStyle, explicitValues, excel)
+                .write(data, sheet, this.headFieldList, metaStyle, this.needInit);
+        this.needInit = false;
         return this;
     }
 
@@ -293,13 +546,13 @@ public class ExcelWriter {
         this.metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()),
                 excelStyle.setTitleStyle(this.workbook, this.workbook.createCellStyle()));
         this.headFieldList = BeanUtils.getExcelFields(excelClass, ignores);
-        this.needHead = true;
         this.excel = excel;
+        this.needInit = true;
         return this;
     }
 
     /**
-     * Output the contents of the cache
+     * Output the contents to excel of the cache
      */
     public void flush() {
         this.writerResolver.flush(this.response, this.fileName);
@@ -309,56 +562,19 @@ public class ExcelWriter {
     }
 
     /**
-     * Write to the specified excel
-     *
-     * @param data           data
-     * @param sheetName      sheet name
-     * @param style          Excel style
-     * @param explicitValues The value in the drop-down box
-     * @param bigTitle       Big title
-     * @return this
-     */
-    public ExcelWriter write(List<?> data, String sheetName, Supplier<? extends ExcelStyle> style, Map<String, String[]> explicitValues, BigTitle bigTitle) {
-        ExcelStyle excelStyle = style.get();
-        MetaStyle metaStyle = new MetaStyle(excelStyle.setHeaderStyle(this.workbook, this.workbook.createCellStyle()), excelStyle.setBodyStyle(this.workbook, this.workbook.createCellStyle()),
-                excelStyle.setTitleStyle(this.workbook, this.workbook.createCellStyle()));
-        return this.write(data, sheetName, metaStyle, explicitValues, bigTitle);
-    }
-
-    /**
-     * To write
-     *
-     * @param data           data
-     * @param sheetName      sheet name
-     * @param metaStyle      Excel style
-     * @param explicitValues The value in the drop-down box
-     * @param bigTitle       Big title
-     * @return this
-     */
-    private ExcelWriter write(List<?> data, String sheetName, MetaStyle metaStyle, Map<String, String[]> explicitValues, BigTitle bigTitle) {
-        this.initSheet(sheetName);
-        boolean noContent = data == null || data.isEmpty();
-        this.writerResolver.writeTitle(this.headFieldList.size(), bigTitle, metaStyle, this.currentSheet)
-                .writeHead(noContent, this.headFieldList, this.currentSheet, this.needHead, metaStyle, explicitValues, excel)
-                .write(data, this.currentSheet, this.headFieldList, this.metaStyle, false);
-        this.needHead = false;
-        return this;
-    }
-
-    /**
      * Init excel sheet
      *
      * @param sheetName sheet name
      */
-    private void initSheet(String sheetName) {
+    private Sheet initSheet(String sheetName) {
         Sheet sheet = this.workbook.getSheet(sheetName);
         if (sheet == null) {
-            this.needHead = true;
             sheet = this.workbook.createSheet(sheetName);
             if (this.excel.lock()) {
                 sheet.protectSheet(this.excel.secret());
             }
+            this.needInit = true;
         }
-        this.currentSheet = sheet;
+        return sheet;
     }
 }

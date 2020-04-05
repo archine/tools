@@ -38,8 +38,8 @@ class ExcelWriteXlsResolver implements ExcelWriterResolver {
     }
 
     @Override
-    public ExcelWriterResolver writeTitle(int totalCol, BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet) {
-        this.excelHelper.setBigTitle(totalCol, bigTitle, metaStyle, sheet);
+    public ExcelWriterResolver writeTitle(BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet) {
+        this.excelHelper.setBigTitle(bigTitle, metaStyle, sheet);
         return this;
     }
 
@@ -51,15 +51,14 @@ class ExcelWriteXlsResolver implements ExcelWriterResolver {
     }
 
     @Override
-    public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList, MetaStyle metaStyle, boolean initExtension) {
-        this.excelHelper.setValue(data, headFieldList, sheet, metaStyle, initExtension);
+    public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList, MetaStyle metaStyle, boolean needInit) {
+        this.excelHelper.setValue(data, headFieldList, sheet, metaStyle, needInit);
         return this;
     }
 
     @Override
-    public ExcelWriterResolver customWrite(CustomWrite processor) {
+    public void customWrite(CustomWrite processor) {
         processor.process();
-        return this;
     }
 
     @Override

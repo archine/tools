@@ -31,18 +31,20 @@ public interface ReadCallback<R> {
     }
 
     /**
-     * The method callback occurs when the cell data is empty and the policy is set to jump
+     * This callback occurs when the currently read cell does not exist or the value is null and the current header is set to not allow null
      *
-     * @param field      Empty field
+     * @param field      Current field
      * @param excelField ExcelField annotation on that field
      * @param rowIndex   The index of the current row
      * @param colIndex   The index of the current col
+     * @return Whether to save this data
      */
-    default void readJump(Field field, ExcelField excelField, int rowIndex, int colIndex) {
+    default boolean readEmpty(Field field, ExcelField excelField, int rowIndex, int colIndex) {
+        return false;
     }
 
     /**
-     * Triggered when a reading is not empty cell
+     * Occurs when the currently read cell exists
      * @param val Current cell value
      * @param field Current field
      * @param rowIndex Current row index

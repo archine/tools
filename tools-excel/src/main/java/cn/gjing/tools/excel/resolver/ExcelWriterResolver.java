@@ -21,13 +21,12 @@ public interface ExcelWriterResolver {
     /**
      * Write excel big title
      *
-     * @param totalCol  How many columns are merged
      * @param sheet     Current sheet
      * @param metaStyle Excel meta style
      * @param bigTitle  Excel big title
      * @return this
      */
-    ExcelWriterResolver writeTitle(int totalCol, BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet);
+    ExcelWriterResolver writeTitle(BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet);
 
     /**
      * Write excel body
@@ -35,11 +34,11 @@ public interface ExcelWriterResolver {
      * @param headFieldList Fields in Excel mapped entity that map to list headers
      * @param metaStyle     Excel meta style
      * @param sheet         Current sheet
-     * @param initExtension          Is need to init extension(sum、merge、style)
      * @param data          data
+     * @param needInit      Whether need init extension and width
      * @return this
      */
-    ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList, MetaStyle metaStyle, boolean initExtension);
+    ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList, MetaStyle metaStyle, boolean needInit);
 
     /**
      * Write excel head
@@ -58,10 +57,10 @@ public interface ExcelWriterResolver {
 
     /**
      * Customize export excel head, body, big title, and so on
+     *
      * @param processor Export processor
-     * @return this
      */
-    ExcelWriterResolver customWrite(CustomWrite processor);
+    void customWrite(CustomWrite processor);
 
     /**
      * Output the contents of the cache

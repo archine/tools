@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.4.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.5.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **Java版Excel导入导出，可以灵活的在项目中进行使用**
@@ -7,21 +7,22 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>1.4.8</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 ## 二、注解说明
 ### 1、@Excel
-**在实体对象上使用，声明这是一个Excel实体，注解参数如下**     
+**在实体对象上使用，声明这是一个Excel映射实体，注解参数如下**     
 
 |参数|描述|
 |---|---|
 |value|Excel导出的文件名，优先级``低``于方法传入|
 |type|Excel导出的文档类型，默认``XLS``|
 |headHeight|列表头的行高，默认``350``|
-|maxSize|当文档类型为``XLSX``时，保留在内存中的条数，超出会将其写入到本地|
-|bufferSize|当文档类型为``XLSX``时，允许在内存中保存的字节|
-|style|Excel导出后的样式，此处配置是``全局性``的，不指定会走默认样式处理|
+|windowSize|窗口大小，当文档类型为``XLSX``时，导出时如果写入的数据超过指定大小，会将当前数据刷新到磁盘|
+|cacheRowSize|当文档类型为``XLSX``时，导入时保留在内存中的行数|
+|bufferSize|当文档类型为``XLSX``时，读取文件流的缓冲区大小|
+|style|Excel全局样式，会影响到当前映射实体下的所有表头，不指定会走默认样式处理|
 |lock|是否锁定sheet标签页|
 |secret|解锁密码|
 ### 2、@ExcelField
@@ -31,8 +32,8 @@
 |---|---|
 |value|表头名称, ``必填``|
 |width|表头所在列的整列单元格宽度，默认``5120``|
-|style|表头的样式，``优先级高于全局配置``|
-|sort|表头出现在Excel的顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
+|style|当前表头的样式，``优先级高于Excel全局样式``|
+|sort|表头在Excel文件的列顺序，序号``越小越靠前``，当序号相同时会默认按实体的``字段先后顺序``进行排序|
 |format|导出Excel时表头下方的单元格格式，``优先级高于设置样式时指定``|
 |autoMerge|表头所在列是否需要自动纵向合并相邻且值相同的单元格，默认``false``|
 |allowEmpty|表头下方的单元格是否允许空值，默认``true``，在``@ExcelAssert``校验前执行|
@@ -47,6 +48,9 @@
 |value|求和的描述，整个Excel实体中只会找``第一个开启``了求和的表头中设置的描述|
 |format|求和后的数字格式，默认整数|
 |height|行高，默认``300``|
+|align|水平位置|
+|verticalAlign|垂直位置|
+|bold|字体是否加粗|
 ### 4、@Merge
 **在@ExcelFiled注解的autoMerge参数使用，使用该注解后会自动纵向合并当前表头下相邻且值相同的单元格。``示例用法可参考第五节：注解的使用``**     
 
@@ -54,9 +58,9 @@
 |---|---|
 |open|是否开启，默认``false``|
 |empty|null值或者空字符串是否也要合并，默认``false``|
-|callback|合并回调接口类，可以通过回调进行自定义设置合并规则|
+|callback|合并回调接口类，可以通过回调进行控制合并|
 ### 5、@ExcelAssert
-**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空、正则匹配等等。。在表头的``非空策略后执行``，注解参数如下**       
+**导入时对表头下方的单元格内容进行数据有效性判断，如数据的文本长度、数字大小、是否为空、正则匹配等等。。后于表头的``allowEmpty``执行，注解参数如下**       
 
 |参数|描述|
 |---|---|
@@ -106,13 +110,13 @@
 |errorTitle|错误框标题|
 |errorContent|详细错误内容| 
 ### 9、@ExcelEnumConvert
-**枚举转换器，在字段类型为枚举时需要配置，否则在导入导出时未检测到转换器会抛出未找到转换器异常，注解参数如下。``示例用法可参考第五节：注解的使用``**     
+**枚举转换器，注解参数如下。``示例用法可参考第五节：注解的使用``**     
 
 |参数|描述|
 |---|---|
-|convert|实现了``EnumConvert``接口的类|
+|convert|实现了``EnumConvert``接口的转换类|
 ### 10、@ExcelDataConvert
-**数据转换器，导入导出时需要对数据进行加工处理的时候使用**     
+**数据转换器，导入导出时需要对数据进行加工处理的时候使用，该方式``先于接口实现数据转换器执行``**     
 
 |参数|描述|
 |---|---|
@@ -154,6 +158,7 @@ public class UserController {
     public void exportUser(HttpServletResponse response) {
         List<User> users = userService.userList();
         ExcelFactory.createWriter(User.class, response)
+                // 如果导出不想要表头，就在write方法中的needHead参数指定
                 .write(users)
                 .flush();
     }
@@ -199,7 +204,7 @@ public class UserController {
     }
 }
 ```
-**导出到不同的sheet或导出多次到同一个sheet中，只需多次调用``write()``方法，不指定sheet的名称则会写入到默认名称的sheet。导出时如若Excel实体为同一个且导出在同一个sheet时，只会出现一次表头**
+**导出到不同的sheet或导出多次到同一个sheet中，只需多次调用``write()``方法，不指定sheet的名称则会写入到默认名称的sheet**
 ```java
 /**
  * @author Gjing
@@ -285,7 +290,8 @@ public class UserController {
     @ApiOperation("导入")
     public ResponseEntity userImport(MultipartFile file) throws IOException {
         List<User> users = ExcelFactory.createReader(file.getInputStream(), User.class)
-                //不指定sheet名称，会去读默认名称的sheet，你可以多次调用read()方法进行数据导入，最后通过get()获取到所有数据
+                // 不指定sheet名称，会去读默认名称的sheet，你可以多次调用read()方法进行数据导入，
+                // 最后通过get()获取到所有数据
                 .read()
                 .get();
         userService.saveUserList(users);
@@ -361,7 +367,7 @@ public class UserController {
     }
 }
 ```
-**导入时如果需要做一些额外操作，可以通过配置Excel导入时的回调来实现，需要实现``ReadCallback``接口，该接口支持泛型**
+**导入时如果需要做一些额外操作，可以通过配置Excel导入回调来实现，需要实现``ReadCallback``接口，该接口支持泛型**
 ```java
 /**
  * 导入时的回调
@@ -372,9 +378,9 @@ public class MyReadCallback implements ReadCallback<Object> {
     /**
      * 读取完一行时发生的回调
      *
-     * @param value    这一行读完得到的对象
+     * @param value    当前行读完生成的Excel映射实体对象
      * @param rowIndex 这行的下标，下标是从0开始的
-     * @return Object 将该value原样返回
+     * @return Object value
      */
     @Override
     public Object readLine(Object value, int rowIndex) {
@@ -383,19 +389,21 @@ public class MyReadCallback implements ReadCallback<Object> {
     }
 
     /**
-     * 当读取到某个表头下的单元格是空的时候，同时该表头设置了不允许为空，会产生该回调
-     * @param field 当前为空的字段
+     * 当前读取的单元格不存在或者值为空且当前表头设置了不允许为空时发生该回调
+     * @param field 当前字段
      * @param excelField 该字段上的@ExcelField注解
      * @param rowIndex 当前单元格所在的行数下标，下标是从0开始的
      * @param colIndex 当前单元格所在的列数，下标是从0开始的
+     * @return 当前这行生成的Excel映射实体对象是否还需要保存，如果返回false，那么当前行后面的单元格不会继续进行读取，也不会再触发readLine回调
      */
     @Override
-    public void readJump(Field field, ExcelField excelField, int rowIndex, int colIndex) {
+    public boolean readEmpty(Field field, ExcelField excelField, int rowIndex, int colIndex) {
         System.out.println("当前错误的是第：" + (rowIndex + 1) + "行，第: " + (colIndex + 1) + "列");
+        return false;
     }
 
      /**
-      * 读取到每一个非空单元格时会触发该回调，如果未设置不允许为空，空字符串也会触发该回调
+      * 当前读取的单元格存在时发生该回调
       * @param val 单元格内容
       * @param field 当前字段
       * @param rowIndex 当前单元格所在的行数下标，下标是从0开始的
@@ -408,9 +416,9 @@ public class MyReadCallback implements ReadCallback<Object> {
      }
 
     /**
-     * 当前读到的所有数据，如果需要在此处进行数据插入数据库，请自行根据业务决定是否清除当前的数据
-     * @param dataList 数据集合
-     * @param rowIndex 当前下标，下标是从0开始的
+     * 当前生成的所有Excel映射实体，可以在此处进行插入数据库，为了避免数据重复插入，建议在插入数据库之后调用dataList.clear()
+     * @param dataList Excel映射实体集合
+     * @param rowIndex 当前行下标，下标是从0开始的
      * @param hasNext 是否还有数据
      */
     @Override
@@ -472,6 +480,7 @@ public enum GenderEnum {
         }
         throw new NullPointerException("没找到你的枚举");
     }
+
     /**
      * 自定义枚举转换器
      */
@@ -499,7 +508,7 @@ public class User {
 }
 ```
 ### 2、数据转换器
-**该转换器主要提供导入导出时对某个单元格进行数据加工，如数据替换、默认值设置。。转换器一共有接口方式与注解方式，``同时出现只取其一``**
+**该转换器主要提供导入导出时对某个单元格进行数据加工，如数据替换、默认值设置。。转换器目前支持接口方式与注解方式**
 #### a、实现接口方式
 **实现``DataConvert``接口，该接口支持泛型，泛型为你的实体类型**
 ```java
@@ -620,10 +629,10 @@ public class UserController {
     }
 }
 ```
-**在使用Map传递下拉框的值时，如果Excel实体``普通下拉框和级联下拉框同时存在，那么不应将这个Map缓存``，可考虑将级联下拉框的Map进行缓存，普通下拉框的值在调用时手动Put进去，否则``第二次write时
+**在使用Map传递下拉框的值时，如果Excel实体``普通下拉框和级联下拉框同时存在，那么不应将两个类型的内容都存放在一个map并缓存``，可考虑将级联下拉框的Map进行缓存，普通下拉框的值在调用时手动``put``进去，否则``第二次write时
 会丢失普通下拉框的数据``**
-### 4、动态设置合并规则
-**如若Excel实体中每个表头都想有独立的纵向合并规则，那么可使用合并回调的方式进行设置，需实现``MergeCalback``接口，该接口需指定当前Excel实体**
+### 4、控制合并
+**根据业务场景控制合并，只需实现``MergeCallback``接口，该接口需指定当前Excel实体**
 ```java
 /**
  * 如果名字是张三，我才需要合并，否则不需要
@@ -643,7 +652,7 @@ public class MyMergeCallback implements MergeCallback<User1> {
     }
 }
 ```
-**在Excel实体的表头指定**
+**在Excel实体对你需要控制的表头指定刚实现的合并回调类**
 ```java
 @Excel("测试自定义合并导出")
 public class User1 {
@@ -739,93 +748,5 @@ public class UserController {
     }
 }
 ```
-### 2、自定义校验注解的处理流程
-**自定义校验注解的处理逻辑，可以实现``ExcelDateValidation``、``ExcelNumericValidation``、``ExcelDropdownBoxValidation``接口，下面举例实现``ExcelDropdownBoxValidation``接口**
-```java
-/**
- * @author Gjing
- **/
-public class MyValid implements ExcelDropdownBoxValidation {
-    @Override
-    public boolean valid(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol, boolean locked, 
-        String fieldName, Map<String, String[]> values) {
-        return locked;
-    }
-}
-```
-**修改你实体类中对应注解的默认处理类，没有指定的注解还是会走默认处理**
-```java
-@Excel("用户列表")
-public class User {
-    @ExcelField("用户Id")
-    private Long id;
-
-    @ExcelField("用户名")
-    @ExcelDropdownBox(validClass = MyValid.class,rows = 10)
-    private String userName;
-
-    @ExcelField(value = "创建时间",format = "yyyy-MM-dd")
-    //在当前表头下方的第一行单元格中，时间只能输入在2019-10-11至2019-10-13范围的时间
-    @ExcelDateValid(expr1 = "2019-10-11",expr2 = "2019-10-13")
-    private Date createTime;
-}
-```
-### 3、自定义导出
-**自定义导出，针对于导出复杂表头或者Excel表头、正文和大标题非正常流程的场景。由于该方式代码量较大且需要对``POI有一定的了解``，对于通用场景，为了避免导出时失败或者扩展功能失效，建议还是通过``ExcelWriter``进行导出。使用时
-同之前一样，需要绑定一个Excel实体，用于初始化处理器，初始化完成之后可以随意使用其他实体**
-```java
-@RestController
-public class TestController {
-    @GetMapping("/user1_export_custom")
-    @ApiOperation("自定义导出")
-    public void user1ExportCustom(HttpServletResponse response) {
-        // 通过Excel工厂创建一个Excel导出助手(初始化你传入的Excel实体对应的核心处理器、workbook对象、元样式、列表头字段)
-        ExcelWriter writer = ExcelFactory.createWriter(User1.class, response);
-        // 通过助手获取到核心处理器
-        ExcelWriterResolver resolver = writer.getWriterResolver();
-        // 模拟数据
-        List<User1> user1List = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            user1List.add(User1.builder()
-                    .userName("用户" + i)
-                    .birthday(new Date())
-                    .genderEnum(GenderEnum.MAN)
-                    .userSalary(new BigDecimal(i))
-            .build());
-        }
-        // 通过核心处理器调用内部的自定义导出
-        resolver.customWrite(() -> {
-            // 通过助手获取到workbook对象
-            Workbook workbook = writer.getWorkbook();
-            // 创建一个sheet（因为没有通过助手直接导出，所以没有初始化默认的sheet）
-            Sheet sheet = workbook.createSheet("自定义sheet");
-            //先直接导出一个大标题
-            resolver.writeTitle(4, new BigTitle(2, "自定义导出"), writer.getMetaStyle(), sheet);
-            //创建列表头
-            Row head1Row = sheet.createRow(sheet.getPhysicalNumberOfRows());
-            Cell head1RowCell1 = head1Row.createCell(0);
-            head1RowCell1.setCellValue("名称");
-            head1RowCell1.setCellStyle(writer.getMetaStyle().getHeadStyle());
-            Cell head1RowCell2 = head1Row.createCell(1);
-            head1RowCell2.setCellValue("基本信息");
-            head1RowCell2.setCellStyle(writer.getMetaStyle().getHeadStyle());
-            sheet.addMergedRegion(new CellRangeAddress(head1Row.getRowNum(), head1Row.getRowNum(), 1, 2));
-            Cell head1RowCell = head1Row.createCell(3);
-            head1RowCell.setCellValue("生日");
-            head1RowCell.setCellStyle(writer.getMetaStyle().getHeadStyle());
-            resolver.writeHead(false, writer.getHeadFieldList(), sheet, true, writer.getMetaStyle(), null, writer.getExcel());
-            //合并
-            sheet.addMergedRegion(new CellRangeAddress(head1Row.getRowNum(), head1Row.getRowNum() + 1, 0, 0));
-            sheet.addMergedRegion(new CellRangeAddress(head1Row.getRowNum(), head1Row.getRowNum() + 1, 3, 3));
-            //将模拟的数据导出
-            resolver.write(user1List, sheet, writer.getHeadFieldList(), writer.getMetaStyle(), false);
-            //最后在来一个大标题
-            resolver.writeTitle(4, new BigTitle(1, "实现自定义"), writer.getMetaStyle(), sheet);
-        }).flush(response, "测试");
-    }
-}
-```
-* 效果图     
-![](https://upload-images.jianshu.io/upload_images/17866147-1fad1e08acb0e874.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 ---
 **Demo地址：[excel-demo](https://github.com/archine/excel-demo)**

@@ -35,16 +35,22 @@ public @interface Excel {
     short headHeight() default 350;
 
     /**
-     * The number of rows cached in memory
-     * @return 1000
+     * Window size, which is flushed to disk if more data is written to the export than the specified size
+     * @return 500
      */
-    int maxSize() default 1000;
+    int windowSize() default 500;
 
     /**
-     * The byte size cached to memory
+     * number of rows to keep in memory
+     * @return 500
+     */
+    int cacheRowSize() default 100;
+
+    /**
+     * buffer size to use when reading InputStream to file
      * @return 10240
      */
-    int bufferSize() default 10240;
+    int bufferSize() default 2048;
 
     /**
      * Excel style
