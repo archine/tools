@@ -1,9 +1,7 @@
-package cn.gjing.tools.excel.resolver;
+package cn.gjing.tools.excel.metadata;
 
 import cn.gjing.tools.excel.BigTitle;
 import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.MetaStyle;
-import cn.gjing.tools.excel.listen.CustomWrite;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import javax.servlet.http.HttpServletResponse;
@@ -21,39 +19,34 @@ public interface ExcelWriterResolver {
     /**
      * Write excel big title
      *
-     * @param sheet     Current sheet
-     * @param metaStyle Excel meta style
-     * @param bigTitle  Excel big title
+     * @param sheet    Current sheet
+     * @param bigTitle Excel big title
      * @return this
      */
-    ExcelWriterResolver writeTitle(BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet);
+    void writeTitle(BigTitle bigTitle, Sheet sheet);
 
     /**
      * Write excel body
      *
      * @param headFieldList Fields in Excel mapped entity that map to list headers
-     * @param metaStyle     Excel meta style
      * @param sheet         Current sheet
      * @param data          data
-     * @param needInit      Whether need init extension and width
      * @return this
      */
-    ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList, MetaStyle metaStyle, boolean needInit);
+    ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList);
 
     /**
      * Write excel head
      *
      * @param headFieldList     Fields in Excel mapped entity that map to list headers
+     * @param headNames         Excel head names
      * @param sheet             Current sheet
-     * @param noContent         Have data
      * @param needHead          Is needHead excel entity or sheet?
      * @param excel             Excel annotation
-     * @param metaStyle         Excel meta style
      * @param dropdownBoxValues Excel dropdown box values
      * @return this
      */
-    ExcelWriterResolver writeHead(boolean noContent, List<Field> headFieldList, Sheet sheet, boolean needHead, MetaStyle metaStyle,
-                                  Map<String, String[]> dropdownBoxValues, Excel excel);
+    ExcelWriterResolver writeHead(List<Field> headFieldList, List<String> headNames, Sheet sheet, boolean needHead, Map<String, String[]> dropdownBoxValues, Excel excel);
 
     /**
      * Customize export excel head, body, big title, and so on

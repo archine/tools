@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel.write;
+package cn.gjing.tools.excel.write.merge;
 
 import lombok.*;
 
@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-class ExcelOldModel {
+public class ExcelOldModel {
     /**
      * The last cell value
      */

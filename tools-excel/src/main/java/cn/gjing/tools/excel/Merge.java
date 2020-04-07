@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel;
 
-import cn.gjing.tools.excel.listen.MergeCallback;
-import cn.gjing.tools.excel.write.DefaultMergeCallback;
+import cn.gjing.tools.excel.write.callback.AutoColumnMergeCallback;
+import cn.gjing.tools.excel.write.merge.DefaultColumnMergeCallback;
 
 import java.lang.annotation.*;
 
@@ -28,5 +28,5 @@ public @interface Merge {
      * Custom Settings merge rules
      * @return DefaultMergeCallback
      */
-    Class<? extends MergeCallback<?>> callback() default DefaultMergeCallback.class;
+    Class<? extends AutoColumnMergeCallback<?>> callback() default DefaultColumnMergeCallback.class;
 }

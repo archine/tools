@@ -4,7 +4,7 @@ import lombok.*;
 import org.apache.poi.ss.usermodel.CellStyle;
 
 /**
- * Style metadata
+ * Excel meta style
  *
  * @author Gjing
  **/

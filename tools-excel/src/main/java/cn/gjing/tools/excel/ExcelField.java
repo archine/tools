@@ -56,13 +56,6 @@ public @interface ExcelField {
     Sum sum() default @Sum;
 
     /**
-     * Excel style
-     *
-     * @return ExcelStyle
-     */
-    Class<? extends ExcelStyle> style() default DefaultExcelStyle.class;
-
-    /**
      * Is allow empty
      *
      * @return boolean

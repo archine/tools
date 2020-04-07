@@ -1,9 +1,11 @@
 package cn.gjing.tools.excel;
 
 
+import cn.gjing.tools.excel.write.style.DefaultExcelStyle;
+
 import java.lang.annotation.*;
 
-import static cn.gjing.tools.excel.Type.XLS;
+import static cn.gjing.tools.excel.ExcelType.XLS;
 
 /**
  * Excel mapped entity annotation
@@ -26,7 +28,7 @@ public @interface Excel {
      *
      * @return Type
      */
-    Type type() default XLS;
+    ExcelType type() default XLS;
 
     /**
      * Excel head row height
@@ -57,7 +59,7 @@ public @interface Excel {
      *
      * @return ExcelStyle
      */
-    Class<? extends ExcelStyle> style() default DefaultExcelStyle.class;
+    Class<?> style() default DefaultExcelStyle.class;
 
     /**
      * Lock sheet

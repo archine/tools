@@ -1,13 +1,13 @@
-package cn.gjing.tools.excel.write;
+package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.BigTitle;
 import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.MetaStyle;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
-import cn.gjing.tools.excel.listen.CustomWrite;
-import cn.gjing.tools.excel.resolver.ExcelWriterResolver;
+import cn.gjing.tools.excel.metadata.CustomWrite;
+import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
+import cn.gjing.tools.excel.write.listener.WriteListener;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -23,36 +23,35 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Xlsx resolver
+ * XLS resolver
  *
  * @author Gjing
  **/
-class ExcelWriteXlsxResolver implements ExcelWriterResolver {
-    private SXSSFWorkbook workbook;
+class ExcelWriteXlsResolver implements ExcelWriterResolver {
+    private HSSFWorkbook workbook;
     private OutputStream outputStream;
     private ExcelHelper excelHelper;
 
-    ExcelWriteXlsxResolver(SXSSFWorkbook workbook) {
+    ExcelWriteXlsResolver(HSSFWorkbook workbook, Map<Class<? extends WriteListener>, List<WriteListener>> writeListenerMap) {
         this.workbook = workbook;
-        this.excelHelper = new ExcelHelper(workbook);
+        this.excelHelper = new ExcelHelper(workbook, writeListenerMap);
     }
 
     @Override
-    public ExcelWriterResolver writeTitle(BigTitle bigTitle, MetaStyle metaStyle, Sheet sheet) {
-        this.excelHelper.setBigTitle(bigTitle, metaStyle, sheet);
-        return this;
+    public void writeTitle(BigTitle bigTitle, Sheet sheet) {
+        this.excelHelper.setBigTitle(bigTitle, sheet);
     }
 
     @Override
-    public ExcelWriterResolver writeHead(boolean noContent, List<Field> headFieldList, Sheet sheet, boolean needHead, MetaStyle metaStyle,
+    public ExcelWriterResolver writeHead(List<Field> headFieldList, List<String> headNames, Sheet sheet, boolean needHead,
                                          Map<String, String[]> dropdownBoxValues, Excel excel) {
-        this.excelHelper.setHead(noContent, headFieldList, sheet, needHead, metaStyle, dropdownBoxValues, excel);
+        this.excelHelper.setHead(headFieldList, headNames, sheet, needHead, dropdownBoxValues, excel);
         return this;
     }
 
     @Override
-    public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList, MetaStyle metaStyle, boolean needInit) {
-        this.excelHelper.setValue(data, headFieldList, sheet, metaStyle, needInit);
+    public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList) {
+        this.excelHelper.setValue(data, headFieldList, sheet);
         return this;
     }
 
@@ -71,9 +70,9 @@ class ExcelWriteXlsxResolver implements ExcelWriterResolver {
             } else {
                 fileName = URLEncoder.encode(fileName, "UTF-8");
             }
-            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xls");
             this.outputStream = response.getOutputStream();
-            this.workbook.write(outputStream);
+            this.workbook.write(this.outputStream);
         } catch (IOException e) {
             throw new ExcelResolverException("Excel cache data refresh failure, " + e.getMessage());
         } finally {

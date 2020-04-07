@@ -54,20 +54,28 @@ public final class BeanUtils {
      *
      * @param excelClass Excel mapped entity
      * @param ignores    The exported field is to be ignored
-     * @return Annotated fields
+     * @return Excel fields
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores) {
+    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String> headNames) {
         Field[] declaredFields = excelClass.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = excelClass.getSuperclass();
         if (superclass != Object.class) {
             fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
         }
-        return fieldList.stream()
+        fieldList = fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .filter(e -> ParamUtils.noContains(ignores, e.getAnnotation(ExcelField.class).value()))
+                .filter(e -> {
+                    String value = e.getAnnotation(ExcelField.class).value();
+                    boolean noContains = ParamUtils.noContains(ignores, value);
+                    if (noContains) {
+                        headNames.add(value);
+                    }
+                    return noContains;
+                })
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).sort()))
                 .collect(Collectors.toList());
+        return fieldList;
     }
 
     /**
