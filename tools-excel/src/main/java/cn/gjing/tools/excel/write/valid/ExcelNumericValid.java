@@ -13,13 +13,6 @@ import java.lang.annotation.*;
 public @interface ExcelNumericValid {
 
     /**
-     * Validator Class
-     *
-     * @return ExcelValidation
-     */
-    Class<? extends ExcelNumericValidation> validClass() default DefaultNumericValidation.class;
-
-    /**
      * Check the number of rows
      *
      * @return 200

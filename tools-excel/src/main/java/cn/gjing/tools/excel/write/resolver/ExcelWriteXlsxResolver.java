@@ -44,8 +44,8 @@ class ExcelWriteXlsxResolver implements ExcelWriterResolver {
 
     @Override
     public ExcelWriterResolver writeHead(List<Field> headFieldList, List<String[]> headNames, Sheet sheet, boolean needHead,
-                                         Map<String, String[]> dropdownBoxValues, Excel excel) {
-        this.excelExecutor.setHead(headFieldList, headNames, sheet, needHead, dropdownBoxValues, excel);
+                                         Map<String, String[]> boxValues, Excel excel, boolean needValid) {
+        this.excelExecutor.setHead(headFieldList, headNames, sheet, needHead, boxValues, excel,needHead);
         return this;
     }
 

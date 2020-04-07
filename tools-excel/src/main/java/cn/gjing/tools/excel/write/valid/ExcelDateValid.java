@@ -13,13 +13,6 @@ import java.lang.annotation.*;
 public @interface ExcelDateValid {
 
     /**
-     * Validator Class
-     *
-     * @return ExcelValidation
-     */
-    Class<? extends ExcelDateValidation> validClass() default DefaultDateValidation.class;
-
-    /**
      * Check the number of rows
      *
      * @return 200
