@@ -20,11 +20,14 @@ public class BigTitle {
     @Builder.Default
     private int lines = 2;
 
+    /**
+     * First col index
+     */
     @Builder.Default
     private int firstCol = 0;
 
     /**
-     * How many columns, 0 is the number of following excel header size
+     * Last col index, 0 is the number of following excel header size
      */
     @Builder.Default
     private int lastCols = 0;

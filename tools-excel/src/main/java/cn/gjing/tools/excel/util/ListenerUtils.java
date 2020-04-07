@@ -14,28 +14,21 @@ import java.util.List;
  **/
 public class ListenerUtils {
 
-    public static void createdCell(List<WriteListener> listeners, Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, String headName, int rowIndex, int colIndex, boolean isHead, Object value) {
+    public static void completeCell(List<WriteListener> listeners, Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, String headName, int rowIndex, int colIndex, boolean isHead, Object value) {
         if (listeners != null) {
-            listeners.forEach(e -> ((BaseCellWriteListener) e).createdCell(sheet, row, cell, excelField, field, headName, rowIndex, colIndex, isHead, value));
+            listeners.forEach(e -> ((BaseCellWriteListener) e).completeCell(sheet, row, cell, excelField, field, headName, rowIndex, colIndex, isHead, value));
         }
     }
 
-    public static void createdRow(List<WriteListener> listeners, Sheet sheet, Row row, int rowIndex, boolean isHead) {
+    public static void completeRow(List<WriteListener> listeners, Sheet sheet, Row row, int rowIndex, boolean isHead) {
         if (listeners != null) {
-            listeners.forEach(e -> ((BaseRowWriteListener) e).createdRow(sheet, row, rowIndex, isHead));
+            listeners.forEach(e -> ((BaseRowWriteListener) e).completeRow(sheet, row, rowIndex, isHead));
         }
     }
 
-    public static void createdSheet(List<WriteListener> listeners, Sheet sheet) {
+    public static void completeSheet(List<WriteListener> listeners, Sheet sheet) {
         if (listeners != null) {
-            listeners.forEach(e -> ((BaseSheetWriteListener) e).createdSheet(sheet));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static<T> void merge(List<WriteListener> listeners, Sheet sheet,Row row,int rowIndex,T currentObj) {
-        if (listeners != null) {
-            listeners.forEach(e -> ((BaseMergeWriteListener<T>) e).merge(sheet, row, rowIndex, currentObj));
+            listeners.forEach(e -> ((BaseSheetWriteListener) e).completeSheet(sheet));
         }
     }
 }

@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel;
 
-import cn.gjing.tools.excel.write.callback.AutoColumnMergeCallback;
-import cn.gjing.tools.excel.write.merge.DefaultColumnMergeCallback;
+import cn.gjing.tools.excel.write.callback.AutoMergeCallback;
+import cn.gjing.tools.excel.write.callback.DefaultAutoMergeCallback;
 
 import java.lang.annotation.*;
 
@@ -14,19 +14,22 @@ import java.lang.annotation.*;
 public @interface Merge {
     /**
      * Whether to enable row merge
+     *
      * @return false
      */
     boolean open() default false;
 
     /**
      * Whether to merge empty
+     *
      * @return boolean
      */
     boolean empty() default false;
 
     /**
-     * Custom Settings merge rules
+     * Callback strategy
+     *
      * @return DefaultMergeCallback
      */
-    Class<? extends AutoColumnMergeCallback<?>> callback() default DefaultColumnMergeCallback.class;
+    Class<? extends AutoMergeCallback<?>> callback() default DefaultAutoMergeCallback.class;
 }

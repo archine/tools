@@ -8,7 +8,7 @@
         <version>2.1.9</version>
     </parent>
     <artifactId>tools-excel</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
     <name>tools-excel</name>
     <description>Excel导入导出工具</description>
 

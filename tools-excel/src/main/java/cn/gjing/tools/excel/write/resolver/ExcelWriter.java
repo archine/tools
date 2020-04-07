@@ -6,6 +6,7 @@ import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.metadata.CustomWrite;
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
+import cn.gjing.tools.excel.util.ListenerUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.listener.*;
 import cn.gjing.tools.excel.write.style.DefaultExcelStyle;
@@ -34,20 +35,21 @@ public class ExcelWriter {
     @Getter
     private List<Field> headFieldList;
     @Getter
-    private List<String> headNames;
+    private List<String[]> headNames;
     @Getter
     private Excel excel;
     @Getter
     private String defaultSheetName = "sheet1";
     @Getter
     private Map<Class<? extends WriteListener>, List<WriteListener>> writeListenerMap;
+    private Boolean needValid;
     private ExcelWriterResolver writerResolver;
 
     private ExcelWriter() {
 
     }
 
-    public ExcelWriter(String fileName, Excel excel, HttpServletResponse response, List<Field> headFieldList, boolean initDefaultStyle, List<String> headNames) {
+    public ExcelWriter(String fileName, Excel excel, HttpServletResponse response, List<Field> headFieldList, boolean initDefaultStyle, List<String[]> headNames) {
         this.fileName = fileName;
         this.response = response;
         this.headFieldList = headFieldList;
@@ -56,7 +58,7 @@ public class ExcelWriter {
         this.writeListenerMap = new HashMap<>(8);
         this.initResolver(excel);
         if (initDefaultStyle) {
-            this.initStyle();
+            this.initStyle(workbook);
         }
     }
 
@@ -83,11 +85,13 @@ public class ExcelWriter {
     /**
      * Init default style
      */
-    private void initStyle() {
+    private void initStyle(Workbook workbook) {
         List<WriteListener> cellWriteListeners = this.writeListenerMap.get(BaseCellWriteListener.class);
         if (cellWriteListeners == null) {
             cellWriteListeners = new ArrayList<>();
         }
+        DefaultExcelStyle defaultExcelStyle = new DefaultExcelStyle();
+        defaultExcelStyle.init(workbook);
         cellWriteListeners.add(new DefaultExcelStyle());
         this.writeListenerMap.put(BaseCellWriteListener.class, cellWriteListeners);
     }
@@ -96,11 +100,32 @@ public class ExcelWriter {
      * To write
      *
      * @param data      data
+     * @return this
+     */
+    public ExcelWriter write(List<?> data) {
+        return this.write(this.defaultSheetName, data, true, null, this.headNames);
+    }
+
+    /**
+     * To write
+     *
+     * @param data      data
      * @param headNames Excel head names
      * @return this
      */
-    public ExcelWriter write(List<?> data, String... headNames) {
-        return this.write(this.defaultSheetName, data, true, null, headNames);
+    public ExcelWriter write(List<?> data, List<String[]> headNames) {
+        return this.write(this.defaultSheetName, data, true, null,headNames);
+    }
+
+    /**
+     * To write
+     *
+     * @param data      data
+     * @param sheetName sheet name
+     * @return this
+     */
+    public ExcelWriter write(String sheetName, List<?> data) {
+        return this.write(sheetName, data, true, null, this.headNames);
     }
 
     /**
@@ -111,8 +136,19 @@ public class ExcelWriter {
      * @param headNames Excel head names
      * @return this
      */
-    public ExcelWriter write(String sheetName, List<?> data, String... headNames) {
+    public ExcelWriter write(String sheetName, List<?> data, List<String[]> headNames) {
         return this.write(sheetName, data, true, null, headNames);
+    }
+
+    /**
+     * To write
+     *
+     * @param data      data
+     * @param needHead  Whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, boolean needHead) {
+        return this.write(this.defaultSheetName, data, needHead, null, this.headNames);
     }
 
     /**
@@ -123,7 +159,7 @@ public class ExcelWriter {
      * @param needHead  Whether need excel head
      * @return this
      */
-    public ExcelWriter write(List<?> data, boolean needHead, String... headNames) {
+    public ExcelWriter write(List<?> data, boolean needHead, List<String[]> headNames) {
         return this.write(this.defaultSheetName, data, needHead, null, headNames);
     }
 
@@ -132,12 +168,35 @@ public class ExcelWriter {
      *
      * @param data      data
      * @param sheetName sheet name
+     * @param needHead  Whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(String sheetName, List<?> data, boolean needHead) {
+        return this.write(sheetName, data, needHead, null, this.headNames);
+    }
+
+    /**
+     * To write
+     *
+     * @param data      data
+     * @param sheetName sheet name
      * @param headNames Excel head names
      * @param needHead  Whether need excel head
      * @return this
      */
-    public ExcelWriter write(String sheetName, List<?> data, boolean needHead, String... headNames) {
+    public ExcelWriter write(String sheetName, List<?> data, boolean needHead, List<String[]> headNames) {
         return this.write(sheetName, data, needHead, null, headNames);
+    }
+
+    /**
+     * To write
+     *
+     * @param data      data
+     * @param boxValues dropdown box values
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, Map<String, String[]> boxValues) {
+        return this.write(this.defaultSheetName, data, true, boxValues, this.headNames);
     }
 
     /**
@@ -148,7 +207,7 @@ public class ExcelWriter {
      * @param headNames Excel head names
      * @return this
      */
-    public ExcelWriter write(List<?> data, Map<String, String[]> boxValues, String... headNames) {
+    public ExcelWriter write(List<?> data, Map<String, String[]> boxValues, List<String[]> headNames) {
         return this.write(this.defaultSheetName, data, true, boxValues, headNames);
     }
 
@@ -158,11 +217,35 @@ public class ExcelWriter {
      * @param data      data
      * @param sheetName sheet name
      * @param boxValues dropdown box values
+     * @return this
+     */
+    public ExcelWriter write(String sheetName, List<?> data, Map<String, String[]> boxValues) {
+        return this.write(sheetName, data, true, boxValues, this.headNames);
+    }
+
+    /**
+     * To write
+     *
+     * @param data      data
+     * @param sheetName sheet name
+     * @param boxValues dropdown box values
      * @param headNames Excel head names
      * @return this
      */
-    public ExcelWriter write(String sheetName, List<?> data, Map<String, String[]> boxValues, String... headNames) {
+    public ExcelWriter write(String sheetName, List<?> data, Map<String, String[]> boxValues, List<String[]> headNames) {
         return this.write(sheetName, data, true, boxValues, headNames);
+    }
+
+    /**
+     * To write
+     *
+     * @param data      data
+     * @param boxValues dropdown box values
+     * @param needHead  Whether need excel head
+     * @return this
+     */
+    public ExcelWriter write(List<?> data, boolean needHead, Map<String, String[]> boxValues) {
+        return this.write(this.defaultSheetName, data, needHead, boxValues, this.headNames);
     }
 
     /**
@@ -174,7 +257,7 @@ public class ExcelWriter {
      * @param needHead  Whether need excel head
      * @return this
      */
-    public ExcelWriter write(List<?> data, boolean needHead, Map<String, String[]> boxValues, String... headNames) {
+    public ExcelWriter write(List<?> data, boolean needHead, Map<String, String[]> boxValues, List<String[]> headNames) {
         return this.write(this.defaultSheetName, data, needHead, boxValues, headNames);
     }
 
@@ -189,9 +272,9 @@ public class ExcelWriter {
      * @param needHead  Whether need excel head
      * @return this
      */
-    public ExcelWriter write(String sheetName, List<?> data, boolean needHead, Map<String, String[]> boxValues, String... headNames) {
+    public ExcelWriter write(String sheetName, List<?> data, boolean needHead, Map<String, String[]> boxValues, List<String[]> headNames) {
         Sheet sheet = this.createSheet(sheetName);
-        this.writerResolver.writeHead(this.headFieldList, headNames == null ? this.headNames : Arrays.asList(headNames), sheet, needHead, boxValues, excel)
+        this.writerResolver.writeHead(this.headFieldList, headNames == null ? this.headNames : headNames, sheet, needHead, boxValues, excel, this.needValid)
                 .write(data, sheet, this.headFieldList);
         return this;
     }
@@ -275,8 +358,8 @@ public class ExcelWriter {
             }
             listeners.add(listener);
         }
-        if (listener instanceof BaseMergeWriteListener) {
-            List<WriteListener> listeners = this.writeListenerMap.get(BaseCellWriteListener.class);
+        if (listener instanceof BaseCascadingDropdownBoxListener) {
+            List<WriteListener> listeners = this.writeListenerMap.get(BaseCascadingDropdownBoxListener.class);
             if (listeners == null) {
                 listeners = new ArrayList<>();
             }
@@ -335,9 +418,7 @@ public class ExcelWriter {
         Sheet sheet = this.workbook.getSheet(sheetName);
         if (sheet == null) {
             sheet = this.workbook.createSheet(sheetName);
-            if (this.excel.lock()) {
-                sheet.protectSheet(this.excel.secret());
-            }
+            ListenerUtils.completeSheet(this.writeListenerMap.get(BaseSheetWriteListener.class), sheet);
         }
         return sheet;
     }

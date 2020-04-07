@@ -12,6 +12,7 @@ import java.util.Map;
 public class DefaultExcelStyle implements BaseExcelStyleListener {
     private Workbook workbook;
     private CellStyle titleStyle;
+    private CellStyle sumStyle;
     private Map<String, CellStyle> headStyle;
     private Map<String, CellStyle> bodyStyle;
 
@@ -35,7 +36,7 @@ public class DefaultExcelStyle implements BaseExcelStyleListener {
     }
 
     @Override
-    public void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int rowIndex, int colIndex) {
+    public void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex) {
         CellStyle cellStyle = this.headStyle.get(headName);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
@@ -54,7 +55,7 @@ public class DefaultExcelStyle implements BaseExcelStyleListener {
     }
 
     @Override
-    public void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int rowIndex, int colIndex) {
+    public void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex) {
         CellStyle cellStyle = this.bodyStyle.get(headName);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
@@ -71,11 +72,13 @@ public class DefaultExcelStyle implements BaseExcelStyleListener {
     }
 
     @Override
-    public void createdCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, String headName, int rowIndex, int colIndex, boolean isHead, Object value) {
+    public void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, String headName, int index,
+                             int colIndex, boolean isHead, Object value) {
         if (isHead) {
-            this.setHeadStyle(row, cell, excelField, field, headName, rowIndex, colIndex);
+            sheet.setColumnWidth(colIndex, excelField.width());
+            this.setHeadStyle(row, cell, excelField, field, headName, index, colIndex);
             return;
         }
-        this.setBodyStyle(row, cell, excelField, field, headName, rowIndex, colIndex);
+        this.setBodyStyle(row, cell, excelField, field, headName, index, colIndex);
     }
 }

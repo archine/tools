@@ -19,7 +19,7 @@ public @interface ExcelField {
      *
      * @return name
      */
-    String value();
+    String[] value() default {};
 
     /**
      * Excel header width
@@ -33,10 +33,11 @@ public @interface ExcelField {
      *
      * @return sort index
      */
-    int sort() default 99;
+    int sort() default -1;
 
     /**
      * Column format
+     *
      * @return format
      */
     String format() default "";

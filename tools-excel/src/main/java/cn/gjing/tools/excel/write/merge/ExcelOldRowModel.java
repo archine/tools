@@ -10,11 +10,11 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExcelOldModel {
+public class ExcelOldRowModel {
     /**
-     * The last cell value
+     * The last row cell value
      */
-    private Object oldValue;
+    private Object oldRowCellValue;
     /**
      * The ord row index
      */

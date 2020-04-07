@@ -51,12 +51,11 @@ public class ExcelFactory {
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<String> headNames = new ArrayList<>();
+        List<String[]> headNames = new ArrayList<>();
         List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, ignores, headNames);
         return new ExcelWriter(fileName == null ? "".equals(excel.value()) ? UUID.randomUUID().toString().replaceAll("-", "") : excel.value() : fileName,
                 excel, response, excelFieldList, initDefaultStyle, headNames);
     }
-
 
     /**
      * Create an Excel read

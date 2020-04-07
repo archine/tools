@@ -12,5 +12,5 @@ public interface BaseSheetWriteListener extends WriteListener{
      * Has been created
      * @param sheet Create the finished sheet
      */
-    void createdSheet(Sheet sheet);
+    void completeSheet(Sheet sheet);
 }

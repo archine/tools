@@ -21,7 +21,6 @@ public interface ExcelWriterResolver {
      *
      * @param sheet    Current sheet
      * @param bigTitle Excel big title
-     * @return this
      */
     void writeTitle(BigTitle bigTitle, Sheet sheet);
 
@@ -38,15 +37,17 @@ public interface ExcelWriterResolver {
     /**
      * Write excel head
      *
-     * @param headFieldList     Fields in Excel mapped entity that map to list headers
-     * @param headNames         Excel head names
-     * @param sheet             Current sheet
-     * @param needHead          Is needHead excel entity or sheet?
-     * @param excel             Excel annotation
-     * @param dropdownBoxValues Excel dropdown box values
+     * @param headFieldList Fields in Excel mapped entity that map to list headers
+     * @param headNames     Excel head names
+     * @param sheet         Current sheet
+     * @param needHead      Is needHead excel entity or sheet?
+     * @param excel         Excel annotation
+     * @param boxValues     Excel dropdown box values
+     * @param needValid     Whether need valid
      * @return this
      */
-    ExcelWriterResolver writeHead(List<Field> headFieldList, List<String> headNames, Sheet sheet, boolean needHead, Map<String, String[]> dropdownBoxValues, Excel excel);
+    ExcelWriterResolver writeHead(List<Field> headFieldList, List<String[]> headNames, Sheet sheet, boolean needHead, Map<String, String[]> boxValues,
+                                  Excel excel, boolean needValid);
 
     /**
      * Customize export excel head, body, big title, and so on

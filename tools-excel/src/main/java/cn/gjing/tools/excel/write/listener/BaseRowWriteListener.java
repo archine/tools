@@ -13,10 +13,10 @@ public interface BaseRowWriteListener extends WriteListener {
     /**
      * All the cells for the current row are created
      *
-     * @param sheet    Current sheet
-     * @param row      Create the finished row
-     * @param rowIndex Current row index
-     * @param isHead   Whether is excel head
+     * @param sheet  Current sheet
+     * @param row    Create the finished row
+     * @param index  Line index, index type according to isHead
+     * @param isHead Whether is excel head
      */
-    void createdRow(Sheet sheet, Row row, int rowIndex, boolean isHead);
+    void completeRow(Sheet sheet, Row row, int index, boolean isHead);
 }

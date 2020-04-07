@@ -31,26 +31,26 @@ public interface BaseExcelStyleListener extends BaseCellWriteListener {
     /**
      * Set excel head style
      *
-     * @param row      Current row
-     * @param cell     Current cell
-     * @param rowIndex Row index
-     * @param colIndex cell index
+     * @param row        Current row
+     * @param cell       Current cell
+     * @param index      Line index, index type according to isHead
+     * @param colIndex   cell index
      * @param excelField ExcelField annotation of current field
-     * @param field Current field
-     * @param headName The header name of the list where the cell resides
+     * @param field      Current field
+     * @param headName   The header name of the list where the cell resides
      */
-    void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int rowIndex, int colIndex);
+    void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex);
 
     /**
      * Set excel body style
      *
-     * @param row      Current row
-     * @param cell     Current cell
-     * @param rowIndex Row index
-     * @param colIndex cell index
+     * @param row        Current row
+     * @param cell       Current cell
+     * @param index      Line index, index type according to isHead
+     * @param colIndex   cell index
      * @param excelField ExcelField annotation of current field
-     * @param field Current field
-     * @param headName The header name of the list where the cell resides
+     * @param field      Current field
+     * @param headName   The header name of the list where the cell resides
      */
-    void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int rowIndex, int colIndex);
+    void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex);
 }

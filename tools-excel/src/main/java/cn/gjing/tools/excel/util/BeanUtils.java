@@ -56,7 +56,7 @@ public final class BeanUtils {
      * @param ignores    The exported field is to be ignored
      * @return Excel fields
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String> headNames) {
+    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String[]> headNames) {
         Field[] declaredFields = excelClass.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = excelClass.getSuperclass();
@@ -66,12 +66,13 @@ public final class BeanUtils {
         fieldList = fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .filter(e -> {
-                    String value = e.getAnnotation(ExcelField.class).value();
-                    boolean noContains = ParamUtils.noContains(ignores, value);
-                    if (noContains) {
-                        headNames.add(value);
-                    }
-                    return noContains;
+//                    String[] value = e.getAnnotation(ExcelField.class).value();
+//                    boolean noContains = ParamUtils.noContains(ignores, value[value.length - 1]);
+//                    if (!noContains) {
+//                        System.arraycopy(value,0,new String[],);
+//                    }
+                    headNames.add(e.getAnnotation(ExcelField.class).value());
+                    return true;
                 })
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).sort()))
                 .collect(Collectors.toList());

@@ -30,28 +30,28 @@ import java.util.Objects;
 class ExcelWriteXlsResolver implements ExcelWriterResolver {
     private HSSFWorkbook workbook;
     private OutputStream outputStream;
-    private ExcelHelper excelHelper;
+    private ExcelExecutor excelExecutor;
 
     ExcelWriteXlsResolver(HSSFWorkbook workbook, Map<Class<? extends WriteListener>, List<WriteListener>> writeListenerMap) {
         this.workbook = workbook;
-        this.excelHelper = new ExcelHelper(workbook, writeListenerMap);
+        this.excelExecutor = new ExcelExecutor(workbook, writeListenerMap);
     }
 
     @Override
     public void writeTitle(BigTitle bigTitle, Sheet sheet) {
-        this.excelHelper.setBigTitle(bigTitle, sheet);
+        this.excelExecutor.setBigTitle(bigTitle, sheet);
     }
 
     @Override
-    public ExcelWriterResolver writeHead(List<Field> headFieldList, List<String> headNames, Sheet sheet, boolean needHead,
-                                         Map<String, String[]> dropdownBoxValues, Excel excel) {
-        this.excelHelper.setHead(headFieldList, headNames, sheet, needHead, dropdownBoxValues, excel);
+    public ExcelWriterResolver writeHead(List<Field> headFieldList, List<String[]> headNames, Sheet sheet, boolean needHead,
+                                         Map<String, String[]> dropdownBoxValues, Excel excel, boolean needValid) {
+        this.excelExecutor.setHead(headFieldList, headNames, sheet, needHead, dropdownBoxValues, excel, needValid);
         return this;
     }
 
     @Override
     public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList) {
-        this.excelHelper.setValue(data, headFieldList, sheet);
+        this.excelExecutor.setValue(data, headFieldList, sheet);
         return this;
     }
 

@@ -60,16 +60,4 @@ public @interface Excel {
      * @return ExcelStyle
      */
     Class<?> style() default DefaultExcelStyle.class;
-
-    /**
-     * Lock sheet
-     * @return false
-     */
-    boolean lock() default false;
-
-    /**
-     * Unlock password
-     * @return ""
-     */
-    String secret() default "";
 }
