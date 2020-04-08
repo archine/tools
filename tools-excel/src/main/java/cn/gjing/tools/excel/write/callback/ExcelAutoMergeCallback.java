@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
  *
  * @author Gjing
  **/
-public interface AutoMergeCallback<T> {
+public interface ExcelAutoMergeCallback<T> {
     /**
      * Horizontal merger
      *

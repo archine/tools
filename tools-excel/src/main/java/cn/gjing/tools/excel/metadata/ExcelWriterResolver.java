@@ -1,10 +1,9 @@
 package cn.gjing.tools.excel.metadata;
 
 import cn.gjing.tools.excel.write.BigTitle;
-import org.apache.poi.ss.usermodel.Sheet;
+import cn.gjing.tools.excel.write.ExcelWriterContext;
 
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -15,44 +14,37 @@ import java.util.Map;
  **/
 public interface ExcelWriterResolver {
 
+    void init(ExcelWriterContext context);
+
     /**
      * Write excel big title
      *
-     * @param sheet    Current sheet
      * @param bigTitle Excel big title
      */
-    void writeTitle(BigTitle bigTitle, Sheet sheet);
+    void writeTitle(BigTitle bigTitle);
 
     /**
      * Write excel body
      *
-     * @param headFieldList Fields in Excel mapped entity that map to list headers
-     * @param sheet         Current sheet
      * @param data          data
      * @return this
      */
-    ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList);
+    ExcelWriterResolver write(List<?> data);
 
     /**
      * Write excel head
      *
-     * @param headFieldList Fields in Excel mapped entity that map to list headers
-     * @param headNames     Excel head names
-     * @param sheet         Current sheet
      * @param needHead      Is needHead excel entity or sheet?
      * @param boxValues     Excel dropdown box values
-     * @param needValid     Whether need valid
-     * @param isMulti       Whether is multi head
      * @return this
      */
-    ExcelWriterResolver writeHead(List<Field> headFieldList, List<String[]> headNames, Sheet sheet, boolean needHead, Map<String, String[]> boxValues,
-                                  boolean needValid, boolean isMulti);
+    ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> boxValues);
 
     /**
      * Output the contents of the cache
      *
-     * @param fileName file name
+     * @param context Excel write context
      * @param response response
      */
-    void flush(HttpServletResponse response, String fileName);
+    void flush(HttpServletResponse response, ExcelWriterContext context);
 }

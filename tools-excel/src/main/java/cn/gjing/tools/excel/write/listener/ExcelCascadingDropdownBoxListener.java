@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
  * @author Gjing
  **/
 @FunctionalInterface
-public interface CascadingDropdownBoxListener extends WriteListener {
+public interface ExcelCascadingDropdownBoxListener extends ExcelWriteListener {
     /**
      * Add cascading dropdown box
      *

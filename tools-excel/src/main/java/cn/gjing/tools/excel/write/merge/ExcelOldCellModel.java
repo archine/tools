@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExcelOldCellModel {
+public final class ExcelOldCellModel {
     private Object lastCellValue;
 
     private int lastCellIndex;

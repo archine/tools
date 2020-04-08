@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write.merge;
 
-import cn.gjing.tools.excel.write.callback.AutoMergeCallback;
-import cn.gjing.tools.excel.write.callback.DefaultAutoMergeCallback;
+import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
+import cn.gjing.tools.excel.write.callback.DefaultExcelAutoMergeCallback;
 
 import java.lang.annotation.*;
 
@@ -31,5 +31,5 @@ public @interface Merge {
      *
      * @return DefaultMergeCallback
      */
-    Class<? extends AutoMergeCallback<?>> callback() default DefaultAutoMergeCallback.class;
+    Class<? extends ExcelAutoMergeCallback<?>> callback() default DefaultExcelAutoMergeCallback.class;
 }

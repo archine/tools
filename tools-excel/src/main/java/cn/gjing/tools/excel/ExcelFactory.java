@@ -3,28 +3,29 @@ package cn.gjing.tools.excel;
 import cn.gjing.tools.excel.read.resolver.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
+import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.resolver.ExcelWriter;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Excel factory
  *
  * @author Gjing
  **/
-public class ExcelFactory {
+public final class ExcelFactory {
 
     private ExcelFactory() {
 
     }
 
     /**
-     * Create an Excel write
+     * Create an excel writer
      *
      * @param excelClass Excel mapped entity
      * @param response   response
@@ -35,26 +36,39 @@ public class ExcelFactory {
         return createWriter(null, excelClass, response, true, ignores);
     }
 
+    /**
+     * Create an excel writer
+     *
+     * @param excelClass       Excel mapped entity
+     * @param response         response
+     * @param ignores          The exported field is to be ignored
+     * @param initDefaultStyle Whether init  default excel style
+     * @return ExcelWriter
+     */
     public static ExcelWriter createWriter(Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
         return createWriter(null, excelClass, response, initDefaultStyle, ignores);
     }
 
     /**
-     * Create an Excel write
+     * Create an excel writer
      *
      * @param fileName   Excel file name，The priority is higher than the annotation specification
      * @param excelClass Excel mapped entity
      * @param response   response
      * @param ignores    The exported field is to be ignored
+     * @param initDefaultStyle Whether init  default excel style
      * @return ExcelWriter
      */
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
         List<String[]> headerNames = new ArrayList<>();
-        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, ignores, headerNames);
-        return new ExcelWriter(fileName == null ? "".equals(excel.value()) ? UUID.randomUUID().toString().replaceAll("-", "") : excel.value() : fileName,
-                excel, response, excelFieldList, initDefaultStyle, headerNames);
+        ExcelWriterContext context = ExcelWriterContext.builder()
+                .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerNames))
+                .headNames(headerNames)
+                .fileName(fileName == null ? "".equals(excel.value()) ? LocalDate.now().toString() : excel.value() : fileName)
+                .build();
+        return new ExcelWriter(context, excel, response, initDefaultStyle);
     }
 
     /**

@@ -13,14 +13,14 @@ import java.lang.reflect.Field;
  * @author Gjing
  **/
 @FunctionalInterface
-public interface CellWriteListener extends WriteListener {
+public interface ExcelCellWriteListener extends ExcelWriteListener {
     /**
      * Cell assignment complete (include data convert complete)
      *
      * @param sheet      Current sheet
      * @param row        Current row
      * @param cell       Current cell
-     * @param index      Line index, index type according to isHead
+     * @param index      Line index, index type according to isHead, Starting from 0
      * @param colIndex   Current cell index
      * @param isHead     Whether is excel head
      * @param excelField ExcelField annotation of current field

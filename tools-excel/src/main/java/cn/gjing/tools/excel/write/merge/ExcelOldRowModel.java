@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExcelOldRowModel {
+public final class ExcelOldRowModel {
     /**
      * The last row cell value
      */

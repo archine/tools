@@ -1,8 +1,8 @@
 package cn.gjing.tools.excel.write.style;
 
 import cn.gjing.tools.excel.ExcelField;
-import cn.gjing.tools.excel.write.listener.CellWriteListener;
-import cn.gjing.tools.excel.write.listener.RowWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
  *
  * @author Gjing
  **/
-public interface ExcelStyleListener extends CellWriteListener, RowWriteListener {
+public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRowWriteListener {
 
     /**
      * Init listener

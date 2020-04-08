@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BigTitle {
+public final class BigTitle {
 
     /**
      * How many lines

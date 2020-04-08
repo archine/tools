@@ -9,13 +9,13 @@ import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
-import cn.gjing.tools.excel.read.ExcelAssert;
+import cn.gjing.tools.excel.read.valid.ExcelAssert;
 import cn.gjing.tools.excel.read.listener.EmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ReadListener;
 import cn.gjing.tools.excel.read.listener.ResultReadListener;
 import cn.gjing.tools.excel.read.listener.RowReadListener;
 import cn.gjing.tools.excel.util.BeanUtils;
-import cn.gjing.tools.excel.util.ListenerUtils;
+import cn.gjing.tools.excel.util.ListenerChain;
 import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.expression.EvaluationContext;
@@ -106,7 +106,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 if (this.headNameList.isEmpty()) {
                     for (Cell cell : row) {
                         headNameList.add(cell.getStringCellValue());
-                        stop = ListenerUtils.readRow(rowReadListeners, null, headNameList, startIndex, true, hasNext);
+                        stop = ListenerChain.doReadRow(rowReadListeners, null, headNameList, startIndex, true, hasNext);
                     }
                 }
                 continue;
@@ -125,26 +125,25 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
                 ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
                 Cell valueCell = row.getCell(c);
+                Object value;
                 try {
                     if (valueCell != null) {
-                        Object value = this.getValue(r, valueCell, field, excelField, gson, hasNext);
+                        value = this.getValue(r, valueCell, field, excelField, gson, hasNext);
                         context.setVariable(field.getName(), value);
-                        this.assertValue(parser, context, row, c, field, excelField, excelAssert, value);
+                        this.assertValue(parser, context, row, c, field, excelField, excelAssert);
                         value = this.convert(field, value, parser, excelDataConvert, context);
-                        ListenerUtils.readCell(rowReadListeners, r, value, field, row.getRowNum(), c, false);
-                        context.setVariable(field.getName(), value);
+                        ListenerChain.doReadCell(rowReadListeners, r, value, field, row.getRowNum(), c, false);
                         if (isSave && value != null) {
                             this.setValue(r, field, value);
                         }
                     } else {
-                        Object value = this.convert(field, null, parser, excelDataConvert, context);
-                        if (value == null) {
-                            this.allowEmpty(r, field, excelField, row.getRowNum(), c, hasNext);
-                            this.assertValue(parser, context, row, c, field, excelField, excelAssert, null);
-                            continue;
-                        }
+                        context.setVariable(field.getName(), null);
+                        this.allowEmpty(r, field, excelField, row.getRowNum(), c, hasNext);
+                        this.assertValue(parser, context, row, c, field, excelField, excelAssert);
+                        value = this.convert(field, null, parser, excelDataConvert, context);
                         this.setValue(r, field, value);
                     }
+                    context.setVariable(field.getName(), value);
                 } catch (Exception e) {
                     if (e instanceof ExcelAssertException) {
                         throw (ExcelAssertException) e;
@@ -154,7 +153,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
             }
             if (this.isSave) {
                 try {
-                    ListenerUtils.readRow(rowReadListeners, r, null, row.getRowNum(), false, hasNext);
+                    ListenerChain.doReadRow(rowReadListeners, r, null, row.getRowNum(), false, hasNext);
                     if (collect) {
                         dataList.add(r);
                     }
@@ -163,7 +162,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
             }
         }
-        ListenerUtils.resultNotify(this.readListenersMap.get(ResultReadListener.class), dataList);
+        ListenerChain.doResultNotify(this.readListenersMap.get(ResultReadListener.class), dataList);
     }
 
     /**
@@ -259,7 +258,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
         if (excelField.allowEmpty()) {
             return;
         }
-        this.isSave = ListenerUtils.readEmpty(this.readListenersMap.get(EmptyReadListener.class), r, field, excelField, rowIndex, colIndex, hasNext);
+        this.isSave = ListenerChain.doReadEmpty(this.readListenersMap.get(EmptyReadListener.class), r, field, excelField, rowIndex, colIndex, hasNext);
     }
 
     /**
@@ -272,9 +271,8 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
      * @param field       Current field
      * @param excelField  ExcelFiled annotation on current filed
      * @param excelAssert Excel Assert on current field
-     * @param value       Current attribute value
      */
-    private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField, ExcelAssert excelAssert, Object value) {
+    private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField, ExcelAssert excelAssert) {
         if (excelAssert != null) {
             Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
             if (test != null && !test) {

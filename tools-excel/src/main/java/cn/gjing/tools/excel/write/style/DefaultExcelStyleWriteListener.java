@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-public class DefaultExcelStyle implements ExcelStyleListener {
+public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteListener {
     private Workbook workbook;
     private CellStyle titleStyle;
     private Map<Integer, CellStyle> headStyle;

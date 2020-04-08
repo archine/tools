@@ -5,11 +5,11 @@ import cn.gjing.tools.excel.read.listener.EmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ReadListener;
 import cn.gjing.tools.excel.read.listener.ResultReadListener;
 import cn.gjing.tools.excel.read.listener.RowReadListener;
+import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.listener.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -18,39 +18,39 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-public class ListenerUtils {
+public final class ListenerChain {
 
-    public static void completeCell(Map<Class<? extends WriteListener>, List<WriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
+    public static void doCompleteCell(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
                                     ExcelField excelField, Field field, String headName, int index, int colIndex, boolean isHead, Object value) {
-        List<WriteListener> cellListeners = excelListeners.get(CellWriteListener.class);
+        List<ExcelWriteListener> cellListeners = excelListeners.get(ExcelCellWriteListener.class);
         if (cellListeners != null) {
-            cellListeners.forEach(e -> ((CellWriteListener) e).completeCell(sheet, row, cell, excelField, field, headName, index, colIndex, isHead, value));
+            cellListeners.forEach(e -> ((ExcelCellWriteListener) e).completeCell(sheet, row, cell, excelField, field, headName, index, colIndex, isHead, value));
         }
     }
 
-    public static void completeRow(Map<Class<? extends WriteListener>, List<WriteListener>> excelListeners, Sheet sheet, Row row, int index, boolean isHead) {
-        List<WriteListener> rowListeners = excelListeners.get(RowWriteListener.class);
+    public static void doCompleteRow(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, int index, boolean isHead) {
+        List<ExcelWriteListener> rowListeners = excelListeners.get(ExcelRowWriteListener.class);
         if (rowListeners != null) {
-            rowListeners.forEach(e -> ((RowWriteListener) e).completeRow(sheet, row, index, isHead));
+            rowListeners.forEach(e -> ((ExcelRowWriteListener) e).completeRow(sheet, row, index, isHead));
         }
     }
 
-    public static void completeSheet(Map<Class<? extends WriteListener>, List<WriteListener>> excelListeners, Sheet sheet) {
-        List<WriteListener> sheetListeners = excelListeners.get(SheetWriteListener.class);
+    public static void doCompleteSheet(ExcelWriterContext context) {
+        List<ExcelWriteListener> sheetListeners = context.getWriteListenerCache().get(ExcelSheetWriteListener.class);
         if (sheetListeners != null) {
-            sheetListeners.forEach(e -> ((SheetWriteListener) e).completeSheet(sheet));
+            sheetListeners.forEach(e -> ((ExcelSheetWriteListener) e).completeSheet(context));
         }
     }
 
-    public static void workbookFlushBefore(Map<Class<? extends WriteListener>, List<WriteListener>> excelListeners, Workbook workbook, String fileName) {
-        List<WriteListener> workbookListeners = excelListeners.get(WorkbookWriteListener.class);
+    public static void doWorkbookFlushBefore(ExcelWriterContext context) {
+        List<ExcelWriteListener> workbookListeners = context.getWriteListenerCache().get(ExcelWorkbookWriteListener.class);
         if (workbookListeners != null) {
-            workbookListeners.forEach(e -> ((WorkbookWriteListener) e).flushBefore(workbook, fileName));
+            workbookListeners.forEach(e -> ((ExcelWorkbookWriteListener) e).flushBefore(context));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <R> boolean readRow(List<ReadListener> rowReadListeners, R r, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext) {
+    public static <R> boolean doReadRow(List<ReadListener> rowReadListeners, R r, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext) {
         boolean stop = false;
         if (rowReadListeners != null) {
             for (ReadListener rowReadListener : rowReadListeners) {
@@ -61,14 +61,14 @@ public class ListenerUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <R> void readCell(List<ReadListener> rowReadListeners, R r, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
+    public static <R> void doReadCell(List<ReadListener> rowReadListeners, R r, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
         if (rowReadListeners != null) {
             rowReadListeners.forEach(e -> ((RowReadListener<R>) e).readCell(r, cellValue, field, rowIndex, colIndex, isHead));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <R> boolean readEmpty(List<ReadListener> emptyReadListeners, R r, Field field, ExcelField excelField, int rowIndex, int colIndex, boolean hasNext) {
+    public static <R> boolean doReadEmpty(List<ReadListener> emptyReadListeners, R r, Field field, ExcelField excelField, int rowIndex, int colIndex, boolean hasNext) {
         boolean isSave = false;
         if (emptyReadListeners != null) {
             for (ReadListener emptyReadListener : emptyReadListeners) {
@@ -79,7 +79,7 @@ public class ListenerUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <R> void resultNotify(List<ReadListener> resultReadListeners, List<R> data) {
+    public static <R> void doResultNotify(List<ReadListener> resultReadListeners, List<R> data) {
         if (resultReadListeners != null) {
             resultReadListeners.forEach(e -> ((ResultReadListener<R>) e).notify(data));
         }

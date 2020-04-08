@@ -1,11 +1,9 @@
 package cn.gjing.tools.excel.write.resolver;
 
-import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
-import cn.gjing.tools.excel.write.listener.WriteListener;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Sheet;
+import cn.gjing.tools.excel.write.BigTitle;
+import cn.gjing.tools.excel.write.ExcelWriterContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -13,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -26,56 +23,54 @@ import java.util.Objects;
  * @author Gjing
  **/
 class ExcelWriteXlsResolver implements ExcelWriterResolver {
-    private HSSFWorkbook workbook;
-    private OutputStream outputStream;
     private ExcelWriteExecutor excelWriteExecutor;
 
-    ExcelWriteXlsResolver(HSSFWorkbook workbook, Map<Class<? extends WriteListener>, List<WriteListener>> writeListenerMap) {
-        this.workbook = workbook;
-        this.excelWriteExecutor = new ExcelWriteExecutor(workbook, writeListenerMap);
+    @Override
+    public void init(ExcelWriterContext context) {
+        this.excelWriteExecutor = new ExcelWriteExecutor(context);
     }
 
     @Override
-    public void writeTitle(BigTitle bigTitle, Sheet sheet) {
-        this.excelWriteExecutor.setBigTitle(bigTitle, sheet);
+    public void writeTitle(BigTitle bigTitle) {
+        this.excelWriteExecutor.setBigTitle(bigTitle);
     }
 
     @Override
-    public ExcelWriterResolver writeHead(List<Field> headFieldList, List<String[]> headNames, Sheet sheet, boolean needHead,
-                                         Map<String, String[]> dropdownBoxValues, boolean needValid, boolean isMulti) {
-        this.excelWriteExecutor.setHead(headFieldList, headNames, sheet, needHead, dropdownBoxValues, needValid, isMulti);
+    public ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> dropdownBoxValues) {
+        this.excelWriteExecutor.setHead(needHead, dropdownBoxValues);
         return this;
     }
 
     @Override
-    public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList) {
-        this.excelWriteExecutor.setValue(data, headFieldList, sheet);
+    public ExcelWriterResolver write(List<?> data) {
+        this.excelWriteExecutor.setValue(data);
         return this;
     }
 
     @Override
-    public void flush(HttpServletResponse response, String fileName) {
+    public void flush(HttpServletResponse response, ExcelWriterContext context) {
         response.setContentType("application/vnd.ms-excel");
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        OutputStream outputStream = null;
         try {
             if (request.getHeader("User-Agent").toLowerCase().indexOf("firefox") > 0) {
-                fileName = new String(fileName.getBytes(StandardCharsets.UTF_8), "ISO8859-1");
+                context.setFileName(new String(context.getFileName().getBytes(StandardCharsets.UTF_8), "ISO8859-1"));
             } else {
-                fileName = URLEncoder.encode(fileName, "UTF-8");
+                context.setFileName(URLEncoder.encode(context.getFileName(), "UTF-8"));
             }
-            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xls");
-            this.outputStream = response.getOutputStream();
-            this.workbook.write(this.outputStream);
+            response.setHeader("Content-disposition", "attachment;filename=" + context.getFileName() + ".xls");
+            outputStream = response.getOutputStream();
+            context.getWorkbook().write(outputStream);
         } catch (IOException e) {
             throw new ExcelResolverException("Excel cache data refresh failure, " + e.getMessage());
         } finally {
             try {
-                if (this.outputStream != null) {
-                    this.outputStream.flush();
-                    this.outputStream.close();
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
                 }
-                if (this.workbook != null) {
-                    this.workbook.close();
+                if (context.getWorkbook() != null) {
+                    context.getWorkbook().close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

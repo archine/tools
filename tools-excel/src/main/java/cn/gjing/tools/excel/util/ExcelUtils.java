@@ -16,14 +16,54 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Gjing
  **/
-public class ExcelUtils {
+public final class ExcelUtils {
+
+    /**
+     * Set cell value
+     *
+     * @param cell  Current cell
+     * @param value Attribute values
+     */
+    public static void setCellValue(Cell cell, Object value) {
+        if (value == null) {
+            return;
+        }
+        if (value instanceof String) {
+            cell.setCellValue(value.toString());
+            return;
+        }
+        if (value instanceof Number) {
+            cell.setCellValue(Double.parseDouble(value.toString()));
+            return;
+        }
+        if (value instanceof Enum) {
+            cell.setCellValue(value.toString());
+            return;
+        }
+        if (value instanceof Date) {
+            cell.setCellValue((Date) value);
+            return;
+        }
+        if (value instanceof LocalDateTime) {
+            cell.setCellValue((LocalDateTime) value);
+            return;
+        }
+        if (value instanceof LocalDate) {
+            cell.setCellValue((LocalDate) value);
+            return;
+        }
+        throw new IllegalArgumentException("Unsupported data type, you can use a data convert");
+    }
 
     /**
      * Add a dropdown box when export
@@ -236,39 +276,41 @@ public class ExcelUtils {
     /**
      * Create a sum expression
      *
-     * @param firstCell Start cell
-     * @param lastCell  End cell
+     * @param firstColIndex Which column starts
+     * @param firstRowIndex Which row starts
+     * @param lastColIndex  Which column end
+     * @param lastRowIndex  Which row end
      * @return expression
      */
-    public static String createSumFormula(Cell firstCell, Cell lastCell) {
-        return "SUM(" + firstCell.getAddress().formatAsString() + ":" + lastCell.getAddress().formatAsString() + ")";
+    public static String createSumFormula(int firstColIndex, int firstRowIndex, int lastColIndex, int lastRowIndex) {
+        return "SUM(" + (char) ('A' + firstColIndex) + firstRowIndex + ":" + (char) ('A' + lastColIndex) + lastRowIndex + ")";
     }
 
     /**
      * Add a write listener
      *
-     * @param writeListenerMap writeListenerMap
-     * @param listener         Write listener
+     * @param writeListenerCache writeListenerCache
+     * @param listener           Write listener
      */
-    public static void addWriteListener(Map<Class<? extends WriteListener>, List<WriteListener>> writeListenerMap, WriteListener listener) {
-        if (listener instanceof SheetWriteListener) {
-            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(SheetWriteListener.class, k -> new ArrayList<>());
+    public static void addWriteListener(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache, ExcelWriteListener listener) {
+        if (listener instanceof ExcelSheetWriteListener) {
+            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelSheetWriteListener.class, k -> new ArrayList<>());
             listeners.add(listener);
         }
-        if (listener instanceof RowWriteListener) {
-            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(RowWriteListener.class, k -> new ArrayList<>());
+        if (listener instanceof ExcelRowWriteListener) {
+            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelRowWriteListener.class, k -> new ArrayList<>());
             listeners.add(listener);
         }
-        if (listener instanceof CellWriteListener) {
-            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(CellWriteListener.class, k -> new ArrayList<>());
+        if (listener instanceof ExcelCellWriteListener) {
+            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelCellWriteListener.class, k -> new ArrayList<>());
             listeners.add(listener);
         }
-        if (listener instanceof CascadingDropdownBoxListener) {
-            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(CascadingDropdownBoxListener.class, k -> new ArrayList<>());
+        if (listener instanceof ExcelCascadingDropdownBoxListener) {
+            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelCascadingDropdownBoxListener.class, k -> new ArrayList<>());
             listeners.add(listener);
         }
-        if (listener instanceof WorkbookWriteListener) {
-            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(WorkbookWriteListener.class, k -> new ArrayList<>());
+        if (listener instanceof ExcelWorkbookWriteListener) {
+            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelWorkbookWriteListener.class, k -> new ArrayList<>());
             listeners.add(listener);
         }
     }
@@ -276,20 +318,20 @@ public class ExcelUtils {
     /**
      * Add a read listener
      *
-     * @param readListenersMap readListenersMap
-     * @param readListener     read Listener
+     * @param readListenersCache readListenersCache
+     * @param readListener       read Listener
      */
-    public static void addReadListener(Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap, ReadListener readListener) {
+    public static void addReadListener(Map<Class<? extends ReadListener>, List<ReadListener>> readListenersCache, ReadListener readListener) {
         if (readListener instanceof RowReadListener) {
-            List<ReadListener> readListeners = readListenersMap.computeIfAbsent(RowReadListener.class, k -> new ArrayList<>());
+            List<ReadListener> readListeners = readListenersCache.computeIfAbsent(RowReadListener.class, k -> new ArrayList<>());
             readListeners.add(readListener);
         }
         if (readListener instanceof EmptyReadListener) {
-            List<ReadListener> readListeners = readListenersMap.computeIfAbsent(EmptyReadListener.class, k -> new ArrayList<>());
+            List<ReadListener> readListeners = readListenersCache.computeIfAbsent(EmptyReadListener.class, k -> new ArrayList<>());
             readListeners.add(readListener);
         }
         if (readListener instanceof ResultReadListener) {
-            List<ReadListener> readListeners = readListenersMap.computeIfAbsent(ResultReadListener.class, k -> new ArrayList<>());
+            List<ReadListener> readListeners = readListenersCache.computeIfAbsent(ResultReadListener.class, k -> new ArrayList<>());
             readListeners.add(readListener);
         }
     }

@@ -66,7 +66,8 @@ public @interface ExcelField {
     boolean allowEmpty() default true;
 
     /**
-     * Data convert
+     * Data converter, which you can use to change data during import and export,
+     * occurs before cell assignment and before Java object assignment
      *
      * @return DefaultDataConvert.class
      */
