@@ -1,7 +1,8 @@
 package cn.gjing.tools.excel.write.style;
 
 import cn.gjing.tools.excel.ExcelField;
-import cn.gjing.tools.excel.write.listener.BaseCellWriteListener;
+import cn.gjing.tools.excel.write.listener.CellWriteListener;
+import cn.gjing.tools.excel.write.listener.RowWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -13,13 +14,15 @@ import java.lang.reflect.Field;
  *
  * @author Gjing
  **/
-public interface BaseExcelStyleListener extends BaseCellWriteListener {
+public interface ExcelStyleListener extends CellWriteListener, RowWriteListener {
+
     /**
-     * Init
+     * Init listener
      *
      * @param workbook workbook
      */
     void init(Workbook workbook);
+
 
     /**
      * Set excel big title style

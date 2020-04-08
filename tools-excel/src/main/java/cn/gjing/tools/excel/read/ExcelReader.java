@@ -2,9 +2,11 @@ package cn.gjing.tools.excel.read;
 
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelInitException;
-import cn.gjing.tools.excel.metadata.ReadCallback;
-import cn.gjing.tools.excel.metadata.ReadListener;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
+import cn.gjing.tools.excel.read.listener.EmptyReadListener;
+import cn.gjing.tools.excel.read.listener.ReadListener;
+import cn.gjing.tools.excel.read.listener.ResultReadListener;
+import cn.gjing.tools.excel.read.listener.RowReadListener;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -12,7 +14,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -22,16 +27,13 @@ import java.util.function.Supplier;
  **/
 public class ExcelReader<R> {
     private Class<R> excelClass;
-    private Excel excel;
     private List<Field> excelFieldList;
-    private List<R> data;
-    private ReadCallback<R> readCallback;
     private ExcelReaderResolver<R> readerResolver;
     private InputStream inputStream;
     private Workbook workbook;
-    private int headerIndex;
-    private int readLines;
+    private boolean collect;
     private String defaultSheetName = "sheet1";
+    private Map<Class<? extends ReadListener<R>>, List<ReadListener<R>>> readListeners;
 
     private ExcelReader() {
 
@@ -40,11 +42,9 @@ public class ExcelReader<R> {
     public ExcelReader(Class<R> excelClass, InputStream inputStream, Excel excel, List<Field> excelFieldList) {
         this.excelClass = excelClass;
         this.inputStream = inputStream;
-        this.readCallback = (r, rowIndex) -> r;
-        this.excel = excel;
         this.excelFieldList = excelFieldList;
+        this.readListeners = new HashMap<>(8);
         this.initResolver(excel, inputStream);
-        this.initSequence();
     }
 
     /**
@@ -54,7 +54,6 @@ public class ExcelReader<R> {
      * @param inputStream File inputStream
      */
     private void initResolver(Excel excel, InputStream inputStream) {
-        this.readerResolver = new DefaultExcelReadResolver<>();
         switch (excel.type()) {
             case XLS:
                 try {
@@ -69,14 +68,7 @@ public class ExcelReader<R> {
             default:
                 throw new ExcelInitException("No corresponding processor was found");
         }
-    }
-
-    /**
-     * Initializes the sequence number and resolver
-     */
-    private void initSequence() {
-        this.headerIndex = 0;
-        this.readLines = 0;
+        this.readerResolver = new ExcelReadExecutor<>(this.workbook, this.readListeners);
     }
 
     /**
@@ -85,22 +77,8 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read() {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
-                this.defaultSheetName, this.readCallback, this.workbook, this.excelFieldList, excel);
-        this.initSequence();
-        return this;
-    }
-
-    /**
-     * Read excel
-     *
-     * @param callback Excel import callback
-     * @return this
-     */
-    public ExcelReader<R> read(Supplier<? extends ReadCallback<R>> callback) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
-                this.defaultSheetName, callback.get(), this.workbook, this.excelFieldList, excel);
-        this.initSequence();
+        this.readerResolver.read(this.excelClass, 0, this.defaultSheetName,
+                this.excelFieldList, this.collect);
         return this;
     }
 
@@ -111,79 +89,31 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(String sheetName) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
-                sheetName, this.readCallback, this.workbook, this.excelFieldList, excel);
-        this.initSequence();
-        return this;
-    }
-
-    /**
-     * Read the specified sheet
-     *
-     * @param sheetName sheet name
-     * @param callback  Excel import callback
-     * @return this
-     */
-    public ExcelReader<R> read(String sheetName, Supplier<? extends ReadCallback<R>> callback) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, this.headerIndex, this.readLines,
-                sheetName, callback.get(), this.workbook, this.excelFieldList, excel);
-        this.initSequence();
+        this.readerResolver.read(this.excelClass, 0, sheetName,
+                this.excelFieldList, this.collect);
         return this;
     }
 
     /**
      * Read the excel sheet
      *
-     * @param headerIndex Excel header starter index
+     * @param startIndex Excel header starter index
      * @return this
      */
-    public ExcelReader<R> read(int headerIndex) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
-                this.defaultSheetName, this.readCallback, this.workbook, this.excelFieldList, excel);
-        this.initSequence();
+    public ExcelReader<R> read(int startIndex) {
+        this.readerResolver.read(this.excelClass, startIndex, this.defaultSheetName, this.excelFieldList, this.collect);
         return this;
     }
 
     /**
      * Read the specified sheet
      *
-     * @param headerIndex Excel header starter index
-     * @param callback    Excel import callback
+     * @param startIndex Excel header starter index
+     * @param sheetName  Excel Sheet name
      * @return this
      */
-    public ExcelReader<R> read(int headerIndex, Supplier<? extends ReadCallback<R>> callback) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
-                this.defaultSheetName, callback.get(), this.workbook, this.excelFieldList, excel);
-        this.initSequence();
-        return this;
-    }
-
-    /**
-     * Read the specified sheet
-     *
-     * @param headerIndex Excel header starter index
-     * @param sheetName   Excel Sheet name
-     * @return this
-     */
-    public ExcelReader<R> read(int headerIndex, String sheetName) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
-                sheetName, this.readCallback, this.workbook, this.excelFieldList, excel);
-        this.initSequence();
-        return this;
-    }
-
-    /**
-     * Read the specified sheet
-     *
-     * @param headerIndex Excel header starter index
-     * @param callback    Excel import callback
-     * @param sheetName   Sheet name
-     * @return this
-     */
-    public ExcelReader<R> read(int headerIndex, String sheetName, Supplier<? extends ReadCallback<R>> callback) {
-        this.readerResolver.read(this.inputStream, this.excelClass, readData -> this.data = readData, headerIndex, this.readLines,
-                sheetName, callback.get(), this.workbook, this.excelFieldList, excel);
-        this.initSequence();
+    public ExcelReader<R> read(int startIndex, String sheetName) {
+        this.readerResolver.read(this.excelClass, startIndex, sheetName, this.excelFieldList, this.collect);
         return this;
     }
 
@@ -199,61 +129,65 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Excel header starter index
+     * Add readListeners
      *
-     * @param index List header, which is the number to the left of the excel file list header
+     * @param readListenerList Read listeners
      * @return this
      */
-    @Deprecated
-    public ExcelReader<R> headerIndex(int index) {
-        this.headerIndex = index;
+    public ExcelReader<R> addListener(List<ReadListener<R>> readListenerList) {
+        readListenerList.forEach(this::addListener);
         return this;
     }
 
     /**
-     * Read how many rows
+     * Subscribe to the results of the import
      *
-     * @param lines Number of lines read
+     * @param readListener Read listener
      * @return this
      */
-    public ExcelReader<R> readLines(int lines) {
-        this.readLines = lines;
-        return this;
-    }
-
-    /**
-     * Get result
-     *
-     * @return List
-     */
-    public List<R> get() {
-        this.end();
-        return this.data;
-    }
-
-    /**
-     * Listen for the return of the result through the listener
-     *
-     * @param dataReadListener Result listener
-     * @return this
-     */
-    public ExcelReader<R> subscribe(ReadListener<List<R>> dataReadListener) {
-        dataReadListener.notify(this.data);
-        this.data.clear();
-        return this;
-    }
-
-    /**
-     * Listen for the return of the result through the listener
-     *
-     * @param dataReadListener Result listener
-     * @return this
-     */
-    public ExcelReader<R> subscribe(ReadListener<List<R>> dataReadListener, boolean clear) {
-        dataReadListener.notify(this.data);
-        if (clear) {
-            this.data.clear();
+    @SuppressWarnings("all")
+    public ExcelReader<R> addListener(ReadListener<R> readListener) {
+        if (readListener instanceof RowReadListener) {
+            List<ReadListener<R>> readListeners = this.readListeners.get(RowReadListener.class);
+            if (readListeners == null) {
+                readListeners = new ArrayList<>();
+            }
+            readListeners.add(readListener);
         }
+        if (readListener instanceof EmptyReadListener) {
+            List<ReadListener<R>> readListeners = this.readListeners.get(EmptyReadListener.class);
+            if (readListeners == null) {
+                readListeners = new ArrayList<>();
+            }
+            readListeners.add(readListener);
+        }
+        if (readListener instanceof ResultReadListener) {
+            List<ReadListener<R>> readListeners = this.readListeners.get(ResultReadListener.class);
+            if (readListeners == null) {
+                readListeners = new ArrayList<>();
+            }
+            readListeners.add(readListener);
+        }
+        return this;
+    }
+
+    /**
+     * Open the collection of Java objects generated for each row of the import
+     *
+     * @return this
+     */
+    public ExcelReader<R> enableCollect() {
+        this.collect = true;
+        return this;
+    }
+
+    /**
+     * Close the collection of Java objects generated for each row of the import
+     *
+     * @return this
+     */
+    public ExcelReader<R> closeCollect() {
+        this.collect = false;
         return this;
     }
 

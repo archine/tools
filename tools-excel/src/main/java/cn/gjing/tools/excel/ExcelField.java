@@ -2,11 +2,12 @@ package cn.gjing.tools.excel;
 
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
+import cn.gjing.tools.excel.write.merge.Merge;
 
 import java.lang.annotation.*;
 
 /**
- * Excel list headers map to entity fields annotation
+ * Excel list headerers map to entity fields annotation
  *
  * @author Gjing
  **/
@@ -15,9 +16,10 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface ExcelField {
     /**
-     * Excel header name
+     * Excel header names, If you have more than one, you have more than one headerer,
+     * and if you want to merge headers, you need to open them on export
      *
-     * @return name
+     * @return header names
      */
     String[] value() default {};
 
@@ -29,35 +31,29 @@ public @interface ExcelField {
     int width() default 5120;
 
     /**
-     * The list headers are sorted by default by entity field if the Numbers are the same
+     * List headerer sort, if not set will default entity property order
+     * If part of the headerer is set, it only appears behind the unset headerer
      *
      * @return sort index
      */
     int sort() default -1;
 
     /**
-     * Column format
+     * Cell format when exported
      *
      * @return format
      */
-    String format() default "";
+    String format() default "@";
 
     /**
-     * If a cell has the same number of rows, merge automatically
+     * Whether to enable automatic vertical merge when export
      *
      * @return autoMerge
      */
     Merge autoMerge() default @Merge;
 
     /**
-     * Cell sum
-     *
-     * @return Sum
-     */
-    Sum sum() default @Sum;
-
-    /**
-     * Is allow empty
+     * Whether null values are supported when imported (including cells that do not exist or empty strings)
      *
      * @return boolean
      */

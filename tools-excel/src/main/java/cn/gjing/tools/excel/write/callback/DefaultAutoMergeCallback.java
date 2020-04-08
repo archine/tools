@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
  **/
 public class DefaultAutoMergeCallback implements AutoMergeCallback<Object> {
     @Override
-    public boolean mergeY(Object o, Field field, int colIndex, int index, boolean isHead) {
+    public boolean mergeY(Object o, Field field, int colIndex, int index) {
         return true;
     }
 }

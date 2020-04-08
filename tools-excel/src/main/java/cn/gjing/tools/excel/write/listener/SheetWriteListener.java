@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
  * @author Gjing
  **/
 @FunctionalInterface
-public interface BaseSheetWriteListener extends WriteListener{
+public interface SheetWriteListener extends WriteListener{
     /**
      * Has been created
      * @param sheet Create the finished sheet

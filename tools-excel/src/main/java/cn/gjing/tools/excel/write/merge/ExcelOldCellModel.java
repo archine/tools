@@ -1,23 +1,17 @@
 package cn.gjing.tools.excel.write.merge;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Gjing
  **/
-@Setter
-@Getter
-@Builder
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ExcelOldCellModel {
-    /**
-     * The last cell value
-     */
-    private Object oldCellValue;
+    private Object lastCellValue;
 
-    /**
-     * The last cell index
-     */
-    private int oldCellIndex;
+    private int lastCellIndex;
 }

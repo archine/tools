@@ -1,11 +1,12 @@
 package cn.gjing.tools.excel;
 
 
+import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.write.style.DefaultExcelStyle;
 
 import java.lang.annotation.*;
 
-import static cn.gjing.tools.excel.ExcelType.XLS;
+import static cn.gjing.tools.excel.metadata.ExcelType.XLS;
 
 /**
  * Excel mapped entity annotation
@@ -29,12 +30,6 @@ public @interface Excel {
      * @return Type
      */
     ExcelType type() default XLS;
-
-    /**
-     * Excel head row height
-     * @return 350
-     */
-    short headHeight() default 350;
 
     /**
      * Window size, which is flushed to disk if more data is written to the export than the specified size

@@ -11,7 +11,8 @@ import java.lang.reflect.Field;
  *
  * @author Gjing
  **/
-public interface BaseCascadingDropdownBoxListener extends WriteListener {
+@FunctionalInterface
+public interface CascadingDropdownBoxListener extends WriteListener {
     /**
      * Add cascading dropdown box
      *

@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel;
+package cn.gjing.tools.excel.metadata;
 
 /**
  * Excel file type

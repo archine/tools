@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write.valid;
 
 import cn.gjing.tools.excel.util.ParamUtils;
-import cn.gjing.tools.excel.write.listener.BaseCascadingDropdownBoxListener;
+import cn.gjing.tools.excel.write.listener.CascadingDropdownBoxListener;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-public class DefaultCascadingDropdownBox implements BaseCascadingDropdownBoxListener {
+public class DefaultCascadingDropdownBox implements CascadingDropdownBoxListener {
     private Map<String, String[]> boxValues;
 
     public DefaultCascadingDropdownBox(Map<String, String[]> boxValues) {

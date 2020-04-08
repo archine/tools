@@ -1,9 +1,7 @@
 package cn.gjing.tools.excel.write.resolver;
 
-import cn.gjing.tools.excel.BigTitle;
-import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
-import cn.gjing.tools.excel.metadata.CustomWrite;
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
 import cn.gjing.tools.excel.write.listener.WriteListener;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -30,34 +28,29 @@ import java.util.Objects;
 class ExcelWriteXlsxResolver implements ExcelWriterResolver {
     private SXSSFWorkbook workbook;
     private OutputStream outputStream;
-    private ExcelExecutor excelExecutor;
+    private ExcelWriteExecutor excelWriteExecutor;
 
     ExcelWriteXlsxResolver(SXSSFWorkbook workbook,Map<Class<? extends WriteListener>, List<WriteListener>> writeListenerMap) {
         this.workbook = workbook;
-        this.excelExecutor = new ExcelExecutor(workbook, writeListenerMap);
+        this.excelWriteExecutor = new ExcelWriteExecutor(workbook, writeListenerMap);
     }
 
     @Override
     public void writeTitle(BigTitle bigTitle, Sheet sheet) {
-        this.excelExecutor.setBigTitle(bigTitle, sheet);
+        this.excelWriteExecutor.setBigTitle(bigTitle, sheet);
     }
 
     @Override
     public ExcelWriterResolver writeHead(List<Field> headFieldList, List<String[]> headNames, Sheet sheet, boolean needHead,
-                                         Map<String, String[]> boxValues, Excel excel, boolean needValid) {
-        this.excelExecutor.setHead(headFieldList, headNames, sheet, needHead, boxValues, excel,needHead);
+                                         Map<String, String[]> boxValues, boolean needValid, boolean isMulti) {
+        this.excelWriteExecutor.setHead(headFieldList, headNames, sheet, needHead, boxValues, needValid, isMulti);
         return this;
     }
 
     @Override
     public ExcelWriterResolver write(List<?> data, Sheet sheet, List<Field> headFieldList) {
-        this.excelExecutor.setValue(data, headFieldList, sheet);
+        this.excelWriteExecutor.setValue(data, headFieldList, sheet);
         return this;
-    }
-
-    @Override
-    public void customWrite(CustomWrite processor) {
-        processor.process();
     }
 
     @Override

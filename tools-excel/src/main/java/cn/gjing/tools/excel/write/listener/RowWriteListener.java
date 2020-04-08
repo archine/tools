@@ -9,7 +9,7 @@ import org.apache.poi.ss.usermodel.Sheet;
  * @author Gjing
  **/
 @FunctionalInterface
-public interface BaseRowWriteListener extends WriteListener {
+public interface RowWriteListener extends WriteListener {
     /**
      * All the cells for the current row are created
      *

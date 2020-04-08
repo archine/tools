@@ -1,7 +1,6 @@
 package cn.gjing.tools.excel.metadata;
 
-import cn.gjing.tools.excel.BigTitle;
-import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.write.BigTitle;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,20 +40,13 @@ public interface ExcelWriterResolver {
      * @param headNames     Excel head names
      * @param sheet         Current sheet
      * @param needHead      Is needHead excel entity or sheet?
-     * @param excel         Excel annotation
      * @param boxValues     Excel dropdown box values
      * @param needValid     Whether need valid
+     * @param isMulti       Whether is multi head
      * @return this
      */
     ExcelWriterResolver writeHead(List<Field> headFieldList, List<String[]> headNames, Sheet sheet, boolean needHead, Map<String, String[]> boxValues,
-                                  Excel excel, boolean needValid);
-
-    /**
-     * Customize export excel head, body, big title, and so on
-     *
-     * @param processor Export processor
-     */
-    void customWrite(CustomWrite processor);
+                                  boolean needValid, boolean isMulti);
 
     /**
      * Output the contents of the cache

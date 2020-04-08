@@ -13,9 +13,9 @@ import java.lang.reflect.Field;
  * @author Gjing
  **/
 @FunctionalInterface
-public interface BaseCellWriteListener extends WriteListener {
+public interface CellWriteListener extends WriteListener {
     /**
-     * Cell assignment complete (including data converter complete)
+     * Cell assignment complete (include data convert complete)
      *
      * @param sheet      Current sheet
      * @param row        Current row

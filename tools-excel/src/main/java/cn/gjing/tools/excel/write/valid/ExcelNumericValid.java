@@ -74,4 +74,25 @@ public @interface ExcelNumericValid {
      * @return content
      */
     String errorContent() default "请输入正确的文本长度";
+
+    /**
+     * Whether show cell tip
+     *
+     * @return false
+     */
+    boolean showTip() default false;
+
+    /**
+     * Tip title
+     *
+     * @return ""
+     */
+    String tipTitle() default "";
+
+    /**
+     * Tip content
+     *
+     * @return ""
+     */
+    String tipContent() default "请输入1970-01-01到2999-01-01范围内的时间,且格式为年-月-日";
 }

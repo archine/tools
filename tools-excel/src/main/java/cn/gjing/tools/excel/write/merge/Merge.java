@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel;
+package cn.gjing.tools.excel.write.merge;
 
 import cn.gjing.tools.excel.write.callback.AutoMergeCallback;
 import cn.gjing.tools.excel.write.callback.DefaultAutoMergeCallback;
