@@ -44,7 +44,6 @@ import java.util.Map;
  **/
 class ExcelWriteExecutor {
     private Workbook workbook;
-    private Map<String, EnumConvert<Enum<?>, ?>> enumConvertMap;
     private Map<String, DataConvert<?>> dataConvertMap;
     private Map<String, AutoMergeCallback<?>> mergeCallbackMap;
     private Map<Integer, ExcelOldRowModel> oldRowModelMap;
@@ -169,7 +168,7 @@ class ExcelWriteExecutor {
                 try {
                     value = this.convert(field, value, o, parser, excelDataConvert, context, dataConvert);
                     if (excelField.autoMerge().open()) {
-                        autoMergeCallback = this.getMergeCallback(field, excelField);
+                        autoMergeCallback = this.createMergeCallback(field, excelField);
                         this.autoMergeY(autoMergeCallback, sheet, valueRow, field, excelField, index, colIndex, value, o, dataSize);
                     }
                     this.setCellValue(valueCell, value);
@@ -209,16 +208,16 @@ class ExcelWriteExecutor {
     }
 
     /**
-     * Get merge callback
+     * Init merge callback
      *
      * @param field      Current field
      * @param excelField ExcelField annotation on current field
      * @return AutoMergeCallback
      */
-    private AutoMergeCallback<?> getMergeCallback(Field field, ExcelField excelField) {
+    private AutoMergeCallback<?> createMergeCallback(Field field, ExcelField excelField) {
         if (this.mergeCallbackMap == null) {
             this.mergeCallbackMap = new HashMap<>(12);
-            if (this.oldRowModelMap != null) {
+            if (this.oldRowModelMap == null) {
                 this.oldRowModelMap = new HashMap<>(12);
             }
         }

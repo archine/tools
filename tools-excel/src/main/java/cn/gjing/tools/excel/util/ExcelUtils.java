@@ -1,5 +1,11 @@
 package cn.gjing.tools.excel.util;
 
+import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.read.listener.EmptyReadListener;
+import cn.gjing.tools.excel.read.listener.ReadListener;
+import cn.gjing.tools.excel.read.listener.ResultReadListener;
+import cn.gjing.tools.excel.read.listener.RowReadListener;
+import cn.gjing.tools.excel.write.listener.*;
 import cn.gjing.tools.excel.write.merge.ExcelOldCellModel;
 import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
 import cn.gjing.tools.excel.write.valid.OperatorType;
@@ -10,6 +16,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +38,7 @@ public class ExcelUtils {
      * @param firstRow     Start row
      * @param lastRow      End row
      * @param colIndex     Column index
-     * @param values       The dropdown box can be large, but if it's version 07, it's limited by the window size in the Excel annotation
+     * @param values       The dropdown box can be large, but if it's version 07, it's limited by the window size in the Excel annotation{@link Excel}
      */
     public static void addDropdownBox(String[] combobox, boolean showErrorBox, Rank errorBoxRank, String errorTitle, String errorContent,
                                       Workbook workbook, Sheet sheet, int firstRow, int lastRow, int colIndex, String[] values) {
@@ -234,5 +242,55 @@ public class ExcelUtils {
      */
     public static String createSumFormula(Cell firstCell, Cell lastCell) {
         return "SUM(" + firstCell.getAddress().formatAsString() + ":" + lastCell.getAddress().formatAsString() + ")";
+    }
+
+    /**
+     * Add a write listener
+     *
+     * @param writeListenerMap writeListenerMap
+     * @param listener         Write listener
+     */
+    public static void addWriteListener(Map<Class<? extends WriteListener>, List<WriteListener>> writeListenerMap, WriteListener listener) {
+        if (listener instanceof SheetWriteListener) {
+            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(SheetWriteListener.class, k -> new ArrayList<>());
+            listeners.add(listener);
+        }
+        if (listener instanceof RowWriteListener) {
+            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(RowWriteListener.class, k -> new ArrayList<>());
+            listeners.add(listener);
+        }
+        if (listener instanceof CellWriteListener) {
+            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(CellWriteListener.class, k -> new ArrayList<>());
+            listeners.add(listener);
+        }
+        if (listener instanceof CascadingDropdownBoxListener) {
+            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(CascadingDropdownBoxListener.class, k -> new ArrayList<>());
+            listeners.add(listener);
+        }
+        if (listener instanceof WorkbookWriteListener) {
+            List<WriteListener> listeners = writeListenerMap.computeIfAbsent(WorkbookWriteListener.class, k -> new ArrayList<>());
+            listeners.add(listener);
+        }
+    }
+
+    /**
+     * Add a read listener
+     *
+     * @param readListenersMap readListenersMap
+     * @param readListener     read Listener
+     */
+    public static void addReadListener(Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap, ReadListener readListener) {
+        if (readListener instanceof RowReadListener) {
+            List<ReadListener> readListeners = readListenersMap.computeIfAbsent(RowReadListener.class, k -> new ArrayList<>());
+            readListeners.add(readListener);
+        }
+        if (readListener instanceof EmptyReadListener) {
+            List<ReadListener> readListeners = readListenersMap.computeIfAbsent(EmptyReadListener.class, k -> new ArrayList<>());
+            readListeners.add(readListener);
+        }
+        if (readListener instanceof ResultReadListener) {
+            List<ReadListener> readListeners = readListenersMap.computeIfAbsent(ResultReadListener.class, k -> new ArrayList<>());
+            readListeners.add(readListener);
+        }
     }
 }

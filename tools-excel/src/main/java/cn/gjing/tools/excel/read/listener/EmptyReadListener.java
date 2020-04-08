@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
  * @author Gjing
  **/
 @FunctionalInterface
-public interface EmptyReadListener<R> extends ReadListener<R> {
+public interface EmptyReadListener<R> extends ReadListener {
 
     /**
      * When a body cell is read, if the cell does not exist or the value is null,

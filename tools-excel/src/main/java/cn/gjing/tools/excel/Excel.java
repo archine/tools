@@ -2,7 +2,6 @@ package cn.gjing.tools.excel;
 
 
 import cn.gjing.tools.excel.metadata.ExcelType;
-import cn.gjing.tools.excel.write.style.DefaultExcelStyle;
 
 import java.lang.annotation.*;
 
@@ -48,11 +47,4 @@ public @interface Excel {
      * @return 10240
      */
     int bufferSize() default 2048;
-
-    /**
-     * Excel style
-     *
-     * @return ExcelStyle
-     */
-    Class<?> style() default DefaultExcelStyle.class;
 }

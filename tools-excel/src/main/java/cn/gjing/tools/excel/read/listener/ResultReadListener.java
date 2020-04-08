@@ -8,7 +8,7 @@ import java.util.List;
  * @author Gjing
  **/
 @FunctionalInterface
-public interface ResultReadListener<R> extends ReadListener<R> {
+public interface ResultReadListener<R> extends ReadListener {
     /**
      * Notifies the caller and returns the result
      *

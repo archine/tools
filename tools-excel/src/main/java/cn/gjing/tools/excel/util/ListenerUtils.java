@@ -49,33 +49,37 @@ public class ListenerUtils {
         }
     }
 
-    public static <R> boolean readRow(List<ReadListener<R>> rowReadListeners, R r, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext) {
+    @SuppressWarnings("unchecked")
+    public static <R> boolean readRow(List<ReadListener> rowReadListeners, R r, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext) {
         boolean stop = false;
         if (rowReadListeners != null) {
-            for (ReadListener<R> rowReadListener : rowReadListeners) {
+            for (ReadListener rowReadListener : rowReadListeners) {
                 stop = ((RowReadListener<R>) rowReadListener).readRow(r, headNames, rowIndex, isHead, hasNext);
             }
         }
         return stop;
     }
 
-    public static <R> void readCell(List<ReadListener<R>> rowReadListeners, R r, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
+    @SuppressWarnings("unchecked")
+    public static <R> void readCell(List<ReadListener> rowReadListeners, R r, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
         if (rowReadListeners != null) {
             rowReadListeners.forEach(e -> ((RowReadListener<R>) e).readCell(r, cellValue, field, rowIndex, colIndex, isHead));
         }
     }
 
-    public static <R> boolean readEmpty(List<ReadListener<R>> emptyReadListeners, R r, Field field, ExcelField excelField, int rowIndex, int colIndex, boolean hasNext) {
+    @SuppressWarnings("unchecked")
+    public static <R> boolean readEmpty(List<ReadListener> emptyReadListeners, R r, Field field, ExcelField excelField, int rowIndex, int colIndex, boolean hasNext) {
         boolean isSave = false;
         if (emptyReadListeners != null) {
-            for (ReadListener<R> emptyReadListener : emptyReadListeners) {
+            for (ReadListener emptyReadListener : emptyReadListeners) {
                 isSave = ((EmptyReadListener<R>) emptyReadListener).readEmpty(r, field, excelField, rowIndex, colIndex, hasNext);
             }
         }
         return isSave;
     }
 
-    public static <R> void resultNotify(List<ReadListener<R>> resultReadListeners, List<R> data) {
+    @SuppressWarnings("unchecked")
+    public static <R> void resultNotify(List<ReadListener> resultReadListeners, List<R> data) {
         if (resultReadListeners != null) {
             resultReadListeners.forEach(e -> ((ResultReadListener<R>) e).notify(data));
         }

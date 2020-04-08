@@ -1,6 +1,6 @@
 package cn.gjing.tools.excel;
 
-import cn.gjing.tools.excel.read.ExcelReader;
+import cn.gjing.tools.excel.read.resolver.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.resolver.ExcelWriter;

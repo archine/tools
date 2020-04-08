@@ -4,6 +4,7 @@ import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
+import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.BigTitle;
@@ -53,7 +54,6 @@ public class ExcelWriter {
         if (initDefaultStyle) {
             this.initStyle(this.workbook);
         }
-
     }
 
     /**
@@ -82,7 +82,7 @@ public class ExcelWriter {
     private void initStyle(Workbook workbook) {
         DefaultExcelStyle defaultExcelStyle = new DefaultExcelStyle();
         defaultExcelStyle.init(workbook);
-        this.addListener(defaultExcelStyle);
+        ExcelUtils.addWriteListener(this.writeListenerMap, defaultExcelStyle);
     }
 
     /**
@@ -353,22 +353,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter addListener(WriteListener listener) {
-        if (listener instanceof SheetWriteListener) {
-            List<WriteListener> listeners = this.writeListenerMap.computeIfAbsent(SheetWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof RowWriteListener) {
-            List<WriteListener> listeners = this.writeListenerMap.computeIfAbsent(RowWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof CellWriteListener) {
-            List<WriteListener> listeners = this.writeListenerMap.computeIfAbsent(CellWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof CascadingDropdownBoxListener) {
-            List<WriteListener> listeners = this.writeListenerMap.computeIfAbsent(CascadingDropdownBoxListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
+        ExcelUtils.addWriteListener(this.writeListenerMap, listener);
         return this;
     }
 
@@ -379,7 +364,7 @@ public class ExcelWriter {
      * @return this
      */
     public ExcelWriter addListener(List<? extends WriteListener> listeners) {
-        listeners.forEach(this::addListener);
+        listeners.forEach(e -> ExcelUtils.addWriteListener(this.writeListenerMap, e));
         return this;
     }
 

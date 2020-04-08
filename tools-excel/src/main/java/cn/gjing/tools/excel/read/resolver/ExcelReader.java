@@ -1,12 +1,10 @@
-package cn.gjing.tools.excel.read;
+package cn.gjing.tools.excel.read.resolver;
 
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
-import cn.gjing.tools.excel.read.listener.EmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ReadListener;
-import cn.gjing.tools.excel.read.listener.ResultReadListener;
-import cn.gjing.tools.excel.read.listener.RowReadListener;
+import cn.gjing.tools.excel.util.ExcelUtils;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -14,7 +12,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +30,7 @@ public class ExcelReader<R> {
     private Workbook workbook;
     private boolean collect;
     private String defaultSheetName = "sheet1";
-    private Map<Class<? extends ReadListener<R>>, List<ReadListener<R>>> readListeners;
+    private Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap;
 
     private ExcelReader() {
 
@@ -43,7 +40,7 @@ public class ExcelReader<R> {
         this.excelClass = excelClass;
         this.inputStream = inputStream;
         this.excelFieldList = excelFieldList;
-        this.readListeners = new HashMap<>(8);
+        this.readListenersMap = new HashMap<>(8);
         this.initResolver(excel, inputStream);
     }
 
@@ -68,7 +65,7 @@ public class ExcelReader<R> {
             default:
                 throw new ExcelInitException("No corresponding processor was found");
         }
-        this.readerResolver = new ExcelReadExecutor<>(this.workbook, this.readListeners);
+        this.readerResolver = new ExcelReadExecutor<>(this.workbook, this.readListenersMap);
     }
 
     /**
@@ -129,13 +126,13 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Add readListeners
+     * Add readListenersMap
      *
      * @param readListenerList Read listeners
      * @return this
      */
-    public ExcelReader<R> addListener(List<ReadListener<R>> readListenerList) {
-        readListenerList.forEach(this::addListener);
+    public ExcelReader<R> addListener(List<ReadListener> readListenerList) {
+        readListenerList.forEach(e -> ExcelUtils.addReadListener(this.readListenersMap, e));
         return this;
     }
 
@@ -145,29 +142,8 @@ public class ExcelReader<R> {
      * @param readListener Read listener
      * @return this
      */
-    @SuppressWarnings("all")
-    public ExcelReader<R> addListener(ReadListener<R> readListener) {
-        if (readListener instanceof RowReadListener) {
-            List<ReadListener<R>> readListeners = this.readListeners.get(RowReadListener.class);
-            if (readListeners == null) {
-                readListeners = new ArrayList<>();
-            }
-            readListeners.add(readListener);
-        }
-        if (readListener instanceof EmptyReadListener) {
-            List<ReadListener<R>> readListeners = this.readListeners.get(EmptyReadListener.class);
-            if (readListeners == null) {
-                readListeners = new ArrayList<>();
-            }
-            readListeners.add(readListener);
-        }
-        if (readListener instanceof ResultReadListener) {
-            List<ReadListener<R>> readListeners = this.readListeners.get(ResultReadListener.class);
-            if (readListeners == null) {
-                readListeners = new ArrayList<>();
-            }
-            readListeners.add(readListener);
-        }
+    public ExcelReader<R> addListener(ReadListener readListener) {
+        ExcelUtils.addReadListener(this.readListenersMap, readListener);
         return this;
     }
 

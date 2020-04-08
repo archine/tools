@@ -7,7 +7,9 @@ import cn.gjing.tools.excel.write.merge.Merge;
 import java.lang.annotation.*;
 
 /**
- * Excel list headerers map to entity fields annotation
+ * This annotation is used to declare that an attribute is an Excel header,
+ * and if it is not annotated through this annotation,
+ * it will not be exported or imported as a header
  *
  * @author Gjing
  **/
@@ -16,8 +18,12 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface ExcelField {
     /**
-     * Excel header names, If you have more than one, you have more than one headerer,
-     * and if you want to merge headers, you need to open them on export
+     * Array of Excel header names.
+     * If multiple headers appear in the array and you want to merge the same header when exporting,
+     * you need to activate the multi-header mode before the export is executed.
+     * The last one in the array belongs to the real header,
+     * and if you are importing a multilevel header Excel file,
+     * you need to specify the real header start subscript
      *
      * @return header names
      */
@@ -31,8 +37,8 @@ public @interface ExcelField {
     int width() default 5120;
 
     /**
-     * List headerer sort, if not set will default entity property order
-     * If part of the headerer is set, it only appears behind the unset headerer
+     * List header sort, if not set will default entity property order
+     * If part of the header is set, it only appears behind the unset header
      *
      * @return sort index
      */

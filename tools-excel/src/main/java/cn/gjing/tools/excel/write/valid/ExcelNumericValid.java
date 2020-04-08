@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 public @interface ExcelNumericValid {
 
     /**
-     * Check the number of rows
+     * How many rows to add
      *
      * @return 200
      */
@@ -94,5 +94,5 @@ public @interface ExcelNumericValid {
      *
      * @return ""
      */
-    String tipContent() default "请输入1970-01-01到2999-01-01范围内的时间,且格式为年-月-日";
+    String tipContent() default "请输入正确的文本长度";
 }

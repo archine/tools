@@ -20,7 +20,7 @@ public @interface ExcelDropdownBox {
     String[] combobox() default {};
 
     /**
-     * Check the number of rows
+     * How many rows to add
      *
      * @return 200
      */
@@ -34,7 +34,7 @@ public @interface ExcelDropdownBox {
     boolean showErrorBox() default true;
 
     /**
-     * Prompt box level
+     * Error box level
      *
      * @return level
      */

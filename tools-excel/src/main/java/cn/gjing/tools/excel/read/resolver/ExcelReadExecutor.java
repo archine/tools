@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel.read;
+package cn.gjing.tools.excel.read.resolver;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.convert.DataConvert;
@@ -9,6 +9,7 @@ import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
+import cn.gjing.tools.excel.read.ExcelAssert;
 import cn.gjing.tools.excel.read.listener.EmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ReadListener;
 import cn.gjing.tools.excel.read.listener.ResultReadListener;
@@ -37,13 +38,13 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
     private List<String> headNameList;
     private Map<String, Field> excelFieldMap;
     private Map<String, DataConvert<?>> dataConvertMap;
-    private Map<Class<? extends ReadListener<R>>, List<ReadListener<R>>> readListeners;
+    private Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap;
     private Boolean isSave;
 
-    public ExcelReadExecutor(Workbook workbook, Map<Class<? extends ReadListener<R>>, List<ReadListener<R>>> readListeners) {
+    public ExcelReadExecutor(Workbook workbook, Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap) {
         this.excelFieldMap = new HashMap<>(16);
         this.workbook = workbook;
-        this.readListeners = readListeners;
+        this.readListenersMap = readListenersMap;
         this.headNameList = new ArrayList<>();
     }
 
@@ -91,7 +92,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
         boolean stop = false;
-        List<ReadListener<R>> rowReadListeners = this.readListeners.get(RowReadListener.class);
+        List<ReadListener> rowReadListeners = this.readListenersMap.get(RowReadListener.class);
         Gson gson = new Gson();
         for (Row row : sheet) {
             if (stop) {
@@ -162,7 +163,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
             }
         }
-        ListenerUtils.resultNotify(this.readListeners.get(ResultReadListener.class), dataList);
+        ListenerUtils.resultNotify(this.readListenersMap.get(ResultReadListener.class), dataList);
     }
 
     /**
@@ -258,7 +259,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
         if (excelField.allowEmpty()) {
             return;
         }
-        this.isSave = ListenerUtils.readEmpty(this.readListeners.get(EmptyReadListener.class), r, field, excelField, rowIndex, colIndex, hasNext);
+        this.isSave = ListenerUtils.readEmpty(this.readListenersMap.get(EmptyReadListener.class), r, field, excelField, rowIndex, colIndex, hasNext);
     }
 
     /**

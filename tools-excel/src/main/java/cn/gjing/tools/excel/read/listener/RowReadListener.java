@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author Gjing
  **/
-public interface RowReadListener<R> extends ReadListener<R> {
+public interface RowReadListener<R> extends ReadListener {
     /**
      * Read each row successfully
      *
