@@ -1,13 +1,16 @@
 package cn.gjing.tools.excel.write;
 
-import cn.gjing.tools.excel.util.ExcelUtils;
-import cn.gjing.tools.excel.write.listener.*;
+import cn.gjing.tools.excel.util.ListenerChain;
+import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import lombok.*;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Excel writer context
@@ -65,7 +68,7 @@ public final class ExcelWriterContext {
     private Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache = new HashMap<>(8);
 
     public ExcelWriterContext addListener(ExcelWriteListener excelWriteListener) {
-        ExcelUtils.addWriteListener(this.writeListenerCache, excelWriteListener);
+        ListenerChain.addWriteListener(this.writeListenerCache, excelWriteListener);
         return this;
     }
 }

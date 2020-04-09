@@ -3,19 +3,15 @@ package cn.gjing.tools.excel.read.resolver;
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
-import cn.gjing.tools.excel.read.listener.ReadListener;
-import cn.gjing.tools.excel.read.listener.ResultReadListener;
-import cn.gjing.tools.excel.util.ExcelUtils;
+import cn.gjing.tools.excel.read.ExcelReaderContext;
+import cn.gjing.tools.excel.read.listener.ExcelReadListener;
+import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -24,49 +20,44 @@ import java.util.function.Supplier;
  * @author Gjing
  **/
 public class ExcelReader<R> {
-    private Class<R> excelClass;
-    private List<Field> excelFieldList;
+    private ExcelReaderContext<R> context;
     private ExcelReaderResolver<R> readerResolver;
-    private InputStream inputStream;
-    private Workbook workbook;
-    private boolean collect;
     private String defaultSheetName = "sheet1";
-    private Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap;
 
     private ExcelReader() {
 
     }
 
-    public ExcelReader(Class<R> excelClass, InputStream inputStream, Excel excel, List<Field> excelFieldList) {
-        this.excelClass = excelClass;
-        this.inputStream = inputStream;
-        this.excelFieldList = excelFieldList;
-        this.readListenersMap = new HashMap<>(8);
-        this.initResolver(excel, inputStream);
+    public ExcelReader(ExcelReaderContext<R> context, Excel excel) {
+        this.context = context;
+        this.initResolver(excel);
     }
 
     /**
      * Init excel read resolver
      *
-     * @param excel       Excel annotation of Excel entity
-     * @param inputStream File inputStream
+     * @param excel Excel annotation of Excel entity
      */
-    private void initResolver(Excel excel, InputStream inputStream) {
+    private void initResolver(Excel excel) {
         switch (excel.type()) {
             case XLS:
                 try {
-                    this.workbook = new HSSFWorkbook(inputStream);
+                    this.context.setWorkbook(new HSSFWorkbook(this.context.getInputStream()));
                 } catch (IOException e) {
                     throw new ExcelInitException("Init workbook error, " + e.getMessage());
                 }
                 break;
             case XLSX:
-                this.workbook = StreamingReader.builder().rowCacheSize(excel.cacheRowSize()).bufferSize(excel.bufferSize()).open(inputStream);
+                Workbook workbook = StreamingReader.builder()
+                        .rowCacheSize(excel.cacheRowSize())
+                        .bufferSize(excel.bufferSize())
+                        .open(this.context.getInputStream());
+                this.context.setWorkbook(workbook);
                 break;
             default:
                 throw new ExcelInitException("No corresponding processor was found");
         }
-        this.readerResolver = new ReadExecutor<>(this.workbook, this.readListenersMap);
+        this.readerResolver = new ReadExecutor<>(this.context);
     }
 
     /**
@@ -75,8 +66,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read() {
-        this.readerResolver.read(this.excelClass, 0, this.defaultSheetName,
-                this.excelFieldList, this.collect);
+        this.readerResolver.read(0, this.defaultSheetName);
         return this;
     }
 
@@ -87,8 +77,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(String sheetName) {
-        this.readerResolver.read(this.excelClass, 0, sheetName,
-                this.excelFieldList, this.collect);
+        this.readerResolver.read(0, sheetName);
         return this;
     }
 
@@ -99,7 +88,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(int startIndex) {
-        this.readerResolver.read(this.excelClass, startIndex, this.defaultSheetName, this.excelFieldList, this.collect);
+        this.readerResolver.read(startIndex, this.defaultSheetName);
         return this;
     }
 
@@ -111,7 +100,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> read(int startIndex, String sheetName) {
-        this.readerResolver.read(this.excelClass, startIndex, sheetName, this.excelFieldList, this.collect);
+        this.readerResolver.read(startIndex, sheetName);
         return this;
     }
 
@@ -132,8 +121,9 @@ public class ExcelReader<R> {
      * @param readListenerList Read listeners
      * @return this
      */
-    public ExcelReader<R> addListener(List<ReadListener> readListenerList) {
-        readListenerList.forEach(e -> ExcelUtils.addReadListener(this.readListenersMap, e));
+    public ExcelReader<R> addListener(List<ExcelReadListener> readListenerList) {
+        readListenerList.forEach(this.context::addListener);
+        this.context.setCollectMode(false);
         return this;
     }
 
@@ -143,33 +133,21 @@ public class ExcelReader<R> {
      * @param readListener Read listener
      * @return this
      */
-    public ExcelReader<R> addListener(ReadListener readListener) {
-        ExcelUtils.addReadListener(this.readListenersMap, readListener);
-        return this;
-    }
-
-    public ExcelReader<R> subscribe(ResultReadListener<R> resultReadListener) {
-        ExcelUtils.addReadListener(this.readListenersMap, resultReadListener);
+    public ExcelReader<R> addListener(ExcelReadListener readListener) {
+        this.context.addListener(readListener);
+        this.context.setCollectMode(false);
         return this;
     }
 
     /**
-     * Open the collection of Java objects generated for each row of the import
+     * Subscribe to the data after the import is complete
      *
+     * @param excelResultReadListener resultReadListener
      * @return this
      */
-    public ExcelReader<R> enableCollect() {
-        this.collect = true;
-        return this;
-    }
-
-    /**
-     * Close the collection of Java objects generated for each row of the import
-     *
-     * @return this
-     */
-    public ExcelReader<R> closeCollect() {
-        this.collect = false;
+    public ExcelReader<R> subscribe(ExcelResultReadListener<R> excelResultReadListener) {
+        this.context.addListener(excelResultReadListener);
+        this.context.setCollectMode(true);
         return this;
     }
 
@@ -178,11 +156,11 @@ public class ExcelReader<R> {
      */
     public void end() {
         try {
-            if (this.inputStream != null) {
-                this.inputStream.close();
+            if (this.context.getInputStream() != null) {
+                this.context.getInputStream().close();
             }
-            if (this.workbook != null) {
-                this.workbook.close();
+            if (this.context.getWorkbook() != null) {
+                this.context.getWorkbook().close();
             }
         } catch (IOException e) {
             e.printStackTrace();

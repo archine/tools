@@ -1,11 +1,6 @@
 package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.read.listener.EmptyReadListener;
-import cn.gjing.tools.excel.read.listener.ReadListener;
-import cn.gjing.tools.excel.read.listener.ResultReadListener;
-import cn.gjing.tools.excel.read.listener.RowReadListener;
-import cn.gjing.tools.excel.write.listener.*;
 import cn.gjing.tools.excel.write.merge.ExcelOldCellModel;
 import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
 import cn.gjing.tools.excel.write.valid.OperatorType;
@@ -18,9 +13,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -284,55 +277,5 @@ public final class ExcelUtils {
      */
     public static String createSumFormula(int firstColIndex, int firstRowIndex, int lastColIndex, int lastRowIndex) {
         return "SUM(" + (char) ('A' + firstColIndex) + firstRowIndex + ":" + (char) ('A' + lastColIndex) + lastRowIndex + ")";
-    }
-
-    /**
-     * Add a write listener
-     *
-     * @param writeListenerCache writeListenerCache
-     * @param listener           Write listener
-     */
-    public static void addWriteListener(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache, ExcelWriteListener listener) {
-        if (listener instanceof ExcelSheetWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelSheetWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelRowWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelRowWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelCellWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelCellWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelCascadingDropdownBoxListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelCascadingDropdownBoxListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelWorkbookWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelWorkbookWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-    }
-
-    /**
-     * Add a read listener
-     *
-     * @param readListenersCache readListenersCache
-     * @param readListener       read Listener
-     */
-    public static void addReadListener(Map<Class<? extends ReadListener>, List<ReadListener>> readListenersCache, ReadListener readListener) {
-        if (readListener instanceof RowReadListener) {
-            List<ReadListener> readListeners = readListenersCache.computeIfAbsent(RowReadListener.class, k -> new ArrayList<>());
-            readListeners.add(readListener);
-        }
-        if (readListener instanceof EmptyReadListener) {
-            List<ReadListener> readListeners = readListenersCache.computeIfAbsent(EmptyReadListener.class, k -> new ArrayList<>());
-            readListeners.add(readListener);
-        }
-        if (readListener instanceof ResultReadListener) {
-            List<ReadListener> readListeners = readListenersCache.computeIfAbsent(ResultReadListener.class, k -> new ArrayList<>());
-            readListeners.add(readListener);
-        }
     }
 }

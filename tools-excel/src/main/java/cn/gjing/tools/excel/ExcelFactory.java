@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel;
 
+import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.resolver.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
@@ -52,10 +53,10 @@ public final class ExcelFactory {
     /**
      * Create an excel writer
      *
-     * @param fileName   Excel file name，The priority is higher than the annotation specification
-     * @param excelClass Excel mapped entity
-     * @param response   response
-     * @param ignores    The exported field is to be ignored
+     * @param fileName         Excel file name，The priority is higher than the annotation specification
+     * @param excelClass       Excel mapped entity
+     * @param response         response
+     * @param ignores          The exported field is to be ignored
      * @param initDefaultStyle Whether init  default excel style
      * @return ExcelWriter
      */
@@ -82,7 +83,9 @@ public final class ExcelFactory {
     public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, null, new ArrayList<>());
-        return new ExcelReader<>(excelClass, inputStream, excel, excelFieldList);
+        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, null, null);
+        ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(inputStream, excelClass, excelFieldList);
+        return new ExcelReader<>(readerContext, excel);
     }
+
 }

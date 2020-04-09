@@ -4,7 +4,6 @@ import cn.gjing.tools.excel.exception.ExcelResolverException;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Param utils
@@ -12,10 +11,8 @@ import java.util.regex.Pattern;
  * @author Gjing
  **/
 public final class ParamUtils {
-    private static Pattern pattern = Pattern.compile("^(-?\\d+)(\\.\\d+)?$");
-
     /**
-     * Determines whether the array contains a value
+     * Whether the array contains a value
      *
      * @param arr array
      * @param val value
@@ -65,16 +62,6 @@ public final class ParamUtils {
         if (obj == null) {
             throw new ExcelResolverException(message);
         }
-    }
-
-    /**
-     * Whether it's numeric
-     *
-     * @param str param
-     * @return true or false
-     */
-    public static boolean isNumber(String str) {
-        return pattern.matcher(str).matches();
     }
 
     /**

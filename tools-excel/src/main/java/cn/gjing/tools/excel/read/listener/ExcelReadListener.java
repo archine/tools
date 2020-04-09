@@ -7,4 +7,4 @@ import cn.gjing.tools.excel.metadata.ExcelListener;
  *
  * @author Gjing
  **/
-public interface ReadListener extends ExcelListener {}
+public interface ExcelReadListener extends ExcelListener {}

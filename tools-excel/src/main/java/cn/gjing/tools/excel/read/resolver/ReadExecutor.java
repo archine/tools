@@ -9,11 +9,12 @@ import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
+import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.valid.ExcelAssert;
-import cn.gjing.tools.excel.read.listener.EmptyReadListener;
-import cn.gjing.tools.excel.read.listener.ReadListener;
-import cn.gjing.tools.excel.read.listener.ResultReadListener;
-import cn.gjing.tools.excel.read.listener.RowReadListener;
+import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
+import cn.gjing.tools.excel.read.listener.ExcelReadListener;
+import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
+import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import com.google.gson.Gson;
@@ -34,24 +35,20 @@ import java.util.stream.Collectors;
  * @author Gjing
  **/
 class ReadExecutor<R> implements ExcelReaderResolver<R> {
-    private Workbook workbook;
-    private List<String> headNameList;
+    private ExcelReaderContext<R> context;
     private Map<String, Field> excelFieldMap;
     private Map<String, DataConvert<?>> dataConvertMap;
-    private Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap;
     private Boolean isSave;
 
-    public ReadExecutor(Workbook workbook, Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap) {
+    public ReadExecutor(ExcelReaderContext<R> context) {
         this.excelFieldMap = new HashMap<>(16);
-        this.workbook = workbook;
-        this.readListenersMap = readListenersMap;
-        this.headNameList = new ArrayList<>();
+        this.context = context;
     }
 
     @Override
-    public void read(Class<R> excelClass, int startIndex, String sheetName, List<Field> excelFieldList, boolean collect) {
+    public void read(int startIndex, String sheetName) {
         if (excelFieldMap.isEmpty()) {
-            this.excelFieldMap = excelFieldList.stream()
+            this.excelFieldMap = this.context.getExcelFields().stream()
                     .peek(e -> {
                         ExcelField excelField = e.getAnnotation(ExcelField.class);
                         if (excelField.convert() != DefaultDataConvert.class) {
@@ -70,54 +67,52 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                         return excelField.value()[headSize == 0 ? 0 : headSize - 1];
                     }, field -> field));
         }
-        Sheet sheet = workbook.getSheet(sheetName);
+        Sheet sheet = this.context.getWorkbook().getSheet(sheetName);
         if (sheet == null) {
             throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
         }
-        this.reader(sheet, excelClass, startIndex, collect ? new ArrayList<>() : null, collect);
+        this.context.setSheet(sheet);
+        this.reader(startIndex, this.context.getCollectMode() ? new ArrayList<>() : null);
     }
 
     /**
      * Start read
      *
-     * @param sheet      Current sheet
-     * @param excelClass Current excel class
      * @param startIndex Excel header index
      * @param dataList   All data
-     * @param collect    Whether collect the Java objects generated for each row when imported
      */
-    private void reader(Sheet sheet, Class<R> excelClass, int startIndex, List<R> dataList, boolean collect) {
+    private void reader(int startIndex, List<R> dataList) {
         R r;
         this.isSave = true;
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
         boolean stop = false;
-        List<ReadListener> rowReadListeners = this.readListenersMap.get(RowReadListener.class);
+        List<ExcelReadListener> rowReadListeners = this.context.getReadListenersCache().get(ExcelRowReadListener.class);
         Gson gson = new Gson();
-        for (Row row : sheet) {
+        for (Row row : this.context.getSheet()) {
             if (stop) {
                 break;
             }
-            boolean hasNext = row.getRowNum() < sheet.getLastRowNum();
+            boolean hasNext = row.getRowNum() < this.context.getSheet().getLastRowNum();
             if (row.getRowNum() < startIndex) {
                 continue;
             }
             if (row.getRowNum() == startIndex) {
-                if (this.headNameList.isEmpty()) {
+                if (this.context.getHeadNames().isEmpty()) {
                     for (Cell cell : row) {
-                        headNameList.add(cell.getStringCellValue());
-                        stop = ListenerChain.doReadRow(rowReadListeners, null, headNameList, startIndex, true, hasNext);
+                        this.context.getHeadNames().add(cell.getStringCellValue());
+                        stop = ListenerChain.doReadRow(rowReadListeners, null, this.context.getHeadNames(), startIndex, true, hasNext);
                     }
                 }
                 continue;
             }
             try {
-                r = excelClass.newInstance();
+                r = this.context.getExcelClass().newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelInitException("Excel entity init failure, " + e.getMessage());
             }
             for (int c = 0; c < row.getLastCellNum() && this.isSave; c++) {
-                Field field = excelFieldMap.get(headNameList.get(c));
+                Field field = excelFieldMap.get(this.context.getHeadNames().get(c));
                 if (field == null) {
                     throw new ExcelTemplateException();
                 }
@@ -154,7 +149,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
             if (this.isSave) {
                 try {
                     ListenerChain.doReadRow(rowReadListeners, r, null, row.getRowNum(), false, hasNext);
-                    if (collect) {
+                    if (this.context.getCollectMode()) {
                         dataList.add(r);
                     }
                 } catch (Exception e) {
@@ -162,7 +157,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
             }
         }
-        ListenerChain.doResultNotify(this.readListenersMap.get(ResultReadListener.class), dataList);
+        ListenerChain.doResultNotify(this.context.getReadListenersCache().get(ExcelResultReadListener.class), dataList);
     }
 
     /**
@@ -258,7 +253,8 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
         if (excelField.allowEmpty()) {
             return;
         }
-        this.isSave = ListenerChain.doReadEmpty(this.readListenersMap.get(EmptyReadListener.class), r, field, excelField, rowIndex, colIndex, hasNext);
+        this.isSave = ListenerChain.doReadEmpty(this.context.getReadListenersCache()
+                .get(ExcelEmptyReadListener.class), r, field, excelField, rowIndex, colIndex, hasNext);
     }
 
     /**

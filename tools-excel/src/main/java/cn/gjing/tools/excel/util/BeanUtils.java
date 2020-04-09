@@ -71,7 +71,9 @@ public final class BeanUtils {
                     String[] names = e.getAnnotation(ExcelField.class).value();
                     for (String name : names) {
                         if (ParamUtils.noContains(ignores, name)) {
-                            headerNames.add(names);
+                            if (headerNames != null) {
+                                headerNames.add(names);
+                            }
                             break;
                         }
                         noContain = false;

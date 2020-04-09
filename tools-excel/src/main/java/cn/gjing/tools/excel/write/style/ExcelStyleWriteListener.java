@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRowWriteListener {
 
     /**
-     * Init listener
+     * Init Style write listener
      *
      * @param workbook workbook
      */
@@ -27,7 +27,7 @@ public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRo
     /**
      * Set excel big title style
      *
-     * @param cell cell
+     * @param cell Current cell
      */
     void setTitleStyle(Cell cell);
 

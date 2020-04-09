@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author Gjing
  **/
-public interface RowReadListener<R> extends ReadListener {
+public interface ExcelRowReadListener<R> extends ExcelReadListener {
     /**
      * Read each row successfully
      *

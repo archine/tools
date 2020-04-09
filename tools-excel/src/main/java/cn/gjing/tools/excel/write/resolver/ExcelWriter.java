@@ -4,7 +4,6 @@ import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.BeanUtils;
-import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.BigTitle;
@@ -75,7 +74,7 @@ public final class ExcelWriter {
     private void initStyle(ExcelWriterContext context) {
         DefaultExcelStyleWriteListener defaultExcelStyle = new DefaultExcelStyleWriteListener();
         defaultExcelStyle.init(context.getWorkbook());
-        ExcelUtils.addWriteListener(this.context.getWriteListenerCache(), defaultExcelStyle);
+        this.context.addListener(defaultExcelStyle);
     }
 
     /**
