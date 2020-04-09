@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * @author Gjing
  **/
-class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
+class ReadExecutor<R> implements ExcelReaderResolver<R> {
     private Workbook workbook;
     private List<String> headNameList;
     private Map<String, Field> excelFieldMap;
@@ -41,7 +41,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
     private Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap;
     private Boolean isSave;
 
-    public ExcelReadExecutor(Workbook workbook, Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap) {
+    public ReadExecutor(Workbook workbook, Map<Class<? extends ReadListener>, List<ReadListener>> readListenersMap) {
         this.excelFieldMap = new HashMap<>(16);
         this.workbook = workbook;
         this.readListenersMap = readListenersMap;

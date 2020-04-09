@@ -23,27 +23,27 @@ import java.util.Objects;
  * @author Gjing
  **/
 class ExcelWriteXlsResolver implements ExcelWriterResolver {
-    private ExcelWriteExecutor excelWriteExecutor;
+    private WriteExecutor writeExecutor;
 
     @Override
     public void init(ExcelWriterContext context) {
-        this.excelWriteExecutor = new ExcelWriteExecutor(context);
+        this.writeExecutor = new WriteExecutor(context);
     }
 
     @Override
     public void writeTitle(BigTitle bigTitle) {
-        this.excelWriteExecutor.setBigTitle(bigTitle);
+        this.writeExecutor.setBigTitle(bigTitle);
     }
 
     @Override
     public ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> dropdownBoxValues) {
-        this.excelWriteExecutor.setHead(needHead, dropdownBoxValues);
+        this.writeExecutor.setHead(needHead, dropdownBoxValues);
         return this;
     }
 
     @Override
     public ExcelWriterResolver write(List<?> data) {
-        this.excelWriteExecutor.setValue(data);
+        this.writeExecutor.setValue(data);
         return this;
     }
 

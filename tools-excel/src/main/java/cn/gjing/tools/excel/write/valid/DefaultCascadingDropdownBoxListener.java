@@ -13,10 +13,10 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-public final class DefaultCascadingDropdownBoxCascadingDropdownBoxListener implements ExcelCascadingDropdownBoxListener {
+public final class DefaultCascadingDropdownBoxListener implements ExcelCascadingDropdownBoxListener {
     private Map<String, String[]> boxValues;
 
-    public DefaultCascadingDropdownBoxCascadingDropdownBoxListener(Map<String, String[]> boxValues) {
+    public DefaultCascadingDropdownBoxListener(Map<String, String[]> boxValues) {
         this.boxValues = boxValues;
     }
 

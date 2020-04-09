@@ -195,7 +195,7 @@ public final class ExcelWriter {
     public ExcelWriter writeTitle(BigTitle bigTitle, String sheetName) {
         this.createSheet(sheetName);
         if (bigTitle.getLastCols() < 1) {
-            bigTitle.setLastCols(this.context.getExcelFields().size());
+            bigTitle.setLastCols(this.context.getExcelFields().size() - 1);
         }
         this.writerResolver.writeTitle(bigTitle);
         return this;
@@ -248,7 +248,7 @@ public final class ExcelWriter {
      * @return this
      */
     public ExcelWriter addListener(ExcelWriteListener listener) {
-        ExcelUtils.addWriteListener(this.context.getWriteListenerCache(), listener);
+        this.context.addListener(listener);
         return this;
     }
 
@@ -259,7 +259,7 @@ public final class ExcelWriter {
      * @return this
      */
     public ExcelWriter addListener(List<? extends ExcelWriteListener> listeners) {
-        listeners.forEach(e -> ExcelUtils.addWriteListener(this.context.getWriteListenerCache(), e));
+        listeners.forEach(this.context::addListener);
         return this;
     }
 

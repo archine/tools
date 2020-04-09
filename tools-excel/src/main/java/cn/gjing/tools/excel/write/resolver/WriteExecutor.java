@@ -40,14 +40,14 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-class ExcelWriteExecutor {
+class WriteExecutor {
     private ExcelWriterContext context;
     private Map<String, DataConvert<?>> dataConvertMap;
     private Map<String, ExcelAutoMergeCallback<?>> mergeCallbackMap;
     private Map<Integer, ExcelOldRowModel> oldRowModelMap;
     private Gson gson;
 
-    public ExcelWriteExecutor(ExcelWriterContext context) {
+    public WriteExecutor(ExcelWriterContext context) {
         this.gson = new Gson();
         this.context = context;
     }
@@ -73,14 +73,14 @@ class ExcelWriteExecutor {
                 });
             }
         }
-        this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCols() - 1));
+        this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCols()));
     }
 
     /**
      * Set excel head
      *
-     * @param needHead      Whether to set header
-     * @param boxValues     Excel dropdown box value
+     * @param needHead  Whether to set header
+     * @param boxValues Excel dropdown box value
      */
     public void setHead(boolean needHead, Map<String, String[]> boxValues) {
         if (this.context.getHeadNames().isEmpty()) {
@@ -114,7 +114,7 @@ class ExcelWriteExecutor {
                     }
                     if (this.context.getNeedValid() && index == headRowSize - 1) {
                         try {
-                            this.addValid(field, headRow, index, boxValues);
+                            this.addValid(field, headRow, colIndex, boxValues);
                         } catch (Exception e) {
                             throw new ExcelResolverException("Add excel validation failure, " + e.getMessage());
                         }
@@ -129,7 +129,7 @@ class ExcelWriteExecutor {
     /**
      * Set excel body
      *
-     * @param data          Export data
+     * @param data Export data
      */
     public void setValue(List<?> data) {
         if (data == null) {
@@ -289,11 +289,11 @@ class ExcelWriteExecutor {
     /**
      * Call the macro to set Excel data validation
      *
-     * @param field     Current field
-     * @param row       Current row
-     * @param colIndex  Current col index
+     * @param field    Current field
+     * @param row      Current row
+     * @param colIndex Current col index
      */
-    private void addValid(Field field, Row row, int colIndex,Map<String, String[]> boxValues) {
+    private void addValid(Field field, Row row, int colIndex, Map<String, String[]> boxValues) {
         ExcelDropdownBox ev = field.getAnnotation(ExcelDropdownBox.class);
         ExcelDateValid dv = field.getAnnotation(ExcelDateValid.class);
         ExcelNumericValid nv = field.getAnnotation(ExcelNumericValid.class);
@@ -301,7 +301,7 @@ class ExcelWriteExecutor {
         if (ev != null) {
             if ("".equals(ev.link())) {
                 ExcelUtils.addDropdownBox(ev.combobox(), ev.showErrorBox(), ev.rank(), ev.errorTitle(), ev.errorContent(), this.context.getWorkbook(), this.context.getSheet(),
-                        firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, boxValues.get(field.getName()));
+                        firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, boxValues == null ? null : boxValues.get(field.getName()));
             } else {
                 List<ExcelWriteListener> dropdownListeners = this.context.getWriteListenerCache().get(ExcelCascadingDropdownBoxListener.class);
                 dropdownListeners.forEach(e -> ((ExcelCascadingDropdownBoxListener) e)

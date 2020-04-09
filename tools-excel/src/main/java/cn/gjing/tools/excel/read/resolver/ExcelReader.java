@@ -4,6 +4,7 @@ import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
 import cn.gjing.tools.excel.read.listener.ReadListener;
+import cn.gjing.tools.excel.read.listener.ResultReadListener;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -65,7 +66,7 @@ public class ExcelReader<R> {
             default:
                 throw new ExcelInitException("No corresponding processor was found");
         }
-        this.readerResolver = new ExcelReadExecutor<>(this.workbook, this.readListenersMap);
+        this.readerResolver = new ReadExecutor<>(this.workbook, this.readListenersMap);
     }
 
     /**
@@ -144,6 +145,11 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> addListener(ReadListener readListener) {
         ExcelUtils.addReadListener(this.readListenersMap, readListener);
+        return this;
+    }
+
+    public ExcelReader<R> subscribe(ResultReadListener<R> resultReadListener) {
+        ExcelUtils.addReadListener(this.readListenersMap, resultReadListener);
         return this;
     }
 
