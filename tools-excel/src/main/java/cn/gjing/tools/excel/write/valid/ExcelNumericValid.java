@@ -38,7 +38,7 @@ public @interface ExcelNumericValid {
      *
      * @return expr1
      */
-    String expr1() default "50";
+    String expr1() default "1";
 
     /**
      * expr2

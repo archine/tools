@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.read;
 
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
+import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import cn.gjing.tools.excel.util.ListenerChain;
 import lombok.*;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -14,51 +15,51 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Excel reader global context
+ *
  * @author Gjing
  **/
 @Getter
+@Setter
 public class ExcelReaderContext<R> {
     /**
      * Current workbook
      */
-    @Setter
     private Workbook workbook;
+
     /**
      * Current sheet
      */
-    @Setter
     private Sheet sheet;
+
     /**
      * File inputStream
      */
-    @Setter
     private InputStream inputStream;
-    /**
-     * Whether to turn on collection mode
-     */
-    @Setter
-    private Boolean collectMode;
+
     /**
      * Current excel mapping entity
      */
-    @Setter
     private Class<R> excelClass;
+
     /**
      * Real header
      */
-    @Setter
     @Builder.Default
     private List<String> headNames = new ArrayList<>();
+
     /**
      * Current excel header mapping field
      */
-    @Setter
     private List<Field> excelFields;
+
     /**
      * Read listener cache
      */
     @Builder.Default
     private Map<Class<? extends ExcelReadListener>, List<ExcelReadListener>> readListenersCache = new HashMap<>(8);
+
+    private ExcelResultReadListener<R> resultReadListener;
 
     public ExcelReaderContext(InputStream inputStream, Class<R> excelClass, List<Field> excelFields) {
         this.inputStream = inputStream;

@@ -10,15 +10,17 @@ import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
-import cn.gjing.tools.excel.read.valid.ExcelAssert;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
-import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
+import cn.gjing.tools.excel.read.valid.ExcelAssert;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import com.google.gson.Gson;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -73,7 +75,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
             throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
         }
         this.context.setSheet(sheet);
-        this.reader(startIndex, this.context.getCollectMode() ? new ArrayList<>() : null);
+        this.reader(startIndex, this.context.getResultReadListener() == null ? null : new ArrayList<>());
     }
 
     /**
@@ -150,7 +152,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
             if (this.isSave) {
                 try {
                     ListenerChain.doReadRow(rowReadListeners, r, null, row.getRowNum(), false, hasNext);
-                    if (this.context.getCollectMode()) {
+                    if (dataList != null) {
                         dataList.add(r);
                     }
                 } catch (Exception e) {
@@ -158,7 +160,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
             }
         }
-        ListenerChain.doResultNotify(this.context.getReadListenersCache().get(ExcelResultReadListener.class), dataList);
+        ListenerChain.doResultNotify(this.context.getResultReadListener(), dataList);
     }
 
     /**

@@ -33,7 +33,7 @@ public final class BigTitle {
     private int lastCols = 0;
 
     /**
-     * Title content
+     * Fill content
      */
     @Builder.Default
     private String content = "";

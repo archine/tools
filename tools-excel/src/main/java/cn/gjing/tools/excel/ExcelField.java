@@ -45,7 +45,8 @@ public @interface ExcelField {
     int sort() default -1;
 
     /**
-     * Cell format when exported
+     * The format of the cells under the current table header when exported,
+     * default to normal format
      *
      * @return format
      */
@@ -67,9 +68,10 @@ public @interface ExcelField {
 
     /**
      * Data converter, which you can use to change data during import and export,
-     * occurs before cell assignment and before Java object assignment
+     * before the cells are populated and converted to entity fields
      *
-     * @return DefaultDataConvert.class
+     * @return DefaultDataConvert
+     * @see DataConvert
      */
     Class<? extends DataConvert<?>> convert() default DefaultDataConvert.class;
 }

@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.lang.reflect.Field;
 
 /**
- * Call the macro to add a drop-down box to the Excel file
+ * Cascading dropdown box listener
  *
  * @author Gjing
  **/

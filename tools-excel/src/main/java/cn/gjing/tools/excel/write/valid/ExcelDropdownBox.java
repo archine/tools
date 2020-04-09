@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 public @interface ExcelDropdownBox {
 
     /**
-     * The value in the drop-down box
+     * The value in the dropdown box
      *
      * @return value
      */
@@ -41,7 +41,9 @@ public @interface ExcelDropdownBox {
     Rank rank() default Rank.STOP;
 
     /**
-     * Number of parent cell index
+     * If you specify a parent cell, then you need to add a cascading drop-down listener.{@link DefaultCascadingDropdownBoxListener}
+     * Of course, you can implement the listener yourself and pass it to me.The column index starts at 0
+     *
      * @return link
      */
     String link() default "";

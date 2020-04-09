@@ -16,6 +16,7 @@ public interface ExcelWriterResolver {
 
     /**
      * Init resolver
+     *
      * @param context Excel write context
      */
     void init(ExcelWriterContext context);
@@ -30,16 +31,16 @@ public interface ExcelWriterResolver {
     /**
      * Write excel body
      *
-     * @param data          data
+     * @param data data
      * @return this
      */
     ExcelWriterResolver write(List<?> data);
 
     /**
-     * Write excel head
+     * Write excel header
      *
-     * @param needHead      Is needHead excel entity or sheet?
-     * @param boxValues     Excel dropdown box values
+     * @param needHead  Is needHead excel entity or sheet?
+     * @param boxValues Excel dropdown box values
      * @return this
      */
     ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> boxValues);
@@ -47,7 +48,7 @@ public interface ExcelWriterResolver {
     /**
      * Output the contents of the cache
      *
-     * @param context Excel write context
+     * @param context  Excel write context
      * @param response response
      */
     void flush(HttpServletResponse response, ExcelWriterContext context);

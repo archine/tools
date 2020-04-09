@@ -1,6 +1,8 @@
 package cn.gjing.tools.excel.exception;
 
 /**
+ * Excel template exception
+ *
  * @author Gjing
  **/
 public class ExcelTemplateException extends ExcelResolverException {

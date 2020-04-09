@@ -30,15 +30,15 @@ public class ExcelReader<R> {
 
     public ExcelReader(ExcelReaderContext<R> context, Excel excel) {
         this.context = context;
-        this.initResolver(excel);
+        this.chooseResolver(excel);
     }
 
     /**
-     * Init excel read resolver
+     * Choose excel read resolver
      *
      * @param excel Excel annotation of Excel entity
      */
-    private void initResolver(Excel excel) {
+    private void chooseResolver(Excel excel) {
         switch (excel.type()) {
             case XLS:
                 try {
@@ -55,7 +55,7 @@ public class ExcelReader<R> {
                 this.context.setWorkbook(workbook);
                 break;
             default:
-                throw new ExcelInitException("No corresponding processor was found");
+                throw new ExcelInitException("No corresponding resolver was found");
         }
         this.readerResolver = new ReadExecutor<>();
         this.readerResolver.init(this.context);
@@ -83,9 +83,10 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Read the excel sheet
+     * Specifies that the Excel subscript to start reading.
+     * This line must be a real subscript,
      *
-     * @param startIndex Excel header starter index
+     * @param startIndex subscript is evaluated from 0
      * @return this
      */
     public ExcelReader<R> read(int startIndex) {
@@ -106,7 +107,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Reset the processor before any other operation
+     * Reset the resolver before you start reading the file
      *
      * @param excelReaderResolver Excel read resolver
      * @return this
@@ -117,7 +118,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Add readListenersMap
+     * Add readListeners
      *
      * @param readListenerList Read listeners
      * @return this
@@ -128,7 +129,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Subscribe to the results of the import
+     * Add readListeners
      *
      * @param readListener Read listener
      * @return this
@@ -145,18 +146,7 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> subscribe(ExcelResultReadListener<R> excelResultReadListener) {
-        this.context.addListener(excelResultReadListener);
-        this.context.setCollectMode(true);
-        return this;
-    }
-
-    /**
-     * Whether need enable collect mode
-     * @param needCollect needCollect
-     * @return this
-     */
-    public ExcelReader<R> collect(boolean needCollect) {
-        this.context.setCollectMode(needCollect);
+        this.context.setResultReadListener(excelResultReadListener);
         return this;
     }
 

@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  **/
 public interface ExcelAutoMergeCallback<T> {
     /**
-     * Horizontal merger
+     * Vertical merge
      *
      * @param t        The excel mapping entity for the current row, Null in the header case
      * @param field    Current field

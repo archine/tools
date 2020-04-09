@@ -182,7 +182,7 @@ public final class ExcelUtils {
     }
 
     /**
-     * Vertical merger
+     * Vertical merge
      * OldRowModelMap should be global, with minimum partitioning to each export
      *
      * @param oldRowModelMap  oldRowModelMap
@@ -271,8 +271,8 @@ public final class ExcelUtils {
     /**
      * Create a sum expression
      *
-     * @param firstColIndex Which column starts
-     * @param firstRowIndex Which row starts
+     * @param firstColIndex Which column start
+     * @param firstRowIndex Which row start
      * @param lastColIndex  Which column end
      * @param lastRowIndex  Which row end
      * @return expression

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * Excel front cell
  * @author Gjing
  **/
 @Data

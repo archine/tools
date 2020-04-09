@@ -6,8 +6,12 @@ import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.resolver.ExcelWriter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -63,17 +67,41 @@ public final class ExcelFactory {
     public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<String[]> headerNames = new ArrayList<>();
+        List<String[]> headerArr = new ArrayList<>();
         ExcelWriterContext context = ExcelWriterContext.builder()
-                .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerNames))
-                .headNames(headerNames)
+                .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr))
+                .headNames(headerArr)
                 .fileName(fileName == null ? "".equals(excel.value()) ? LocalDate.now().toString() : excel.value() : fileName)
                 .build();
         return new ExcelWriter(context, excel, response, initDefaultStyle);
     }
 
     /**
-     * Create an Excel read
+     * Create an Excel reader
+     *
+     * @param file       Excel file
+     * @param excelClass Excel mapped entity
+     * @param <R>        Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass) throws IOException {
+        return createReader(file.getInputStream(), excelClass);
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param file       Excel file
+     * @param excelClass Excel mapped entity
+     * @param <R>        Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass) throws IOException {
+        return createReader(new FileInputStream(file), excelClass);
+    }
+
+    /**
+     * Create an Excel reader
      *
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity
@@ -87,5 +115,4 @@ public final class ExcelFactory {
         ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(inputStream, excelClass, excelFieldList);
         return new ExcelReader<>(readerContext, excel);
     }
-
 }

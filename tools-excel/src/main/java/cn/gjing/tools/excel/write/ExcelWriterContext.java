@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Excel writer context
+ * Excel writer global context
  *
  * @author Gjing
  **/
@@ -27,40 +27,47 @@ public final class ExcelWriterContext {
      */
     @Setter
     private Workbook workbook;
+
     /**
      * Current sheet
      */
     @Setter
     private Sheet sheet;
+
     /**
      * The Excel file name to be exported
      */
     @Setter
     private String fileName;
+
     /**
      * Whether to add validation when exporting Excel templates
      */
     @Setter
     @Builder.Default
     private Boolean needValid = false;
+
     /**
-     * Whether there are more than one header
+     * Whether to open multistage Excel headers
      */
     @Setter
     @Builder.Default
     private Boolean multiHead = false;
+
     /**
      * Excel headers
      */
     @Setter
     @Builder.Default
     private List<Field> excelFields = new ArrayList<>();
+
     /**
      * Excel header names
      */
     @Setter
     @Builder.Default
     private List<String[]> headNames = new ArrayList<>();
+
     /**
      * Export listener cache
      */

@@ -54,9 +54,10 @@ public final class BeanUtils {
      *
      * @param excelClass Excel mapped entity
      * @param ignores    The exported field is to be ignored
+     * @param headerArr  excel header array
      * @return Excel fields
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String[]> headerNames) {
+    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String[]> headerArr) {
         Field[] declaredFields = excelClass.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = excelClass.getSuperclass();
@@ -68,11 +69,11 @@ public final class BeanUtils {
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).sort()))
                 .filter(e -> {
                     boolean noContain = true;
-                    String[] names = e.getAnnotation(ExcelField.class).value();
-                    for (String name : names) {
+                    String[] headNames = e.getAnnotation(ExcelField.class).value();
+                    for (String name : headNames) {
                         if (ParamUtils.noContains(ignores, name)) {
-                            if (headerNames != null) {
-                                headerNames.add(names);
+                            if (headerArr != null) {
+                                headerArr.add(headNames);
                             }
                             break;
                         }
@@ -85,7 +86,7 @@ public final class BeanUtils {
     }
 
     /**
-     * Gets the class of a generic in a generic interface
+     * Get the class of a generic in a generic interface
      *
      * @param source        A class that implements a generic interface
      * @param typeInterface A generic interface

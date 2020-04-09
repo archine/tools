@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.exception;
 
 /**
+ * Excel resolver initialization exception
  * @author Gjing
  **/
 public class ExcelInitException extends ExcelResolverException {

@@ -3,6 +3,7 @@ package cn.gjing.tools.excel.write.merge;
 import lombok.*;
 
 /**
+ * Excel front row
  * @author Gjing
  **/
 @Getter

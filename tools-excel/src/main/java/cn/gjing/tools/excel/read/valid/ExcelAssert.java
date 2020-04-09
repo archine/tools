@@ -5,6 +5,8 @@ import cn.gjing.tools.excel.exception.ExcelAssertException;
 import java.lang.annotation.*;
 
 /**
+ * Assert when Excel import
+ *
  * @author Gjing
  **/
 @Documented
@@ -12,14 +14,16 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface ExcelAssert {
     /**
-     * Check the rule (EL expression) that the expression result must be of type Boolean
+     * Predicate expressions.With an EL expression,
+     * the expression must satisfy a Boolean value
      *
      * @return boolean expression
      */
     String expr();
+
     /**
      * A validation failure throws an {@link ExcelAssertException},
-     * which is used to configure the information to be thrown
+     * which is used to configure the error information to be thrown
      *
      * @return message
      */

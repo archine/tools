@@ -38,18 +38,18 @@ public final class ExcelWriter {
     public ExcelWriter(ExcelWriterContext context, Excel excel, HttpServletResponse response, boolean initDefaultStyle) {
         this.response = response;
         this.context = context;
-        this.initResolver(context, excel);
+        this.chooseResolver(context, excel);
         if (initDefaultStyle) {
             this.initStyle(context);
         }
     }
 
     /**
-     * Init resolver
+     * Choose resolver
      *
      * @param excel excel
      */
-    private void initResolver(ExcelWriterContext context, Excel excel) {
+    private void chooseResolver(ExcelWriterContext context, Excel excel) {
         switch (excel.type()) {
             case XLS:
                 context.setWorkbook(new HSSFWorkbook());
@@ -62,12 +62,12 @@ public final class ExcelWriter {
                 this.writerResolver.init(context);
                 break;
             default:
-                throw new ExcelInitException("No corresponding processor was found");
+                throw new ExcelInitException("No corresponding resolver was found");
         }
     }
 
     /**
-     * Init default style
+     * Init default style listener
      *
      * @param context Excel write context
      */
@@ -173,8 +173,7 @@ public final class ExcelWriter {
     }
 
     /**
-     * Write excel big title
-     * This method only fires the style listener
+     * Write an Excel header that does not trigger a row callback or cell callback
      *
      * @param bigTitle Big title
      * @return this
@@ -184,8 +183,7 @@ public final class ExcelWriter {
     }
 
     /**
-     * Write excel big title
-     * This method only fires the style listener
+     * Write an Excel header that does not trigger a row listener or cell listener
      *
      * @param bigTitle  Big title
      * @param sheetName Sheet name
@@ -241,7 +239,7 @@ public final class ExcelWriter {
     }
 
     /**
-     * Add an write listener
+     * Add write listener
      *
      * @param listener Write listener
      * @return this
@@ -252,7 +250,7 @@ public final class ExcelWriter {
     }
 
     /**
-     * Add multiple write listener
+     * Add write listeners
      *
      * @param listeners Write listener list
      * @return this
@@ -263,7 +261,7 @@ public final class ExcelWriter {
     }
 
     /**
-     * Reset the processor before write operation
+     * Reset the write resolver before you are ready to call the write method
      *
      * @param excelWriteResolver Excel write Resolver
      * @return this

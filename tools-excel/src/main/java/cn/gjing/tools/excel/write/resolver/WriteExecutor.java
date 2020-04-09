@@ -169,7 +169,7 @@ class WriteExecutor {
     }
 
     /**
-     * initialize data convert
+     * Create data convert
      *
      * @param field      Current field
      * @param excelField ExcelField annotation on current field
@@ -195,7 +195,7 @@ class WriteExecutor {
     }
 
     /**
-     * Init merge callback
+     * Create merge callback
      *
      * @param field      Current field
      * @param excelField ExcelField annotation on current field
@@ -221,7 +221,7 @@ class WriteExecutor {
     }
 
     /**
-     * Vertical merger
+     * Vertical merge
      *
      * @param autoMergeCallback AutoMergeCallback
      * @param row               Current row

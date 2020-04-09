@@ -18,6 +18,7 @@ import java.util.Map;
 
 /**
  * Excel listener link call tool
+ *
  * @author Gjing
  **/
 public final class ListenerChain {
@@ -154,14 +155,13 @@ public final class ListenerChain {
     /**
      * Execute result notify listener
      *
-     * @param resultReadListeners resultReadListeners
-     * @param data                Import all the Java objects generated after success
-     * @param <R>                 R
+     * @param resultReadListener resultReadListener
+     * @param data               Import all the Java objects generated after success
+     * @param <R>                R
      */
-    @SuppressWarnings("unchecked")
-    public static <R> void doResultNotify(List<ExcelReadListener> resultReadListeners, List<R> data) {
-        if (resultReadListeners != null) {
-            resultReadListeners.forEach(e -> ((ExcelResultReadListener<R>) e).notify(data));
+    public static <R> void doResultNotify(ExcelResultReadListener<R> resultReadListener, List<R> data) {
+        if (data != null) {
+            resultReadListener.notify(data);
         }
     }
 
@@ -207,10 +207,6 @@ public final class ListenerChain {
         }
         if (readListener instanceof ExcelEmptyReadListener) {
             List<ExcelReadListener> readListeners = readListenersCache.computeIfAbsent(ExcelEmptyReadListener.class, k -> new ArrayList<>());
-            readListeners.add(readListener);
-        }
-        if (readListener instanceof ExcelResultReadListener) {
-            List<ExcelReadListener> readListeners = readListenersCache.computeIfAbsent(ExcelResultReadListener.class, k -> new ArrayList<>());
             readListeners.add(readListener);
         }
     }

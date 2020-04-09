@@ -12,14 +12,14 @@ public interface ExcelReaderResolver<R> {
     /**
      * Init resolver
      *
-     * @param readerContext Excel reader context
+     * @param readerContext Excel reader global context
      */
     void init(ExcelReaderContext<R> readerContext);
 
     /**
-     * Import excel
+     * Start Import excel
      *
-     * @param headerIndex Excel header index
+     * @param headerIndex Excel header start index
      * @param sheetName   sheetName
      */
     void read(int headerIndex, String sheetName);

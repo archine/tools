@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write.valid;
 
 /**
- * Tip grade
+ * Error box grade
  *
  * @author Gjing
  **/
