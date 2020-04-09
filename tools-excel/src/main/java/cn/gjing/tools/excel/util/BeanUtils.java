@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  **/
 public final class BeanUtils {
     /**
-     * Sets the value of a field of an object
+     * Set the value of a field of an object
      *
      * @param o     object
      * @param field field

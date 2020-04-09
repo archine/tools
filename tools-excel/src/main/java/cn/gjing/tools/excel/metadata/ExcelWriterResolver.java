@@ -14,6 +14,10 @@ import java.util.Map;
  **/
 public interface ExcelWriterResolver {
 
+    /**
+     * Init resolver
+     * @param context Excel write context
+     */
     void init(ExcelWriterContext context);
 
     /**

@@ -16,8 +16,6 @@ import java.util.Map;
  * @author Gjing
  **/
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ExcelReaderContext<R> {
     /**
      * Current workbook

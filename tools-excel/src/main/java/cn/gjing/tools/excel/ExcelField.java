@@ -49,7 +49,7 @@ public @interface ExcelField {
      *
      * @return format
      */
-    String format() default "@";
+    String format() default "";
 
     /**
      * Whether to enable automatic vertical merge when export

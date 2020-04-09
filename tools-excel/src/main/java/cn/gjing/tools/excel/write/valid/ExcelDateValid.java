@@ -94,6 +94,6 @@ public @interface ExcelDateValid {
      *
      * @return ""
      */
-    String tipContent() default "格式为: 年-月-日";
+    String tipContent() default "格式为年-月-日";
 
 }

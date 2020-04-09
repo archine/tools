@@ -66,7 +66,9 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setWrapText(true);
             cellStyle.setLocked(false);
-            cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
+            if (!"".equals(excelField.format())) {
+                cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
+            }
             this.bodyStyle.put(colIndex, cellStyle);
         }
         cell.setCellStyle(cellStyle);
@@ -77,9 +79,11 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
                              int colIndex, boolean isHead, Object value) {
         if (isHead) {
             if (index == 0) {
-                CellStyle cellStyle = this.workbook.createCellStyle();
-                cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.format()));
-                sheet.setDefaultColumnStyle(colIndex, cellStyle);
+                if (!"".equals(excelField.format())) {
+                    CellStyle cellStyle = this.workbook.createCellStyle();
+                    cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.format()));
+                    sheet.setDefaultColumnStyle(colIndex, cellStyle);
+                }
                 sheet.setColumnWidth(colIndex, excelField.width());
             }
             this.setHeadStyle(row, cell, excelField, field, headName, index, colIndex);

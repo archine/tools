@@ -139,8 +139,9 @@ public final class ExcelUtils {
         dataValidation.setShowErrorBox(showErrorBox);
         dataValidation.setErrorStyle(errorBoxRank.getRank());
         dataValidation.createErrorBox(errorTitle, errorContent);
-        dataValidation.setShowPromptBox(showTip);
-        dataValidation.createPromptBox(tipTitle, tipContent);
+        if (showTip) {
+            dataValidation.createPromptBox(tipTitle, tipContent);
+        }
         sheet.addValidationData(dataValidation);
     }
 
@@ -174,8 +175,9 @@ public final class ExcelUtils {
         dataValidation.setShowErrorBox(showErrorBox);
         dataValidation.setErrorStyle(errorBoxRank.getRank());
         dataValidation.createErrorBox(errorTitle, errorContent);
-        dataValidation.setShowPromptBox(showTip);
-        dataValidation.createPromptBox(tipTitle, tipContent);
+        if (showTip) {
+            dataValidation.createPromptBox(tipTitle, tipContent);
+        }
         sheet.addValidationData(dataValidation);
     }
 

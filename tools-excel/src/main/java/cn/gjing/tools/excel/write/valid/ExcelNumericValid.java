@@ -31,14 +31,14 @@ public @interface ExcelNumericValid {
      *
      * @return ValidType
      */
-    ValidType validationType() default ValidType.TEXT_LENGTH;
+    ValidType validType() default ValidType.TEXT_LENGTH;
 
     /**
      * expr1
      *
      * @return expr1
      */
-    String expr1() default "0";
+    String expr1() default "50";
 
     /**
      * expr2
