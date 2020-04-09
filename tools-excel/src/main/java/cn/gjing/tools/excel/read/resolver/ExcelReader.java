@@ -57,7 +57,8 @@ public class ExcelReader<R> {
             default:
                 throw new ExcelInitException("No corresponding processor was found");
         }
-        this.readerResolver = new ReadExecutor<>(this.context);
+        this.readerResolver = new ReadExecutor<>();
+        this.readerResolver.init(this.context);
     }
 
     /**
@@ -123,7 +124,6 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> addListener(List<ExcelReadListener> readListenerList) {
         readListenerList.forEach(this.context::addListener);
-        this.context.setCollectMode(false);
         return this;
     }
 
@@ -135,7 +135,6 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> addListener(ExcelReadListener readListener) {
         this.context.addListener(readListener);
-        this.context.setCollectMode(false);
         return this;
     }
 
@@ -148,6 +147,16 @@ public class ExcelReader<R> {
     public ExcelReader<R> subscribe(ExcelResultReadListener<R> excelResultReadListener) {
         this.context.addListener(excelResultReadListener);
         this.context.setCollectMode(true);
+        return this;
+    }
+
+    /**
+     * Whether need enable collect mode
+     * @param needCollect needCollect
+     * @return this
+     */
+    public ExcelReader<R> collect(boolean needCollect) {
+        this.context.setCollectMode(needCollect);
         return this;
     }
 

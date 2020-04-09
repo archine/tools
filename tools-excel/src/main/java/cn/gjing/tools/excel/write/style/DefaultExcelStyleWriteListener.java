@@ -81,6 +81,9 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             if (index == 0) {
                 if (!"".equals(excelField.format())) {
                     CellStyle cellStyle = this.workbook.createCellStyle();
+                    cellStyle.setAlignment(HorizontalAlignment.CENTER);
+                    cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                    cellStyle.setWrapText(true);
                     cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.format()));
                     sheet.setDefaultColumnStyle(colIndex, cellStyle);
                 }

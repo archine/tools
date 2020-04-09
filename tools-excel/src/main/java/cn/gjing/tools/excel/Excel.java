@@ -32,18 +32,21 @@ public @interface Excel {
 
     /**
      * Window size, which is flushed to disk if more data is written to the export than the specified size
+     *
      * @return 500
      */
     int windowSize() default 500;
 
     /**
      * number of rows to keep in memory
+     *
      * @return 500
      */
     int cacheRowSize() default 100;
 
     /**
      * buffer size to use when reading InputStream to file
+     *
      * @return 10240
      */
     int bufferSize() default 2048;

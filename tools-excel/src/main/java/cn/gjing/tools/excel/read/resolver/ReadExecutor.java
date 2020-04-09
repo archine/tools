@@ -40,9 +40,10 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
     private Map<String, DataConvert<?>> dataConvertMap;
     private Boolean isSave;
 
-    public ReadExecutor(ExcelReaderContext<R> context) {
+    @Override
+    public void init(ExcelReaderContext<R> readerContext) {
         this.excelFieldMap = new HashMap<>(16);
-        this.context = context;
+        this.context = readerContext;
     }
 
     @Override
@@ -127,10 +128,10 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                         context.setVariable(field.getName(), value);
                         this.assertValue(parser, context, row, c, field, excelField, excelAssert);
                         value = this.convert(field, value, parser, excelDataConvert, context);
-                        ListenerChain.doReadCell(rowReadListeners, r, value, field, row.getRowNum(), c, false);
                         if (isSave && value != null) {
                             this.setValue(r, field, value);
                         }
+                        ListenerChain.doReadCell(rowReadListeners, r, value, field, row.getRowNum(), c, false);
                     } else {
                         context.setVariable(field.getName(), null);
                         this.allowEmpty(r, field, excelField, row.getRowNum(), c, hasNext);
@@ -194,7 +195,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
     }
 
     /**
-     * Data converter
+     * Data convert
      *
      * @param field            Current field
      * @param value            Attribute values
@@ -217,7 +218,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
     }
 
     /**
-     * Set values for the fields of the object
+     * Set value for the field of the object
      *
      * @param o     object
      * @param field field

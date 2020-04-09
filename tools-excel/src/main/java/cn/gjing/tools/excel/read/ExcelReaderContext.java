@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,25 +38,22 @@ public class ExcelReaderContext<R> {
      */
     @Setter
     private Boolean collectMode;
-
     /**
      * Current excel mapping entity
      */
     @Setter
     private Class<R> excelClass;
-
     /**
      * Real header
      */
     @Setter
-    private List<String> headNames;
-
+    @Builder.Default
+    private List<String> headNames = new ArrayList<>();
     /**
      * Current excel header mapping field
      */
     @Setter
     private List<Field> excelFields;
-
     /**
      * Read listener cache
      */

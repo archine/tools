@@ -17,7 +17,6 @@ public @interface ExcelAssert {
      * @return boolean expression
      */
     String expr();
-
     /**
      * A validation failure throws an {@link ExcelAssertException},
      * which is used to configure the information to be thrown
