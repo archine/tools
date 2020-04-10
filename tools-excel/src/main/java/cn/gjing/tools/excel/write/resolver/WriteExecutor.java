@@ -304,6 +304,9 @@ class WriteExecutor {
                         firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, boxValues == null ? null : boxValues.get(field.getName()));
             } else {
                 List<ExcelWriteListener> dropdownListeners = this.context.getWriteListenerCache().get(ExcelCascadingDropdownBoxListener.class);
+                if (dropdownListeners == null) {
+                    return;
+                }
                 dropdownListeners.forEach(e -> ((ExcelCascadingDropdownBoxListener) e)
                         .addCascadingDropdownBox(ev, this.context.getWorkbook(), this.context.getSheet(), firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, field));
             }

@@ -104,13 +104,15 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 if (this.context.getHeadNames().isEmpty()) {
                     for (Cell cell : row) {
                         this.context.getHeadNames().add(cell.getStringCellValue());
-                        stop = ListenerChain.doReadRow(rowReadListeners, null, this.context.getHeadNames(), startIndex, true, hasNext);
+                        ListenerChain.doReadCell(rowReadListeners, null, cell.getStringCellValue(), null, startIndex, cell.getColumnIndex(), true);
                     }
+                    stop = ListenerChain.doReadRow(rowReadListeners, null, this.context.getHeadNames(), startIndex, true, hasNext);
                 }
                 continue;
             }
             try {
                 r = this.context.getExcelClass().newInstance();
+                context.setVariable(this.context.getExcelClass().getSimpleName(), r);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelInitException("Excel entity init failure, " + e.getMessage());
             }
@@ -133,7 +135,6 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                         if (isSave && value != null) {
                             this.setValue(r, field, value);
                         }
-                        ListenerChain.doReadCell(rowReadListeners, r, value, field, row.getRowNum(), c, false);
                     } else {
                         context.setVariable(field.getName(), null);
                         this.allowEmpty(r, field, excelField, row.getRowNum(), c, hasNext);
@@ -141,6 +142,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                         value = this.convert(field, null, parser, excelDataConvert, context);
                         this.setValue(r, field, value);
                     }
+                    ListenerChain.doReadCell(rowReadListeners, r, value, field, row.getRowNum(), c, false);
                     context.setVariable(field.getName(), value);
                 } catch (Exception e) {
                     if (e instanceof ExcelAssertException) {
@@ -151,10 +153,10 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
             }
             if (this.isSave) {
                 try {
-                    ListenerChain.doReadRow(rowReadListeners, r, null, row.getRowNum(), false, hasNext);
                     if (dataList != null) {
                         dataList.add(r);
                     }
+                    ListenerChain.doReadRow(rowReadListeners, r, null, row.getRowNum(), false, hasNext);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }

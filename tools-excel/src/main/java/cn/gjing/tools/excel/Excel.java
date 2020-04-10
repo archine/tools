@@ -31,14 +31,16 @@ public @interface Excel {
     ExcelType type() default XLS;
 
     /**
-     * Window size, which is flushed to disk if more data is written to the export than the specified size
-     *
+     * Window size, which is flushed to disk when exported
+     * if the data that has been written out exceeds the specified size
+     * only for xlsx
      * @return 500
      */
     int windowSize() default 500;
 
     /**
-     * number of rows to keep in memory
+     * How many lines of data in the Excel file need to be saved when imported,
+     * only for xlsx
      *
      * @return 500
      */

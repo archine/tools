@@ -48,6 +48,12 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             cellStyle.setWrapText(true);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            cellStyle.setBorderBottom(BorderStyle.THIN);
+            cellStyle.setBottomBorderColor(IndexedColors.GREY_40_PERCENT.index);
+            cellStyle.setBorderLeft(BorderStyle.THIN);
+            cellStyle.setLeftBorderColor(IndexedColors.GREY_40_PERCENT.index);
+            cellStyle.setBorderRight(BorderStyle.THIN);
+            cellStyle.setRightBorderColor(IndexedColors.GREY_40_PERCENT.index);
             Font font = workbook.createFont();
             font.setBold(true);
             font.setColor(IndexedColors.WHITE.index);

@@ -28,7 +28,7 @@ import java.util.function.Supplier;
 public final class ExcelWriter {
     private ExcelWriterContext context;
     private HttpServletResponse response;
-    private String defaultSheetName = "sheet1";
+    private final String defaultSheetName = "sheet1";
     private ExcelWriterResolver writerResolver;
 
     private ExcelWriter() {

@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Gjing
  **/
 public final class DefaultCascadingDropdownBoxListener implements ExcelCascadingDropdownBoxListener {
-    private Map<String, String[]> boxValues;
+    private final Map<String, String[]> boxValues;
 
     public DefaultCascadingDropdownBoxListener(Map<String, String[]> boxValues) {
         this.boxValues = boxValues;

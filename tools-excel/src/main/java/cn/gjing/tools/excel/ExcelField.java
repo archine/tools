@@ -27,7 +27,7 @@ public @interface ExcelField {
      *
      * @return header names
      */
-    String[] value() default {};
+    String[] value() default {""};
 
     /**
      * Excel header width
@@ -38,11 +38,10 @@ public @interface ExcelField {
 
     /**
      * List header sort, if not set will default entity property order
-     * If part of the header is set, it only appears behind the unset header
      *
      * @return sort index
      */
-    int sort() default -1;
+    int sort() default 0;
 
     /**
      * The format of the cells under the current table header when exported,
@@ -67,8 +66,8 @@ public @interface ExcelField {
     boolean allowEmpty() default true;
 
     /**
-     * Data converter, which you can use to change data during import and export,
-     * before the cells are populated and converted to entity fields
+     * Data convert, which you can use to change data during import and export,
+     * before the cell are populated and converted to entity field
      *
      * @return DefaultDataConvert
      * @see DataConvert
