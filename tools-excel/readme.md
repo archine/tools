@@ -36,14 +36,16 @@
 |convert|数据转换器，可以在导入导出时对数据进行转换|      
 <span id="convert"></span>
 ### 3、@ExcelDataConvert
-**数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)，     [查看用例](#convert_use)**    
+**数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)，     [查看用例](#convert_use)**   
+ 
 |参数|描述|
 |---|---|
 |expr1|导出时的EL表达式|
 |expr2|导入时的EL表达式|     
 <span id="assert"></span>
 ### 4、@ExcelAssert
-**导入时对单元格的内容进行数据校验，[查看用例](#assert_use)**     
+**导入时对单元格的内容进行数据校验，[查看用例](#assert_use)**    
+ 
 |参数|描述|
 |---|---|
 |expr|EL表达式，结果必须满足``Boolean``类型|
@@ -51,6 +53,7 @@
 <span id="dropdown"></span>
 ### 5、@ExcelDropdownBox
 **导出时给列表头下方的单元格增加下拉选项，[查看用例](#dropdown_use)**      
+
 |参数|描述|
 |---|---|
 |combobox|选项内容，此处配置的选项``不允许超过25个``，大量选项的请使用方法设置。两种方式都存在时会以方法设置的为准|
@@ -63,6 +66,7 @@
 <span id="date"></span>
 ### 6、@ExcelDateValid
 **导出时给列表头下方的单元格加上时间格式校验，[查看用例](#date_use)**
+
 |参数|描述|
 |---|---|
 |rows|列表头下方需要给多少行加上下拉框|
@@ -80,6 +84,7 @@
 <span id="number"></span>
 ### 7、@ExcelNumericValid
 **导出时给列表头下方单元格增加数字或者文本数据校验，[查看用例](#number_use)**     
+
 |参数|描述|
 |---|---|
 |rows|列表头下方需要给多少行加上下拉框|
