@@ -10,14 +10,14 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface ExcelDataConvert {
     /**
-     * When the export of expression
+     * When the export of EL expression
      *
      * @return expr1
      */
     String expr1() default "";
 
     /**
-     * When the import of expression
+     * When the import of EL expression
      * @return expr2
      */
     String expr2() default "";

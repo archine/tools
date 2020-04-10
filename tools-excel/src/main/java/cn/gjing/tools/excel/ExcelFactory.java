@@ -1,29 +1,36 @@
 package cn.gjing.tools.excel;
 
-import cn.gjing.tools.excel.read.ExcelReader;
+import cn.gjing.tools.excel.read.ExcelReaderContext;
+import cn.gjing.tools.excel.read.resolver.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
-import cn.gjing.tools.excel.write.ExcelWriter;
+import cn.gjing.tools.excel.write.ExcelWriterContext;
+import cn.gjing.tools.excel.write.resolver.ExcelWriter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Excel factory
  *
  * @author Gjing
  **/
-public class ExcelFactory {
+public final class ExcelFactory {
 
     private ExcelFactory() {
 
     }
 
     /**
-     * Create an Excel write
+     * Create an excel writer
      *
      * @param excelClass Excel mapped entity
      * @param response   response
@@ -31,28 +38,70 @@ public class ExcelFactory {
      * @return ExcelWriter
      */
     public static ExcelWriter createWriter(Class<?> excelClass, HttpServletResponse response, String... ignores) {
-        return createWriter(null, excelClass, response, ignores);
+        return createWriter(null, excelClass, response, true, ignores);
     }
 
     /**
-     * Create an Excel write
+     * Create an excel writer
      *
-     * @param fileName   Excel file name，The priority is higher than the annotation specification
-     * @param excelClass Excel mapped entity
-     * @param response   response
-     * @param ignores    The exported field is to be ignored
+     * @param excelClass       Excel mapped entity
+     * @param response         response
+     * @param ignores          The exported field is to be ignored
+     * @param initDefaultStyle Whether init  default excel style
      * @return ExcelWriter
      */
-    public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
-        Excel excel = excelClass.getAnnotation(Excel.class);
-        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, ignores);
-        return new ExcelWriter(fileName == null ? "".equals(excel.value()) ? UUID.randomUUID().toString().replaceAll("-", "") : excel.value() : fileName,
-                excel, response, excelFieldList);
+    public static ExcelWriter createWriter(Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
+        return createWriter(null, excelClass, response, initDefaultStyle, ignores);
     }
 
     /**
-     * Create an Excel read
+     * Create an excel writer
+     *
+     * @param fileName         Excel file name，The priority is higher than the annotation specification
+     * @param excelClass       Excel mapped entity
+     * @param response         response
+     * @param ignores          The exported field is to be ignored
+     * @param initDefaultStyle Whether init  default excel style
+     * @return ExcelWriter
+     */
+    public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
+        Excel excel = excelClass.getAnnotation(Excel.class);
+        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
+        List<String[]> headerArr = new ArrayList<>();
+        ExcelWriterContext context = ExcelWriterContext.builder()
+                .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr))
+                .headNames(headerArr)
+                .fileName(fileName == null ? "".equals(excel.value()) ? LocalDate.now().toString() : excel.value() : fileName)
+                .build();
+        return new ExcelWriter(context, excel, response, initDefaultStyle);
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param file       Excel file
+     * @param excelClass Excel mapped entity
+     * @param <R>        Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass) throws IOException {
+        return createReader(file.getInputStream(), excelClass);
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param file       Excel file
+     * @param excelClass Excel mapped entity
+     * @param <R>        Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass) throws IOException {
+        return createReader(new FileInputStream(file), excelClass);
+    }
+
+    /**
+     * Create an Excel reader
      *
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity
@@ -62,8 +111,8 @@ public class ExcelFactory {
     public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, null);
-        return new ExcelReader<>(excelClass, inputStream, excel, excelFieldList);
+        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, null, null);
+        ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(inputStream, excelClass, excelFieldList);
+        return new ExcelReader<>(readerContext, excel);
     }
-
 }

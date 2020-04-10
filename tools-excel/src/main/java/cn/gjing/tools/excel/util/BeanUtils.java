@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  **/
 public final class BeanUtils {
     /**
-     * Sets the value of a field of an object
+     * Set the value of a field of an object
      *
      * @param o     object
      * @param field field
@@ -54,24 +54,39 @@ public final class BeanUtils {
      *
      * @param excelClass Excel mapped entity
      * @param ignores    The exported field is to be ignored
-     * @return Annotated fields
+     * @param headerArr  excel header array
+     * @return Excel fields
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores) {
+    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String[]> headerArr) {
         Field[] declaredFields = excelClass.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = excelClass.getSuperclass();
         if (superclass != Object.class) {
             fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
         }
-        return fieldList.stream()
+        fieldList = fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .filter(e -> ParamUtils.noContains(ignores, e.getAnnotation(ExcelField.class).value()))
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).sort()))
+                .filter(e -> {
+                    boolean noContain = true;
+                    String[] headNames = e.getAnnotation(ExcelField.class).value();
+                    for (String name : headNames) {
+                        if (ParamUtils.noContains(ignores, name)) {
+                            if (headerArr != null) {
+                                headerArr.add(headNames);
+                            }
+                            break;
+                        }
+                        noContain = false;
+                    }
+                    return noContain;
+                })
                 .collect(Collectors.toList());
+        return fieldList;
     }
 
     /**
-     * Gets the class of a generic in a generic interface
+     * Get the class of a generic in a generic interface
      *
      * @param source        A class that implements a generic interface
      * @param typeInterface A generic interface
