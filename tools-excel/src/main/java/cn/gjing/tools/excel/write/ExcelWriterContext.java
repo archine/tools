@@ -18,6 +18,7 @@ import java.util.Map;
  * @author Gjing
  **/
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,46 +26,39 @@ public final class ExcelWriterContext {
     /**
      * Current workbook
      */
-    @Setter
     private Workbook workbook;
 
     /**
      * Current sheet
      */
-    @Setter
     private Sheet sheet;
 
     /**
      * The Excel file name to be exported
      */
-    @Setter
     private String fileName;
 
     /**
      * Whether to add validation when exporting Excel templates
      */
-    @Setter
     @Builder.Default
     private Boolean needValid = false;
 
     /**
      * Whether to open multistage Excel headers
      */
-    @Setter
     @Builder.Default
     private Boolean multiHead = false;
 
     /**
      * Excel headers
      */
-    @Setter
     @Builder.Default
     private List<Field> excelFields = new ArrayList<>();
 
     /**
      * Excel header names
      */
-    @Setter
     @Builder.Default
     private List<String[]> headNames = new ArrayList<>();
 
@@ -75,7 +69,7 @@ public final class ExcelWriterContext {
     private Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache = new HashMap<>(8);
 
     public ExcelWriterContext addListener(ExcelWriteListener excelWriteListener) {
-        ListenerChain.addWriteListener(this.writeListenerCache, excelWriteListener);
+        ListenerChain.addWriteListener(this.writeListenerCache, excelWriteListener, this.workbook);
         return this;
     }
 }

@@ -87,9 +87,9 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
     private void reader(int startIndex, List<R> dataList) {
         R r;
         this.isSave = true;
+        boolean stop = false;
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
-        boolean stop = false;
         List<ExcelReadListener> rowReadListeners = this.context.getReadListenersCache().get(ExcelRowReadListener.class);
         Gson gson = new Gson();
         for (Row row : this.context.getSheet()) {

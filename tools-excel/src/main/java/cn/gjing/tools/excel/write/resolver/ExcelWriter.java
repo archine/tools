@@ -40,7 +40,7 @@ public final class ExcelWriter {
         this.context = context;
         this.chooseResolver(context, excel);
         if (initDefaultStyle) {
-            this.initStyle(context);
+            this.initStyle();
         }
     }
 
@@ -68,12 +68,9 @@ public final class ExcelWriter {
 
     /**
      * Init default style listener
-     *
-     * @param context Excel write context
      */
-    private void initStyle(ExcelWriterContext context) {
+    private void initStyle() {
         DefaultExcelStyleWriteListener defaultExcelStyle = new DefaultExcelStyleWriteListener();
-        defaultExcelStyle.init(context.getWorkbook());
         this.context.addListener(defaultExcelStyle);
     }
 

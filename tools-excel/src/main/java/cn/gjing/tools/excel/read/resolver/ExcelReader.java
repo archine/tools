@@ -114,6 +114,7 @@ public class ExcelReader<R> {
      */
     public ExcelReader<R> resetResolver(Supplier<? extends ExcelReaderResolver<R>> excelReaderResolver) {
         this.readerResolver = excelReaderResolver.get();
+        this.readerResolver.init(this.context);
         return this;
     }
 

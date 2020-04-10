@@ -7,9 +7,11 @@ import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.listener.*;
+import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -170,8 +172,12 @@ public final class ListenerChain {
      *
      * @param writeListenerCache writeListenerCache
      * @param listener           Write listener
+     * @param workbook workbook
      */
-    public static void addWriteListener(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache, ExcelWriteListener listener) {
+    public static void addWriteListener(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache, ExcelWriteListener listener, Workbook workbook) {
+        if (listener instanceof ExcelStyleWriteListener) {
+            ((ExcelStyleWriteListener) listener).init(workbook);
+        }
         if (listener instanceof ExcelSheetWriteListener) {
             List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelSheetWriteListener.class, k -> new ArrayList<>());
             listeners.add(listener);
