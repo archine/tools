@@ -21,7 +21,7 @@
 |type|Excel文件类型，默认``XLS``|
 |windowSize|窗口大小，导出时如果已经写出的数据超过指定大小，则将其刷新到磁盘 ``适用于XLSX``|
 |cacheRowSize|导入时需要保存Excel文件中的多少行数据 ``适用于XLSX``|
-|bufferSize|将InputStream读入文件时使用的缓冲区大小|
+|bufferSize|将InputStream读入文件时使用的缓冲区大小 ``适用于XLSX``|
 ### 2、@ExcelField
 **声明实体类内的字段与Excel表头存在映射关系**     
 
@@ -36,16 +36,16 @@
 |convert|数据转换器，可以在导入导出时对数据进行转换|      
 <span id="convert"></span>
 ### 3、@ExcelDataConvert
-**数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)，     [查看用例](#convert_use)**   
- 
+**数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)，     [查看用例](#convert_use)**    
+
 |参数|描述|
 |---|---|
 |expr1|导出时的EL表达式|
 |expr2|导入时的EL表达式|     
 <span id="assert"></span>
 ### 4、@ExcelAssert
-**导入时对单元格的内容进行数据校验，[查看用例](#assert_use)**    
- 
+**导入时对单元格的内容进行数据校验，[查看用例](#assert_use)**     
+
 |参数|描述|
 |---|---|
 |expr|EL表达式，结果必须满足``Boolean``类型|
@@ -65,7 +65,7 @@
 |link|父级列表头序号(假设父级是第一列的话，那么就是``0``)|     
 <span id="date"></span>
 ### 6、@ExcelDateValid
-**导出时给列表头下方的单元格加上时间格式校验，[查看用例](#date_use)**
+**导出时给列表头下方的单元格加上时间格式校验，[查看用例](#date_use)**      
 
 |参数|描述|
 |---|---|
@@ -140,10 +140,10 @@ public class UserController {
     }
 }
 ```
-![single](https://img-blog.csdnimg.cn/20200410113832685.jpg)
+![single](https://user-gold-cdn.xitu.io/2020/4/10/171637e42b1f4cdc?w=565&h=161&f=png&s=3242)
 <span id="multi"></span>
 ### 2、多级表头
-**数组中的每个值代表着一级**
+**数组中的每个值代表着一级表头**
 ```java
 /**
  * @author Gjing
@@ -182,7 +182,7 @@ public class TestController {
     }
 }
 ```
-![multi](https://img-blog.csdnimg.cn/2020041011411078.png)
+![multi](https://user-gold-cdn.xitu.io/2020/4/10/171637e42dad8f9e?w=645&h=176&f=png&s=6960)
 ### 3、带大标题
 [参考实体](#single)    
 
@@ -205,7 +205,7 @@ public class TestController {
     }
 }
 ```
-![title](https://img-blog.csdnimg.cn/20200410130928948.png)     
+![title](https://user-gold-cdn.xitu.io/2020/4/10/171637e42d9aac99?w=570&h=166&f=png&s=6291)     
 <span id="dropdown_use"></span>
 ### 4、下拉框
 **单元格增加下拉框  >> [注解说明](#dropdown)**
@@ -242,7 +242,7 @@ public class TestController {
     }
 }
 ```
-![下拉框](https://img-blog.csdnimg.cn/20200410142407277.png)
+![下拉框](https://user-gold-cdn.xitu.io/2020/4/10/171637e427dcbd35?w=281&h=98&f=png&s=3060)
 ### 5、级联下拉框
 **导出Excel时给列表头下方的单元格执行级联的下拉框**
 ```java
@@ -250,13 +250,14 @@ public class TestController {
  * @author Gjing
  **/
 @Data
-@Excel("下拉框导出")
+@Excel("级联下拉框导出")
 public class SingleHead {
     @ExcelField("性别")
     @ExcelDropdownBox(combobox = {"男", "女"})
     private Gender gender;
 
     @ExcelField("爱好")
+    @ExcelDropdownBox(link = "0")
     private String favorite;
 }
 ```
@@ -285,7 +286,7 @@ public class TestController {
     }
 }
 ```
-![级联](https://img-blog.csdnimg.cn/20200410152133649.png)
+![级联](https://user-gold-cdn.xitu.io/2020/4/10/171637e434f81597?w=297&h=98&f=png&s=3762)
 <span id="date_use"></span>
 ### 6、时间校验
 **导出时给列表头下方的单元格增加时间校验  >> [注解说明](#date)** 
@@ -325,7 +326,7 @@ public class TestController {
     }
 }
 ```
-![时间校验](https://img-blog.csdnimg.cn/2020041014334120.png)    
+![时间校验](https://user-gold-cdn.xitu.io/2020/4/10/171637e434efd885?w=476&h=110&f=png&s=6274)    
 <span id="number_use"></span>
 ### 7、数字、文本校验
 **导出时给列表头下方的单元格增加数值校验。可以对数字的大小，文本的长度进行校验  >>  [注解说明](#number)**
@@ -360,7 +361,7 @@ public class TestController {
     }
 }
 ```
-![数值校验](https://img-blog.csdnimg.cn/20200410144059476.png)
+![数值校验](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d734aa7?w=143&h=117&f=png&s=3780)
 <span id="convert_use"></span>
 ### 7、数据转换
 **导出时对数据进行加工或者添加默认值，支持注解方式和接口方式  >>  [注解参考](#convert)**
@@ -450,11 +451,11 @@ public class MyStyleListener implements ExcelStyleWriteListener {
 
     @Override
     public void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, String headName, int index,
-                             int colIndex, boolean isHead, Object value) {
-   		//该方法是ExcelCellWriteListener中的，会在每次单元格填充内容之后触发，这里是为了设置样式，
-   		//你也可以实现其他的逻辑
+                         int colIndex, boolean isHead, Object value) {
+       //该方法是ExcelCellWriteListener中的，会在每次单元格填充内容之后触发，这里是为了设置样式，
+       //你也可以实现其他的逻辑
         if (isHead) {
-        	//如果是表头我就设置每列的样式和宽度
+            //如果是表头我就设置每列的样式和宽度
             sheet.setColumnWidth(colIndex, excelField.width());
             this.setHeadStyle(row, cell, excelField, field, headName, index, icolIndex);
         }
@@ -473,8 +474,8 @@ public class MyStyleListener implements ExcelStyleWriteListener {
  **/
 @RestController
 public class TestController {
-	@Resource
-	private UserService userService;
+    @Resource
+    private UserService userService;
 	
     @GetMapping("/test_export")
     @ApiOperation("带数值校验")
@@ -488,7 +489,7 @@ public class TestController {
     }
 }
 ```
-![自定义样式](https://img-blog.csdnimg.cn/20200410150828448.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzgzNTcxNw==,size_16,color_FFFFFF,t_70)
+![自定义样式](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d463be7?w=562&h=243&f=png&s=15612)
 **导出方法调用最后一定要使用``flush()``方法进行数据刷新到Excel文件中**
 ## 三、导入
 ### 1、单表头
@@ -499,14 +500,14 @@ public class TestController {
  **/
 @RestController
 public class TestController {
-	@Resource
-	private UserService userService;
+    @Resource
+    private UserService userService;
 	
-	@PostMapping("/user_import")
+    @PostMapping("/user_import")
     @ApiOperation("导入单表头")
     public void userImport(MultipartFile file) throws IOException {
         ExcelFactory.createReader(file, SingleHead.class)
-        		//在read()方法前通过订阅方法增加一个结果监听器，该监听器会在每一次read()结束之后触发
+                //在read()方法前通过订阅方法增加一个结果监听器，该监听器会在每一次read()结束之后触发
                 .subscribe(e -> this.userService.saveUsers(e))
                 .read()
                 .end();
@@ -522,15 +523,15 @@ public class TestController {
  **/
 @RestController
 public class TestController {
-	@Resource
-	private UserService userService;
+    @Resource
+    private UserService userService;
 	
-	@PostMapping("/user_import")
+    @PostMapping("/user_import")
     @ApiOperation("导入单表头")
     public void userImport(MultipartFile file) throws IOException {
         ExcelFactory.createReader(file, SingleHead.class)
-        		//在read()方法前通过订阅方法增加一个结果监听器，该监听器会在每一次read()结束之后触发
-        		//如果Excel中数据量太大，不建议使用结果监听器，会造成生成了过多的映射实体对象造成内存溢出
+                //在read()方法前通过订阅方法增加一个结果监听器，该监听器会在每一次read()结束之后触发
+                //如果Excel中数据量太大，不建议使用结果监听器，会造成生成了过多的映射实体对象造成内存溢出
                 .subscribe(e -> this.userService.saveUsers(e))
                 .read(1)
                 .end();
@@ -547,8 +548,8 @@ public class TestController {
 public class MyReadRowListener implements ExcelRowReadListener<SingleHead> {
     @Override
     public boolean readRow(SingleHead singleHead, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext) {
-    	//如果Excel的数据量太大，为了避免生成的映射实体对象过多造成内存溢出，可以选择
-		//在这里对当前对象进行存储，然后达到一定数量后就存数据库，然后clear掉这些数据
+        //如果Excel的数据量太大，为了避免生成的映射实体对象过多造成内存溢出，可以选择
+        //在这里对当前对象进行存储，然后达到一定数量后就存数据库，然后clear掉这些数据
         System.out.println("读完一行");
         return false;
     }
@@ -566,10 +567,10 @@ public class MyReadRowListener implements ExcelRowReadListener<SingleHead> {
  **/
 @RestController
 public class TestController {
-	@Resource
-	private UserService userService;
+    @Resource
+    private UserService userService;
 	
-	@PostMapping("/user_import")
+    @PostMapping("/user_import")
     @ApiOperation("导入单表头")
     public void userImport(MultipartFile file) throws IOException {
         ExcelFactory.createReader(file, SingleHead.class)
@@ -590,7 +591,7 @@ public class TestController {
 @Excel
 public class SingleHead {
     @ExcelField("姓名")
-   	@ExcelAssert(expr = "#userName != null")
+    @ExcelAssert(expr = "#userName != null")
     private String userName;
 }
 ```
