@@ -11,6 +11,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -26,8 +27,9 @@ public final class ExcelUtils {
      *
      * @param cell  Current cell
      * @param value Attribute values
+     * @param field Current field
      */
-    public static void setCellValue(Cell cell, Object value) {
+    public static void setCellValue(Cell cell, Object value, Field field) {
         if (value == null) {
             return;
         }
@@ -55,7 +57,7 @@ public final class ExcelUtils {
             cell.setCellValue((LocalDate) value);
             return;
         }
-        throw new IllegalArgumentException("Unsupported data type, you can use a data convert");
+        throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + field.getName() + " " + value);
     }
 
     /**

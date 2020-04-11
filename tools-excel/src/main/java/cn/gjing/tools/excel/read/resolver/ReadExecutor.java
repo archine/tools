@@ -61,7 +61,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                             try {
                                 this.dataConvertMap.put(e.getName(), excelField.convert().newInstance());
                             } catch (Exception ex) {
-                                throw new ExcelInitException("Init specified excel header data convert error " + e.getName() + ", " + ex.getMessage());
+                                throw new ExcelInitException("Init specified excel header data converter error " + e.getName() + ", " + ex.getMessage());
                             }
                         }
                     }).collect(Collectors.toMap(field -> {
@@ -240,7 +240,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
                 return;
             }
-            throw new IllegalArgumentException("Unsupported data type, you can use a data converter");
+            throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + field.getName() + " " + value);
         }
     }
 

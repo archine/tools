@@ -82,6 +82,7 @@ public final class ExcelFactory {
      * @param file       Excel file
      * @param excelClass Excel mapped entity
      * @param <R>        Entity type
+     * @throws IOException io
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass) throws IOException {
@@ -94,6 +95,7 @@ public final class ExcelFactory {
      * @param file       Excel file
      * @param excelClass Excel mapped entity
      * @param <R>        Entity type
+     * @throws IOException io
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass) throws IOException {

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.0.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.0.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -49,7 +49,7 @@
 |参数|描述|
 |---|---|
 |expr|EL表达式，结果必须满足``Boolean``类型|
-|message|数据不满足时抛出的异常信息|       
+|message|不满足表达式条件时抛出的异常信息|       
 <span id="dropdown"></span>
 ### 5、@ExcelDropdownBox
 **导出时给列表头下方的单元格增加下拉选项，[查看用例](#dropdown_use)**      
@@ -72,8 +72,8 @@
 |rows|列表头下方需要给多少行加上下拉框|
 |pattern|时间格式|
 |operatorType|操作类型，可选择小于、大于、区间等|
-|expr1|时间表达式1|
-|expr2|时间表达式2，仅在操作类型为``between``或者``not_between``需要设置|
+|expr1|时间表达式1，如：2020-04-10|
+|expr2|时间表达式2，仅在操作类型为``between``或者``not_between``时会取该表达式|
 |showErrorBox|填入单元格的内容不是下拉框中的选项，是否打开错误框|
 |rank|错误框级别|
 |errorTitle|错误框标题|
@@ -90,8 +90,8 @@
 |rows|列表头下方需要给多少行加上下拉框|
 |operatorType|操作类型，可选择小于、大于、区间等|
 |validType|校验类型，可选择整数、文本、小数|
-|expr1|表达式1|
-|expr2|表达式2，仅在操作类型为``between``或者``not_between``需要设置|
+|expr1|表达式1，如：校验类型为整数、操作类型为小于时，表达式填了``1``, 表示输入的数字必须小于1|
+|expr2|表达式2，仅在操作类型为``between``或者``not_between``时取该表达式|
 |showErrorBox|填入单元格的内容不是下拉框中的选项，是否打开错误框|
 |rank|错误框级别|
 |errorTitle|错误框标题|
@@ -238,6 +238,28 @@ public class TestController {
                 //需要在write前激活校验
                 .enableValid()
                 .write(null)
+                .flush();
+    }
+}
+```
+* 通过方法设置普通下拉框的选项
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class TestController {
+
+    @GetMapping("/test_export")
+    @ApiOperation("带下拉框")
+    public void testExport(HttpServletResponse response) {
+        Map<String, String[]> genderMap = new HashMap<>(8);
+        //key为实体类的字段名，使用方法进行设置时，实体字段的@ExcelDropdownBox注解不在需要指定combobox
+        //如果指定了也会去覆盖注解中的值
+        genderMap.put("gender", new String[]{"男", "女"});
+        ExcelFactory.createWriter(SingleHead.class, response)
+                .enableValid()
+                .write(null, genderMap)
                 .flush();
     }
 }

@@ -41,11 +41,11 @@ import java.util.Map;
  * @author Gjing
  **/
 class WriteExecutor {
-    private ExcelWriterContext context;
+    private final ExcelWriterContext context;
     private Map<String, DataConvert<?>> dataConvertMap;
     private Map<String, ExcelAutoMergeCallback<?>> mergeCallbackMap;
     private Map<Integer, ExcelOldRowModel> oldRowModelMap;
-    private Gson gson;
+    private final Gson gson;
 
     public WriteExecutor(ExcelWriterContext context) {
         this.gson = new Gson();
@@ -158,7 +158,7 @@ class WriteExecutor {
                         autoMergeCallback = this.createMergeCallback(field, excelField);
                         this.autoMergeY(autoMergeCallback, valueRow, field, excelField, index, colIndex, value, o, dataSize);
                     }
-                    ExcelUtils.setCellValue(valueCell, value);
+                    ExcelUtils.setCellValue(valueCell, value, field);
                     ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, null, index, colIndex, false, value);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
@@ -187,7 +187,7 @@ class WriteExecutor {
                     dataConvert = excelField.convert().newInstance();
                     this.dataConvertMap.put(field.getName(), dataConvert);
                 } catch (Exception e) {
-                    throw new ExcelInitException("Init specified excel header data convert failure " + field.getName() + ", " + e.getMessage());
+                    throw new ExcelInitException("Init specified excel header data converter failure " + field.getName() + ", " + e.getMessage());
                 }
             }
         }

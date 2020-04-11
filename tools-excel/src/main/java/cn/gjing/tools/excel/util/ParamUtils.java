@@ -81,7 +81,6 @@ public final class ParamUtils {
                 char end = (char) (start + colCount - 1);
                 return "$" + start + "$" + rowIndex + ":$" + end + "$" + rowIndex;
             }
-
         } else {
             char endPrefix = 'A';
             char endSuffix;
