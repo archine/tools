@@ -208,7 +208,8 @@ public class TestController {
 ![title](https://user-gold-cdn.xitu.io/2020/4/10/171637e42d9aac99?w=570&h=166&f=png&s=6291)     
 <span id="dropdown_use"></span>
 ### 4、下拉框
-**单元格增加下拉框  >> [注解说明](#dropdown)**
+**单元格增加下拉框  >> [注解说明](#dropdown)**      
+* 通过注解设置
 ```java
 /**
  * @author Gjing
@@ -242,7 +243,7 @@ public class TestController {
     }
 }
 ```
-* 通过方法设置普通下拉框的选项
+* 通过方法设置
 ```java
 /**
  * @author Gjing
