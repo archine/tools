@@ -81,12 +81,13 @@ public final class ExcelFactory {
      *
      * @param file       Excel file
      * @param excelClass Excel mapped entity
+     * @param ignores    Ignored header
      * @param <R>        Entity type
-     * @throws IOException io
      * @return ExcelReader
+     * @throws IOException io
      */
-    public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass) throws IOException {
-        return createReader(file.getInputStream(), excelClass);
+    public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) throws IOException {
+        return createReader(file.getInputStream(), excelClass, ignores);
     }
 
     /**
@@ -94,12 +95,13 @@ public final class ExcelFactory {
      *
      * @param file       Excel file
      * @param excelClass Excel mapped entity
+     * @param ignores    Ignored header
      * @param <R>        Entity type
-     * @throws IOException io
      * @return ExcelReader
+     * @throws IOException io
      */
-    public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass) throws IOException {
-        return createReader(new FileInputStream(file), excelClass);
+    public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass, String... ignores) throws IOException {
+        return createReader(new FileInputStream(file), excelClass, ignores);
     }
 
     /**
@@ -107,13 +109,14 @@ public final class ExcelFactory {
      *
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity
+     * @param ignores     Ignored header
      * @param <R>         Entity type
      * @return ExcelReader
      */
-    public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass) {
+    public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, null, null);
+        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, ignores, null);
         ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(inputStream, excelClass, excelFieldList);
         return new ExcelReader<>(readerContext, excel);
     }

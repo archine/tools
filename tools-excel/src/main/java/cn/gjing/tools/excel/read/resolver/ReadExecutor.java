@@ -31,45 +31,35 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Gjing
  **/
 class ReadExecutor<R> implements ExcelReaderResolver<R> {
     private ExcelReaderContext<R> context;
-    private Map<String, Field> excelFieldMap;
     private Map<String, DataConvert<?>> dataConvertMap;
     private Boolean isSave;
 
     @Override
     public void init(ExcelReaderContext<R> readerContext) {
-        this.excelFieldMap = new HashMap<>(16);
         this.context = readerContext;
     }
 
     @Override
     public void read(int startIndex, String sheetName) {
-        if (excelFieldMap.isEmpty()) {
-            this.excelFieldMap = this.context.getExcelFields().stream()
-                    .peek(e -> {
-                        ExcelField excelField = e.getAnnotation(ExcelField.class);
-                        if (excelField.convert() != DefaultDataConvert.class) {
-                            if (this.dataConvertMap == null) {
-                                this.dataConvertMap = new HashMap<>(16);
-                            }
-                            try {
-                                this.dataConvertMap.put(e.getName(), excelField.convert().newInstance());
-                            } catch (Exception ex) {
-                                throw new ExcelInitException("Init specified excel header data converter error " + e.getName() + ", " + ex.getMessage());
-                            }
-                        }
-                    }).collect(Collectors.toMap(field -> {
-                        ExcelField excelField = field.getAnnotation(ExcelField.class);
-                        int headSize = excelField.value().length;
-                        return excelField.value()[headSize == 0 ? 0 : headSize - 1];
-                    }, field -> field));
-        }
+        this.context.getExcelFields().forEach(e -> {
+            ExcelField excelField = e.getAnnotation(ExcelField.class);
+            if (excelField.convert() != DefaultDataConvert.class) {
+                if (this.dataConvertMap == null) {
+                    this.dataConvertMap = new HashMap<>(16);
+                }
+                try {
+                    this.dataConvertMap.put(e.getName(), excelField.convert().newInstance());
+                } catch (Exception ex) {
+                    throw new ExcelInitException("Init specified excel header data converter error " + e.getName() + ", " + ex.getMessage());
+                }
+            }
+        });
         Sheet sheet = this.context.getWorkbook().getSheet(sheetName);
         if (sheet == null) {
             throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
@@ -101,6 +91,9 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 continue;
             }
             if (row.getRowNum() == startIndex) {
+                if (row.getLastCellNum() != this.context.getExcelFields().size()) {
+                    throw new ExcelTemplateException();
+                }
                 if (this.context.getHeadNames().isEmpty()) {
                     for (Cell cell : row) {
                         this.context.getHeadNames().add(cell.getStringCellValue());
@@ -117,10 +110,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 throw new ExcelInitException("Excel entity init failure, " + e.getMessage());
             }
             for (int c = 0; c < row.getLastCellNum() && this.isSave; c++) {
-                Field field = excelFieldMap.get(this.context.getHeadNames().get(c));
-                if (field == null) {
-                    throw new ExcelTemplateException();
-                }
+                Field field = this.context.getExcelFields().get(c);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
                 ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
