@@ -26,6 +26,7 @@ public final class DefaultCascadingDropdownBoxListener implements ExcelCascading
         Sheet explicitSheet = workbook.getSheet("subsetSheet");
         if (explicitSheet == null) {
             explicitSheet = workbook.createSheet("subsetSheet");
+            workbook.setSheetHidden(workbook.getSheetIndex("subsetSheet"), true);
         }
         for (Map.Entry<String, String[]> valueMap : this.boxValues.entrySet()) {
             Name name = workbook.getName(valueMap.getKey());
@@ -42,7 +43,6 @@ public final class DefaultCascadingDropdownBoxListener implements ExcelCascading
                 name.setRefersToFormula("subsetSheet!" + formula);
             }
         }
-        workbook.setSheetHidden(workbook.getSheetIndex("subsetSheet"), true);
         char parentIndex = (char) ('A' + Integer.parseInt(excelDropdownBox.link()));
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint constraint;

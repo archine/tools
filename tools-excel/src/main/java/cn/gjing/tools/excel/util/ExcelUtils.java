@@ -38,7 +38,7 @@ public final class ExcelUtils {
             return;
         }
         if (value instanceof Number) {
-            cell.setCellValue(Double.parseDouble(value.toString()));
+            cell.setCellValue(((Number) value).doubleValue());
             return;
         }
         if (value instanceof Enum) {
@@ -58,6 +58,10 @@ public final class ExcelUtils {
             return;
         }
         throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + field.getName() + " " + value);
+    }
+
+    public static void main(String[] args) {
+        setCellValue(null, 1, null);
     }
 
     /**

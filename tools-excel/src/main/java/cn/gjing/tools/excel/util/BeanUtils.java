@@ -61,8 +61,9 @@ public final class BeanUtils {
         Field[] declaredFields = excelClass.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = excelClass.getSuperclass();
-        if (superclass != Object.class) {
+        while (superclass != Object.class) {
             fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
+            superclass = superclass.getSuperclass();
         }
         fieldList = fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))

@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public class ExcelReader<R> {
     private ExcelReaderContext<R> context;
     private ExcelReaderResolver<R> readerResolver;
-    private String defaultSheetName = "sheet1";
+    private final String defaultSheetName = "Sheet1";
 
     private ExcelReader() {
 
