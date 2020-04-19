@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
@@ -115,18 +116,33 @@ public final class ListenerChain {
      * Execute read row listener
      *
      * @param rowReadListeners rowReadListeners
-     * @param r                Current Java object
      * @param cellValue        Current cell value
      * @param field            Current field
      * @param rowIndex         Current row index
      * @param colIndex         Current col index
      * @param isHead           Whether is excel header
-     * @param <R>              R
+     * @return cellValue
+     */
+    @SuppressWarnings("rawtypes")
+    public static Object doReadCell(List<ExcelReadListener> rowReadListeners, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
+        if (rowReadListeners != null) {
+            for (ExcelReadListener rowReadListener : rowReadListeners) {
+                cellValue = ((ExcelRowReadListener) rowReadListener).readCell(cellValue, field, rowIndex, colIndex, isHead);
+            }
+        }
+        return cellValue;
+    }
+
+    /**
+     * Execute read row listener
+     * @param rowReadListeners rowReadListeners
+     * @param context Excel reader context
+     * @param <R> R
      */
     @SuppressWarnings("unchecked")
-    public static <R> void doReadCell(List<ExcelReadListener> rowReadListeners, R r, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
+    public static <R> void doReadFinish(List<ExcelReadListener> rowReadListeners, ExcelReaderContext<R> context) {
         if (rowReadListeners != null) {
-            rowReadListeners.forEach(e -> ((ExcelRowReadListener<R>) e).readCell(r, cellValue, field, rowIndex, colIndex, isHead));
+            rowReadListeners.forEach(e -> ((ExcelRowReadListener<R>) e).readFinish(context));
         }
     }
 

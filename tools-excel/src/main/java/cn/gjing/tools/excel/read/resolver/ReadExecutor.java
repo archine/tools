@@ -92,12 +92,15 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
             }
             if (row.getRowNum() == startIndex) {
                 if (row.getLastCellNum() != this.context.getExcelFields().size()) {
-                    throw new ExcelTemplateException();
+                    if (this.context.isTemplateCheck()) {
+                        throw new ExcelTemplateException();
+                    }
                 }
                 if (this.context.getHeadNames().isEmpty()) {
+                    Object value;
                     for (Cell cell : row) {
-                        this.context.getHeadNames().add(cell.getStringCellValue());
-                        ListenerChain.doReadCell(rowReadListeners, null, cell.getStringCellValue(), null, startIndex, cell.getColumnIndex(), true);
+                        value = ListenerChain.doReadCell(rowReadListeners, cell.getStringCellValue(), null, startIndex, cell.getColumnIndex(), true);
+                        this.context.getHeadNames().add(value == null ? "" : value.toString());
                     }
                     stop = ListenerChain.doReadRow(rowReadListeners, null, this.context.getHeadNames(), startIndex, true, hasNext);
                 }
@@ -121,18 +124,19 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                         value = this.getValue(r, valueCell, field, excelField, gson, hasNext);
                         context.setVariable(field.getName(), value);
                         this.assertValue(parser, context, row, c, field, excelField, excelAssert);
+                        value = ListenerChain.doReadCell(rowReadListeners, value, field, row.getRowNum(), c, false);
                         value = this.convert(field, value, parser, excelDataConvert, context);
                         if (isSave && value != null) {
                             this.setValue(r, field, value);
                         }
                     } else {
-                        context.setVariable(field.getName(), null);
                         this.allowEmpty(r, field, excelField, row.getRowNum(), c, hasNext);
+                        context.setVariable(field.getName(), null);
                         this.assertValue(parser, context, row, c, field, excelField, excelAssert);
-                        value = this.convert(field, null, parser, excelDataConvert, context);
+                        value = ListenerChain.doReadCell(rowReadListeners, null, field, row.getRowNum(), c, false);
+                        value = this.convert(field, value, parser, excelDataConvert, context);
                         this.setValue(r, field, value);
                     }
-                    ListenerChain.doReadCell(rowReadListeners, r, value, field, row.getRowNum(), c, false);
                     context.setVariable(field.getName(), value);
                 } catch (Exception e) {
                     if (e instanceof ExcelAssertException) {
@@ -152,6 +156,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
             }
         }
+        ListenerChain.doReadFinish(rowReadListeners, this.context);
         ListenerChain.doResultNotify(this.context.getResultReadListener(), dataList);
     }
 

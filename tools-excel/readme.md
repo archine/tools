@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.0.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.0.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -578,8 +578,14 @@ public class MyReadRowListener implements ExcelRowReadListener<SingleHead> {
     }
 
     @Override
-    public void readCell(SingleHead singleHead, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
-        System.out.println("读完一格");
+    public Object readCell(Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
+        System.out.println("读到了一格，并进行完了数据校验");
+        return cellValue;
+    }
+
+    @Override
+    public void readFinish(ExcelReaderContext<SingleHead> context) {
+        System.out.println("数据全部导入完毕了");
     }
 }
 ```

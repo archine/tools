@@ -152,6 +152,17 @@ public class ExcelReader<R> {
     }
 
     /**
+     * Whether to check excel template when excel import
+     *
+     * @param check Whether check
+     * @return this
+     */
+    public ExcelReader<R> checkTemplate(boolean check) {
+        this.context.setTemplateCheck(check);
+        return this;
+    }
+
+    /**
      * Excel import end
      */
     public void end() {

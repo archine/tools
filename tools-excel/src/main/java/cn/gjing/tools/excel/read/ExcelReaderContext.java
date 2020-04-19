@@ -54,6 +54,11 @@ public class ExcelReaderContext<R> {
     private List<Field> excelFields;
 
     /**
+     * Whether to check excel template when excel import
+     */
+    private boolean templateCheck = true;
+
+    /**
      * Read listener cache
      */
     @Builder.Default
