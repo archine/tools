@@ -86,23 +86,23 @@ public class ExcelReader<R> {
      * Specifies that the Excel subscript to start reading.
      * This line must be a real subscript,
      *
-     * @param startIndex subscript is evaluated from 0
+     * @param headerIndex subscript is evaluated from 0
      * @return this
      */
-    public ExcelReader<R> read(int startIndex) {
-        this.readerResolver.read(startIndex, this.defaultSheetName);
+    public ExcelReader<R> read(int headerIndex) {
+        this.readerResolver.read(headerIndex, this.defaultSheetName);
         return this;
     }
 
     /**
      * Read the specified sheet
      *
-     * @param startIndex Excel header starter index
+     * @param headerIndex Excel header starter index
      * @param sheetName  Excel Sheet name
      * @return this
      */
-    public ExcelReader<R> read(int startIndex, String sheetName) {
-        this.readerResolver.read(startIndex, sheetName);
+    public ExcelReader<R> read(int headerIndex, String sheetName) {
+        this.readerResolver.read(headerIndex, sheetName);
         return this;
     }
 

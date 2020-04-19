@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.0.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.0.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -569,8 +569,9 @@ public class TestController {
  * @author Gjing
  **/
 public class MyReadRowListener implements ExcelRowReadListener<SingleHead> {
+
     @Override
-    public boolean readRow(SingleHead singleHead, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext) {
+    public boolean readRow(SingleHead singleHead, List<Object> otherValues, int rowIndex, boolean isHead, boolean isBody) {
         //如果Excel的数据量太大，为了避免生成的映射实体对象过多造成内存溢出，可以选择
         //在这里对当前对象进行存储，然后达到一定数量后就存数据库，然后clear掉这些数据
         System.out.println("读完一行");
@@ -578,14 +579,14 @@ public class MyReadRowListener implements ExcelRowReadListener<SingleHead> {
     }
 
     @Override
-    public Object readCell(Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
-        System.out.println("读到了一格，并进行完了数据校验");
+    public Object readCell(Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead, boolean isBody) {
+        //每一个单元格读取成功触发该方法
         return cellValue;
     }
 
     @Override
     public void readFinish(ExcelReaderContext<SingleHead> context) {
-        System.out.println("数据全部导入完毕了");
+        //全部读完时触发该方法
     }
 }
 ```

@@ -21,8 +21,7 @@ public interface ExcelEmptyReadListener<R> extends ExcelReadListener {
      * @param excelField ExcelField annotation on that field
      * @param rowIndex   The index of the current row
      * @param colIndex   The index of the current col
-     * @param hasNext    Whether has next row
      * @return Whether to save this data
      */
-    boolean readEmpty(R r, Field field, ExcelField excelField, int rowIndex, int colIndex, boolean hasNext);
+    boolean readEmpty(R r, Field field, ExcelField excelField, int rowIndex, int colIndex);
 }

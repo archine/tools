@@ -96,17 +96,16 @@ public final class ListenerChain {
      * @param r                Generated Java object
      * @param rowIndex         The index of the current row
      * @param isHead           Whether is excel head
-     * @param hasNext          Whether has next row
-     * @param headNames        All the table headers of the current row
+     * @param otherValues      Except for the content of the body
      * @param <R>              R
      * @return Whether to stop reading
      */
     @SuppressWarnings("unchecked")
-    public static <R> boolean doReadRow(List<ExcelReadListener> rowReadListeners, R r, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext) {
+    public static <R> boolean doReadRow(List<ExcelReadListener> rowReadListeners, R r, List<Object> otherValues, int rowIndex, boolean isHead, boolean isBody) {
         boolean stop = false;
         if (rowReadListeners != null) {
             for (ExcelReadListener rowReadListener : rowReadListeners) {
-                stop = ((ExcelRowReadListener<R>) rowReadListener).readRow(r, headNames, rowIndex, isHead, hasNext);
+                stop = ((ExcelRowReadListener<R>) rowReadListener).readRow(r, otherValues, rowIndex, isHead, isBody);
             }
         }
         return stop;
@@ -121,13 +120,14 @@ public final class ListenerChain {
      * @param rowIndex         Current row index
      * @param colIndex         Current col index
      * @param isHead           Whether is excel header
+     * @param isBody           Whether is excel body
      * @return cellValue
      */
     @SuppressWarnings("rawtypes")
-    public static Object doReadCell(List<ExcelReadListener> rowReadListeners, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead) {
+    public static Object doReadCell(List<ExcelReadListener> rowReadListeners, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead, boolean isBody) {
         if (rowReadListeners != null) {
             for (ExcelReadListener rowReadListener : rowReadListeners) {
-                cellValue = ((ExcelRowReadListener) rowReadListener).readCell(cellValue, field, rowIndex, colIndex, isHead);
+                cellValue = ((ExcelRowReadListener) rowReadListener).readCell(cellValue, field, rowIndex, colIndex, isHead, isBody);
             }
         }
         return cellValue;
@@ -135,9 +135,10 @@ public final class ListenerChain {
 
     /**
      * Execute read row listener
+     *
      * @param rowReadListeners rowReadListeners
-     * @param context Excel reader context
-     * @param <R> R
+     * @param context          Excel reader context
+     * @param <R>              R
      */
     @SuppressWarnings("unchecked")
     public static <R> void doReadFinish(List<ExcelReadListener> rowReadListeners, ExcelReaderContext<R> context) {
@@ -155,16 +156,15 @@ public final class ListenerChain {
      * @param excelField         ExcelField annotation on that field
      * @param rowIndex           The index of the current row
      * @param colIndex           The index of the current col
-     * @param hasNext            Whether has next row
      * @param <R>                R
      * @return Whether to save this data
      */
     @SuppressWarnings("unchecked")
-    public static <R> boolean doReadEmpty(List<ExcelReadListener> emptyReadListeners, R r, Field field, ExcelField excelField, int rowIndex, int colIndex, boolean hasNext) {
+    public static <R> boolean doReadEmpty(List<ExcelReadListener> emptyReadListeners, R r, Field field, ExcelField excelField, int rowIndex, int colIndex) {
         boolean isSave = false;
         if (emptyReadListeners != null) {
             for (ExcelReadListener emptyReadListener : emptyReadListeners) {
-                isSave = ((ExcelEmptyReadListener<R>) emptyReadListener).readEmpty(r, field, excelField, rowIndex, colIndex, hasNext);
+                isSave = ((ExcelEmptyReadListener<R>) emptyReadListener).readEmpty(r, field, excelField, rowIndex, colIndex);
             }
         }
         return isSave;
@@ -188,7 +188,7 @@ public final class ListenerChain {
      *
      * @param writeListenerCache writeListenerCache
      * @param listener           Write listener
-     * @param workbook workbook
+     * @param workbook           workbook
      */
     public static void addWriteListener(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache, ExcelWriteListener listener, Workbook workbook) {
         if (listener instanceof ExcelStyleWriteListener) {

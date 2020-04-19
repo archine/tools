@@ -13,14 +13,14 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
     /**
      * Read each row successfully
      *
-     * @param r         Generated Java object
-     * @param rowIndex  The index of the current row
-     * @param isHead    Whether is excel head
-     * @param hasNext   Whether has next row
-     * @param headNames All the table headers of the current row
+     * @param r           Generated Java object , Null when not in the body
+     * @param rowIndex    The index of the current row
+     * @param isHead      Whether is excel header
+     * @param isBody      Whether is excel body
+     * @param otherValues Except for the content of the body
      * @return Whether to stop reading
      */
-    boolean readRow(R r, List<String> headNames, int rowIndex, boolean isHead, boolean hasNext);
+    boolean readRow(R r, List<Object> otherValues, int rowIndex, boolean isHead, boolean isBody);
 
     /**
      * Read each cell successfully
@@ -30,12 +30,15 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
      * @param rowIndex  Current row index
      * @param colIndex  Current col index
      * @param isHead    Whether is excel header
+     * @param isBody    Whether is excel body
      * @return cellValue
      */
-    default Object readCell(Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead){return cellValue;}
+    default Object readCell(Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead, boolean isBody) {
+        return cellValue;
+    }
 
     /**
-     * All data imported
+     * End of the import
      *
      * @param context Excel reader context
      */
