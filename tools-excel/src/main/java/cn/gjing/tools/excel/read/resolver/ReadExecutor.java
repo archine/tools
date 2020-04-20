@@ -38,7 +38,7 @@ import java.util.*;
 class ReadExecutor<R> implements ExcelReaderResolver<R> {
     private ExcelReaderContext<R> context;
     private Map<String, DataConvert<?>> dataConvertMap;
-    private Boolean isSave;
+    private Boolean save;
 
     @Override
     public void init(ExcelReaderContext<R> readerContext) {
@@ -76,7 +76,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
      */
     private void reader(int headerIndex, List<R> dataList) {
         R r;
-        this.isSave = true;
+        this.save = true;
         boolean stop = false;
         headerIndex++;
         ExpressionParser parser = new SpelExpressionParser();
@@ -89,21 +89,21 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 break;
             }
             if (row.getRowNum() < headerIndex) {
-                if (row.getRowNum() == 0) {
-                    if (row.getLastCellNum() != this.context.getExcelFields().size()) {
-                        if (this.context.isTemplateCheck()) {
-                            throw new ExcelTemplateException();
+                if (this.context.isNeedMetaInfo()) {
+                    boolean isHead = row.getRowNum() == headerIndex - 1;
+                    if (isHead) {
+                        if (row.getLastCellNum() != this.context.getExcelFields().size()) {
+                            if (this.context.isTemplateCheck()) {
+                                throw new ExcelTemplateException();
+                            }
                         }
                     }
+                    otherValues = new ArrayList<>();
+                    for (Cell cell : row) {
+                        otherValues.add(ListenerChain.doReadCell(rowReadListeners, cell.getStringCellValue(), null, row.getRowNum(), cell.getColumnIndex(), isHead, false));
+                    }
+                    stop = ListenerChain.doReadRow(rowReadListeners, null, otherValues, row.getRowNum(), isHead, false);
                 }
-                Object otherValue;
-                boolean isHead = row.getRowNum() == headerIndex - 1;
-                otherValues = new ArrayList<>();
-                for (Cell cell : row) {
-                    otherValue = ListenerChain.doReadCell(rowReadListeners, cell.getStringCellValue(), null, row.getRowNum(), cell.getColumnIndex(), isHead, false);
-                    otherValues.add(otherValue == null ? "" : otherValue.toString());
-                }
-                stop = ListenerChain.doReadRow(rowReadListeners, null, otherValues, row.getRowNum(), isHead, false);
                 continue;
             }
             try {
@@ -112,29 +112,27 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelInitException("Excel entity init failure, " + e.getMessage());
             }
-            for (int c = 0; c < row.getLastCellNum() && this.isSave; c++) {
+            for (int c = 0; c < row.getLastCellNum() && save; c++) {
                 Field field = this.context.getExcelFields().get(c);
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
-                ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
-                ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
                 Cell valueCell = row.getCell(c);
                 Object value;
                 try {
                     if (valueCell != null) {
                         value = this.getValue(r, valueCell, field, excelField, gson);
                         context.setVariable(field.getName(), value);
-                        this.assertValue(parser, context, row, c, field, excelField, excelAssert);
+                        this.assertValue(parser, context, row, c, field, excelField);
                         value = ListenerChain.doReadCell(rowReadListeners, value, field, row.getRowNum(), c, false, true);
-                        value = this.convert(field, value, parser, excelDataConvert, context);
-                        if (isSave && value != null) {
+                        value = this.convert(field, value, parser, context);
+                        if (save && value != null) {
                             this.setValue(r, field, value);
                         }
                     } else {
                         this.allowEmpty(r, field, excelField, row.getRowNum(), c);
                         context.setVariable(field.getName(), null);
-                        this.assertValue(parser, context, row, c, field, excelField, excelAssert);
+                        this.assertValue(parser, context, row, c, field, excelField);
                         value = ListenerChain.doReadCell(rowReadListeners, null, field, row.getRowNum(), c, false, true);
-                        value = this.convert(field, value, parser, excelDataConvert, context);
+                        value = this.convert(field, value, parser, context);
                         this.setValue(r, field, value);
                     }
                     context.setVariable(field.getName(), value);
@@ -145,7 +143,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                     throw new ExcelResolverException(e.getMessage());
                 }
             }
-            if (this.isSave) {
+            if (save) {
                 try {
                     if (dataList != null) {
                         dataList.add(r);
@@ -195,14 +193,14 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
     /**
      * Data convert
      *
-     * @param field            Current field
-     * @param value            Attribute values
-     * @param parser           El parser
-     * @param excelDataConvert excelDataConvert
-     * @param context          EL context
+     * @param field   Current field
+     * @param value   Attribute values
+     * @param parser  El parser
+     * @param context EL context
      * @return new value
      */
-    private Object convert(Field field, Object value, ExpressionParser parser, ExcelDataConvert excelDataConvert, EvaluationContext context) {
+    private Object convert(Field field, Object value, ExpressionParser parser, EvaluationContext context) {
+        ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr2())) {
             return parser.parseExpression(excelDataConvert.expr2()).getValue(context);
         }
@@ -251,22 +249,22 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
         if (excelField.allowEmpty()) {
             return;
         }
-        this.isSave = ListenerChain.doReadEmpty(this.context.getReadListenersCache()
+        this.save = ListenerChain.doReadEmpty(this.context.getReadListenersCache()
                 .get(ExcelEmptyReadListener.class), r, field, excelField, rowIndex, colIndex);
     }
 
     /**
      * Cell value assert
      *
-     * @param parser      El parser
-     * @param context     EL context
-     * @param row         Current row
-     * @param c           Current col index
-     * @param field       Current field
-     * @param excelField  ExcelFiled annotation on current filed
-     * @param excelAssert Excel Assert on current field
+     * @param parser     El parser
+     * @param context    EL context
+     * @param row        Current row
+     * @param c          Current col index
+     * @param field      Current field
+     * @param excelField ExcelFiled annotation on current filed
      */
-    private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField, ExcelAssert excelAssert) {
+    private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField) {
+        ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
         if (excelAssert != null) {
             Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
             if (test != null && !test) {

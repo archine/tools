@@ -53,6 +53,11 @@ public class ExcelReaderContext<R> {
     private boolean templateCheck = true;
 
     /**
+     * Whether is need meta info(Such as header,title)
+     */
+    private boolean needMetaInfo = false;
+
+    /**
      * Read listener cache
      */
     private Map<Class<? extends ExcelReadListener>, List<ExcelReadListener>> readListenersCache = new HashMap<>(8);

@@ -98,7 +98,7 @@ public class ExcelReader<R> {
      * Read the specified sheet
      *
      * @param headerIndex Excel header starter index
-     * @param sheetName  Excel Sheet name
+     * @param sheetName   Excel Sheet name
      * @return this
      */
     public ExcelReader<R> read(int headerIndex, String sheetName) {
@@ -152,13 +152,15 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Whether to check excel template when excel import
+     * Whether is need meta info(Such as header,title)
      *
-     * @param check Whether check
+     * @param need          Read meta info
+     * @param checkTemplate Check that the excel template matches the entity
      * @return this
      */
-    public ExcelReader<R> checkTemplate(boolean check) {
-        this.context.setTemplateCheck(check);
+    public ExcelReader<R> metaInfo(boolean need, boolean checkTemplate) {
+        this.context.setNeedMetaInfo(need);
+        this.context.setTemplateCheck(checkTemplate);
         return this;
     }
 

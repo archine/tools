@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.0.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.0.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.0.4</version>
+    <version>2.0.5</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -561,7 +561,30 @@ public class TestController {
     }
 }
 ```
-### 3、自定义监听器
+### 3、开启读表头、大标题信息
+**默认情况下不会进行表头和大标题的读取，只读主体内容，``在调用read()``前设置**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class TestController {
+    @Resource
+    private UserService userService;
+	
+    @PostMapping("/user_import")
+    @ApiOperation("导入单表头")
+    public void userImport(MultipartFile file) throws IOException {
+        ExcelFactory.createReader(file, SingleHead.class)
+                //开启读取表头和大标题数据，并进行模板检查
+                .metaInfo(true, true)
+                .subscribe(e -> this.userService.saveUsers(e))
+                .read(1)
+                .end();
+    }
+}
+```
+### 4、自定义监听器
 **在导入时增加一系列监听器来执行一些拓展，框架中提供了``ExcelEmptyReadListener(非空策略监听器)``、``ExcelResultReadListener(结果监听器)``、``ExcelRowReadListener(行读取监听器)``三种监听器，这里演示添加一个行读取监听器**
 ```java
 /**
@@ -611,7 +634,7 @@ public class TestController {
 }
 ```
 <span id="assert_use"></span>
-### 4、数据校验
+### 5、数据校验
 **在导入时对数据进行校验，这里演示导入时姓名不能为空  >>  [注解参考](#assert)**
 ```java
 /**
@@ -625,7 +648,7 @@ public class SingleHead {
     private String userName;
 }
 ```
-### 5、数据转换
+### 6、数据转换
 **导入时对读取到的单元格内容进行加工，支持注解方式和接口方式  >>  [注解参考](#convert)**
 ```java
 /**
