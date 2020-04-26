@@ -60,10 +60,6 @@ public final class ExcelUtils {
         throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + field.getName() + " " + value);
     }
 
-    public static void main(String[] args) {
-        setCellValue(null, 1, null);
-    }
-
     /**
      * Add a dropdown box when export
      *

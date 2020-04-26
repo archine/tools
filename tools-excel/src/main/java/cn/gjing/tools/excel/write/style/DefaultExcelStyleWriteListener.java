@@ -30,8 +30,12 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             CellStyle cellStyle = this.workbook.createCellStyle();
             cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            cellStyle.setAlignment(HorizontalAlignment.CENTER);
+            cellStyle.setAlignment(HorizontalAlignment.LEFT);
+            Font font = this.workbook.createFont();
+            font.setFontName("宋体");
+            font.setBold(true);
             cellStyle.setWrapText(true);
+            cellStyle.setFont(font);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             this.titleStyle = cellStyle;
         }
@@ -98,7 +102,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
     }
 
     @Override
-    public void completeRow(Sheet sheet, Row row, int index, boolean isHead) {
+    public void completeRow(Sheet sheet, Row row, Object obj, int index, boolean isHead) {
         if (isHead) {
             row.setHeight((short) 350);
         }

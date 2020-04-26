@@ -55,13 +55,14 @@ public final class ListenerChain {
      * @param excelListeners excelListeners
      * @param sheet          Current sheet
      * @param row            Create the finished row
+     * @param obj            Current java object
      * @param index          Line index, index type according to isHead，Starting from 0
      * @param isHead         Whether is excel head
      */
-    public static void doCompleteRow(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, int index, boolean isHead) {
+    public static void doCompleteRow(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Object obj, int index, boolean isHead) {
         List<ExcelWriteListener> rowListeners = excelListeners.get(ExcelRowWriteListener.class);
         if (rowListeners != null) {
-            rowListeners.forEach(e -> ((ExcelRowWriteListener) e).completeRow(sheet, row, index, isHead));
+            rowListeners.forEach(e -> ((ExcelRowWriteListener) e).completeRow(sheet, row, obj, index, isHead));
         }
     }
 

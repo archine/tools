@@ -15,8 +15,9 @@ public interface ExcelRowWriteListener extends ExcelWriteListener {
      *
      * @param sheet  Current sheet
      * @param row    Create the finished row
+     * @param obj    Current Java object
      * @param index  Line index, index type according to isHead，Starting from 0
      * @param isHead Whether is excel head
      */
-    void completeRow(Sheet sheet, Row row, int index, boolean isHead);
+    void completeRow(Sheet sheet, Row row, Object obj, int index, boolean isHead);
 }

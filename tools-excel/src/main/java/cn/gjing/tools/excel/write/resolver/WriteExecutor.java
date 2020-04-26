@@ -121,7 +121,7 @@ class WriteExecutor {
                     }
                     ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, headName, index, colIndex, true, headName);
                 }
-                ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, rowIndex, true);
+                ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(), rowIndex, true);
             }
         }
     }
@@ -164,7 +164,7 @@ class WriteExecutor {
                     throw new ExcelResolverException(e.getMessage());
                 }
             }
-            ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, index, false);
+            ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, this.context.getHeadNames(), index, false);
         }
     }
 

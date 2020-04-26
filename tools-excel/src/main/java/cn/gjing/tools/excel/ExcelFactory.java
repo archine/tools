@@ -57,6 +57,19 @@ public final class ExcelFactory {
     /**
      * Create an excel writer
      *
+     * @param excelClass Excel mapped entity
+     * @param response   response
+     * @param ignores    The exported field is to be ignored
+     * @param fileName   Excel file name，The priority is higher than the annotation specification
+     * @return ExcelWriter
+     */
+    public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
+        return createWriter(fileName, excelClass, response, true, ignores);
+    }
+
+    /**
+     * Create an excel writer
+     *
      * @param fileName         Excel file name，The priority is higher than the annotation specification
      * @param excelClass       Excel mapped entity
      * @param response         response

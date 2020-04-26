@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.0.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.0.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.0.5</version>
+    <version>2.0.6</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -485,7 +485,7 @@ public class MyStyleListener implements ExcelStyleWriteListener {
     }
 
     @Override
-    public void completeRow(Sheet sheet, Row row, int index, boolean isHead) {
+    public void completeRow(Sheet sheet, Row row, Object obj, int index, boolean isHead) {
         //该方法是ExcelRowWriteListener中的，会在每一行结束之后触发，你可以在这里实现其他的逻辑
     }
 }
