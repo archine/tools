@@ -5,7 +5,7 @@
     <groupId>cn.gjing</groupId>
     <artifactId>tools</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.6</version>
+    <version>2.2.7</version>
     <name>tools</name>
     <modules>
         <module>tools-common</module>

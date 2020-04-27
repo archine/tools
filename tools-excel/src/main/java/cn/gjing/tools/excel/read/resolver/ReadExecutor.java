@@ -37,7 +37,7 @@ import java.util.*;
  **/
 class ReadExecutor<R> implements ExcelReaderResolver<R> {
     private ExcelReaderContext<R> context;
-    private Map<String, DataConvert<?>> dataConvertMap;
+    private Map<Class<? extends DataConvert<?>>, DataConvert<?>> dataConvertMap;
     private Boolean save;
 
     @Override
@@ -54,7 +54,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                     this.dataConvertMap = new HashMap<>(16);
                 }
                 try {
-                    this.dataConvertMap.put(e.getName(), excelField.convert().newInstance());
+                    this.dataConvertMap.put(excelField.convert(), excelField.convert().newInstance());
                 } catch (Exception ex) {
                     throw new ExcelInitException("Init specified excel header data converter error " + e.getName() + ", " + ex.getMessage());
                 }
@@ -123,7 +123,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                         context.setVariable(field.getName(), value);
                         this.assertValue(parser, context, row, c, field, excelField);
                         value = ListenerChain.doReadCell(rowReadListeners, value, field, row.getRowNum(), c, false, true);
-                        value = this.convert(field, value, parser, context);
+                        value = this.convert(field, excelField, value, parser, context);
                         if (save && value != null) {
                             this.setValue(r, field, value);
                         }
@@ -132,7 +132,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                         context.setVariable(field.getName(), null);
                         this.assertValue(parser, context, row, c, field, excelField);
                         value = ListenerChain.doReadCell(rowReadListeners, null, field, row.getRowNum(), c, false, true);
-                        value = this.convert(field, value, parser, context);
+                        value = this.convert(field, excelField, value, parser, context);
                         this.setValue(r, field, value);
                     }
                     context.setVariable(field.getName(), value);
@@ -183,7 +183,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
                 return gson.fromJson(gson.toJson(cell.getNumericCellValue()), field.getType());
             case FORMULA:
-                return cell.getCellFormula();
+                return gson.fromJson(gson.toJson(cell.getStringCellValue()), field.getType());
             default:
                 return cell.getStringCellValue();
         }
@@ -193,19 +193,20 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
     /**
      * Data convert
      *
-     * @param field   Current field
-     * @param value   Attribute values
-     * @param parser  El parser
-     * @param context EL context
+     * @param field      Current field
+     * @param value      Attribute values
+     * @param excelField Excel field
+     * @param parser     El parser
+     * @param context    EL context
      * @return new value
      */
-    private Object convert(Field field, Object value, ExpressionParser parser, EvaluationContext context) {
+    private Object convert(Field field, ExcelField excelField, Object value, ExpressionParser parser, EvaluationContext context) {
         ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr2())) {
             return parser.parseExpression(excelDataConvert.expr2()).getValue(context);
         }
         if (this.dataConvertMap != null) {
-            DataConvert<?> dataConvert = this.dataConvertMap.get(field.getName());
+            DataConvert<?> dataConvert = this.dataConvertMap.get(excelField.convert());
             if (dataConvert != null) {
                 return dataConvert.toEntityAttribute(value, field);
             }

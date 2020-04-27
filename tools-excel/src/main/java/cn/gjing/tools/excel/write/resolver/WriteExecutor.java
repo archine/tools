@@ -2,7 +2,6 @@ package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.convert.DataConvert;
-import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
@@ -42,14 +41,15 @@ import java.util.Map;
  **/
 class WriteExecutor {
     private final ExcelWriterContext context;
-    private Map<String, DataConvert<?>> dataConvertMap;
-    private Map<String, ExcelAutoMergeCallback<?>> mergeCallbackMap;
+    private final Map<Class<? extends DataConvert<?>>, DataConvert<?>> dataConvertMap;
+    private Map<Class<? extends ExcelAutoMergeCallback<?>>, ExcelAutoMergeCallback<?>> mergeCallbackMap;
     private Map<Integer, ExcelOldRowModel> oldRowModelMap;
     private final Gson gson;
 
     public WriteExecutor(ExcelWriterContext context) {
         this.gson = new Gson();
         this.context = context;
+        this.dataConvertMap = new HashMap<>(16);
     }
 
     /**
@@ -164,7 +164,7 @@ class WriteExecutor {
                     throw new ExcelResolverException(e.getMessage());
                 }
             }
-            ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, this.context.getHeadNames(), index, false);
+            ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, o, index, false);
         }
     }
 
@@ -176,19 +176,13 @@ class WriteExecutor {
      * @return DataConvert
      */
     private DataConvert<?> createDataConvert(Field field, ExcelField excelField) {
-        DataConvert<?> dataConvert = null;
-        if (excelField.convert() != DefaultDataConvert.class) {
-            if (this.dataConvertMap == null) {
-                this.dataConvertMap = new HashMap<>(10);
-            }
-            dataConvert = dataConvertMap.get(field.getName());
-            if (dataConvert == null) {
-                try {
-                    dataConvert = excelField.convert().newInstance();
-                    this.dataConvertMap.put(field.getName(), dataConvert);
-                } catch (Exception e) {
-                    throw new ExcelInitException("Init specified excel header data converter failure " + field.getName() + ", " + e.getMessage());
-                }
+        DataConvert<?> dataConvert = dataConvertMap.get(excelField.convert());
+        if (dataConvert == null) {
+            try {
+                dataConvert = excelField.convert().newInstance();
+                this.dataConvertMap.put(excelField.convert(), dataConvert);
+            } catch (Exception e) {
+                throw new ExcelInitException("Init specified excel header data converter failure " + field.getName() + ", " + e.getMessage());
             }
         }
         return dataConvert;
@@ -203,16 +197,16 @@ class WriteExecutor {
      */
     private ExcelAutoMergeCallback<?> createMergeCallback(Field field, ExcelField excelField) {
         if (this.mergeCallbackMap == null) {
-            this.mergeCallbackMap = new HashMap<>(12);
+            this.mergeCallbackMap = new HashMap<>(16);
             if (this.oldRowModelMap == null) {
-                this.oldRowModelMap = new HashMap<>(12);
+                this.oldRowModelMap = new HashMap<>(16);
             }
         }
-        ExcelAutoMergeCallback<?> autoMergeCallback = this.mergeCallbackMap.get(field.getName());
+        ExcelAutoMergeCallback<?> autoMergeCallback = this.mergeCallbackMap.get(excelField.autoMerge().callback());
         if (autoMergeCallback == null) {
             try {
                 autoMergeCallback = excelField.autoMerge().callback().newInstance();
-                this.mergeCallbackMap.put(field.getName(), autoMergeCallback);
+                this.mergeCallbackMap.put(excelField.autoMerge().callback(), autoMergeCallback);
             } catch (Exception e) {
                 throw new ExcelInitException("Init specified excel header merge callback failure " + field.getName() + ", " + e.getMessage());
             }
@@ -281,7 +275,7 @@ class WriteExecutor {
             return parser.parseExpression(excelDataConvert.expr1()).getValue(context);
         }
         if (dataConvert != null) {
-            return dataConvert.toExcelAttribute(this.gson.fromJson(this.gson.toJson(obj), (java.lang.reflect.Type) obj.getClass()), value, field);
+            return dataConvert.toExcelAttribute(this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), value, field);
         }
         return value;
     }
