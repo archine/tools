@@ -37,11 +37,19 @@ public @interface ExcelField {
     int width() default 5120;
 
     /**
+     * List header sort, Please to use order
+     *
+     * @return sort index
+     */
+    @Deprecated
+    int sort() default 0;
+
+    /**
      * List header sort, if not set will default entity property order
      *
      * @return sort index
      */
-    int sort() default 0;
+    int order() default 0;
 
     /**
      * The format of the cells under the current table header when exported,

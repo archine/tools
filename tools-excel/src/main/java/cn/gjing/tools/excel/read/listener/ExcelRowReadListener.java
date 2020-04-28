@@ -42,6 +42,12 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
      *
      * @param context Excel reader context
      */
-    default void readFinish(ExcelReaderContext<R> context) {
-    }
+    default void readFinish(ExcelReaderContext<R> context) {}
+
+    /**
+     * Before you start reading the data
+     *
+     * @param context Excel reader context
+     */
+    default void readBefore(ExcelReaderContext<R> context) {}
 }

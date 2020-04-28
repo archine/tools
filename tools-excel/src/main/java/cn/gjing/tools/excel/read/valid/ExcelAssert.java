@@ -27,5 +27,5 @@ public @interface ExcelAssert {
      *
      * @return message
      */
-    String message() default "填写的内容有误";
+    String message() default "There is an error in the content";
 }

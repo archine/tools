@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.0.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.0.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.0.7</version>
+    <version>2.0.8</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -29,11 +29,11 @@
 |---|---|
 |value|表头名称，该参数为一个数组，数组中的``最后一个值为实际的表头名称``|
 |width|表头所在列的整列宽度|
-|sort|表头出现在Excel文件中的先后顺序，建议要么都配置要么全不配置，不配置的情况下``默认按实体中字段顺序``|
+|order|表头出现在Excel文件中的先后顺序，建议要么都配置要么全不配置，不配置的情况下``默认按实体中字段顺序``|
 |format|表头所在列的整列单元格格式，格式参照Excel文件中的单元格格式|
 |autoMerge|表头下方是否开启纵向合并|
 |allowEmpty|导入时，表头下方的单元格是否允许为空|
-|convert|数据转换器，可以在导入导出时对数据进行转换|      
+|convert|数据转换器，可以在导入导出时对数据进行转换,``相同的转换器只会出现一个``|      
 <span id="convert"></span>
 ### 3、@ExcelDataConvert
 **数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)，     [查看用例](#convert_use)**    
@@ -533,7 +533,7 @@ public class TestController {
                 //在read()方法前通过订阅方法增加一个结果监听器，该监听器会在每一次read()结束之后触发
                 .subscribe(e -> this.userService.saveUsers(e))
                 .read()
-                .end();
+                .finish();
     }
 }
 ```
@@ -557,7 +557,7 @@ public class TestController {
                 //如果Excel中数据量太大，不建议使用结果监听器，会造成生成了过多的映射实体对象造成内存溢出
                 .subscribe(e -> this.userService.saveUsers(e))
                 .read(1)
-                .end();
+                .finish();
     }
 }
 ```
@@ -580,7 +580,7 @@ public class TestController {
                 .metaInfo(true, true)
                 .subscribe(e -> this.userService.saveUsers(e))
                 .read(1)
-                .end();
+                .finish();
     }
 }
 ```
@@ -629,7 +629,7 @@ public class TestController {
         ExcelFactory.createReader(file, SingleHead.class)
                 .addListener(new MyReadRowListener())
                 .read()
-                .end();
+                .finish();
     }
 }
 ```
@@ -694,7 +694,7 @@ public enum Gender {
 ```
 **接口方式这里不在演示，同导出时一样  >>  [导出接口方式转换](#convert_use_interface)**       
 
-**在导入调用结束后，一定要在最后调用``end()``方法对流进行关闭**       
+**在导入调用结束后，一定要在最后调用``finish()``方法对流进行关闭**       
 
 [**置顶**](#top)
 

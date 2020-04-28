@@ -67,7 +67,7 @@ public final class BeanUtils {
         }
         fieldList = fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).sort()))
+                .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).order()))
                 .filter(e -> {
                     boolean noContain = true;
                     String[] headNames = e.getAnnotation(ExcelField.class).value();

@@ -165,9 +165,17 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Excel import end
+     * The Excel read data end，please use finish method
      */
+    @Deprecated
     public void end() {
+        this.finish();
+    }
+
+    /**
+     * The Excel read data end
+     */
+    public void finish() {
         try {
             if (this.context.getInputStream() != null) {
                 this.context.getInputStream().close();

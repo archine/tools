@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write.merge;
 
-import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 import cn.gjing.tools.excel.write.callback.DefaultExcelAutoMergeCallback;
+import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 
 import java.lang.annotation.*;
 
@@ -13,11 +13,19 @@ import java.lang.annotation.*;
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface Merge {
     /**
+     * Whether to enable vertical merge, please to use enable
+     *
+     * @return false
+     */
+    @Deprecated
+    boolean open() default false;
+
+    /**
      * Whether to enable vertical merge
      *
      * @return false
      */
-    boolean open() default false;
+    boolean enable() default false;
 
     /**
      * Whether to merge when null value is encountered

@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.convert.DataConvert;
+import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
@@ -50,6 +51,7 @@ class WriteExecutor {
         this.gson = new Gson();
         this.context = context;
         this.dataConvertMap = new HashMap<>(16);
+        this.dataConvertMap.put(DefaultDataConvert.class, new DefaultDataConvert());
     }
 
     /**
@@ -154,7 +156,7 @@ class WriteExecutor {
                 context.setVariable(field.getName(), value);
                 try {
                     value = this.convert(field, value, o, parser, excelDataConvert, context, dataConvert);
-                    if (excelField.autoMerge().open()) {
+                    if (excelField.autoMerge().enable()) {
                         autoMergeCallback = this.createMergeCallback(field, excelField);
                         this.autoMergeY(autoMergeCallback, valueRow, field, excelField, index, colIndex, value, o, dataSize);
                     }

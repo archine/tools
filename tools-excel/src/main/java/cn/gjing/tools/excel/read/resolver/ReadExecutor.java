@@ -43,23 +43,12 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
     @Override
     public void init(ExcelReaderContext<R> readerContext) {
         this.context = readerContext;
+        this.dataConvertMap = new HashMap<>(16);
+        this.dataConvertMap.put(DefaultDataConvert.class, new DefaultDataConvert());
     }
 
     @Override
     public void read(int headerIndex, String sheetName) {
-        this.context.getExcelFields().forEach(e -> {
-            ExcelField excelField = e.getAnnotation(ExcelField.class);
-            if (excelField.convert() != DefaultDataConvert.class) {
-                if (this.dataConvertMap == null) {
-                    this.dataConvertMap = new HashMap<>(16);
-                }
-                try {
-                    this.dataConvertMap.put(excelField.convert(), excelField.convert().newInstance());
-                } catch (Exception ex) {
-                    throw new ExcelInitException("Init specified excel header data converter error " + e.getName() + ", " + ex.getMessage());
-                }
-            }
-        });
         Sheet sheet = this.context.getWorkbook().getSheet(sheetName);
         if (sheet == null) {
             throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
@@ -78,80 +67,80 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
         R r;
         this.save = true;
         boolean stop = false;
-        headerIndex++;
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
         List<ExcelReadListener> rowReadListeners = this.context.getReadListenersCache().get(ExcelRowReadListener.class);
         Gson gson = new Gson();
         List<Object> otherValues;
+        ListenerChain.doReadBefore(rowReadListeners, this.context);
         for (Row row : this.context.getSheet()) {
             if (stop) {
                 break;
             }
-            if (row.getRowNum() < headerIndex) {
-                if (this.context.isNeedMetaInfo()) {
-                    boolean isHead = row.getRowNum() == headerIndex - 1;
-                    if (isHead) {
-                        if (row.getLastCellNum() != this.context.getExcelFields().size()) {
-                            if (this.context.isTemplateCheck()) {
-                                throw new ExcelTemplateException();
+            if (row.getRowNum() > headerIndex) {
+                try {
+                    r = this.context.getExcelClass().newInstance();
+                    context.setVariable(this.context.getExcelClass().getSimpleName(), r);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new ExcelInitException("Excel entity init failure, " + e.getMessage());
+                }
+                for (int c = 0, fieldSize = this.context.getExcelFields().size(); c < fieldSize && save; c++) {
+                    Field field = this.context.getExcelFields().get(c);
+                    ExcelField excelField = field.getAnnotation(ExcelField.class);
+                    Cell valueCell = row.getCell(c);
+                    Object value;
+                    try {
+                        if (valueCell != null) {
+                            value = this.getValue(r, valueCell, field, excelField, gson);
+                            context.setVariable(field.getName(), value);
+                            this.assertValue(parser, context, row, c, field, excelField);
+                            value = ListenerChain.doReadCell(rowReadListeners, value, field, row.getRowNum(), c, false, true);
+                            value = this.convert(field, value, parser, context, this.createDataConvert(field, excelField));
+                            if (save && value != null) {
+                                this.setValue(r, field, value);
                             }
+                        } else {
+                            this.allowEmpty(r, field, excelField, row.getRowNum(), c);
+                            context.setVariable(field.getName(), null);
+                            this.assertValue(parser, context, row, c, field, excelField);
+                            value = ListenerChain.doReadCell(rowReadListeners, null, field, row.getRowNum(), c, false, true);
+                            value = this.convert(field, value, parser, context, this.createDataConvert(field, excelField));
+                            this.setValue(r, field, value);
                         }
+                        context.setVariable(field.getName(), value);
+                    } catch (Exception e) {
+                        if (e instanceof ExcelAssertException) {
+                            throw (ExcelAssertException) e;
+                        }
+                        throw new ExcelResolverException(e.getMessage());
                     }
-                    otherValues = new ArrayList<>();
-                    for (Cell cell : row) {
-                        otherValues.add(ListenerChain.doReadCell(rowReadListeners, cell.getStringCellValue(), null, row.getRowNum(), cell.getColumnIndex(), isHead, false));
+                }
+                if (save) {
+                    try {
+                        if (dataList != null) {
+                            dataList.add(r);
+                        }
+                        ListenerChain.doReadRow(rowReadListeners, r, null, row.getRowNum(), false, true);
+                    } catch (Exception e) {
+                        throw new ExcelResolverException(e.getMessage());
                     }
-                    stop = ListenerChain.doReadRow(rowReadListeners, null, otherValues, row.getRowNum(), isHead, false);
                 }
                 continue;
             }
-            try {
-                r = this.context.getExcelClass().newInstance();
-                context.setVariable(this.context.getExcelClass().getSimpleName(), r);
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new ExcelInitException("Excel entity init failure, " + e.getMessage());
-            }
-            for (int c = 0; c < row.getLastCellNum() && save; c++) {
-                Field field = this.context.getExcelFields().get(c);
-                ExcelField excelField = field.getAnnotation(ExcelField.class);
-                Cell valueCell = row.getCell(c);
-                Object value;
-                try {
-                    if (valueCell != null) {
-                        value = this.getValue(r, valueCell, field, excelField, gson);
-                        context.setVariable(field.getName(), value);
-                        this.assertValue(parser, context, row, c, field, excelField);
-                        value = ListenerChain.doReadCell(rowReadListeners, value, field, row.getRowNum(), c, false, true);
-                        value = this.convert(field, excelField, value, parser, context);
-                        if (save && value != null) {
-                            this.setValue(r, field, value);
+            if (this.context.isNeedMetaInfo()) {
+                boolean isHead = row.getRowNum() == headerIndex;
+                if (isHead) {
+                    if (row.getLastCellNum() != this.context.getExcelFields().size()) {
+                        if (this.context.isTemplateCheck()) {
+                            throw new ExcelTemplateException();
                         }
-                    } else {
-                        this.allowEmpty(r, field, excelField, row.getRowNum(), c);
-                        context.setVariable(field.getName(), null);
-                        this.assertValue(parser, context, row, c, field, excelField);
-                        value = ListenerChain.doReadCell(rowReadListeners, null, field, row.getRowNum(), c, false, true);
-                        value = this.convert(field, excelField, value, parser, context);
-                        this.setValue(r, field, value);
                     }
-                    context.setVariable(field.getName(), value);
-                } catch (Exception e) {
-                    if (e instanceof ExcelAssertException) {
-                        throw (ExcelAssertException) e;
-                    }
-                    throw new ExcelResolverException(e.getMessage());
                 }
-            }
-            if (save) {
-                try {
-                    if (dataList != null) {
-                        dataList.add(r);
-                    }
-                    ListenerChain.doReadRow(rowReadListeners, r, null, row.getRowNum(), false, true);
-                } catch (Exception e) {
-                    throw new ExcelResolverException(e.getMessage());
+                otherValues = new ArrayList<>();
+                for (Cell cell : row) {
+                    otherValues.add(ListenerChain.doReadCell(rowReadListeners, cell.getStringCellValue(), null, row.getRowNum(), cell.getColumnIndex(), isHead, false));
                 }
+                stop = ListenerChain.doReadRow(rowReadListeners, null, otherValues, row.getRowNum(), isHead, false);
             }
         }
         ListenerChain.doReadFinish(rowReadListeners, this.context);
@@ -195,23 +184,36 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
      *
      * @param field      Current field
      * @param value      Attribute values
-     * @param excelField Excel field
      * @param parser     El parser
      * @param context    EL context
      * @return new value
      */
-    private Object convert(Field field, ExcelField excelField, Object value, ExpressionParser parser, EvaluationContext context) {
+    private Object convert(Field field, Object value, ExpressionParser parser, EvaluationContext context, DataConvert<?> dataConvert) {
         ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr2())) {
             return parser.parseExpression(excelDataConvert.expr2()).getValue(context);
         }
-        if (this.dataConvertMap != null) {
-            DataConvert<?> dataConvert = this.dataConvertMap.get(excelField.convert());
-            if (dataConvert != null) {
-                return dataConvert.toEntityAttribute(value, field);
+        return dataConvert.toEntityAttribute(value, field);
+    }
+
+    /**
+     * Create data convert
+     *
+     * @param field      Current field
+     * @param excelField ExcelField annotation on current field
+     * @return DataConvert
+     */
+    private DataConvert<?> createDataConvert(Field field, ExcelField excelField) {
+        DataConvert<?> dataConvert = this.dataConvertMap.get(excelField.convert());
+        if (dataConvert == null) {
+            try {
+                dataConvert = excelField.convert().newInstance();
+                this.dataConvertMap.put(excelField.convert(), dataConvert);
+            } catch (Exception e) {
+                throw new ExcelInitException("Init specified excel header data converter failure " + field.getName() + ", " + e.getMessage());
             }
         }
-        return value;
+        return dataConvert;
     }
 
     /**

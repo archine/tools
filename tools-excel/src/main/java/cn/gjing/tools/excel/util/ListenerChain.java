@@ -69,12 +69,13 @@ public final class ListenerChain {
     /**
      * Execute write sheet listener
      *
+     * @param sheet   Current created sheet
      * @param context Excel write context
      */
-    public static void doCompleteSheet(ExcelWriterContext context) {
+    public static void doCompleteSheet(Sheet sheet, ExcelWriterContext context) {
         List<ExcelWriteListener> sheetListeners = context.getWriteListenerCache().get(ExcelSheetWriteListener.class);
         if (sheetListeners != null) {
-            sheetListeners.forEach(e -> ((ExcelSheetWriteListener) e).completeSheet(context));
+            sheetListeners.forEach(e -> ((ExcelSheetWriteListener) e).completeSheet(sheet, context));
         }
     }
 
@@ -110,6 +111,19 @@ public final class ListenerChain {
             }
         }
         return stop;
+    }
+
+    /**
+     * Before you start reading the data
+     *
+     * @param listeners Excel read listeners
+     * @param context Excel reader context
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> void doReadBefore(List<ExcelReadListener> listeners, ExcelReaderContext<R> context) {
+        if (listeners != null) {
+            listeners.forEach(e -> ((ExcelRowReadListener<R>) e).readBefore(context));
+        }
     }
 
     /**

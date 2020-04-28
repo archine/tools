@@ -18,9 +18,6 @@ public class StringLongConvert implements DataConvert<Object> {
 
     @Override
     public Object toExcelAttribute(Object obj, Object value, Field field) {
-        if (value == null) {
-            return null;
-        }
-        return String.valueOf(value);
+        return value == null ? null : value.toString();
     }
 }
