@@ -33,7 +33,7 @@ public final class AuthCodeUtils {
      */
     private String code = null;
 
-    private char[] codeSequence = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    private final char[] codeSequence = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
             'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
             'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 

@@ -13,10 +13,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -90,42 +90,51 @@ class ToolsParamValidationHandle implements HandlerInterceptor {
         return true;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked"})
     private boolean isJson(HttpServletRequest request, Parameter parameter) {
         if (parameter.isAnnotationPresent(Json.class)) {
             if (parameter.isAnnotationPresent(RequestBody.class)) {
-                Field[] fields = parameter.getType().getDeclaredFields();
-                Map<String, Object> valueMap;
+                ObjectMapper mapper = new ObjectMapper();
+                Field[] fields;
+                List<Map<String, Object>> bodyMap = new ArrayList<>();
+                boolean collection = true;
                 try {
-                    valueMap = new ObjectMapper().readValue(request.getInputStream(), new TypeReference<Map<String, Object>>() {
-                    });
-                } catch (IOException e) {
-                    throw new ParamValidException("无效的Json对象");
-                }
-                for (Field field : fields) {
-                    Object value = valueMap.get(field.getName());
-                    if (field.isAnnotationPresent(Json.class)) {
-                        this.emptyCheck(field.getAnnotation(NotNull.class), field.getAnnotation(NotEmpty.class), value);
-                        if (value instanceof Collection) {
-                            List<Map<String, Object>> nestValueList = (List) value;
-                            Field[] nestObjFields = BeanUtils.getGenericType(field.getGenericType(), 0).getDeclaredFields();
-                            for (Map<String, Object> nestValueMap : nestValueList) {
-                                for (Field objField : nestObjFields) {
-                                    this.jsonCheck(objField, nestValueMap.get(objField.getName()));
-                                }
-                            }
-                        } else {
-                            if (value != null) {
-                                Field[] nestObjFields = field.getType().getDeclaredFields();
-                                Map<String, ?> nestObjMap = (Map<String, ?>) value;
-                                for (Field objField : nestObjFields) {
-                                    this.jsonCheck(objField, nestObjMap.get(objField.getName()));
-                                }
-                            }
-                        }
-                        continue;
+                    bodyMap.add(new ObjectMapper().readValue(request.getInputStream(), new TypeReference<Map<String, Object>>() {}));
+                    collection = false;
+                } catch (Exception e) {
+                    try {
+                        bodyMap = mapper.readValue(request.getInputStream(),new TypeReference<List<Map<String,Object>>>(){});
+                    } catch (Exception exception) {
+                        throw new ParamValidException("无效的JSON对象");
                     }
-                    this.jsonCheck(field, value);
+                }
+                fields = collection ? BeanUtils.getGenericType(parameter.getParameterizedType(), 0).getDeclaredFields() : parameter.getType().getDeclaredFields();
+                Field[] nestFields;
+                for (Map<String, Object> map : bodyMap) {
+                    for (Field field : fields) {
+                        Object value = map.get(field.getName());
+                        if (field.isAnnotationPresent(Json.class)) {
+                            nestFields = BeanUtils.getGenericType(field.getGenericType(), 0).getDeclaredFields();
+                            this.emptyCheck(field.getAnnotation(NotNull.class), field.getAnnotation(NotEmpty.class), value);
+                            if (value instanceof Collection) {
+                                List<Map<String, Object>> nestValueList = (List<Map<String, Object>>) value;
+                                for (Map<String, Object> nestValueMap : nestValueList) {
+                                    for (Field objField : nestFields) {
+                                        this.jsonCheck(objField, nestValueMap.get(objField.getName()));
+                                    }
+                                }
+                            } else {
+                                if (value != null) {
+                                    Map<String, ?> nestObjMap = (Map<String, ?>) value;
+                                    for (Field objField : nestFields) {
+                                        this.jsonCheck(objField, nestObjMap.get(objField.getName()));
+                                    }
+                                }
+                            }
+                            continue;
+                        }
+                        this.jsonCheck(field, value);
+                    }
                 }
             }
             return true;
