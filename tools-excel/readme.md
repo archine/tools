@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.0.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.0.8</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -98,7 +98,36 @@
 |errorContent|错误提示信息|
 |showTip|点击单元格是否出现提示框|
 |tipTitle|提示标题|
-|tipContent|提示内容|
+|tipContent|提示内容|       
+<span id="driven_annotation"></span>
+### 8、@EnableExcelDrivenMode
+**开启注解驱动模式，可使用注解方式进行Excel的导入导出, [查看用例](#driven)**   
+<span id="driven_read_annotation"></span>  
+### 9、@ExcelRead
+**注解驱动模式下的Excel导入，[查看用例](#driven_read)**      
+
+|参数|描述|
+|---|---|
+|value|要读取的Sheet名称|
+|mapping|Excel映射实体|
+|check|是否检查Excel文件与实体的映射关系|
+|metaInfo|是否需要读取元信息，比如表头、标题|
+|ignores|导入时要忽略的表头|
+|headerIndex|真实表头的开始下标，如：导出的模板设置了大标题，且行数为2，那么开始下标就为2，如果是2级表头，那么开始下标是1|      
+<span id="driven_write_annotation"></span>
+### 10、@ExcelWrite
+**注解驱动模式下的Excel导出, [查看用例](#driven_read)**      
+     
+|参数|描述|
+|---|---|
+|mapping|Excel映射实体|
+|ignores|导出时要忽略的表头|
+|value|导出的Excel文件名|
+|sheet|导出的目标Sheet名称|
+|needValid|是否开启Excel文件校验，如下拉框、时间|
+|needHead|是否需要表头|
+|multiHead|是否为多级表头|
+|initDefaultStyle|是否使用默认样式监听器|
 ## 三、Excel导出
 <span id="single"></span>
 ### 1、单表头
@@ -694,8 +723,99 @@ public enum Gender {
 ```
 **接口方式这里不在演示，同导出时一样  >>  [导出接口方式转换](#convert_use_interface)**       
 
-**在导入调用结束后，一定要在最后调用``finish()``方法对流进行关闭**       
+**在导入调用结束后，一定要在最后调用``finish()``方法对流进行关闭**    
 
+<span id="driven"></span>
+## 四、注解驱动方式的导入导出
+如果要使用注解驱动方式，需要先在启动类开启驱动模式 >>>  [EnableExcelDrivenMode](#driven_annotation)
+### 1、导出
+**导出只需要在方法上增加``@ExcelWrite``注解即可  >>  [注解参考](#driven_write_annotation)**
+#### a、导出模板
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class ExcelDriveController {
+
+    @GetMapping("/excel_drive1")
+    @ApiOperation("下载Excel模板")
+    @ExcelWrite(mapping = SingleHead.class)
+    public void excelDrive1() {
+    }
+}
+```
+#### b、导出带标题的模板
+```java
+@RestController
+public class ExcelDriveController {
+
+    @GetMapping("/excel_drive1")
+    @ApiOperation("导出带大标题的excel")
+    @ExcelWrite(mapping = SingleHead.class)
+    public ExcelWriteWrapper excelDrive3() {
+        return new ExcelWriteWrapper()
+                //设置大标题占用两行
+                .title(new BigTitle(2, "啦啦啦"));
+    }
+}
+```
+#### c、导出数据
+**导出数据时需要将方法的返回值设置为``ExcelWriteWrapper``，这是写出时的Excel数据包装器，用于设置一些属性，如监听器、大标题、导出的数据等等。。**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class ExcelDriveController {
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/excel_drive2")
+    @ApiOperation("导出带数据的excel")
+    @ExcelWrite(mapping = SingleHead.class)
+    public ExcelWriteWrapper excelDrive2() {
+        return new ExcelWriteWrapper().data(userService.userList());
+    }
+}
+```
+### 2、导入
+**导出只需要在方法上增加``@ExcelRead``注解即可  >>  [注解参考](#driven_read_annotation)**
+#### a、导入普通的模板
+**导入时，需要将方法返回值设置为``ExcelReadWrapper``，这是导入时的数据包装器，用于设置一些属性，如文件流、监听器、结果订阅。。。如果使用结果订阅，``最好指定泛型``**
+```java
+@RestController
+public class ExcelDriveController {
+    @Resource
+    private UserService userService;
+
+    @PostMapping("/excel_drive5")
+    @ApiOperation("导入excel")
+    @ExcelRead(mapping = SingleHead.class)
+    public ExcelReadWrapper<SingleHead> excelDrive5(MultipartFile file) throws IOException {
+        return new ExcelReadWrapper<SingleHead>(file)
+                .subscribe(e -> this.userService.saveUsers(e));
+    }
+}
+```
+#### b、导入带大标题的模板
+**由上文可得知，如果模板带有大标题，需要我们指定表头开始下标，下标要根据你的模板标题有多少行而定，我们在导出时设置了两行，所以这里配置两行**
+```java
+@RestController
+public class ExcelDriveController {
+    @Resource
+    private UserService userService;
+
+    @PostMapping("/excel_drive5")
+    @ApiOperation("导入excel")
+    @ExcelRead(mapping = SingleHead.class, headerIndex = 2)
+    public ExcelReadWrapper<SingleHead> excelDrive6(MultipartFile file) throws IOException {
+        return new ExcelReadWrapper<SingleHead>(file)
+                .subscribe(e -> this.userService.saveUsers(e));
+    }
+}
+```
+* ****
 [**置顶**](#top)
 
 ---
