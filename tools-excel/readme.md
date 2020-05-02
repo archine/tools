@@ -116,7 +116,7 @@
 |headerIndex|真实表头的开始下标，如：导出的模板设置了大标题，且行数为2，那么开始下标就为2，如果是2级表头，那么开始下标是1|      
 <span id="driven_write_annotation"></span>
 ### 10、@ExcelWrite
-**注解驱动模式下的Excel导出, [查看用例](#driven_read)**      
+**注解驱动模式下的Excel导出, [查看用例](#driven_write)**      
      
 |参数|描述|
 |---|---|
@@ -727,7 +727,9 @@ public enum Gender {
 
 <span id="driven"></span>
 ## 四、注解驱动方式的导入导出
-如果要使用注解驱动方式，需要先在启动类开启驱动模式 >>>  [EnableExcelDrivenMode](#driven_annotation)
+如果要使用注解驱动方式，需要先在启动类开启驱动模式 >>>  [EnableExcelDrivenMode](#driven_annotation)    
+
+<span id="driven_write"></span>
 ### 1、导出
 **导出只需要在方法上增加``@ExcelWrite``注解即可  >>  [注解参考](#driven_write_annotation)**
 #### a、导出模板
@@ -779,6 +781,7 @@ public class ExcelDriveController {
     }
 }
 ```
+<span id="driven_read"></span>
 ### 2、导入
 **导出只需要在方法上增加``@ExcelRead``注解即可  >>  [注解参考](#driven_read_annotation)**
 #### a、导入普通的模板
