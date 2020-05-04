@@ -18,16 +18,16 @@ public final class ParamUtils {
      * @param val value
      * @return boolean
      */
-    public static boolean noContains(String[] arr, String val) {
+    public static boolean contains(String[] arr, String val) {
         if (arr == null || arr.length == 0) {
-            return true;
+            return false;
         }
         for (String o : arr) {
             if (o.equals(val)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     /**

@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel;
 
+import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.resolver.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
@@ -34,7 +35,10 @@ public final class ExcelFactory {
      *
      * @param excelClass Excel mapped entity
      * @param response   response
-     * @param ignores    The exported field is to be ignored
+     * @param ignores    Which table heads to be ignored when exporting, in the case of multiple table heads,
+     *                   there are more than one child table heads under the ignored table head,
+     *                   then the child table head will be ignored, if the ignored table head is from the table head
+     *                   then it is ignored
      * @return ExcelWriter
      */
     public static ExcelWriter createWriter(Class<?> excelClass, HttpServletResponse response, String... ignores) {
@@ -46,7 +50,10 @@ public final class ExcelFactory {
      *
      * @param excelClass       Excel mapped entity
      * @param response         response
-     * @param ignores          The exported field is to be ignored
+     * @param ignores          Which table heads to be ignored when exporting, in the case of multiple table heads,
+     *                         there are more than one child table heads under the ignored table head,
+     *                         then the child table head will be ignored, if the ignored table head is from the table head
+     *                         then it is ignored
      * @param initDefaultStyle Whether init  default excel style
      * @return ExcelWriter
      */
@@ -59,7 +66,10 @@ public final class ExcelFactory {
      *
      * @param excelClass Excel mapped entity
      * @param response   response
-     * @param ignores    The exported field is to be ignored
+     * @param ignores    Which table heads to be ignored when exporting, in the case of multiple table heads,
+     *                   there are more than one child table heads under the ignored table head,
+     *                   then the child table head will be ignored, if the ignored table head is from the table head
+     *                   then it is ignored
      * @param fileName   Excel file name，The priority is higher than the annotation specification
      * @return ExcelWriter
      */
@@ -73,7 +83,10 @@ public final class ExcelFactory {
      * @param fileName         Excel file name，The priority is higher than the annotation specification
      * @param excelClass       Excel mapped entity
      * @param response         response
-     * @param ignores          The exported field is to be ignored
+     * @param ignores          Which table heads to be ignored when exporting, in the case of multiple table heads,
+     *                         there are more than one child table heads under the ignored table head,
+     *                         then the child table head will be ignored, if the ignored table head is from the table head
+     *                         then it is ignored
      * @param initDefaultStyle Whether init  default excel style
      * @return ExcelWriter
      */
@@ -94,13 +107,18 @@ public final class ExcelFactory {
      *
      * @param file       Excel file
      * @param excelClass Excel mapped entity
-     * @param ignores    Ignored header
+     * @param ignores    Table headers to be ignored when importing, the number of table headers typically used in
+     *                   Excel files does not match the number of mapped entity fields,
+     *                   or some table headers are ignored when exporting templates
      * @param <R>        Entity type
      * @return ExcelReader
-     * @throws IOException io
      */
-    public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) throws IOException {
-        return createReader(file.getInputStream(), excelClass, ignores);
+    public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) {
+        try {
+            return createReader(file.getInputStream(), excelClass, ignores);
+        } catch (IOException e) {
+            throw new ExcelInitException("Create excel reader error," + e.getMessage());
+        }
     }
 
     /**
@@ -108,13 +126,18 @@ public final class ExcelFactory {
      *
      * @param file       Excel file
      * @param excelClass Excel mapped entity
-     * @param ignores    Ignored header
+     * @param ignores    Table headers to be ignored when importing, the number of table headers typically used in
+     *                   Excel files does not match the number of mapped entity fields,
+     *                   or some table headers are ignored when exporting templates
      * @param <R>        Entity type
      * @return ExcelReader
-     * @throws IOException io
      */
-    public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass, String... ignores) throws IOException {
-        return createReader(new FileInputStream(file), excelClass, ignores);
+    public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass, String... ignores) {
+        try {
+            return createReader(new FileInputStream(file), excelClass, ignores);
+        } catch (IOException e) {
+            throw new ExcelInitException("Create excel reader error," + e.getMessage());
+        }
     }
 
     /**
@@ -122,7 +145,9 @@ public final class ExcelFactory {
      *
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity
-     * @param ignores     Ignored header
+     * @param ignores     Table headers to be ignored when importing, the number of table headers typically used in
+     *                    Excel files does not match the number of mapped entity fields,
+     *                    or some table headers are ignored when exporting templates
      * @param <R>         Entity type
      * @return ExcelReader
      */

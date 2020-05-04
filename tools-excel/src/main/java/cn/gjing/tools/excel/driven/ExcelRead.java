@@ -32,7 +32,9 @@ public @interface ExcelRead {
     boolean metaInfo() default false;
 
     /**
-     * The imported field is to be ignored
+     * Table headers to be ignored when importing, the number of table headers typically
+     * used in Excel files does not match the number of mapped entity fields,
+     * or some table headers are ignored when exporting templates
      *
      * @return ignores
      */

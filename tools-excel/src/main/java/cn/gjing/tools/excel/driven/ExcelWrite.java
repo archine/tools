@@ -37,7 +37,10 @@ public @interface ExcelWrite {
     Class<?> mapping();
 
     /**
-     * The exported field is to be ignored
+     * Which table heads to be ignored when exporting, in the case of multiple table heads,
+     * there are more than one child table heads under the ignored table head,
+     * then the child table head will be ignored, if the ignored table head is from the table head
+     * then it is ignored
      *
      * @return ignores
      */

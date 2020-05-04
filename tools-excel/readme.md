@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -110,7 +110,7 @@
 |value|要读取的Sheet名称|
 |check|是否检查Excel文件与实体的映射关系|
 |metaInfo|是否需要读取元信息，比如表头、标题|
-|ignores|导入时要忽略的表头|
+|ignores|导入时要忽略的表头，如果表头是父级表头的话，那么下面的子表头也会被忽略|
 |headerIndex|真实表头的开始下标，如：导出的模板设置了大标题，且行数为2，那么开始下标就为2，如果是2级表头，那么开始下标是1|      
 <span id="driven_write_annotation"></span>
 ### 10、@ExcelWrite
@@ -119,7 +119,7 @@
 |参数|描述|
 |---|---|
 |mapping|Excel映射实体|
-|ignores|导出时要忽略的表头|
+|ignores|导出时要忽略的表头，如果表头是父级表头的话，那么他下面的子表头也会被忽略|
 |value|导出的Excel文件名|
 |sheet|导出的目标Sheet名称|
 |needValid|是否开启Excel文件校验，如下拉框、时间|
@@ -809,6 +809,22 @@ public class ExcelDriveController {
     }
 }
 ```
+#### d、导出时并忽略某个表头
+**指定导出时忽略的Excel映射实体中的某些表头，下面演示了忽略``爱好``这个表头**
+```java
+@RestController
+public class ExcelDriveController {
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/export")
+    @ApiOperation("导出模板并忽略某个表头")
+    @ExcelWrite(mapping = SingleHead.class, ignores = "爱好")
+    public void export9() {
+
+    }
+}
+```
 <span id="driven_read"></span>
 ### 2、导入
 **导入的方法上需要增加``@ExcelRead``注解 >>  [注解参考](#driven_read_annotation)**
@@ -831,7 +847,7 @@ public class ExcelDriveController {
 }
 ```
 #### b、导入带大标题的模板
-**由上文可得知，如果模板带有大标题，需要我们指定表头开始下标，下标要根据你的模板标题有多少行而定，我们在导出时设置了两行，所以这里配置两行**
+**如果模板带有大标题，需要我们指定表头开始下标，下标要根据你的模板标题有多少行而定，我们在导出时设置了两行，所以这里配置两行**
 ```java
 @RestController
 public class ExcelDriveController {
@@ -845,6 +861,24 @@ public class ExcelDriveController {
         return ExcelReadWrapper.build(SingleHead.class)
                 .data(file)
                 .subscribe(e -> this.userService.saveUsers(e));
+    }
+}
+```
+#### c、导入时忽略某些表头
+**导入时如果Excel文件中的表头数量与映射实体不匹配，或者在你导出模板时有忽略某些表头，这时可以通过忽略某些表头来进行正确读取**
+```java
+@RestController
+public class ExcelDriveController {
+    @Resource
+    private UserService userService;
+
+    @PostMapping("/excel_drive5")
+    @ApiOperation("导入excel")
+    @ExcelRead(ignores = "爱好")
+    public ExcelReadWrapper<SingleHead> read4(MultipartFile file) throws IOException {
+        return ExcelReadWrapper.build(SingleHead.class)
+                .data(file)
+                .subscribe(System.out::println);
     }
 }
 ```

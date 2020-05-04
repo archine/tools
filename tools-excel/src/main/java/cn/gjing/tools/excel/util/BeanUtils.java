@@ -69,18 +69,16 @@ public final class BeanUtils {
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).order()))
                 .filter(e -> {
-                    boolean noContain = true;
                     String[] headNames = e.getAnnotation(ExcelField.class).value();
                     for (String name : headNames) {
-                        if (ParamUtils.noContains(ignores, name)) {
-                            if (headerArr != null) {
-                                headerArr.add(headNames);
-                            }
-                            break;
+                        if (ParamUtils.contains(ignores, name)) {
+                            return false;
                         }
-                        noContain = false;
                     }
-                    return noContain;
+                    if (headerArr != null) {
+                        headerArr.add(headNames);
+                    }
+                    return true;
                 })
                 .collect(Collectors.toList());
         return fieldList;
