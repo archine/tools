@@ -1,9 +1,9 @@
-package cn.gjing.tools.redis.cache.core;
+package cn.gjing.tools.cache.core;
 
-import cn.gjing.tools.redis.cache.CaffeineCache;
-import cn.gjing.tools.redis.cache.RedisCache;
-import cn.gjing.tools.redis.cache.Script;
-import cn.gjing.tools.redis.cache.ToolsCache;
+import cn.gjing.tools.cache.CaffeineCache;
+import cn.gjing.tools.cache.RedisCache;
+import cn.gjing.tools.cache.Script;
+import cn.gjing.tools.cache.ToolsCache;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;

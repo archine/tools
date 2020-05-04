@@ -1,4 +1,4 @@
-package cn.gjing.tools.redis.cache;
+package cn.gjing.tools.cache;
 
 import lombok.Getter;
 
@@ -44,7 +44,7 @@ public enum Script {
             "else " +
             "return false " +
             "end");
-    private String script;
+    private final String script;
 
     Script(String script) {
         this.script = script;

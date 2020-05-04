@@ -1,4 +1,4 @@
-package cn.gjing.tools.redis.cache.core;
+package cn.gjing.tools.cache.core;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -8,8 +8,8 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author Gjing
  **/
 class CacheMessageListener implements MessageListener {
-    private RedisTemplate<Object, Object> redisTemplate;
-    private ToolsCacheManager toolsCacheManager;
+    private final RedisTemplate<Object, Object> redisTemplate;
+    private final ToolsCacheManager toolsCacheManager;
 
     CacheMessageListener(ToolsCacheManager toolsCacheManager, RedisTemplate<Object,Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -18,7 +18,7 @@ class CacheMessageListener implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] bytes) {
-        cn.gjing.tools.redis.cache.Message message1 = (cn.gjing.tools.redis.cache.Message) this.redisTemplate.getValueSerializer().deserialize(message.getBody());
+        cn.gjing.tools.cache.Message message1 = (cn.gjing.tools.cache.Message) this.redisTemplate.getValueSerializer().deserialize(message.getBody());
         if (message1 == null) {
             return;
         }

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 </dependency>
 ```
 ## 二、常用注解
@@ -99,9 +99,8 @@
 |showTip|点击单元格是否出现提示框|
 |tipTitle|提示标题|
 |tipContent|提示内容|       
-<span id="driven_annotation"></span>
 ### 8、@EnableExcelDrivenMode
-**开启注解驱动模式，可使用注解方式进行Excel的导入导出, [查看用例](#driven)**   
+**在启动类或者配置类上使用即可开启Excel注解驱动模式，该模式可通过注解方式进行Excel的导入导出,**   
 <span id="driven_read_annotation"></span>  
 ### 9、@ExcelRead
 **注解驱动模式下的Excel导入，[查看用例](#driven_read)**      
@@ -109,7 +108,6 @@
 |参数|描述|
 |---|---|
 |value|要读取的Sheet名称|
-|mapping|Excel映射实体|
 |check|是否检查Excel文件与实体的映射关系|
 |metaInfo|是否需要读取元信息，比如表头、标题|
 |ignores|导入时要忽略的表头|
@@ -727,11 +725,11 @@ public enum Gender {
 
 <span id="driven"></span>
 ## 四、注解驱动方式的导入导出
-如果要使用注解驱动方式，需要先在启动类开启驱动模式 >>>  [EnableExcelDrivenMode](#driven_annotation)    
+如果要使用注解驱动方式，需要先在启动类或者配置类使用 >>>  [EnableExcelDrivenMode](#driven_annotation)    
 
 <span id="driven_write"></span>
 ### 1、导出
-**导出只需要在方法上增加``@ExcelWrite``注解即可  >>  [注解参考](#driven_write_annotation)**
+**导出的方法上需要增加``@ExcelWrite``注解  >>  [注解参考](#driven_write_annotation)**
 #### a、导出模板
 ```java
 /**
@@ -740,30 +738,45 @@ public enum Gender {
 @RestController
 public class ExcelDriveController {
 
-    @GetMapping("/excel_drive1")
+    @GetMapping("/export")
     @ApiOperation("下载Excel模板")
     @ExcelWrite(mapping = SingleHead.class)
-    public void excelDrive1() {
+    public void export() {
     }
 }
 ```
 #### b、导出带标题的模板
+**导出带大标题的模板，你可以直接设置方法的返回值为``bigTitle``，也可以使用``ExcelWriteWrapper``包装器进行数据构造**       
+* 直接返回方式
 ```java
 @RestController
 public class ExcelDriveController {
 
-    @GetMapping("/excel_drive1")
+    @GetMapping("/export")
     @ApiOperation("导出带大标题的excel")
     @ExcelWrite(mapping = SingleHead.class)
-    public ExcelWriteWrapper excelDrive3() {
-        return new ExcelWriteWrapper()
-                //设置大标题占用两行
+    public BigTitle export() {
+        return new BigTitle(2, "啦啦啦");
+    }
+}
+```
+* 包装器方式
+```java
+@RestController
+public class ExcelDriveController {
+
+    @GetMapping("/export")
+    @ApiOperation("导出带大标题的excel")
+    @ExcelWrite(mapping = SingleHead.class)
+    public ExcelWriteWrapper excelDrive() {
+        return ExcelWriteWrapper.build()
                 .title(new BigTitle(2, "啦啦啦"));
     }
 }
 ```
 #### c、导出数据
-**导出数据时需要将方法的返回值设置为``ExcelWriteWrapper``，这是写出时的Excel数据包装器，用于设置一些属性，如监听器、大标题、导出的数据等等。。**
+**导出带数据的Excel，你可以直接设置方法的返回值为数据``List``，也可以使用``ExcelWriteWrapper``包装器进行数据构造，构造器可以用于设置一些属性，如监听器、大标题、导出的数据等等。。**      
+* 直接返回方式
 ```java
 /**
  * @author Gjing
@@ -773,19 +786,34 @@ public class ExcelDriveController {
     @Resource
     private UserService userService;
 
-    @GetMapping("/excel_drive2")
+    @GetMapping("/export")
     @ApiOperation("导出带数据的excel")
     @ExcelWrite(mapping = SingleHead.class)
-    public ExcelWriteWrapper excelDrive2() {
-        return new ExcelWriteWrapper().data(userService.userList());
+    public List<SingleHead> excelDrive() {
+        return this.userService.userList();
+    }
+}
+```
+* 包装器方式
+```java
+@RestController
+public class ExcelDriveController {
+    @Resource
+    private UserService userService;
+
+    @GetMapping("/excel_drive")
+    @ApiOperation("导出带数据的excel")
+    @ExcelWrite(mapping = SingleHead.class)
+    public ExcelWriteWrapper export() {
+        return ExcelWriteWrapper.build(userService.userList());
     }
 }
 ```
 <span id="driven_read"></span>
 ### 2、导入
-**导出只需要在方法上增加``@ExcelRead``注解即可  >>  [注解参考](#driven_read_annotation)**
+**导入的方法上需要增加``@ExcelRead``注解 >>  [注解参考](#driven_read_annotation)**
 #### a、导入普通的模板
-**导入时，需要将方法返回值设置为``ExcelReadWrapper``，这是导入时的数据包装器，用于设置一些属性，如文件流、监听器、结果订阅。。。如果使用结果订阅，``最好指定泛型``**
+**导入时，需要将方法返回值设置为``ExcelReadWrapper``，这是导入时的数据包装器，用于设置一些属性，如文件流、监听器、结果订阅。。。**
 ```java
 @RestController
 public class ExcelDriveController {
@@ -794,9 +822,10 @@ public class ExcelDriveController {
 
     @PostMapping("/excel_drive5")
     @ApiOperation("导入excel")
-    @ExcelRead(mapping = SingleHead.class)
-    public ExcelReadWrapper<SingleHead> excelDrive5(MultipartFile file) throws IOException {
-        return new ExcelReadWrapper<SingleHead>(file)
+    @ExcelRead
+    public ExcelReadWrapper<SingleHead> read1(MultipartFile file) throws IOException {
+        return ExcelReadWrapper.build(SingleHead.class)
+                .data(file)
                 .subscribe(e -> this.userService.saveUsers(e));
     }
 }
@@ -811,9 +840,10 @@ public class ExcelDriveController {
 
     @PostMapping("/excel_drive5")
     @ApiOperation("导入excel")
-    @ExcelRead(mapping = SingleHead.class, headerIndex = 2)
-    public ExcelReadWrapper<SingleHead> excelDrive6(MultipartFile file) throws IOException {
-        return new ExcelReadWrapper<SingleHead>(file)
+    @ExcelRead(headerIndex = 2)
+    public ExcelReadWrapper<SingleHead> read1(MultipartFile file) throws IOException {
+        return ExcelReadWrapper.build(SingleHead.class)
+                .data(file)
                 .subscribe(e -> this.userService.saveUsers(e));
     }
 }
@@ -822,4 +852,4 @@ public class ExcelDriveController {
 [**置顶**](#top)
 
 ---
-**Demo地址：[excel-demo](https://github.com/archine/excel-demo)**
+**更多案例可以查看Demo：[excel-demo](https://github.com/archine/excel-demo)**

@@ -18,23 +18,24 @@ import java.util.List;
 @Getter
 @ToString
 public class ExcelReadWrapper<R> {
+    private final Class<R> mapping;
     private List<ExcelReadListener> readListeners;
     private ExcelResultReadListener<R> resultReadListener;
     private InputStream inputStream;
 
-    public ExcelReadWrapper() {
+    private ExcelReadWrapper(Class<R> mapping) {
+        this.mapping = mapping;
     }
 
-    public ExcelReadWrapper(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
-    public ExcelReadWrapper(File file) throws FileNotFoundException {
-        this.inputStream = new FileInputStream(file);
-    }
-
-    public ExcelReadWrapper(MultipartFile file) throws IOException {
-        this.inputStream = file.getInputStream();
+    /**
+     * Build a read wrapper
+     *
+     * @param mapping Excel mapping entity
+     * @param <R>     Data generic
+     * @return ExcelReadWrapper
+     */
+    public static <R> ExcelReadWrapper<R> build(Class<R> mapping) {
+        return new ExcelReadWrapper<>(mapping);
     }
 
     /**
@@ -78,7 +79,7 @@ public class ExcelReadWrapper<R> {
      * @param readListener readListener
      * @return this
      */
-    public ExcelReadWrapper<R> addListener(ExcelReadListener readListener) {
+    public ExcelReadWrapper<R> listener(ExcelReadListener readListener) {
         if (this.readListeners == null) {
             this.readListeners = new ArrayList<>();
         }
@@ -92,7 +93,7 @@ public class ExcelReadWrapper<R> {
      * @param readListeners readListener
      * @return this
      */
-    public ExcelReadWrapper<R> addListener(List<ExcelReadListener> readListeners) {
+    public ExcelReadWrapper<R> listener(List<ExcelReadListener> readListeners) {
         if (this.readListeners == null) {
             this.readListeners = new ArrayList<>();
         }
@@ -101,7 +102,8 @@ public class ExcelReadWrapper<R> {
     }
 
     /**
-     * Subscribe to all data at the end of the Excel read
+     * Subscribe to all data at the end of the Excel read,
+     * Subscribing to data in this way requires specifying the returned data List generics
      *
      * @param resultListener resultListener
      * @return this

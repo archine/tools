@@ -6,6 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Excel imports annotations that are used on methods to import Excel.
+ * The return value of this method needs to specify a {@link ExcelReadWrapper} to wrap the data,
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
@@ -17,13 +20,6 @@ public @interface ExcelRead {
      * @return Sheet1
      */
     String value() default "Sheet1";
-
-    /**
-     * Excel mapping entity
-     *
-     * @return entity
-     */
-    Class<?> mapping();
 
     /**
      * Whether to check excel template when excel import

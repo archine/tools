@@ -68,8 +68,7 @@ public final class ExcelWriterContext {
     @Builder.Default
     private Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache = new HashMap<>(8);
 
-    public ExcelWriterContext addListener(ExcelWriteListener excelWriteListener) {
+    public void addListener(ExcelWriteListener excelWriteListener) {
         ListenerChain.addWriteListener(this.writeListenerCache, excelWriteListener, this.workbook);
-        return this;
     }
 }

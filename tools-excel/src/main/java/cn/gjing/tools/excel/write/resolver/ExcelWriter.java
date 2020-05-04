@@ -187,11 +187,13 @@ public final class ExcelWriter {
      * @return this
      */
     public ExcelWriter writeTitle(BigTitle bigTitle, String sheetName) {
-        this.createSheet(sheetName);
-        if (bigTitle.getLastCols() < 1) {
-            bigTitle.setLastCols(this.context.getExcelFields().size() - 1);
+        if (bigTitle != null) {
+            this.createSheet(sheetName);
+            if (bigTitle.getLastCols() < 1) {
+                bigTitle.setLastCols(this.context.getExcelFields().size() - 1);
+            }
+            this.writerResolver.writeTitle(bigTitle);
         }
-        this.writerResolver.writeTitle(bigTitle);
         return this;
     }
 
@@ -200,26 +202,40 @@ public final class ExcelWriter {
      *
      * @return this
      */
+    @Deprecated
     public ExcelWriter enableValid() {
         this.context.setNeedValid(true);
         return this;
     }
 
     /**
-     * Whether enable excel valid
+     * Whether enable excel valid,Please use to valid()
      *
      * @return this
      */
+    @Deprecated
     public ExcelWriter closeValid() {
         this.context.setNeedValid(false);
         return this;
     }
 
     /**
-     * Whether close multi excel head
+     * Whether enable excel valid
+     *
+     * @param valid Enable validation
+     * @return this
+     */
+    public ExcelWriter valid(boolean valid) {
+        this.context.setNeedValid(valid);
+        return this;
+    }
+
+    /**
+     * Whether enable multi excel head
      *
      * @return this
      */
+    @Deprecated
     public ExcelWriter enableMultiHead() {
         this.context.setMultiHead(true);
         return this;
@@ -230,8 +246,20 @@ public final class ExcelWriter {
      *
      * @return this
      */
+    @Deprecated
     public ExcelWriter closeMultiHead() {
         this.context.setMultiHead(false);
+        return this;
+    }
+
+    /**
+     * Whether close multi excel head
+     *
+     * @param multi Is multi head
+     * @return this
+     */
+    public ExcelWriter multiHead(boolean multi) {
+        this.context.setMultiHead(multi);
         return this;
     }
 
@@ -242,7 +270,9 @@ public final class ExcelWriter {
      * @return this
      */
     public ExcelWriter addListener(ExcelWriteListener listener) {
-        this.context.addListener(listener);
+        if (listener != null) {
+            this.context.addListener(listener);
+        }
         return this;
     }
 
@@ -253,7 +283,9 @@ public final class ExcelWriter {
      * @return this
      */
     public ExcelWriter addListener(List<? extends ExcelWriteListener> listeners) {
-        listeners.forEach(this.context::addListener);
+        if (listeners != null) {
+            listeners.forEach(this.context::addListener);
+        }
         return this;
     }
 

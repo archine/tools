@@ -1,8 +1,8 @@
-package cn.gjing.tools.redis.cache.core;
+package cn.gjing.tools.cache.core;
 
-import cn.gjing.tools.redis.cache.Message;
-import cn.gjing.tools.redis.cache.RedisCache;
-import cn.gjing.tools.redis.cache.ToolsCache;
+import cn.gjing.tools.cache.Message;
+import cn.gjing.tools.cache.RedisCache;
+import cn.gjing.tools.cache.ToolsCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisTemplate;

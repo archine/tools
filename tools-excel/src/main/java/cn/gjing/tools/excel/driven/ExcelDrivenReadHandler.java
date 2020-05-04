@@ -31,7 +31,7 @@ class ExcelDrivenReadHandler implements HandlerMethodReturnValueHandler {
             if (wrapper.getInputStream() == null) {
                 throw new ExcelResolverException("The data cannot be empty");
             }
-            ExcelReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), readAnno.mapping(), readAnno.ignores());
+            ExcelReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(), readAnno.ignores());
             if (wrapper.getReadListeners() != null) {
                 reader.addListener(wrapper.getReadListeners());
             }
@@ -41,6 +41,7 @@ class ExcelDrivenReadHandler implements HandlerMethodReturnValueHandler {
             reader.metaInfo(readAnno.metaInfo(), readAnno.check())
                     .read(readAnno.headerIndex(), readAnno.value())
                     .finish();
+            return;
         }
         throw new ExcelResolverException("Method return value type must be ExcelReadWrapper: " + methodParameter.getExecutable().getName());
     }

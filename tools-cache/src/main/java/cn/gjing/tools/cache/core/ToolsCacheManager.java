@@ -1,8 +1,8 @@
-package cn.gjing.tools.redis.cache.core;
+package cn.gjing.tools.cache.core;
 
-import cn.gjing.tools.redis.cache.CaffeineCache;
-import cn.gjing.tools.redis.cache.RedisCache;
-import cn.gjing.tools.redis.cache.ToolsCache;
+import cn.gjing.tools.cache.CaffeineCache;
+import cn.gjing.tools.cache.RedisCache;
+import cn.gjing.tools.cache.ToolsCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

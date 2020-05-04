@@ -5,12 +5,12 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>2.0.5</version>
+        <version>2.3.1</version>
     </parent>
-    <artifactId>tools-redis</artifactId>
-    <version>1.2.1</version>
-    <name>tools-redis</name>
-    <description>redis common</description>
+    <artifactId>tools-cache</artifactId>
+    <version>1.0.0</version>
+    <name>tools-cache</name>
+    <description>Distributed cache</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -22,13 +22,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
-            <version>2.2.4.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.9.4</version>
-            <optional>true</optional>
+            <version>2.2.6.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -38,13 +32,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>2.2.4.RELEASE</version>
+            <version>2.2.6.RELEASE</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.10</version>
+            <version>1.18.12</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -56,7 +50,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>5.2.3.RELEASE</version>
+            <version>5.2.5.RELEASE</version>
             <optional>true</optional>
         </dependency>
 

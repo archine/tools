@@ -1,4 +1,4 @@
-package cn.gjing.tools.redis.cache.core;
+package cn.gjing.tools.cache.core;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Import;

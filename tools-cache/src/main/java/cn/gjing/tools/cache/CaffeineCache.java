@@ -1,4 +1,4 @@
-package cn.gjing.tools.redis.cache;
+package cn.gjing.tools.cache;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.driven;
 
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
+import cn.gjing.tools.excel.write.valid.ExcelDropdownBox;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -22,11 +23,25 @@ public class ExcelWriteWrapper {
     private List<?> data;
     private Map<String, String[]> boxValues;
 
-    public ExcelWriteWrapper() {
+    private ExcelWriteWrapper() {
     }
 
-    public ExcelWriteWrapper(List<?> data) {
-        this.data = data;
+    /**
+     * Build a write wrapper
+     * @return ExcelWriteWrapper
+     */
+    public static ExcelWriteWrapper build() {
+        return new ExcelWriteWrapper();
+    }
+
+    /**
+     * Build a write wrapper
+     *
+     * @param data The data to be exported
+     * @return ExcelWriteWrapper
+     */
+    public static ExcelWriteWrapper build(List<?> data) {
+        return new ExcelWriteWrapper().data(data);
     }
 
     /**
@@ -35,7 +50,7 @@ public class ExcelWriteWrapper {
      * @param writeListener writeListener
      * @return this
      */
-    public ExcelWriteWrapper addListener(ExcelWriteListener writeListener) {
+    public ExcelWriteWrapper listener(ExcelWriteListener writeListener) {
         if (this.writeListeners == null) {
             this.writeListeners = new ArrayList<>();
         }
@@ -49,7 +64,7 @@ public class ExcelWriteWrapper {
      * @param writeListeners writeListener
      * @return this
      */
-    public ExcelWriteWrapper addListener(List<ExcelWriteListener> writeListeners) {
+    public ExcelWriteWrapper listener(List<ExcelWriteListener> writeListeners) {
         if (this.writeListeners == null) {
             this.writeListeners = new ArrayList<>();
         }
@@ -58,7 +73,7 @@ public class ExcelWriteWrapper {
     }
 
     /**
-     * Set excel big title
+     * Set excel big title.{@link BigTitle}
      *
      * @param bigTitle big title
      * @return this
@@ -80,7 +95,7 @@ public class ExcelWriteWrapper {
     }
 
     /**
-     * Set dropdown box value
+     * Set dropdown box value.{@link ExcelDropdownBox}
      *
      * @param boxValues box value map
      * @return this
