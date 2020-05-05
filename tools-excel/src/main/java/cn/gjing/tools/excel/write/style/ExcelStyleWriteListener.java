@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write.style;
 
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,8 +29,9 @@ public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRo
      * Set excel big title style
      *
      * @param cell Current cell
+     * @param bigTitle Bit title
      */
-    void setTitleStyle(Cell cell);
+    void setTitleStyle(BigTitle bigTitle, Cell cell);
 
     /**
      * Set excel head style
@@ -40,9 +42,8 @@ public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRo
      * @param colIndex   cell index
      * @param excelField ExcelField annotation of current field
      * @param field      Current field
-     * @param headName   The header name of the list where the cell resides
      */
-    void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex);
+    void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex);
 
     /**
      * Set excel body style
@@ -53,7 +54,6 @@ public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRo
      * @param colIndex   cell index
      * @param excelField ExcelField annotation of current field
      * @param field      Current field
-     * @param headName   The header name of the list where the cell resides
      */
-    void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex);
+    void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex);
 }

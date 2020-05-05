@@ -14,6 +14,7 @@ public class DecimalConvert implements DataConvert<Object> {
     public Object toEntityAttribute(Object value, Field field) {
         return StringUtils.isEmpty(value) ? BigDecimal.ZERO : new BigDecimal(value.toString());
     }
+
     @Override
     public Object toExcelAttribute(Object obj, Object value, Field field) {
         return value;

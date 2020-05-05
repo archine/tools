@@ -70,8 +70,7 @@ public class ExcelReaderContext<R> {
         this.excelFields = excelFields;
     }
 
-    public ExcelReaderContext<R> addListener(ExcelReadListener readListener) {
+    public void addListener(ExcelReadListener readListener) {
         ListenerChain.addReadListener(this.readListenersCache, readListener);
-        return this;
     }
 }

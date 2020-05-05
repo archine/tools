@@ -11,8 +11,14 @@ import java.lang.reflect.Field;
  *
  * @author Gjing
  **/
-@FunctionalInterface
 public interface ExcelCascadingDropdownBoxListener extends ExcelWriteListener {
+    /**
+     * Initializes the excel name manager
+     * @param workbook Current workbook
+     * @param sheet Current sheet
+     */
+    ExcelCascadingDropdownBoxListener initName(Workbook workbook, Sheet sheet);
+
     /**
      * Add cascading dropdown box
      *

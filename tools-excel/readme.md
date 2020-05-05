@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,10 +8,10 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.2</version>
+    <version>2.1.3</version>
 </dependency>
 ```
-## 二、常用注解
+## 二、注解说明
 ### 1、@Excel
 **声明实体类与Excel存在映射关系**    
 
@@ -30,9 +30,9 @@
 |value|表头名称，该参数为一个数组，数组中的``最后一个值为实际的表头名称``|
 |width|表头所在列的整列宽度|
 |order|表头出现在Excel文件中的先后顺序，建议要么都配置要么全不配置，不配置的情况下``默认按实体中字段顺序``|
-|format|表头所在列的整列单元格格式，格式参照Excel文件中的单元格格式|
+|format|表头所在列的整列单元格格式，格式参照Excel文件中的单元格格式，默认``常规``|
 |autoMerge|表头下方是否开启纵向合并|
-|allowEmpty|导入时，表头下方的单元格是否允许为空|
+|allowEmpty|导入时，表头下方的单元格是否允许为空，默认``true``|
 |convert|数据转换器，可以在导入导出时对数据进行转换,``相同的转换器只会出现一个``|      
 <span id="convert"></span>
 ### 3、@ExcelDataConvert
@@ -107,9 +107,9 @@
 
 |参数|描述|
 |---|---|
-|value|要读取的Sheet名称|
-|check|是否检查Excel文件与实体的映射关系|
-|metaInfo|是否需要读取元信息，比如表头、标题|
+|value|要读取的Sheet名称，默认``Sheet1``|
+|check|是否检查Excel文件中的表头数量与映射实体的表头数量是否匹配，默认``true``|
+|metaInfo|是否需要读取元信息，比如表头、标题，默认``false``|
 |ignores|导入时要忽略的表头，如果表头是父级表头的话，那么下面的子表头也会被忽略|
 |headerIndex|真实表头的开始下标，如：导出的模板设置了大标题，且行数为2，那么开始下标就为2，如果是2级表头，那么开始下标是1|      
 <span id="driven_write_annotation"></span>
@@ -119,14 +119,37 @@
 |参数|描述|
 |---|---|
 |mapping|Excel映射实体|
-|ignores|导出时要忽略的表头，如果表头是父级表头的话，那么他下面的子表头也会被忽略|
-|value|导出的Excel文件名|
-|sheet|导出的目标Sheet名称|
-|needValid|是否开启Excel文件校验，如下拉框、时间|
-|needHead|是否需要表头|
-|multiHead|是否为多级表头|
-|initDefaultStyle|是否使用默认样式监听器|
-## 三、Excel导出
+|ignores|导出时要忽略的表头，如果表头是``父级表头，那么他下面的子表头也会被忽略``|
+|value|导出的Excel文件名，如果未指定且映射实体中``Excel``注解也未指定，则会使用当前日期作为文件名|
+|sheet|导出的目标Sheet名称，默认``Sheet1``|
+|needValid|是否开启Excel文件校验，如下拉框、时间，默认``false``|
+|needHead|是否需要表头，默认``true``|
+|multiHead|是否为多级表头，默认``false``|
+|initDefaultStyle|是否使用默认样式监听器，默认``true``|
+## 三、常用类说明
+### 1、BigTitle
+**用于给Excel文件增加大标题**        
+
+|属性|描述|
+|---|---|
+|lines|大标题需要占用多少行，默认``2``|
+|firstCol|起始单元格下标，默认``0``|
+|lastCols|截止单元格下标，默认``0``，也就是默认追随表头|
+|content|大标题中的内容|
+|color|背景填充颜色|
+|fontColor|字体颜色，默认``黑色``|
+|rowHeight|行高|
+|alignment|水平位置，默认``靠左``|
+### 2、ExcelReadWrapper
+**注解驱动方式导入时的数据构造器**
+### 3、ExcelWriteWrapper
+**注解驱动方式导出时的数据构造器**
+### 4、DefaultCascadingDropdownBoxListener
+**如果映射实体中存在级联下拉框的表头，那么导出时需要添加级联下拉框监听器，该类是默认实现的一个级联监听器。也可以自己实现``ExcelCascadingDropdownBoxListener``接口并在导出时通过``addListener()``方法添加**
+### 5、DefaultExcelStyleWriteListener
+**导出时的默认样式监听器，当你想使用自己实现的样式监听器的时候，你最好在工厂创建``Writer``的时候通过``initDefaultStyle``参数来关闭它，否则会造成同时设置默认的和你自己的。
+使用自己的样式监听器时需要实现``ExcelStyleWriteListener``接口并在导出时将你实现的样式监听器通过``addListener()``方法加入**
+## 四、Excel导出
 <span id="single"></span>
 ### 1、单表头
 **定义Excel映射实体, ``@Data``是lombok的注解**
@@ -203,7 +226,7 @@ public class TestController {
     public void testExport(HttpServletResponse response) {
         ExcelFactory.createWriter(MultiHead.class, response)
                 //需要在write前激活多级表头，否则不会自动合并
-                .enableMultiHead()
+                .multiHead(true)
                 .write(null)
                 .flush();
     }
@@ -226,7 +249,7 @@ public class TestController {
     public void testExport(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead.class, response)
                 //大标题占用两行
-                .writeTitle(new BigTitle(2, "我是大标题"))
+                .writeTitle(new BigTitle("我是大标题"))
                 .write(null)
                 .flush();
     }
@@ -264,7 +287,7 @@ public class TestController {
     public void testExport(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead.class, response)
                 //需要在write前激活校验
-                .enableValid()
+                .valid(true)
                 .write(null)
                 .flush();
     }
@@ -286,7 +309,7 @@ public class TestController {
         //如果指定了也会去覆盖注解中的值
         genderMap.put("gender", new String[]{"男", "女"});
         ExcelFactory.createWriter(SingleHead.class, response)
-                .enableValid()
+                .valid(true)
                 .write(null, genderMap)
                 .flush();
     }
@@ -328,7 +351,7 @@ public class TestController {
         boxValues.put("女", new String[]{"逛街", "吃"});
         ExcelFactory.createWriter(SingleHead.class, response)
                 //需要在write前激活校验
-                .enableValid()
+                .valid(true)
                 //使用默认的级联下拉框监听器
                 .addListener(new DefaultCascadingDropdownBoxListener(boxValues))
                 .write(null)
@@ -370,7 +393,7 @@ public class TestController {
     public void testExport(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead.class, response)
                 //需要在write前激活校验
-                .enableValid()
+                .valid(true)
                 .write(null)
                 .flush();
     }
@@ -405,7 +428,7 @@ public class TestController {
     public void testExport(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead .class, response)
                 //需要在write前激活校验
-                .enableValid()
+                .valid(true)
                 .write(null)
                 .flush();
     }
@@ -500,14 +523,14 @@ public class MyStyleListener implements ExcelStyleWriteListener {
     }
 
     @Override
-    public void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, String headName, int index,
-                         int colIndex, boolean isHead, Object value) {
+    public void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, int index,
+                         int colIndex, boolean isHead) {
        //该方法是ExcelCellWriteListener中的，会在每次单元格填充内容之后触发，这里是为了设置样式，
        //你也可以实现其他的逻辑
         if (isHead) {
             //如果是表头我就设置每列的样式和宽度
             sheet.setColumnWidth(colIndex, excelField.width());
-            this.setHeadStyle(row, cell, excelField, field, headName, index, icolIndex);
+            this.setHeadStyle(row, cell, excelField, field, index, icolIndex);
         }
     }
 
@@ -638,6 +661,11 @@ public class MyReadRowListener implements ExcelRowReadListener<SingleHead> {
     public void readFinish(ExcelReaderContext<SingleHead> context) {
         //全部读完时触发该方法
     }
+
+    @Override
+    public void readBefore(ExcelReaderContext<SingleHead> context) {
+        //开始读取前触发
+    }
 }
 ```
 [参考实体](#single)
@@ -724,7 +752,7 @@ public enum Gender {
 **在导入调用结束后，一定要在最后调用``finish()``方法对流进行关闭**    
 
 <span id="driven"></span>
-## 四、注解驱动方式的导入导出
+## 五、注解驱动方式的导入导出
 如果要使用注解驱动方式，需要先在启动类或者配置类使用 >>>  [EnableExcelDrivenMode](#driven_annotation)    
 
 <span id="driven_write"></span>
@@ -756,7 +784,7 @@ public class ExcelDriveController {
     @ApiOperation("导出带大标题的excel")
     @ExcelWrite(mapping = SingleHead.class)
     public BigTitle export() {
-        return new BigTitle(2, "啦啦啦");
+        return new BigTitle("啦啦啦");
     }
 }
 ```

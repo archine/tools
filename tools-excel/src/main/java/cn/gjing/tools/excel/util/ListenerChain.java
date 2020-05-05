@@ -38,15 +38,39 @@ public final class ListenerChain {
      * @param isHead         Whether is excel head
      * @param excelField     ExcelField annotation of current field
      * @param field          Current field
-     * @param value          Cell value
-     * @param headName       The header name of the list where the cell resides
      */
     public static void doCompleteCell(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
-                                      ExcelField excelField, Field field, String headName, int index, int colIndex, boolean isHead, Object value) {
+                                      ExcelField excelField, Field field, int index, int colIndex, boolean isHead) {
         List<ExcelWriteListener> cellListeners = excelListeners.get(ExcelCellWriteListener.class);
         if (cellListeners != null) {
-            cellListeners.forEach(e -> ((ExcelCellWriteListener) e).completeCell(sheet, row, cell, excelField, field, headName, index, colIndex, isHead, value));
+            cellListeners.forEach(e -> ((ExcelCellWriteListener) e).completeCell(sheet, row, cell, excelField, field, index, colIndex, isHead));
         }
+    }
+
+    /**
+     * Execute write cell listener
+     *
+     * @param excelListeners excelListeners
+     * @param sheet          Current sheet
+     * @param row            Current row
+     * @param cell           Current cell
+     * @param index          Line index, index type according to isHead, Starting from 0
+     * @param colIndex       Current cell index
+     * @param isHead         Whether is excel head
+     * @param excelField     ExcelField annotation of current field
+     * @param field          Current field
+     * @param value          Cell value
+     * @return Cell value
+     */
+    public static Object doAssignementBefore(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
+                                             ExcelField excelField, Field field, int index, int colIndex, boolean isHead, Object value) {
+        List<ExcelWriteListener> cellListeners = excelListeners.get(ExcelCellWriteListener.class);
+        if (cellListeners != null) {
+            for (ExcelWriteListener cellListener : cellListeners) {
+                value = ((ExcelCellWriteListener) cellListener).assignmentBefore(sheet, row, cell, excelField, field, index, colIndex, isHead, value);
+            }
+        }
+        return value;
     }
 
     /**
@@ -117,7 +141,7 @@ public final class ListenerChain {
      * Before you start reading the data
      *
      * @param listeners Excel read listeners
-     * @param context Excel reader context
+     * @param context   Excel reader context
      */
     @SuppressWarnings("unchecked")
     public static <R> void doReadBefore(List<ExcelReadListener> listeners, ExcelReaderContext<R> context) {

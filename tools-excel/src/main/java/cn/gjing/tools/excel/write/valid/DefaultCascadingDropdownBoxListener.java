@@ -15,14 +15,17 @@ import java.util.Map;
  **/
 public final class DefaultCascadingDropdownBoxListener implements ExcelCascadingDropdownBoxListener {
     private final Map<String, String[]> boxValues;
+    private boolean init = false;
 
     public DefaultCascadingDropdownBoxListener(Map<String, String[]> boxValues) {
         this.boxValues = boxValues;
     }
 
     @Override
-    public void addCascadingDropdownBox(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow,
-                                        int colIndex, Field field) {
+    public ExcelCascadingDropdownBoxListener initName(Workbook workbook, Sheet sheet) {
+        if (this.init) {
+            return this;
+        }
         Sheet explicitSheet = workbook.getSheet("subsetSheet");
         if (explicitSheet == null) {
             explicitSheet = workbook.createSheet("subsetSheet");
@@ -43,6 +46,13 @@ public final class DefaultCascadingDropdownBoxListener implements ExcelCascading
                 name.setRefersToFormula("subsetSheet!" + formula);
             }
         }
+        this.init = true;
+        return this;
+    }
+
+    @Override
+    public void addCascadingDropdownBox(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow,
+                                        int colIndex, Field field) {
         char parentIndex = (char) ('A' + Integer.parseInt(excelDropdownBox.link()));
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint constraint;

@@ -65,15 +65,14 @@ class WriteExecutor {
         int endOffset = startOffset + bigTitle.getLines() - 1;
         for (int i = 0; i < bigTitle.getLines(); i++) {
             Row row = this.context.getSheet().createRow(startOffset + i);
-            for (int j = bigTitle.getFirstCol(); j < bigTitle.getLastCols(); j++) {
-                Cell cell = row.createCell(j);
-                cell.setCellValue(bigTitle.getContent());
-                cellListeners.forEach(e -> {
-                    if (e instanceof ExcelStyleWriteListener) {
-                        ((ExcelStyleWriteListener) e).setTitleStyle(cell);
-                    }
-                });
-            }
+            row.setHeight(bigTitle.getRowHeight());
+            Cell cell = row.createCell(0);
+            cell.setCellValue(bigTitle.getContent());
+            cellListeners.forEach(e -> {
+                if (e instanceof ExcelStyleWriteListener) {
+                    ((ExcelStyleWriteListener) e).setTitleStyle(bigTitle, cell);
+                }
+            });
         }
         this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCols()));
     }
@@ -99,6 +98,7 @@ class WriteExecutor {
                     ExcelField excelField = field.getAnnotation(ExcelField.class);
                     String headName = this.context.getHeadNames().get(colIndex)[index];
                     Cell headCell = headRow.createCell(colIndex);
+                    headName = (String) ListenerChain.doAssignementBefore(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true, headName);
                     headCell.setCellValue(headName);
                     if (this.context.getMultiHead()) {
                         if (oldCellModel == null) {
@@ -121,7 +121,7 @@ class WriteExecutor {
                             throw new ExcelResolverException("Add excel validation failure, " + e.getMessage());
                         }
                     }
-                    ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, headName, index, colIndex, true, headName);
+                    ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true);
                 }
                 ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(), rowIndex, true);
             }
@@ -156,12 +156,13 @@ class WriteExecutor {
                 context.setVariable(field.getName(), value);
                 try {
                     value = this.convert(field, value, o, parser, excelDataConvert, context, dataConvert);
+                    value = ListenerChain.doAssignementBefore(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, index, colIndex, false, value);
+                    ExcelUtils.setCellValue(valueCell, value, field);
                     if (excelField.autoMerge().enable()) {
                         autoMergeCallback = this.createMergeCallback(field, excelField);
                         this.autoMergeY(autoMergeCallback, valueRow, field, excelField, index, colIndex, value, o, dataSize);
                     }
-                    ExcelUtils.setCellValue(valueCell, value, field);
-                    ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, null, index, colIndex, false, value);
+                    ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, index, colIndex, false);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -304,6 +305,7 @@ class WriteExecutor {
                     return;
                 }
                 dropdownListeners.forEach(e -> ((ExcelCascadingDropdownBoxListener) e)
+                        .initName(this.context.getWorkbook(), this.context.getSheet())
                         .addCascadingDropdownBox(ev, this.context.getWorkbook(), this.context.getSheet(), firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, field));
             }
         }

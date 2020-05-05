@@ -125,7 +125,9 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> addListener(List<ExcelReadListener> readListenerList) {
-        readListenerList.forEach(this.context::addListener);
+        if (readListenerList != null) {
+            readListenerList.forEach(this.context::addListener);
+        }
         return this;
     }
 
@@ -136,7 +138,9 @@ public class ExcelReader<R> {
      * @return this
      */
     public ExcelReader<R> addListener(ExcelReadListener readListener) {
-        this.context.addListener(readListener);
+        if (readListener != null) {
+            this.context.addListener(readListener);
+        }
         return this;
     }
 

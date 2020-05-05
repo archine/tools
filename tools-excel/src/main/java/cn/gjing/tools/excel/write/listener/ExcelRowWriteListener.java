@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 @FunctionalInterface
 public interface ExcelRowWriteListener extends ExcelWriteListener {
     /**
-     * All the cells for the current row are created
+     * All the cells for the current row are finish
      *
      * @param sheet  Current sheet
      * @param row    Create the finished row

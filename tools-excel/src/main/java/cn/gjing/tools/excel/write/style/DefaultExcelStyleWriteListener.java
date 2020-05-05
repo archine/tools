@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write.style;
 
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.write.BigTitle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Default excel style listener
+ *
  * @author Gjing
  **/
 public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteListener {
@@ -25,17 +28,15 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
     }
 
     @Override
-    public void setTitleStyle(Cell cell) {
+    public void setTitleStyle(BigTitle bigTitle, Cell cell) {
         if (this.titleStyle == null) {
             CellStyle cellStyle = this.workbook.createCellStyle();
-            cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+            cellStyle.setFillForegroundColor(bigTitle.getColor().index);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            cellStyle.setAlignment(HorizontalAlignment.LEFT);
-            Font font = this.workbook.createFont();
-            font.setFontName("宋体");
-            font.setBold(true);
+            cellStyle.setAlignment(bigTitle.getAlignment());
             cellStyle.setWrapText(true);
-            cellStyle.setFont(font);
+            Font font = this.workbook.createFont();
+            font.setColor(bigTitle.getFontColor().index);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             this.titleStyle = cellStyle;
         }
@@ -43,7 +44,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
     }
 
     @Override
-    public void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex) {
+    public void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
         CellStyle cellStyle = this.headStyle.get(colIndex);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
@@ -68,14 +69,13 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
     }
 
     @Override
-    public void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, String headName, int index, int colIndex) {
+    public void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
         CellStyle cellStyle = this.bodyStyle.get(colIndex);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setWrapText(true);
-            cellStyle.setLocked(false);
             cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
             this.bodyStyle.put(colIndex, cellStyle);
         }
@@ -83,8 +83,8 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
     }
 
     @Override
-    public void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, String headName, int index,
-                             int colIndex, boolean isHead, Object value) {
+    public void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, int index,
+                             int colIndex, boolean isHead) {
         if (isHead) {
             if (index == 0) {
                 CellStyle cellStyle = this.workbook.createCellStyle();
@@ -95,10 +95,10 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
                 sheet.setDefaultColumnStyle(colIndex, cellStyle);
                 sheet.setColumnWidth(colIndex, excelField.width());
             }
-            this.setHeadStyle(row, cell, excelField, field, headName, index, colIndex);
+            this.setHeadStyle(row, cell, excelField, field, index, colIndex);
             return;
         }
-        this.setBodyStyle(row, cell, excelField, field, headName, index, colIndex);
+        this.setBodyStyle(row, cell, excelField, field, index, colIndex);
     }
 
     @Override

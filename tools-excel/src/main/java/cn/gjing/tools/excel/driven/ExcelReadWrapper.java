@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.driven;
 
+import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import lombok.Getter;
@@ -43,10 +44,13 @@ public class ExcelReadWrapper<R> {
      *
      * @param file Excel file
      * @return this
-     * @throws IOException IOException
      */
-    public ExcelReadWrapper<R> data(MultipartFile file) throws IOException {
-        this.inputStream = file.getInputStream();
+    public ExcelReadWrapper<R> data(MultipartFile file) {
+        try {
+            this.inputStream = file.getInputStream();
+        } catch (IOException e) {
+            throw new ExcelInitException("Initialize read wrapper error," + e.getMessage());
+        }
         return this;
     }
 
@@ -55,10 +59,13 @@ public class ExcelReadWrapper<R> {
      *
      * @param file Excel file
      * @return this
-     * @throws FileNotFoundException FileNotFoundException
      */
-    public ExcelReadWrapper<R> data(File file) throws FileNotFoundException {
-        this.inputStream = new FileInputStream(file);
+    public ExcelReadWrapper<R> data(File file) {
+        try {
+            this.inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new ExcelInitException("Initialize read wrapper error," + e.getMessage());
+        }
         return this;
     }
 
