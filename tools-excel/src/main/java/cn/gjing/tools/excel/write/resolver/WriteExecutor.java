@@ -65,6 +65,9 @@ class WriteExecutor {
         int endOffset = startOffset + bigTitle.getLines() - 1;
         for (int i = 0; i < bigTitle.getLines(); i++) {
             Row row = this.context.getSheet().createRow(startOffset + i);
+            if (startOffset == 0) {
+                this.createIdentifier(row, this.context.getHeadNames().size());
+            }
             row.setHeight(bigTitle.getRowHeight());
             Cell cell = row.createCell(0);
             cell.setCellValue(bigTitle.getContent());
@@ -88,12 +91,16 @@ class WriteExecutor {
             return;
         }
         if (needHead) {
-            int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
             Row headRow;
             ExcelOldCellModel oldCellModel = null;
+            int headSize = this.context.getHeadNames().size();
+            int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
             for (int index = 0, headRowSize = this.context.getHeadNames().get(0).length; index < headRowSize; index++) {
                 headRow = this.context.getSheet().createRow(rowIndex + index);
-                for (int colIndex = 0, headSize = this.context.getHeadNames().size(); colIndex < headSize; colIndex++) {
+                if (rowIndex == 0) {
+                    this.createIdentifier(headRow, headSize);
+                }
+                for (int colIndex = 0; colIndex < headSize; colIndex++) {
                     Field field = this.context.getExcelFields().get(colIndex);
                     ExcelField excelField = field.getAnnotation(ExcelField.class);
                     String headName = this.context.getHeadNames().get(colIndex)[index];
@@ -305,7 +312,6 @@ class WriteExecutor {
                     return;
                 }
                 dropdownListeners.forEach(e -> ((ExcelCascadingDropdownBoxListener) e)
-                        .initName(this.context.getWorkbook(), this.context.getSheet())
                         .addCascadingDropdownBox(ev, this.context.getWorkbook(), this.context.getSheet(), firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, field));
             }
         }
@@ -317,5 +323,15 @@ class WriteExecutor {
             ExcelUtils.addNumericValid(nv.validType(), nv.operatorType(), nv.expr1(), nv.expr2(), this.context.getSheet(), firstRow, nv.rows() == 0 ? firstRow : nv.rows() + firstRow - 1,
                     colIndex, nv.showErrorBox(), nv.rank(), nv.errorTitle(), nv.errorContent(), nv.showTip(), nv.tipTitle(), nv.tipContent());
         }
+    }
+
+    /**
+     * Create an identifier corresponding to excel
+     * @param row row
+     * @param colIndex current col index
+     */
+    private void createIdentifier(Row row, int colIndex) {
+        row.createCell(colIndex).setCellValue(this.context.getExcelClass().getSimpleName());
+        this.context.getSheet().setColumnHidden(colIndex, true);
     }
 }

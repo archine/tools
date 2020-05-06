@@ -34,7 +34,8 @@ class ExcelDrivenReadHandler implements HandlerMethodReturnValueHandler {
             ExcelReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(), readAnno.ignores());
             reader.addListener(wrapper.getReadListeners())
                     .subscribe(wrapper.getResultReadListener())
-                    .metaInfo(readAnno.metaInfo(), readAnno.check())
+                    .metaInfo(readAnno.metaInfo())
+                    .check(readAnno.check())
                     .read(readAnno.headerIndex(), readAnno.value())
                     .finish();
             return;

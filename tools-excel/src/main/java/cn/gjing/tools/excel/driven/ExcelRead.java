@@ -22,12 +22,14 @@ public @interface ExcelRead {
     String value() default "Sheet1";
 
     /**
-     * Whether to check excel template when excel import
+     * Whether to check whether the Excel template matches when importing
+     * @return check
      */
     boolean check() default true;
 
     /**
      * Whether is need meta info(Such as header,title)
+     * @return metaInfo
      */
     boolean metaInfo() default false;
 

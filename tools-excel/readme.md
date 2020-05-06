@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.3</version>
+    <version>2.1.4</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -626,8 +626,8 @@ public class TestController {
     @ApiOperation("导入单表头")
     public void userImport(MultipartFile file) throws IOException {
         ExcelFactory.createReader(file, SingleHead.class)
-                //开启读取表头和大标题数据，并进行模板检查
-                .metaInfo(true, true)
+                //开启读取表头和大标题数据，默认不会读取正文外的内容
+                .metaInfo(true)
                 .subscribe(e -> this.userService.saveUsers(e))
                 .read(1)
                 .finish();

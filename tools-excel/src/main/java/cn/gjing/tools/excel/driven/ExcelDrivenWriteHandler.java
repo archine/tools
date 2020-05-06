@@ -30,7 +30,7 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
                                   @NonNull NativeWebRequest nativeWebRequest) throws Exception {
         ExcelWrite writerAnno = methodParameter.getMethodAnnotation(ExcelWrite.class);
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        ExcelWriter writer = ExcelFactory.createWriter("".equals(writerAnno.value()) ? null : writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
+        ExcelWriter writer = ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
                 .valid(writerAnno.needValid())
                 .multiHead(writerAnno.multiHead());
         modelAndViewContainer.setRequestHandled(true);

@@ -15,44 +15,38 @@ import java.util.Map;
  **/
 public final class DefaultCascadingDropdownBoxListener implements ExcelCascadingDropdownBoxListener {
     private final Map<String, String[]> boxValues;
-    private boolean init = false;
+    private boolean init = true;
 
     public DefaultCascadingDropdownBoxListener(Map<String, String[]> boxValues) {
         this.boxValues = boxValues;
     }
 
     @Override
-    public ExcelCascadingDropdownBoxListener initName(Workbook workbook, Sheet sheet) {
-        if (this.init) {
-            return this;
-        }
-        Sheet explicitSheet = workbook.getSheet("subsetSheet");
-        if (explicitSheet == null) {
-            explicitSheet = workbook.createSheet("subsetSheet");
-            workbook.setSheetHidden(workbook.getSheetIndex("subsetSheet"), true);
-        }
-        for (Map.Entry<String, String[]> valueMap : this.boxValues.entrySet()) {
-            Name name = workbook.getName(valueMap.getKey());
-            if (name == null) {
-                int rowIndex = explicitSheet.getPhysicalNumberOfRows();
-                Row subsetSheetRow = explicitSheet.createRow(rowIndex);
-                subsetSheetRow.createCell(0).setCellValue(valueMap.getKey());
-                for (int i = 0, length = valueMap.getValue().length; i < length; i++) {
-                    subsetSheetRow.createCell(i + 1).setCellValue(valueMap.getValue()[i]);
-                }
-                String formula = ParamUtils.createFormula(1, rowIndex + 1, valueMap.getValue().length);
-                name = workbook.createName();
-                name.setNameName(valueMap.getKey());
-                name.setRefersToFormula("subsetSheet!" + formula);
-            }
-        }
-        this.init = true;
-        return this;
-    }
-
-    @Override
     public void addCascadingDropdownBox(ExcelDropdownBox excelDropdownBox, Workbook workbook, Sheet sheet, int firstRow, int lastRow,
                                         int colIndex, Field field) {
+        if (this.init) {
+            Sheet explicitSheet = workbook.getSheet("subsetSheet");
+            if (explicitSheet == null) {
+                explicitSheet = workbook.createSheet("subsetSheet");
+                workbook.setSheetHidden(workbook.getSheetIndex("subsetSheet"), true);
+            }
+            for (Map.Entry<String, String[]> valueMap : this.boxValues.entrySet()) {
+                Name name = workbook.getName(valueMap.getKey());
+                if (name == null) {
+                    int rowIndex = explicitSheet.getPhysicalNumberOfRows();
+                    Row subsetSheetRow = explicitSheet.createRow(rowIndex);
+                    subsetSheetRow.createCell(0).setCellValue(valueMap.getKey());
+                    for (int i = 0, length = valueMap.getValue().length; i < length; i++) {
+                        subsetSheetRow.createCell(i + 1).setCellValue(valueMap.getValue()[i]);
+                    }
+                    String formula = ParamUtils.createFormula(1, rowIndex + 1, valueMap.getValue().length);
+                    name = workbook.createName();
+                    name.setNameName(valueMap.getKey());
+                    name.setRefersToFormula("subsetSheet!" + formula);
+                }
+            }
+            this.init = false;
+        }
         char parentIndex = (char) ('A' + Integer.parseInt(excelDropdownBox.link()));
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint constraint;

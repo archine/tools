@@ -127,15 +127,16 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
                 continue;
             }
-            if (this.context.isNeedMetaInfo()) {
-                boolean isHead = row.getRowNum() == headerIndex;
-                if (isHead) {
-                    if (row.getLastCellNum() != this.context.getExcelFields().size()) {
-                        if (this.context.isTemplateCheck()) {
-                            throw new ExcelTemplateException();
-                        }
+            if (row.getRowNum() == 0) {
+                if (this.context.isCheckTemplate()) {
+                    Cell checkCell = row.getCell(this.context.getExcelFields().size());
+                    if (checkCell == null||!this.context.getExcelClass().getSimpleName().equals(checkCell.getStringCellValue())) {
+                        throw new ExcelTemplateException();
                     }
                 }
+            }
+            if (this.context.isMetaInfo()) {
+                boolean isHead = row.getRowNum() == headerIndex;
                 otherValues = new ArrayList<>();
                 for (Cell cell : row) {
                     otherValues.add(ListenerChain.doReadCell(rowReadListeners, cell.getStringCellValue(), null, row.getRowNum(), cell.getColumnIndex(), isHead, false));
@@ -235,7 +236,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
                 return;
             }
-            throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + field.getName() + " " + value);
+            throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + field.getType() + " " + value.getClass().getTypeName());
         }
     }
 

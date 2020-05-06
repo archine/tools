@@ -119,4 +119,19 @@ public final class ParamUtils {
             }
         }
     }
+
+    /**
+     * Check the file type is excel
+     *
+     * @param fileName file name
+     * @return is Excel
+     */
+    public static boolean isExcel(String fileName) {
+        if (fileName == null) {
+            return false;
+        }
+        int pos = fileName.lastIndexOf(".") + 1;
+        String extension = fileName.substring(pos);
+        return "xls".equals(extension) || "xlsx".equals(extension);
+    }
 }

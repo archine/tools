@@ -13,13 +13,6 @@ import java.lang.reflect.Field;
  **/
 public interface ExcelCascadingDropdownBoxListener extends ExcelWriteListener {
     /**
-     * Initializes the excel name manager
-     * @param workbook Current workbook
-     * @param sheet Current sheet
-     */
-    ExcelCascadingDropdownBoxListener initName(Workbook workbook, Sheet sheet);
-
-    /**
      * Add cascading dropdown box
      *
      * @param excelDropdownBox ExplicitValid

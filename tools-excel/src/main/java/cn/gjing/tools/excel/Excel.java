@@ -34,6 +34,7 @@ public @interface Excel {
      * Window size, which is flushed to disk when exported
      * if the data that has been written out exceeds the specified size
      * only for xlsx
+     *
      * @return 500
      */
     int windowSize() default 500;

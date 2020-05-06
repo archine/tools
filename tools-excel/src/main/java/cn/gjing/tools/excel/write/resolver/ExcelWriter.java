@@ -314,6 +314,7 @@ public final class ExcelWriter {
         List<String[]> headNames = new ArrayList<>();
         this.context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, headNames));
         this.context.setHeadNames(headNames);
+        this.context.setExcelClass(excelClass);
         if (resetListener) {
             this.context.getWriteListenerCache().clear();
         }

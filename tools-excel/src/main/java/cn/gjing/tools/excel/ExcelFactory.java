@@ -7,6 +7,7 @@ import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.resolver.ExcelWriter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,7 +98,8 @@ public final class ExcelFactory {
         ExcelWriterContext context = ExcelWriterContext.builder()
                 .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr))
                 .headNames(headerArr)
-                .fileName(fileName == null ? "".equals(excel.value()) ? LocalDate.now().toString() : excel.value() : fileName)
+                .fileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().toString() : excel.value() : fileName)
+                .excelClass(excelClass)
                 .build();
         return new ExcelWriter(context, excel, response, initDefaultStyle);
     }
@@ -114,6 +116,12 @@ public final class ExcelFactory {
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) {
+        if (file == null) {
+            throw new ExcelInitException("File cannot be null");
+        }
+        if (!ParamUtils.isExcel(file.getOriginalFilename())) {
+            throw new ExcelInitException("File type error, file suffix name need to be xls or xlsx");
+        }
         try {
             return createReader(file.getInputStream(), excelClass, ignores);
         } catch (IOException e) {
@@ -133,6 +141,12 @@ public final class ExcelFactory {
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass, String... ignores) {
+        if (file == null) {
+            throw new ExcelInitException("File cannot be null");
+        }
+        if (!ParamUtils.isExcel(file.getName())) {
+            throw new ExcelInitException("File type error, file suffix name need to be xls or xlsx");
+        }
         try {
             return createReader(new FileInputStream(file), excelClass, ignores);
         } catch (IOException e) {

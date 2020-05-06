@@ -63,6 +63,11 @@ public final class ExcelWriterContext {
     private List<String[]> headNames = new ArrayList<>();
 
     /**
+     * Excel mapping class
+     */
+    private Class<?> excelClass;
+
+    /**
      * Export listener cache
      */
     @Builder.Default

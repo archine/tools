@@ -162,9 +162,32 @@ public class ExcelReader<R> {
      * @param checkTemplate Check that the excel template matches the entity
      * @return this
      */
+    @Deprecated
     public ExcelReader<R> metaInfo(boolean need, boolean checkTemplate) {
-        this.context.setNeedMetaInfo(need);
-        this.context.setTemplateCheck(checkTemplate);
+        this.context.setMetaInfo(need);
+        this.context.setCheckTemplate(checkTemplate);
+        return this;
+    }
+
+    /**
+     * Whether is need meta info(Such as header,title)
+     *
+     * @param need Read meta info
+     * @return this
+     */
+    public ExcelReader<R> metaInfo(boolean need) {
+        this.context.setMetaInfo(need);
+        return this;
+    }
+
+    /**
+     * Whether to check whether the Excel template matches when importing
+     *
+     * @param checkTemplate Check that the excel template matches the entity
+     * @return this
+     */
+    public ExcelReader<R> check(boolean checkTemplate) {
+        this.context.setCheckTemplate(checkTemplate);
         return this;
     }
 

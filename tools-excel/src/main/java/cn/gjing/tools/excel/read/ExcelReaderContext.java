@@ -48,14 +48,14 @@ public class ExcelReaderContext<R> {
     private List<Field> excelFields;
 
     /**
-     * Whether to check excel template when excel import
+     * Whether to check whether the Excel template matches when importing
      */
-    private boolean templateCheck = true;
+    private boolean checkTemplate = true;
 
     /**
      * Whether is need meta info(Such as header,title)
      */
-    private boolean needMetaInfo = false;
+    private boolean metaInfo = false;
 
     /**
      * Read listener cache
