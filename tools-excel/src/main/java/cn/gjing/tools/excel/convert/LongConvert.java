@@ -3,17 +3,15 @@ package cn.gjing.tools.excel.convert;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 
 /**
- * Converts the string to a Java BigDecimal
- *
+ * Converts the string to a Java Long
  * @author Gjing
  **/
-public class DecimalConvert implements DataConvert<Object> {
+public class LongConvert implements DataConvert<Object> {
     @Override
     public Object toEntityAttribute(Object value, Field field) {
-        return StringUtils.isEmpty(value) ? BigDecimal.ZERO : new BigDecimal(value.toString());
+        return StringUtils.isEmpty(value) ? 0L : Long.parseLong(value.toString());
     }
 
     @Override

@@ -27,11 +27,12 @@ class ExcelDrivenReadHandler implements HandlerMethodReturnValueHandler {
         if (o instanceof ExcelReadWrapper) {
             modelAndViewContainer.setRequestHandled(true);
             ExcelRead readAnno = methodParameter.getMethodAnnotation(ExcelRead.class);
+            assert readAnno != null;
             ExcelReadWrapper wrapper = (ExcelReadWrapper) o;
             if (wrapper.getInputStream() == null) {
                 throw new ExcelResolverException("The data cannot be empty");
             }
-            ExcelReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(), readAnno.ignores());
+            ExcelReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(), wrapper.getIgnores() == null ? readAnno.ignores() : wrapper.getIgnores());
             reader.addListener(wrapper.getReadListeners())
                     .subscribe(wrapper.getResultReadListener())
                     .metaInfo(readAnno.metaInfo())

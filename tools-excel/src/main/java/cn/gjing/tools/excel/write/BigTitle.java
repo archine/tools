@@ -61,6 +61,12 @@ public final class BigTitle {
     @Builder.Default
     private HorizontalAlignment alignment = HorizontalAlignment.LEFT;
 
+    /**
+     * Font bold
+     */
+    @Builder.Default
+    private boolean bold = false;
+
     public BigTitle() {
     }
 
@@ -71,7 +77,7 @@ public final class BigTitle {
         this.rowHeight = 350;
         this.fontColor = IndexedColors.BLACK;
         this.alignment = HorizontalAlignment.LEFT;
-
+        this.bold = false;
     }
     public BigTitle(int lines, String content) {
         this.lines = lines;
@@ -80,6 +86,7 @@ public final class BigTitle {
         this.rowHeight = 350;
         this.fontColor = IndexedColors.BLACK;
         this.alignment = HorizontalAlignment.LEFT;
+        this.bold = false;
     }
 
     public BigTitle(int lines, int lastCols, String content) {
@@ -90,10 +97,11 @@ public final class BigTitle {
         this.rowHeight = 350;
         this.fontColor = IndexedColors.BLACK;
         this.alignment = HorizontalAlignment.LEFT;
+        this.bold = false;
     }
 
     public BigTitle(int lines, int firstCol, int lastCols, String content, IndexedColors color, short rowHeight,
-                    IndexedColors fontColor, HorizontalAlignment alignment) {
+                    IndexedColors fontColor, HorizontalAlignment alignment, boolean bold) {
         this.lines = lines;
         this.firstCol = firstCol;
         this.lastCols = lastCols;
@@ -102,5 +110,6 @@ public final class BigTitle {
         this.rowHeight = rowHeight;
         this.fontColor = fontColor;
         this.alignment = alignment;
+        this.bold = bold;
     }
 }

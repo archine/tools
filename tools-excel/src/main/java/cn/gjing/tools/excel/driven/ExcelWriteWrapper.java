@@ -22,12 +22,14 @@ public class ExcelWriteWrapper {
     private BigTitle bigTitle;
     private List<?> data;
     private Map<String, String[]> boxValues;
+    private String[] ignores;
 
     private ExcelWriteWrapper() {
     }
 
     /**
      * Build a write wrapper
+     *
      * @return ExcelWriteWrapper
      */
     public static ExcelWriteWrapper build() {
@@ -102,6 +104,17 @@ public class ExcelWriteWrapper {
      */
     public ExcelWriteWrapper boxValue(Map<String, String[]> boxValues) {
         this.boxValues = boxValues;
+        return this;
+    }
+
+    /**
+     * Which table heads to be ignored when exporting
+     *
+     * @param ignores ignore head
+     * @return this
+     */
+    public ExcelWriteWrapper ignores(String... ignores) {
+        this.ignores = ignores;
         return this;
     }
 }

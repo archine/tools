@@ -23,6 +23,7 @@ public class ExcelReadWrapper<R> {
     private List<ExcelReadListener> readListeners;
     private ExcelResultReadListener<R> resultReadListener;
     private InputStream inputStream;
+    private String[] ignores;
 
     private ExcelReadWrapper(Class<R> mapping) {
         this.mapping = mapping;
@@ -117,6 +118,17 @@ public class ExcelReadWrapper<R> {
      */
     public ExcelReadWrapper<R> subscribe(ExcelResultReadListener<R> resultListener) {
         this.resultReadListener = resultListener;
+        return this;
+    }
+
+    /**
+     * Which table heads to be ignored when importing
+     *
+     * @param ignores ignore head
+     * @return this
+     */
+    public ExcelReadWrapper<R> ignores(String... ignores) {
+        this.ignores = ignores;
         return this;
     }
 }

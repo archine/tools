@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.4</version>
+    <version>2.1.5</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -140,6 +140,7 @@
 |fontColor|字体颜色，默认``黑色``|
 |rowHeight|行高|
 |alignment|水平位置，默认``靠左``|
+|bold|字体是否加粗，默认``false``|
 ### 2、ExcelReadWrapper
 **注解驱动方式导入时的数据构造器**
 ### 3、ExcelWriteWrapper

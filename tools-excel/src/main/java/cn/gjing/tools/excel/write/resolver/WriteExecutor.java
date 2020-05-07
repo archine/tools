@@ -105,7 +105,7 @@ class WriteExecutor {
                     ExcelField excelField = field.getAnnotation(ExcelField.class);
                     String headName = this.context.getHeadNames().get(colIndex)[index];
                     Cell headCell = headRow.createCell(colIndex);
-                    headName = (String) ListenerChain.doAssignementBefore(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true, headName);
+                    headName = (String) ListenerChain.doAssignmentBefore(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true, headName);
                     headCell.setCellValue(headName);
                     if (this.context.getMultiHead()) {
                         if (oldCellModel == null) {
@@ -163,7 +163,7 @@ class WriteExecutor {
                 context.setVariable(field.getName(), value);
                 try {
                     value = this.convert(field, value, o, parser, excelDataConvert, context, dataConvert);
-                    value = ListenerChain.doAssignementBefore(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, index, colIndex, false, value);
+                    value = ListenerChain.doAssignmentBefore(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, index, colIndex, false, value);
                     ExcelUtils.setCellValue(valueCell, value, field);
                     if (excelField.autoMerge().enable()) {
                         autoMergeCallback = this.createMergeCallback(field, excelField);

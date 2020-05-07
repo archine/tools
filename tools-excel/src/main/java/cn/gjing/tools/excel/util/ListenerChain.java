@@ -62,7 +62,7 @@ public final class ListenerChain {
      * @param value          Cell value
      * @return Cell value
      */
-    public static Object doAssignementBefore(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
+    public static Object doAssignmentBefore(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
                                              ExcelField excelField, Field field, int index, int colIndex, boolean isHead, Object value) {
         List<ExcelWriteListener> cellListeners = excelListeners.get(ExcelCellWriteListener.class);
         if (cellListeners != null) {
