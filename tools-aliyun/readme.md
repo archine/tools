@@ -151,7 +151,7 @@ public class TestController {
 ### 1、配置
 **以下配置除了``region``其他都``必填``**
 ```yaml
-wolf:
+tools:
   aliyun:
     # 用户key，在阿里云获取
     access-key: xxxxxxx
