@@ -62,7 +62,7 @@
 |rank|错误框级别|
 |errorTitle|错误框标题|
 |errorContent|错误提示信息|
-|link|父级列表头序号(假设父级是第一列的话，那么就是``0``)|     
+|link|作为本列单元格下拉框上级的列下标|     
 <span id="date"></span>
 ### 6、@ExcelDateValid
 **导出时给列表头下方的单元格加上时间格式校验，[查看用例](#date_use)**      
@@ -98,9 +98,10 @@
 |errorContent|错误提示信息|
 |showTip|点击单元格是否出现提示框|
 |tipTitle|提示标题|
-|tipContent|提示内容|       
+|tipContent|提示内容|         
+<span id="driven_write_annotation"></span>   
 ### 8、@EnableExcelDrivenMode
-**在启动类或者配置类上使用即可开启Excel注解驱动模式，该模式可通过注解方式进行Excel的导入导出,**   
+**在启动类或者配置类上使用即可开启Excel注解驱动模式，当开启了驱动模式时即可在方法上通过注解对Excel进行导入导出，不需要在通过Excel工厂创建**   
 <span id="driven_read_annotation"></span>  
 ### 9、@ExcelRead
 **注解驱动模式下的Excel导入，[查看用例](#driven_read)**      
@@ -142,9 +143,26 @@
 |alignment|水平位置，默认``靠左``|
 |bold|字体是否加粗，默认``false``|
 ### 2、ExcelReadWrapper
-**注解驱动方式导入时的数据构造器**
+**注解驱动方式导入时的数据构造器**       
+
+|方法|描述|
+|---|---|
+|build|初始化一个``wrapper``, 需要传入映射实体|
+|data|设置要导入的Excel文件或者文件流|
+|listener|添加导入时需要用到的监听器|
+|subscribe|添加结果监听器|
+|ignores|设置要忽略的表头|
 ### 3、ExcelWriteWrapper
-**注解驱动方式导出时的数据构造器**
+**注解驱动方式导出时的数据构造器**        
+
+|方法|描述|
+|---|---|
+|build|初始化一个``wrapper``，可以选择是否在初始化时传入要导出的数据|
+|listener|增加导出时的监听器|
+|title|设置导出的大标题|
+|data|设置导出的数据|
+|ignores|设置要忽略的表头|
+|boxValues|设置下拉框的内容|
 ### 4、DefaultCascadingDropdownBoxListener
 **如果映射实体中存在级联下拉框的表头，那么导出时需要添加级联下拉框监听器，该类是默认实现的一个级联监听器。也可以自己实现``ExcelCascadingDropdownBoxListener``接口并在导出时通过``addListener()``方法添加**
 ### 5、DefaultExcelStyleWriteListener
@@ -159,7 +177,7 @@
  * @author Gjing
  **/
 @Data
-@Excel("单级表头")
+@Excel("单级表头模板")
 public class SingleHead {
     @ExcelField("姓名")
     private String userName;
@@ -186,6 +204,7 @@ public class UserController {
     public void testExport(HttpServletResponse response) {
         //指定映射的实体为刚刚定义的
         ExcelFactory.createWriter(SingleHead.class, response)
+                // 如果是要导出数据，只要将下面的null转成你要导出的对应映射实体的数据集合即可
                 .write(null)
                 .flush();
     }
@@ -200,7 +219,7 @@ public class UserController {
  * @author Gjing
  **/
 @Data
-@Excel("多级表头")
+@Excel("多级表头模板")
 public class MultiHead {
     @ExcelField({"用户名","用户名"})
     private String userName;
@@ -266,7 +285,7 @@ public class TestController {
  * @author Gjing
  **/
 @Data
-@Excel("下拉框导出")
+@Excel("下拉框导出模板")
 public class SingleHead {
     @ExcelField("性别")
     @ExcelDropdownBox(combobox = {"男", "女"})
@@ -295,6 +314,7 @@ public class TestController {
 }
 ```
 * 通过方法设置
+**使用方法设置时，也需要在实体字段上使用``@ExcelDropdownBox``注解，只是不需要在注解中指定下拉框内容，这里不在展示实体代码**
 ```java
 /**
  * @author Gjing
@@ -324,7 +344,7 @@ public class TestController {
  * @author Gjing
  **/
 @Data
-@Excel("级联下拉框导出")
+@Excel("级联下拉框导出模板")
 public class SingleHead {
     @ExcelField("性别")
     @ExcelDropdownBox(combobox = {"男", "女"})
@@ -758,8 +778,9 @@ public enum Gender {
 
 <span id="driven_write"></span>
 ### 1、导出
-**导出的方法上需要增加``@ExcelWrite``注解  >>  [注解参考](#driven_write_annotation)**
+**导出的方法上需要增加``@ExcelWrite``注解  >>  [注解参考](#driven_write_annotation)，这里使用到的映射实体还是同上文中使用到的**
 #### a、导出模板
+**在注解中指定导出的模板对应的映射实体**
 ```java
 /**
  * @author Gjing
@@ -876,7 +897,7 @@ public class ExcelDriveController {
 }
 ```
 #### b、导入带大标题的模板
-**如果模板带有大标题，需要我们指定表头开始下标，下标要根据你的模板标题有多少行而定，我们在导出时设置了两行，所以这里配置两行**
+**如果模板带有大标题，需要我们指定表头开始下标，下标要根据你的模板标题有多少行而定，我们在导出时设置了两行，所以这里配置真实表头开始下标为2**
 ```java
 @RestController
 public class ExcelDriveController {
