@@ -11,6 +11,15 @@ import java.util.Date;
  * @author Gjing
  **/
 public final class TimeUtils {
+    public static SimpleDateFormat DATE_FORMAT;
+    public static SimpleDateFormat DATE_TIME_FORMAT;
+    public static SimpleDateFormat TIME_FORMAT;
+
+    static {
+        DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    }
 
     private TimeUtils() {
 
@@ -22,9 +31,104 @@ public final class TimeUtils {
      * @param date date
      * @return 文本时间
      */
-    public static String dateToString(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static String dateToText(Date date) {
+        return DATE_FORMAT.format(date);
+    }
+
+    /**
+     * 获取文本时间
+     *
+     * @param date   时间
+     * @param format format
+     * @return 文本时间
+     */
+    public static String dateToText(Date date, SimpleDateFormat format) {
         return format.format(date);
+    }
+
+    /**
+     * 获取文本格式时间
+     *
+     * @param date date
+     * @return 文本时间
+     */
+    public static String datetimeToText(Date date) {
+        return DATE_TIME_FORMAT.format(date);
+    }
+
+    /**
+     * 自定义格式获取文本时间
+     *
+     * @param date   date
+     * @param format 格式("yyyy-MM-dd")
+     * @return string 文本
+     */
+    public static String dateToText(Date date, String format) {
+        SimpleDateFormat format1 = new SimpleDateFormat(format);
+        return format1.format(date);
+    }
+
+    /**
+     * 获取时间对象
+     *
+     * @param date 文本格式时间
+     * @return 时间对象
+     */
+    public static Date textToDate(String date) {
+        try {
+            return DATE_FORMAT.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    /**
+     * 获取时间对象
+     *
+     * @param date 文本格式时间
+     * @return 时间对象
+     */
+    public static Date textToDatetime(String date) {
+        try {
+            return DATE_TIME_FORMAT.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    /**
+     * 获取时间对象
+     *
+     * @param date   文本格式时间
+     * @param format format
+     * @return 时间对象
+     */
+    public static Date textToDatetime(String date, SimpleDateFormat format) {
+        try {
+            return format.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    /**
+     * 自定义格式获取时间对象
+     *
+     * @param date   文本时间
+     * @param format format 转化格式
+     * @return 时间对象
+     */
+    public static Date textToDate(String date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        try {
+            return dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
     }
 
     /**
@@ -33,7 +137,7 @@ public final class TimeUtils {
      * @param date date
      * @return localDateTime
      */
-    public static LocalDateTime dateToLocalDateTime(Date date) {
+    public static LocalDateTime toLocalDateTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
@@ -44,7 +148,7 @@ public final class TimeUtils {
      * @return localDate
      */
     public static LocalDate dateToLocalDate(Date date) {
-        return dateToLocalDateTime(date).toLocalDate();
+        return toLocalDateTime(date).toLocalDate();
     }
 
     /**
@@ -53,7 +157,7 @@ public final class TimeUtils {
      * @param localDate localDate
      * @return date
      */
-    public static Date localDateToDate(LocalDate localDate) {
+    public static Date toDate(LocalDate localDate) {
         return localDateTimeToDate(localDate.atStartOfDay());
     }
 
@@ -63,24 +167,48 @@ public final class TimeUtils {
      * @param localDate localDate
      * @return .
      */
-    public static String localDateToString(LocalDate localDate) {
+    public static String toText(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
-    public static String localDateTimeToString(LocalDateTime localDateTime) {
+    /**
+     * LocalDateTime转化为指定格式字符串
+     *
+     * @param localDateTime LocalDateTime
+     * @return 时间字符串
+     */
+    public static String toText(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
-    public static String localTimeToString(LocalTime localTime) {
+    /**
+     * LocalTime转化为指定格式字符串
+     *
+     * @param localTime localTime
+     * @return 时间字符串
+     */
+    public static String toText(LocalTime localTime) {
         return localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
-    public static LocalDate stringToLocalDate(String time) {
-        return LocalDate.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    /**
+     * 文本日期转LocalDate
+     *
+     * @param date date
+     * @return localDate
+     */
+    public static LocalDate toLocalDate(String date) {
+        return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
-    public static LocalDateTime stringToLocalDateTime(String time) {
-        return LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    /**
+     * 文本日期转LocalDateTime
+     *
+     * @param dateTime dateTime
+     * @return LocalDateTime
+     */
+    public static LocalDateTime toLocalDateTime(String dateTime) {
+        return LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     /**
@@ -99,7 +227,7 @@ public final class TimeUtils {
      * @param localDateTime lo
      * @return .
      */
-    public static long localDateTimeToStamp(LocalDateTime localDateTime) {
+    public static long toTimestamp(LocalDateTime localDateTime) {
         ZoneId zone = ZoneId.systemDefault();
         Instant instant = localDateTime.atZone(zone).toInstant();
         return instant.toEpochMilli();
@@ -108,87 +236,55 @@ public final class TimeUtils {
     /**
      * 查询一个日期(年月日)到目前过了多少年
      *
-     * @param startTime 开始时间
+     * @param date 开始日期
      * @return 相差数量
      */
-    public static Integer getYearsByStartTime(String startTime) {
-        LocalDate startDate = stringToLocalDate(startTime);
+    public static Integer getYearsByStartTime(String date) {
+        LocalDate startDate1 = toLocalDate(date);
         LocalDate currentDate = LocalDate.now();
-        if (currentDate.isBefore(startDate)) {
+        if (currentDate.isBefore(startDate1)) {
             return 0;
         } else {
-            return startDate.until(currentDate).getYears();
+            return startDate1.until(currentDate).getYears();
+        }
+    }
+
+    /**
+     * 查询一个日期(年月日)到目前过了多少年
+     *
+     * @param date 开始时间
+     * @return 相差数量
+     */
+    public static Integer getYearsByStartTime(LocalDate date) {
+        LocalDate currentDate = LocalDate.now();
+        if (currentDate.isBefore(date)) {
+            return 0;
+        } else {
+            return date.until(currentDate).getYears();
         }
     }
 
     /**
      * Long类型时间戳转化为LocalDateTime
      *
-     * @param stamp 时间戳
-     * @return .
+     * @param timestamp 时间戳
+     * @return LocalDateTime
      */
-    public static LocalDateTime stampToLocalDateTime(Long stamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(stamp), ZoneId.systemDefault());
-    }
-
-
-    /**
-     * 自定义格式获取文本时间
-     *
-     * @param date   date
-     * @param format 格式("yyyy-MM-dd")
-     * @return string 文本
-     */
-    public static String dateToString(Date date, String format) {
-        SimpleDateFormat format1 = new SimpleDateFormat(format);
-        return format1.format(date);
-    }
-
-    /**
-     * 获取时间对象
-     *
-     * @param date 文本格式时间
-     * @return 时间对象
-     */
-    public static Date stringToDate(String date) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            return format.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
-        }
-    }
-
-
-    /**
-     * 自定义格式获取时间对象
-     *
-     * @param date   文本时间
-     * @param format format 转化格式
-     * @return 时间对象
-     */
-    public static Date stringToDate(String date, String format) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-        try {
-            return dateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
-        }
+    public static LocalDateTime toLocalDateTime(Long timestamp) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
     }
 
     /**
      * 文本时间转化为日期
      *
-     * @param str 文本时间
+     * @param date 文本时间
      * @return 日期
      */
-    public static Calendar stringDateToCalendar(String str) {
+    public static Calendar toCalendar(String date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
         Calendar calendar = Calendar.getInstance();
         try {
-            calendar.setTime(simpleDateFormat.parse(str));
+            calendar.setTime(simpleDateFormat.parse(date));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -202,8 +298,8 @@ public final class TimeUtils {
      * @param format   格式
      * @return 时间
      */
-    public static Date calendarToDate(Calendar calendar, String format) {
-        return stringToDate(calendarToStringDate(calendar, format));
+    public static Date toDate(Calendar calendar, String format) {
+        return textToDate(toText(calendar, format));
     }
 
     /**
@@ -213,8 +309,8 @@ public final class TimeUtils {
      * @param format   格式
      * @return 文本时间
      */
-    public static String calendarToStringDate(Calendar calendar, String format) {
-        return dateToString(calendar.getTime(), format);
+    public static String toText(Calendar calendar, String format) {
+        return dateToText(calendar.getTime(), format);
     }
 
     /**
@@ -296,11 +392,11 @@ public final class TimeUtils {
     /**
      * 将文本时间转换为时间戳
      *
-     * @param stringDate 文本时间
+     * @param date date
      * @return 时间戳
      */
-    public static Long stringDateToStamp(String stringDate) {
-        return TimeUtils.stringToDate(stringDate).getTime();
+    public static Long toTimestamp(String date) {
+        return textToDate(date).getTime();
     }
 
     /**
@@ -309,9 +405,9 @@ public final class TimeUtils {
      * @param timeStamp 时间戳
      * @return 文本时间
      */
-    public static String stampToStringDate(Long timeStamp) {
+    public static String toText(Long timeStamp) {
         long l = timeStamp;
-        return TimeUtils.dateToString(new Date(l));
+        return dateToText(new Date(l));
     }
 
     /**
@@ -322,9 +418,20 @@ public final class TimeUtils {
      * @return 相差的天数
      */
     public static int dateBetween(String startDate, String endDate) {
-        Date dateStart = stringToDate(startDate, "yyyy-MM-dd");
-        Date dateEnd = stringToDate(endDate, "yyyy-MM-dd");
+        Date dateStart = textToDate(startDate, "yyyy-MM-dd");
+        Date dateEnd = textToDate(endDate, "yyyy-MM-dd");
         return (int) ((dateEnd.getTime() - dateStart.getTime()) / 1000 / 60 / 60 / 24);
+    }
+
+    /**
+     * 获取两个日期（不含时分秒）相差的天数，不包含今天
+     *
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @return 相差的天数
+     */
+    public static int dateBetween(Date startDate, Date endDate) {
+        return (int) ((startDate.getTime() - endDate.getTime()) / 1000 / 60 / 60 / 24);
     }
 
     /**
@@ -338,4 +445,14 @@ public final class TimeUtils {
         return dateBetween(startDate, endDate) + 1;
     }
 
+    /**
+     * 获取两个日期（不含时分秒）相差的天数，包含今天
+     *
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @return 相差的天数
+     */
+    public static int dateBetweenIncludeToday(Date startDate, Date endDate) {
+        return dateBetween(startDate, endDate) + 1;
+    }
 }

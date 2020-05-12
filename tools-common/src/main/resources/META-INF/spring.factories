@@ -1,3 +1,2 @@
 # Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.gjing.tools.common.valid.ToolsParamValidationAdapter,\
-cn.gjing.tools.common.ToolsCommonConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.gjing.tools.common.ToolsCommonConfiguration

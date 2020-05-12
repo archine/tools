@@ -11,9 +11,17 @@ import java.io.Serializable;
  **/
 @Data
 public class ResultVO<T> implements Serializable {
-
+    /**
+     * 状态码
+     */
     private Integer code;
+    /**
+     * 提示信息
+     */
     private String message;
+    /**
+     * 数据
+     */
     private T data;
 
     private ResultVO() {

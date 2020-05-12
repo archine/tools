@@ -20,8 +20,13 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResult implements Serializable {
-
+    /**
+     * 状态码
+     */
     private Integer code;
+    /**
+     * 错误信息
+     */
     private String message;
 
     /**

@@ -21,6 +21,7 @@ public final class EmailUtils {
     private EmailUtils() {
 
     }
+
     private EmailUtils(String host, String password, String from) {
         if (ParamUtils.multiEmpty(host, password, from)) {
             throw new NullPointerException("Instantiation exception, Parameters cannot be null");
@@ -52,6 +53,9 @@ public final class EmailUtils {
      * @return true为发送成功
      */
     public boolean sendEmail(String subject, String body, String tos, String copyTo) {
+        if (ParamUtils.isEmpty(tos)) {
+            throw new NullPointerException("The parameter tos cannot be null");
+        }
         try {
             Properties props = getProperties();
             Session session = Session.getInstance(props);
@@ -61,7 +65,7 @@ public final class EmailUtils {
             msg.setContent(mm);
             msg.saveChanges();
             startSend(session, msg);
-        } catch (Exception e) {
+        } catch (MessagingException e) {
             e.printStackTrace();
         }
         return true;
@@ -78,6 +82,9 @@ public final class EmailUtils {
      * @return true为发送成功
      */
     public boolean sendEmail(String subject, String body, String[] files, String tos, String copyTo) {
+        if (ParamUtils.isEmpty(tos)) {
+            throw new NullPointerException("The parameter tos cannot be null");
+        }
         try {
             Properties props = getProperties();
             Session session = Session.getInstance(props);
@@ -110,6 +117,7 @@ public final class EmailUtils {
 
     /**
      * 设置主题和发送人
+     *
      * @param subject 主题
      * @param session 会话
      * @return message
@@ -124,9 +132,10 @@ public final class EmailUtils {
 
     /**
      * 设置收件人和抄送人
-     * @param tos 收件人
+     *
+     * @param tos    收件人
      * @param copyTo 抄送人
-     * @param msg 消息
+     * @param msg    消息
      * @throws MessagingException email异常
      */
     private void setRecipient(String tos, String copyTo, Message msg) throws MessagingException {
@@ -141,9 +150,9 @@ public final class EmailUtils {
         }
     }
 
-
     /**
      * 获取配置信息
+     *
      * @return Properties
      */
     private Properties getProperties() {
@@ -153,10 +162,12 @@ public final class EmailUtils {
         props.put("mail.smtp.host", host);
         return props;
     }
+
     /**
      * 开始发送
+     *
      * @param session 邮件会话
-     * @param msg 消息
+     * @param msg     消息
      * @throws MessagingException email异常
      */
     private void startSend(Session session, Message msg) throws MessagingException {
@@ -168,6 +179,7 @@ public final class EmailUtils {
 
     /**
      * 设置邮件主体内容(包括html文本和附件)
+     *
      * @param body 主体
      * @return MimeMultipart
      * @throws MessagingException email异常
@@ -179,5 +191,5 @@ public final class EmailUtils {
         mm.addBodyPart(html);
         return mm;
     }
-
 }
+

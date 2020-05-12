@@ -12,10 +12,25 @@ import java.util.List;
 @Data
 public class PageResult<T> implements Serializable {
 
+    /**
+     * 数据
+     */
     private List<T> data;
+    /**
+     * 总页数
+     */
     private long totalPages;
+    /**
+     * 当前页数
+     */
     private long currentPage;
+    /**
+     * 总条数
+     */
     private long totalRows;
+    /**
+     * 每页条数
+     */
     private long pageRows;
 
     private PageResult() {
