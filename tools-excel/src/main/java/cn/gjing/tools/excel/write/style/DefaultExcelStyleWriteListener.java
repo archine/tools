@@ -39,6 +39,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             Font font = this.workbook.createFont();
             font.setColor(bigTitle.getFontColor().index);
             font.setBold(bigTitle.isBold());
+            cellStyle.setFont(font);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             this.titleStyle = cellStyle;
         }
