@@ -16,14 +16,12 @@ import java.lang.reflect.Field;
  * @author Gjing
  **/
 public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRowWriteListener {
-
     /**
      * Init Style write listener
      *
      * @param workbook workbook
      */
     void init(Workbook workbook);
-
 
     /**
      * Set excel big title style

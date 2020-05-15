@@ -15,9 +15,9 @@ public @interface ExcelNumericValid {
     /**
      * How many rows to add
      *
-     * @return 200
+     * @return rows
      */
-    int rows() default 200;
+    int rows() default 100;
 
     /**
      * Operator type

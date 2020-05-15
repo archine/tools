@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write.style;
 
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.metadata.ExcelColor;
 import cn.gjing.tools.excel.write.BigTitle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
@@ -49,7 +50,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
         CellStyle cellStyle = this.headStyle.get(colIndex);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
-            cellStyle.setFillForegroundColor(IndexedColors.LIME.index);
+            cellStyle.setFillForegroundColor(excelField.color() == ExcelColor.NONE ? IndexedColors.LIME.index : excelField.color().index);
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             cellStyle.setWrapText(true);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -62,7 +63,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             cellStyle.setRightBorderColor(IndexedColors.GREY_40_PERCENT.index);
             Font font = workbook.createFont();
             font.setBold(true);
-            font.setColor(IndexedColors.WHITE.index);
+            font.setColor(excelField.fontColor() == ExcelColor.NONE ? IndexedColors.WHITE.index : excelField.fontColor().index);
             cellStyle.setFont(font);
             this.headStyle.put(colIndex, cellStyle);
         }
@@ -105,7 +106,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
     @Override
     public void completeRow(Sheet sheet, Row row, Object obj, int index, boolean isHead) {
         if (isHead) {
-            row.setHeight((short) 350);
+            row.setHeight((short) 370);
         }
     }
 }

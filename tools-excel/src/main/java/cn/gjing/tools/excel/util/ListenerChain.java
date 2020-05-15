@@ -93,13 +93,12 @@ public final class ListenerChain {
     /**
      * Execute write sheet listener
      *
-     * @param sheet   Current created sheet
      * @param context Excel write context
      */
-    public static void doCompleteSheet(Sheet sheet, ExcelWriterContext context) {
+    public static void doCompleteSheet(ExcelWriterContext context) {
         List<ExcelWriteListener> sheetListeners = context.getWriteListenerCache().get(ExcelSheetWriteListener.class);
         if (sheetListeners != null) {
-            sheetListeners.forEach(e -> ((ExcelSheetWriteListener) e).completeSheet(sheet, context));
+            sheetListeners.forEach(e -> ((ExcelSheetWriteListener) e).completeSheet(context));
         }
     }
 

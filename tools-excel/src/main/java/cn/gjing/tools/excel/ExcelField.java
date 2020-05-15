@@ -2,6 +2,7 @@ package cn.gjing.tools.excel;
 
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
+import cn.gjing.tools.excel.metadata.ExcelColor;
 import cn.gjing.tools.excel.write.merge.Merge;
 
 import java.lang.annotation.*;
@@ -67,11 +68,19 @@ public @interface ExcelField {
     Merge autoMerge() default @Merge;
 
     /**
-     * Whether null values are supported when imported (including cells that do not exist or empty strings)
+     * Whether null values are supported when imported,Please to use required
      *
      * @return boolean
      */
+    @Deprecated
     boolean allowEmpty() default true;
+
+    /**
+     * Whether the contents in the cell below the current header are required when importing
+     *
+     * @return boolean
+     */
+    boolean required() default false;
 
     /**
      * Data convert, which you can use to change data during import and export,
@@ -81,4 +90,22 @@ public @interface ExcelField {
      * @see DataConvert
      */
     Class<? extends DataConvert<?>> convert() default DefaultDataConvert.class;
+
+    /**
+     * Color index, can control the current header fill color,
+     * default use style listener color configuration
+     *
+     * @return index
+     * @see ExcelColor
+     */
+    ExcelColor color() default ExcelColor.NONE;
+
+    /**
+     * Font color index, can control the current header value color,
+     * default use style listener color configuration
+     *
+     * @return index
+     * @see ExcelColor
+     */
+    ExcelColor fontColor() default ExcelColor.NONE;
 }

@@ -22,9 +22,9 @@ public @interface ExcelDropdownBox {
     /**
      * How many rows to add
      *
-     * @return 200
+     * @return rows
      */
-    int rows() default 200;
+    int rows() default 100;
 
     /**
      * Whether the error box pops up

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.5-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.5</version>
+    <version>2.1.6</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -32,7 +32,9 @@
 |order|表头出现在Excel文件中的先后顺序，建议要么都配置要么全不配置，不配置的情况下``默认按实体中字段顺序``|
 |format|表头所在列的整列单元格格式，格式参照Excel文件中的单元格格式，默认``常规``|
 |autoMerge|表头下方是否开启纵向合并|
-|allowEmpty|导入时，表头下方的单元格是否允许为空，默认``true``|
+|required|导入时，表头下方的单元格是否允许必须，默认``false``|
+|color|表头填充颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过次数配置|
+|fontColor|表头字体颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过次数配置|
 |convert|数据转换器，可以在导入导出时对数据进行转换,``相同的转换器只会出现一个``|      
 <span id="convert"></span>
 ### 3、@ExcelDataConvert
@@ -99,7 +101,7 @@
 |showTip|点击单元格是否出现提示框|
 |tipTitle|提示标题|
 |tipContent|提示内容|         
-<span id="driven_write_annotation"></span>   
+<span id="driven_annotation"></span>   
 ### 8、@EnableExcelDrivenMode
 **在启动类或者配置类上使用即可开启Excel注解驱动模式，当开启了驱动模式时即可在方法上通过注解对Excel进行导入导出，不需要在通过Excel工厂创建**   
 <span id="driven_read_annotation"></span>  

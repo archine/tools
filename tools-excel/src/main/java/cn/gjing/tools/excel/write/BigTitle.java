@@ -1,10 +1,10 @@
 package cn.gjing.tools.excel.write;
 
+import cn.gjing.tools.excel.metadata.ExcelColor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * Excel big title
@@ -41,7 +41,7 @@ public final class BigTitle {
      * Fill color
      */
     @Builder.Default
-    private IndexedColors color = IndexedColors.TAN;
+    private ExcelColor color = ExcelColor.TAN;
 
     /**
      * Row height
@@ -53,7 +53,7 @@ public final class BigTitle {
      * Font color
      */
     @Builder.Default
-    private IndexedColors fontColor = IndexedColors.BLACK;
+    private ExcelColor fontColor = ExcelColor.BLACK;
 
     /**
      * Horizontal alignment
@@ -73,18 +73,19 @@ public final class BigTitle {
     public BigTitle(String content) {
         this.lines = 2;
         this.content = content;
-        this.color = IndexedColors.TAN;
+        this.color = ExcelColor.TAN;
         this.rowHeight = 350;
-        this.fontColor = IndexedColors.BLACK;
+        this.fontColor = ExcelColor.BLACK;
         this.alignment = HorizontalAlignment.LEFT;
         this.bold = false;
     }
+
     public BigTitle(int lines, String content) {
         this.lines = lines;
         this.content = content;
-        this.color = IndexedColors.TAN;
+        this.color = ExcelColor.TAN;
         this.rowHeight = 350;
-        this.fontColor = IndexedColors.BLACK;
+        this.fontColor = ExcelColor.BLACK;
         this.alignment = HorizontalAlignment.LEFT;
         this.bold = false;
     }
@@ -93,15 +94,15 @@ public final class BigTitle {
         this.lines = lines;
         this.lastCols = lastCols;
         this.content = content;
-        this.color = IndexedColors.TAN;
+        this.color = ExcelColor.TAN;
         this.rowHeight = 350;
-        this.fontColor = IndexedColors.BLACK;
+        this.fontColor = ExcelColor.BLACK;
         this.alignment = HorizontalAlignment.LEFT;
         this.bold = false;
     }
 
-    public BigTitle(int lines, int firstCol, int lastCols, String content, IndexedColors color, short rowHeight,
-                    IndexedColors fontColor, HorizontalAlignment alignment, boolean bold) {
+    public BigTitle(int lines, int firstCol, int lastCols, String content, ExcelColor color, short rowHeight,
+                    ExcelColor fontColor, HorizontalAlignment alignment, boolean bold) {
         this.lines = lines;
         this.firstCol = firstCol;
         this.lastCols = lastCols;

@@ -342,7 +342,7 @@ public final class ExcelWriter {
         if (sheet == null) {
             sheet = this.context.getWorkbook().createSheet(sheetName);
             context.setSheet(sheet);
-            ListenerChain.doCompleteSheet(sheet, context);
+            ListenerChain.doCompleteSheet(context);
         }
     }
 }

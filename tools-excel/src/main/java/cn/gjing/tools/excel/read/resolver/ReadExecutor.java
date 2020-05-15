@@ -250,11 +250,10 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
      * @param r          Current row generated java object
      */
     private void allowEmpty(R r, Field field, ExcelField excelField, int rowIndex, int colIndex) {
-        if (excelField.allowEmpty()) {
-            return;
+        if (excelField.required()) {
+            this.save = ListenerChain.doReadEmpty(this.context.getReadListenersCache()
+                    .get(ExcelEmptyReadListener.class), r, field, excelField, rowIndex, colIndex);
         }
-        this.save = ListenerChain.doReadEmpty(this.context.getReadListenersCache()
-                .get(ExcelEmptyReadListener.class), r, field, excelField, rowIndex, colIndex);
     }
 
     /**

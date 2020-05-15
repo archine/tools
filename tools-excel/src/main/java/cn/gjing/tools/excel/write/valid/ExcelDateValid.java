@@ -15,9 +15,9 @@ public @interface ExcelDateValid {
     /**
      * How many rows to add
      *
-     * @return 200
+     * @return rows
      */
-    int rows() default 200;
+    int rows() default 100;
 
     /**
      * Date format of valid
@@ -38,7 +38,7 @@ public @interface ExcelDateValid {
      *
      * @return expr1
      */
-    String expr1() default "1970-01-01";
+    String expr1() default "1900-01-01";
 
     /**
      * expr2
@@ -73,7 +73,7 @@ public @interface ExcelDateValid {
      *
      * @return content
      */
-    String errorContent() default "请输入1970-01-01到2999-01-01范围内的时间";
+    String errorContent() default "请输入1900-01-01到2999-01-01范围内的时间";
 
     /**
      * Whether show cell tip
