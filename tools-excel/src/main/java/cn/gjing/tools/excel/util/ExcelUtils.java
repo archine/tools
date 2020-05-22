@@ -27,7 +27,7 @@ public final class ExcelUtils {
      *
      * @param cell  Current cell
      * @param value Attribute values
-     * @param field Current field
+     * @param field Excel mapping field
      */
     public static void setCellValue(Cell cell, Object value, Field field) {
         if (value == null) {
@@ -271,7 +271,7 @@ public final class ExcelUtils {
     }
 
     /**
-     * Create a sum expression
+     * Create a sum formula
      *
      * @param firstColIndex Which column start
      * @param firstRowIndex Which row start
@@ -280,6 +280,26 @@ public final class ExcelUtils {
      * @return expression
      */
     public static String createSumFormula(int firstColIndex, int firstRowIndex, int lastColIndex, int lastRowIndex) {
-        return "SUM(" + (char) ('A' + firstColIndex) + firstRowIndex + ":" + (char) ('A' + lastColIndex) + lastRowIndex + ")";
+        return createFormula("SUM", firstColIndex, firstRowIndex, lastColIndex, lastRowIndex);
+    }
+
+    /**
+     * Create a formula
+     *
+     * @param suffix        Formula suffix
+     * @param firstColIndex Which column start
+     * @param firstRowIndex Which row start
+     * @param lastColIndex  Which column end
+     * @param lastRowIndex  Which row end
+     * @return expression
+     */
+    public static String createFormula(String suffix, int firstColIndex, int firstRowIndex, int lastColIndex, int lastRowIndex) {
+        if (firstRowIndex == lastRowIndex) {
+            return suffix + "(" + ParamUtils.createFormulaX(firstColIndex, firstRowIndex, lastColIndex) + ")";
+        }
+        if (firstColIndex == lastColIndex) {
+            return suffix + "(" + ParamUtils.createFormulaY(firstColIndex, firstRowIndex, lastRowIndex) + ")";
+        }
+        throw new IllegalArgumentException();
     }
 }

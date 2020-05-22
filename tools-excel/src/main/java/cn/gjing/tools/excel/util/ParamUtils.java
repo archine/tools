@@ -65,42 +65,58 @@ public final class ParamUtils {
     }
 
     /**
-     * Compute cell formula
+     * Horizontal creation formula
      *
-     * @param offset   The offset, if you give it to 0, means you start with column A, and 1 means you start with column B
-     * @param rowIndex Row index
-     * @param colCount How many columns
-     * @return If the input parameter is 1,1,10, it means from B1 to K1. Finally return $B$1:$K$1
+     * @param startColIndex Start column index
+     * @param rowIndex      Row index
+     * @param endColIndex   End column index
+     * @return If the input parameter is 1,1,10, return $B$1:$K$1
      */
-    public static String createFormula(int offset, int rowIndex, int colCount) {
-        char start = (char) ('A' + offset);
-        if (colCount <= 25) {
-            if (colCount == 0) {
+    public static String createFormulaX(int startColIndex, int rowIndex, int endColIndex) {
+        char start = (char) ('A' + startColIndex);
+        if (endColIndex <= 25) {
+            if (endColIndex == 0) {
                 return "$" + start + "$" + rowIndex;
             } else {
-                char end = (char) (start + colCount - 1);
+                char end = (char) (start + endColIndex - 1);
                 return "$" + start + "$" + rowIndex + ":$" + end + "$" + rowIndex;
             }
         } else {
             char endPrefix = 'A';
             char endSuffix;
-            if ((colCount - 25) / 26 == 0 || colCount == 51) {
-                if ((colCount - 25) % 26 == 0) {
-                    endSuffix = (char) ('A' + 25);
-                } else {
-                    endSuffix = (char) ('A' + (colCount - 25) % 26 - 1);
-                }
+            if ((endColIndex - 25) % 26 == 0) {
+                endSuffix = (char) ('A' + 25);
+                endPrefix = (char) (endPrefix + (endColIndex - 25) / 26 - 1);
             } else {
-                if ((colCount - 25) % 26 == 0) {
-                    endSuffix = (char) ('A' + 25);
-                    endPrefix = (char) (endPrefix + (colCount - 25) / 26 - 1);
-                } else {
-                    endSuffix = (char) ('A' + (colCount - 25) % 26 - 1);
-                    endPrefix = (char) (endPrefix + (colCount - 25) / 26);
-                }
+                endSuffix = (char) ('A' + (endColIndex - 25) % 26 - 1);
+                endPrefix = (char) (endPrefix + (endColIndex - 25) / 26);
             }
             return "$" + start + "$" + rowIndex + ":$" + endPrefix + endSuffix + "$" + rowIndex;
         }
+    }
+
+    /**
+     * Vertical creation formula
+     *
+     * @param colIndex colIndex
+     * @param startRow start row index
+     * @param endRow   end row index
+     * @return If the input parameter is 1,2,5, return $B$2:$B$5
+     */
+    public static String createFormulaY(int colIndex, int startRow, int endRow) {
+        char prefix = 'A';
+        if (colIndex < 26) {
+            return "$" + (char) ('A' + colIndex) + "$" + startRow + ":$" + (char) ('A' + colIndex) + "$" + endRow;
+        }
+        char suffix;
+        if ((colIndex - 25) % 26 == 0) {
+            suffix = (char) (prefix + 25);
+            prefix = (char) (prefix + (colIndex - 25) / 26 - 1);
+        } else {
+            suffix = (char) ('A' + (colIndex - 25) % 26 - 1);
+            prefix = (char) (prefix + (colIndex - 25) / 26);
+        }
+        return "$" + prefix + suffix + "$" + startRow + ":$" + prefix + suffix + "$" + endRow;
     }
 
     /**

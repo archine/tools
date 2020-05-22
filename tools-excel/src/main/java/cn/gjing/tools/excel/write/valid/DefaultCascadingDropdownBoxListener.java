@@ -39,7 +39,7 @@ public final class DefaultCascadingDropdownBoxListener implements ExcelCascading
                     for (int i = 0, length = valueMap.getValue().length; i < length; i++) {
                         subsetSheetRow.createCell(i + 1).setCellValue(valueMap.getValue()[i]);
                     }
-                    String formula = ParamUtils.createFormula(1, rowIndex + 1, valueMap.getValue().length);
+                    String formula = ParamUtils.createFormulaX(1, rowIndex + 1, valueMap.getValue().length);
                     name = workbook.createName();
                     name.setNameName(valueMap.getKey());
                     name.setRefersToFormula("subsetSheet!" + formula);

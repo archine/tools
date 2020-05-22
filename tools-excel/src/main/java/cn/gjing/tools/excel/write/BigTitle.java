@@ -1,9 +1,7 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.metadata.ExcelColor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 /**
@@ -14,6 +12,8 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public final class BigTitle {
     /**
      * How many lines
@@ -56,6 +56,12 @@ public final class BigTitle {
     private ExcelColor fontColor = ExcelColor.BLACK;
 
     /**
+     * Font height
+     */
+    @Builder.Default
+    private short fontHeight = 250;
+
+    /**
      * Horizontal alignment
      */
     @Builder.Default
@@ -67,9 +73,6 @@ public final class BigTitle {
     @Builder.Default
     private boolean bold = false;
 
-    public BigTitle() {
-    }
-
     public BigTitle(String content) {
         this.lines = 2;
         this.content = content;
@@ -78,39 +81,6 @@ public final class BigTitle {
         this.fontColor = ExcelColor.BLACK;
         this.alignment = HorizontalAlignment.LEFT;
         this.bold = false;
-    }
-
-    public BigTitle(int lines, String content) {
-        this.lines = lines;
-        this.content = content;
-        this.color = ExcelColor.TAN;
-        this.rowHeight = 350;
-        this.fontColor = ExcelColor.BLACK;
-        this.alignment = HorizontalAlignment.LEFT;
-        this.bold = false;
-    }
-
-    public BigTitle(int lines, int lastCols, String content) {
-        this.lines = lines;
-        this.lastCols = lastCols;
-        this.content = content;
-        this.color = ExcelColor.TAN;
-        this.rowHeight = 350;
-        this.fontColor = ExcelColor.BLACK;
-        this.alignment = HorizontalAlignment.LEFT;
-        this.bold = false;
-    }
-
-    public BigTitle(int lines, int firstCol, int lastCols, String content, ExcelColor color, short rowHeight,
-                    ExcelColor fontColor, HorizontalAlignment alignment, boolean bold) {
-        this.lines = lines;
-        this.firstCol = firstCol;
-        this.lastCols = lastCols;
-        this.content = content;
-        this.color = color;
-        this.rowHeight = rowHeight;
-        this.fontColor = fontColor;
-        this.alignment = alignment;
-        this.bold = bold;
+        this.fontHeight = 280;
     }
 }

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.7</version>
+    <version>2.1.8</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -144,6 +144,7 @@
 |rowHeight|行高|
 |alignment|水平位置，默认``靠左``|
 |bold|字体是否加粗，默认``false``|
+|fontHeight|字体高度，默认``250``|
 ### 2、ExcelReadWrapper
 **注解驱动方式导入时的数据构造器**       
 
@@ -170,6 +171,8 @@
 ### 5、DefaultExcelStyleWriteListener
 **导出时的默认样式监听器，当你想使用自己实现的样式监听器的时候，你最好在工厂创建``Writer``的时候通过``initDefaultStyle``参数来关闭它，否则会造成同时设置默认的和你自己的。
 使用自己的样式监听器时需要实现``ExcelStyleWriteListener``接口并在导出时将你实现的样式监听器通过``addListener()``方法加入**
+### 6、ExcelUtils
+**Excel工具类，里面包含创建公式、纵向合并、横向合并、添加下拉框等工具方法。。。**
 ## 四、Excel导出
 <span id="single"></span>
 ### 1、单表头

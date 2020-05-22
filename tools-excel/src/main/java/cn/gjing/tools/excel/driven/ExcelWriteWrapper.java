@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Excel annotation-driven write wapper
+ * Excel annotation-driven write wrapper
  *
  * @author Gjing
  **/
