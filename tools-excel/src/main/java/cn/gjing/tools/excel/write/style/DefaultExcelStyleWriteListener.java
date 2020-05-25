@@ -17,7 +17,7 @@ import java.util.Map;
  **/
 public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteListener {
     private Workbook workbook;
-    private CellStyle titleStyle;
+    private Map<Integer, CellStyle> titleStyles;
     private Map<Integer, CellStyle> headStyle;
     private Map<Integer, CellStyle> bodyStyle;
 
@@ -26,25 +26,27 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
         this.workbook = workbook;
         this.headStyle = new HashMap<>(16);
         this.bodyStyle = new HashMap<>(16);
+        this.titleStyles = new HashMap<>(8);
     }
 
     @Override
     public void setTitleStyle(BigTitle bigTitle, Cell cell) {
-        if (this.titleStyle == null) {
-            CellStyle cellStyle = this.workbook.createCellStyle();
-            cellStyle.setFillForegroundColor(bigTitle.getColor().index);
-            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            cellStyle.setAlignment(bigTitle.getAlignment());
-            cellStyle.setWrapText(true);
+        CellStyle titleStyle = titleStyles.get(bigTitle.getIndex());
+        if (titleStyle == null) {
+            titleStyle = this.workbook.createCellStyle();
+            titleStyle.setFillForegroundColor(bigTitle.getColor().index);
+            titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            titleStyle.setAlignment(bigTitle.getAlignment());
+            titleStyle.setWrapText(true);
             Font font = this.workbook.createFont();
             font.setColor(bigTitle.getFontColor().index);
             font.setBold(bigTitle.isBold());
             font.setFontHeight(bigTitle.getFontHeight());
-            cellStyle.setFont(font);
-            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-            this.titleStyle = cellStyle;
+            titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            titleStyle.setFont(font);
+            this.titleStyles.put(bigTitle.getIndex(), titleStyle);
         }
-        cell.setCellStyle(this.titleStyle);
+        cell.setCellStyle(titleStyle);
     }
 
     @Override
@@ -52,7 +54,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
         CellStyle cellStyle = this.headStyle.get(colIndex);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
-            cellStyle.setFillForegroundColor(excelField.color() == ExcelColor.NONE ? IndexedColors.LIME.index : excelField.color().index);
+            cellStyle.setFillForegroundColor(excelField.color() == ExcelColor.NONE ? ExcelColor.LIME.index : excelField.color().index);
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             cellStyle.setWrapText(true);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);

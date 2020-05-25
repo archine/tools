@@ -33,7 +33,8 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
         modelAndViewContainer.setRequestHandled(true);
         if (o instanceof ExcelWriteWrapper) {
             ExcelWriteWrapper wrapper = (ExcelWriteWrapper) o;
-            ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores())
+            ExcelFactory.createWriter(wrapper.getFileName() == null ? writerAnno.value() : wrapper.getFileName(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(),
+                    wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores())
                     .valid(writerAnno.needValid())
                     .multiHead(writerAnno.multiHead())
                     .writeTitle(wrapper.getBigTitle())

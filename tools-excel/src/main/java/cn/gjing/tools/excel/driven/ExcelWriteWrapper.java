@@ -23,6 +23,7 @@ public class ExcelWriteWrapper {
     private List<?> data;
     private Map<String, String[]> boxValues;
     private String[] ignores;
+    private String fileName;
 
     private ExcelWriteWrapper() {
     }
@@ -45,6 +46,18 @@ public class ExcelWriteWrapper {
     public static ExcelWriteWrapper build(List<?> data) {
         return new ExcelWriteWrapper().data(data);
     }
+
+    /**
+     * Build a write wrapper
+     *
+     * @param data     The data to be exported
+     * @param fileName Excel file name
+     * @return ExcelWriteWrapper
+     */
+    public static ExcelWriteWrapper build(String fileName, List<?> data) {
+        return new ExcelWriteWrapper().fileName(fileName).data(data);
+    }
+
 
     /**
      * Add write listener
@@ -115,6 +128,17 @@ public class ExcelWriteWrapper {
      */
     public ExcelWriteWrapper ignores(String... ignores) {
         this.ignores = ignores;
+        return this;
+    }
+
+    /**
+     * Set excel file name
+     *
+     * @param fileName Excel file name
+     * @return this
+     */
+    public ExcelWriteWrapper fileName(String fileName) {
+        this.fileName = fileName;
         return this;
     }
 }

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.1.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.1.9-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.1.8</version>
+    <version>2.1.9</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -136,8 +136,8 @@
 |属性|描述|
 |---|---|
 |lines|大标题需要占用多少行，默认``2``|
-|firstCol|起始单元格下标，默认``0``|
-|lastCols|截止单元格下标，默认``0``，也就是默认追随表头|
+|firstCol|起始单元格下标，默认第一个单元格下标|
+|lastCols|截止单元格下标，默认为最后一个表头的下标|
 |content|大标题中的内容|
 |color|背景填充颜色|
 |fontColor|字体颜色，默认``黑色``|
@@ -145,6 +145,7 @@
 |alignment|水平位置，默认``靠左``|
 |bold|字体是否加粗，默认``false``|
 |fontHeight|字体高度，默认``250``|
+|index|样式下标，默认0，如果设置的样式下标已存在则会取已存在的，否则会新创建一个样式|
 ### 2、ExcelReadWrapper
 **注解驱动方式导入时的数据构造器**       
 
@@ -166,6 +167,7 @@
 |data|设置导出的数据|
 |ignores|设置要忽略的表头|
 |boxValues|设置下拉框的内容|
+|fileName|导出的文件名，如果此处未设置则会取注解中的值，如果注解中也未指定，则取@Excel注解中的值|
 ### 4、DefaultCascadingDropdownBoxListener
 **如果映射实体中存在级联下拉框的表头，那么导出时需要添加级联下拉框监听器，该类是默认实现的一个级联监听器。也可以自己实现``ExcelCascadingDropdownBoxListener``接口并在导出时通过``addListener()``方法添加**
 ### 5、DefaultExcelStyleWriteListener
