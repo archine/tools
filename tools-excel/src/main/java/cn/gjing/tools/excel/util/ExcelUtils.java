@@ -184,6 +184,50 @@ public final class ExcelUtils {
     }
 
     /**
+     * Add repeat validation when export
+     *
+     * @param sheet        Current sheet
+     * @param firstRow     Start row
+     * @param lastRow      End row
+     * @param colIndex     Column index
+     * @param showErrorBox Whether show error box
+     * @param errorBoxRank Error box rank
+     * @param errorTitle   Error box title
+     * @param errorContent Error box value
+     */
+    public static void addRepeatValid(Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
+                                      String errorTitle, String errorContent) {
+
+        String index = ParamUtils.numberToEn(colIndex);
+        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + (firstRow + 1) + ")=1", sheet, firstRow, lastRow, colIndex, showErrorBox, errorBoxRank, errorTitle, errorContent);
+    }
+
+    /**
+     * Add custom validation when export
+     *
+     * @param formula      Check formula
+     * @param sheet        Current sheet
+     * @param firstRow     Start row
+     * @param lastRow      End row
+     * @param colIndex     Column index
+     * @param showErrorBox Whether show error box
+     * @param errorBoxRank Error box rank
+     * @param errorTitle   Error box title
+     * @param errorContent Error box value
+     */
+    public static void addCustomValid(String formula, Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
+                                      String errorTitle, String errorContent) {
+        DataValidationHelper helper = sheet.getDataValidationHelper();
+        DataValidationConstraint customConstraint = helper.createCustomConstraint(formula);
+        CellRangeAddressList regions = new CellRangeAddressList(firstRow, lastRow, colIndex, colIndex);
+        DataValidation validation = helper.createValidation(customConstraint, regions);
+        validation.setShowErrorBox(showErrorBox);
+        validation.setErrorStyle(errorBoxRank.getRank());
+        validation.createErrorBox(errorTitle, errorContent);
+        sheet.addValidationData(validation);
+    }
+
+    /**
      * Vertical merge
      * OldRowModelMap should be global, with minimum partitioning to each export
      *

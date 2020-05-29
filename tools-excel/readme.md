@@ -100,12 +100,34 @@
 |errorContent|错误提示信息|
 |showTip|点击单元格是否出现提示框|
 |tipTitle|提示标题|
-|tipContent|提示内容|         
+|tipContent|提示内容|    
+<span id="repeat"></span>     
+### 8、@ExcelRepeatValid
+**导出时给列表头下方单元格增加数据重复校验，[查看用例](#repeat_use)**       
+
+|参数|描述|
+|---|---|
+|rows|列表头下方多少航需要加入数据校验|
+|showErrorBox|填入单元格的内容不是下拉框中的选项，是否打开错误框|
+|rank|错误框级别|
+|errorTitle|错误框标题|
+|errorContent|错误提示信息|
+### 9、@ExcelCustomValid
+**导出时列表头下方单元格增加自定义公式的数据校验**     
+
+|参数|描述|
+|---|---|
+|formula|公式|
+|rows|列表头下方多少航需要加入数据校验|
+|showErrorBox|填入单元格的内容不是下拉框中的选项，是否打开错误框|
+|rank|错误框级别|
+|errorTitle|错误框标题|
+|errorContent|错误提示信息|      
 <span id="driven_annotation"></span>   
-### 8、@EnableExcelDrivenMode
+### 10、@EnableExcelDrivenMode
 **在启动类或者配置类上使用即可开启Excel注解驱动模式，当开启了驱动模式时即可在方法上通过注解对Excel进行导入导出，不需要在通过Excel工厂创建**   
 <span id="driven_read_annotation"></span>  
-### 9、@ExcelRead
+### 11、@ExcelRead
 **注解驱动模式下的Excel导入，[查看用例](#driven_read)**      
 
 |参数|描述|
@@ -116,7 +138,7 @@
 |ignores|导入时要忽略的表头，如果表头是父级表头的话，那么下面的子表头也会被忽略|
 |headerIndex|真实表头的开始下标，如：导出的模板设置了大标题，且行数为2，那么开始下标就为2，如果是2级表头，那么开始下标是1|      
 <span id="driven_write_annotation"></span>
-### 10、@ExcelWrite
+### 12、@ExcelWrite
 **注解驱动模式下的Excel导出, [查看用例](#driven_write)**      
      
 |参数|描述|
@@ -462,9 +484,43 @@ public class TestController {
     }
 }
 ```
-![数值校验](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d734aa7?w=143&h=117&f=png&s=3780)
+![数值校验](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d734aa7?w=143&h=117&f=png&s=3780)     
+<span id="repeat_use"></span>
+### 8、重复校验
+**导出时给列表头下方单元格增加重复内容校验   >>  [注解说明](#repeat)**
+```java
+/**
+ * @author Gjing
+ **/
+@Data
+@Excel
+public class SingleHead {
+    @ExcelField("身份证号")
+    @ExcelRepeatValid
+    private String idCard;
+}
+```
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class TestController {
+
+    @GetMapping("/test_export")
+    @ApiOperation("带数值校验")
+    public void testExport(HttpServletResponse response) {
+        ExcelFactory.createWriter(SingleHead .class, response)
+                //需要在write前激活校验
+                .valid(true)
+                .write(null)
+                .flush();
+    }
+}
+```
+![数据重复](https://upload-images.jianshu.io/upload_images/17866147-7fed24b62ea653fa.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 <span id="convert_use"></span>
-### 7、数据转换
+### 9、数据转换
 **导出时对数据进行加工或者添加默认值，支持注解方式和接口方式  >>  [注解参考](#convert)**
 * 注解方式
 ```java
@@ -517,7 +573,7 @@ public class SingleHead {
     private Integer userAge;
 }
 ```
-### 8、添加监听器
+### 10、添加监听器
 **框架中提供了``ExcelCellWriteListener(单元格监听器)``、``ExcelRowWriteListener(行监听器)``、``ExcelSheetWriteListener(sheet监听器)``、``ExcelWorkbookWriteListener(workbook监听器)``、``ExcelCascadingDropdownBoxListener(级联下拉框监听器)``、``ExcelStyleWriteListener(样式监听器)``六个监听器，这里演示通过样式监听器实现自定义样式，该监听器继承了单元格监听器和行监听器，因此你可以在样式监听器中同时设置样式和对单元格和行进行附加操作**
 ```java
 /**
@@ -939,7 +995,6 @@ public class ExcelDriveController {
     }
 }
 ```
-* ****
 [**置顶**](#top)
 
 ---

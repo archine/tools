@@ -19,9 +19,7 @@ import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.merge.ExcelOldCellModel;
 import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
 import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
-import cn.gjing.tools.excel.write.valid.ExcelDateValid;
-import cn.gjing.tools.excel.write.valid.ExcelDropdownBox;
-import cn.gjing.tools.excel.write.valid.ExcelNumericValid;
+import cn.gjing.tools.excel.write.valid.*;
 import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -301,7 +299,14 @@ class WriteExecutor {
         ExcelDropdownBox ev = field.getAnnotation(ExcelDropdownBox.class);
         ExcelDateValid dv = field.getAnnotation(ExcelDateValid.class);
         ExcelNumericValid nv = field.getAnnotation(ExcelNumericValid.class);
+        ExcelCustomValid ecv = field.getAnnotation(ExcelCustomValid.class);
+        ExcelRepeatValid epv = field.getAnnotation(ExcelRepeatValid.class);
         int firstRow = row.getRowNum() + 1;
+        if (epv != null) {
+            ExcelUtils.addRepeatValid(this.context.getSheet(), firstRow, epv.rows() == 0 ? firstRow : epv.rows() + firstRow - 1, colIndex, epv.showErrorBox(), epv.rank(),
+                    epv.errorTitle(), epv.errorContent());
+            return;
+        }
         if (ev != null) {
             if ("".equals(ev.link())) {
                 ExcelUtils.addDropdownBox(ev.combobox(), ev.showErrorBox(), ev.rank(), ev.errorTitle(), ev.errorContent(), this.context.getWorkbook(), this.context.getSheet(),
@@ -314,20 +319,28 @@ class WriteExecutor {
                 dropdownListeners.forEach(e -> ((ExcelCascadingDropdownBoxListener) e)
                         .addCascadingDropdownBox(ev, this.context.getWorkbook(), this.context.getSheet(), firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, field));
             }
+            return;
         }
         if (dv != null) {
             ExcelUtils.addDateValid(dv.operatorType(), dv.expr1(), dv.expr2(), dv.pattern(), this.context.getSheet(), firstRow, dv.rows() == 0 ? firstRow : dv.rows() + firstRow - 1,
                     colIndex, dv.showErrorBox(), dv.rank(), dv.errorTitle(), dv.errorContent(), dv.showTip(), dv.tipTitle(), dv.tipContent());
+            return;
         }
         if (nv != null) {
             ExcelUtils.addNumericValid(nv.validType(), nv.operatorType(), nv.expr1(), nv.expr2(), this.context.getSheet(), firstRow, nv.rows() == 0 ? firstRow : nv.rows() + firstRow - 1,
                     colIndex, nv.showErrorBox(), nv.rank(), nv.errorTitle(), nv.errorContent(), nv.showTip(), nv.tipTitle(), nv.tipContent());
+            return;
+        }
+        if (ecv != null) {
+            ExcelUtils.addCustomValid(ecv.formula(), this.context.getSheet(), firstRow, ecv.rows() == 0 ? firstRow : ecv.rows() + firstRow - 1,
+                    colIndex, ecv.showErrorBox(), ecv.rank(), ecv.errorTitle(), ecv.errorContent());
         }
     }
 
     /**
      * Create an identifier corresponding to excel
-     * @param row row
+     *
+     * @param row      row
      * @param colIndex current col index
      */
     private void createIdentifier(Row row, int colIndex) {

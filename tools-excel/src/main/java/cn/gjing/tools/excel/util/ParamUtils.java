@@ -104,19 +104,32 @@ public final class ParamUtils {
      * @return If the input parameter is 1,2,5, return $B$2:$B$5
      */
     public static String createFormulaY(int colIndex, int startRow, int endRow) {
-        char prefix = 'A';
         if (colIndex < 26) {
             return "$" + (char) ('A' + colIndex) + "$" + startRow + ":$" + (char) ('A' + colIndex) + "$" + endRow;
         }
-        char suffix;
-        if ((colIndex - 25) % 26 == 0) {
-            suffix = (char) (prefix + 25);
-            prefix = (char) (prefix + (colIndex - 25) / 26 - 1);
-        } else {
-            suffix = (char) ('A' + (colIndex - 25) % 26 - 1);
-            prefix = (char) (prefix + (colIndex - 25) / 26);
+        String all = numberToEn(colIndex);
+        return "$" + all + "$" + startRow + ":$" + all + "$" + endRow;
+    }
+
+    /**
+     * Number to English letter
+     * @param number number
+     * @return letter
+     */
+    public static String numberToEn(int number) {
+        char prefix = 'A';
+        if (number < 26) {
+            return "" + (char) ('A' + number);
         }
-        return "$" + prefix + suffix + "$" + startRow + ":$" + prefix + suffix + "$" + endRow;
+        char suffix;
+        if ((number - 25) % 26 == 0) {
+            suffix = (char) (prefix + 25);
+            prefix = (char) (prefix + (number - 25) / 26 - 1);
+        } else {
+            suffix = (char) ('A' + (number - 25) % 26 - 1);
+            prefix = (char) (prefix + (number - 25) / 26);
+        }
+        return "" + prefix + suffix;
     }
 
     /**
