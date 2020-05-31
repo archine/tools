@@ -17,30 +17,30 @@ import java.util.function.Predicate;
  **/
 public class OssDownload {
     private OSS ossClient;
-    private OssMeta ossMeta;
-    private AliyunMeta aliyunMeta;
+    private final OssMeta ossMeta;
+    private final AliyunMeta aliyunMeta;
 
-    public OssDownload(OssMeta ossMeta,AliyunMeta aliyunMeta) {
+    public OssDownload(OssMeta ossMeta, AliyunMeta aliyunMeta) {
         this.ossMeta = ossMeta;
         this.aliyunMeta = aliyunMeta;
         this.ossInit();
     }
 
     /**
-     * 判断文件是否存在
+     * Determine if the file exists
      *
-     * @param fileName oss文件名
-     * @return true为存在
+     * @param fileName Oss file name
+     * @return true is exist
      */
     public boolean isExist(String fileName) {
         return this.ossClient.doesObjectExist(this.ossMeta.getBucket(), fileName);
     }
 
     /**
-     * 通过流瞎子啊
+     * Stream download
      *
-     * @param fileName oss文件名
-     * @param response response
+     * @param fileName Oss file name
+     * @param response HttpServletResponse
      */
     public void downByStream(String fileName, HttpServletResponse response) {
         OSSObject object = this.ossClient.getObject(this.ossMeta.getBucket(), fileName);
@@ -59,7 +59,7 @@ public class OssDownload {
             }
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage());
-        }finally {
+        } finally {
             if (outputStream != null) {
                 try {
                     outputStream.flush();
@@ -79,10 +79,10 @@ public class OssDownload {
     }
 
     /**
-     * 下载文件到本地文件
+     * Download the file to the local file
      *
-     * @param dir      本地目录
-     * @param fileName oss文件名
+     * @param dir      Local dir
+     * @param fileName Oss file name
      */
     public void downByLocal(String dir, String fileName) {
         File f = new File(dir);

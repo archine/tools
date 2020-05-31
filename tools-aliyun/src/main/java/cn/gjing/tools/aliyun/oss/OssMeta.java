@@ -14,32 +14,32 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "tools.aliyun.oss")
 public class OssMeta {
     /**
-     * 节点
+     * End point
      */
     private String endPoint;
 
     /**
-     * 存储空间
+     * Bucket
      */
     private String bucket;
 
     /**
-     * 最大连接数
+     * Max connections
      */
     private Integer maxConnections = 1024;
 
     /**
-     * Socket层传输数据的超时时间
+     * Socket timeout
      */
     private Integer socketTimeout = 50000;
 
     /**
-     * 空闲超时时间
+     * Idle time
      */
     private Integer idleTime = 60000;
 
     /**
-     * 连接超时时间
+     * Connection timeout
      */
     private Integer connectionTimeout = 50000;
 }

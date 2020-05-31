@@ -10,87 +10,99 @@ import java.util.List;
  **/
 public interface OssUpload {
     /**
-     * 批量删除文件
-     * @param fileNames oss文件名集合
-     * @return 被删除成功的oss文件名集合
+     * Batch deletion of files
+     *
+     * @param fileNames Collection of oss file names
+     * @return The set of oss file names that were successfully deleted
      */
     List<String> deleteFiles(List<String> fileNames);
 
     /**
-     * 批量删除文件
-     * @param fileNames oss文件名集合
-     * @param bucket 存储空间
-     * @return 被删除成功的oss文件名集合
+     * Batch deletion of files
+     *
+     * @param fileNames Collection of oss file names
+     * @param bucket    Bucket
+     * @return The set of oss file names that were successfully deleted
      */
     List<String> deleteFiles(List<String> fileNames, String bucket);
+
     /**
-     * 删除文件
-     * @param fileName oss文件名
+     * Delete the file
+     *
+     * @param fileName Oss file name
      */
     void deleteFile(String fileName);
 
     /**
-     * 删除文件
-     * @param fileName oss文件名
-     * @param bucket 存储空降
+     * Delete the file
+     *
+     * @param fileName Oss file name
+     * @param bucket   Bucket
      */
     void deleteFile(String fileName, String bucket);
+
     /**
-     * 上传
-     * @param file 文件对象
-     * @return oss文件名
+     * Upload the file
+     *
+     * @param file MultipartFile
+     * @return Oss file name
      */
     String upload(MultipartFile file);
 
     /**
-     * 上传
-     * @param file 文件对象
-     * @param dir 目录
-     * @return oss文件名
-     */
-    String upload(MultipartFile file,String dir);
-
-    /**
-     * 上传
-     * @param file 文件对象
-     * @param dir 目录
-     * @param bucket 存储空间
-     * @return oss文件名
-     */
-    String upload(MultipartFile file,String dir, String bucket);
-
-    /**
-     * 上传
-     * @param file 文件流
-     * @param fileName oss文件名
-     * @return oss文件名
-     */
-    String upload(InputStream file,String fileName);
-
-    /**
-     * 上传
+     * Upload the file
      *
-     * @param file     文件流
-     * @param fileName oss文件名
-     * @param bucket 存储空间
-     * @return oss文件名
+     * @param file MultipartFile
+     * @param dir  Oss storage directory
+     * @return Oss file name
+     */
+    String upload(MultipartFile file, String dir);
+
+    /**
+     * Upload the file
+     *
+     * @param file   MultipartFile
+     * @param dir    Oss storage directory
+     * @param bucket Bucket
+     * @return Oss file name
+     */
+    String upload(MultipartFile file, String dir, String bucket);
+
+    /**
+     * Upload the file
+     *
+     * @param file     MultipartFile
+     * @param fileName Custom file name. If the Oss file name change already exists, the original file will be overwritten
+     * @return Oss file name
+     */
+    String upload(InputStream file, String fileName);
+
+    /**
+     * Upload the file
+     *
+     * @param file     MultipartFile
+     * @param fileName Custom file name. If the Oss file name change already exists, the original file will be overwritten
+     * @param bucket   Bucket
+     * @return Oss file name
      */
     String upload(InputStream file, String fileName, String bucket);
 
     /**
-     * 上传
-     * @param file byte数组
-     * @param fileName oss文件名
-     * @return oss文件名
+     * Upload the file
+     *
+     * @param file     File byte array
+     * @param fileName Custom file name. If the Oss file name change already exists, the original file will be overwritten
+     * @return Oss file name
      */
-    String upload(byte[] file,String fileName);
+    String upload(byte[] file, String fileName);
 
     /**
-     * 上传
-     * @param file byte数组
-     * @param fileName oss文件名
-     * @return oss文件名
-     * @param bucket 存储空间
+     * Upload the file
+     *
+     * @param file     File byte array
+     * @param fileName Custom file name. If the Oss file name change already exists, the original file will be overwritten
+     * @param bucket   Bucket
+     * @return Oss file name
      */
-    String upload(byte[] file,String fileName, String bucket);
+    String upload(byte[] file, String fileName, String bucket);
 }

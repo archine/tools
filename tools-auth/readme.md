@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.0.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;   
 **简单快速的在项目中进行权限验证**
 ## 一、导入依赖
@@ -6,7 +6,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-auth</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 ## 二、权限注解
@@ -91,7 +91,7 @@ public class MyListener implements AuthorizationListener {
 ## 六、额外配置
 **可以通过这些配置控制拦截路径和过滤路径，以及token存在的请求头名称等等...全部配置如下：**
 ```yaml
-snow:
+tools:
   auth:
     # 拦截的路径
     path: /**

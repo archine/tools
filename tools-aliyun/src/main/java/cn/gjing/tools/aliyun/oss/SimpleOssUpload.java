@@ -21,8 +21,8 @@ import java.util.UUID;
  **/
 public final class SimpleOssUpload implements OssUpload {
     private OSS ossClient;
-    private OssMeta ossMeta;
-    private AliyunMeta aliyunMeta;
+    private final OssMeta ossMeta;
+    private final AliyunMeta aliyunMeta;
 
     public SimpleOssUpload(OssMeta ossMeta, AliyunMeta aliyunMeta) {
         this.ossMeta = ossMeta;
@@ -39,7 +39,7 @@ public final class SimpleOssUpload implements OssUpload {
     public List<String> deleteFiles(List<String> fileNames, String bucket) {
         this.createBucket(bucket);
         if (fileNames.size() > 1000) {
-            throw new IllegalArgumentException("最多同时删除1000个");
+            throw new IllegalArgumentException("No more than 1000 files are deleted at the same time");
         }
         return this.ossClient.deleteObjects(new DeleteObjectsRequest(bucket).withKeys(fileNames)).getDeletedObjects();
     }
@@ -69,7 +69,7 @@ public final class SimpleOssUpload implements OssUpload {
     public String upload(MultipartFile file, String dir, String bucket) {
         this.createBucket(bucket);
         if (file.getOriginalFilename() == null) {
-            throw new NullPointerException("文件名不能为空");
+            throw new NullPointerException("The file name cannot be empty");
         }
         if (!"".equals(dir)) {
             dir = dir + "/";

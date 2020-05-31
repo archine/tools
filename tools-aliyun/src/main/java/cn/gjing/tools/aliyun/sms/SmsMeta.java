@@ -7,6 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
+ * SMS meta data
+ *
  * @author Gjing
  **/
 @Data
@@ -16,17 +18,17 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "tools.aliyun.sms")
 public class SmsMeta {
     /**
-     * 短信签名
+     * SMS sign name
      */
     private String signName;
 
     /**
-     * 短信模板Id
+     * SMS template code
      */
     private String templateCode;
 
     /**
-     * 节点
+     * region
      */
     private String region = "default";
 }

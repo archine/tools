@@ -14,11 +14,13 @@ import com.google.gson.Gson;
 import java.util.Map;
 
 /**
+ * SMS sending assistant, used to send SMS messages in search of SMS sending records
+ *
  * @author Gjing
  **/
 public class SmsHelper {
-    private SmsMeta smsMeta;
-    private IAcsClient client;
+    private final SmsMeta smsMeta;
+    private final IAcsClient client;
     private final String DO_MAIN = "dysmsapi.aliyuncs.com";
     private final String VERSION = "2017-05-25";
 
@@ -28,26 +30,59 @@ public class SmsHelper {
         this.client = new DefaultAcsClient(profile);
     }
 
+    /**
+     * Send SMS
+     *
+     * @param phones Mobile phone number, multiple with English commas separated, the maximum of 1000
+     * @return Send the receipt
+     */
     public String send(String phones) {
         return this.send(phones, this.smsMeta.getTemplateCode(), this.smsMeta.getSignName(), null);
     }
 
+    /**
+     * Send SMS
+     *
+     * @param phones       Mobile phone number, multiple with English commas separated, the maximum of 1000
+     * @param templateCode SMS template code
+     * @param signName     SMS sign name
+     * @return Send the receipt
+     */
     public String send(String phones, String templateCode, String signName) {
         return this.send(phones, templateCode, signName, null);
     }
 
+    /**
+     * Send SMS
+     *
+     * @param phones Mobile phone number, multiple with English commas separated, the maximum of 1000
+     * @param param  The actual value of the SMS template variable
+     * @return Send the receipt
+     */
     public String send(String phones, Map<String, ?> param) {
         return this.send(phones, this.smsMeta.getTemplateCode(), this.smsMeta.getSignName(), param);
     }
 
     /**
-     * 发送短信
+     * Send SMS
      *
-     * @param phones       手机号,多个用英文逗号隔开,上限为1000个
-     * @param templateCode 短信模板code
-     * @param signName     短信签名名称
-     * @param param        短信模板变量对应的实际值
-     * @return 发送回执
+     * @param phones       Mobile phone number, multiple with English commas separated, the maximum of 1000
+     * @param templateCode SMS template code
+     * @param param        The actual value of the SMS template variable
+     * @return Send the receipt
+     */
+    public String send(String phones, String templateCode, Map<String, ?> param) {
+        return this.send(phones, templateCode, this.smsMeta.getSignName(), param);
+    }
+
+    /**
+     * Send SMS
+     *
+     * @param phones       Mobile phone number, multiple with English commas separated, the maximum of 1000
+     * @param templateCode SMS template code
+     * @param signName     SMS sign name
+     * @param param        The actual value of the SMS template variable
+     * @return Send the receipt
      */
     public String send(String phones, String templateCode, String signName, Map<String, ?> param) {
         CommonRequest request = new CommonRequest();
@@ -70,12 +105,13 @@ public class SmsHelper {
     }
 
     /**
-     * 查询指定手机号的发送记录
-     * @param phone 11位手机号
-     * @param sendDate 发送日期，格式为：yyyy-MM-dd
-     * @param page 页数
-     * @param row 条数，不能大于50
-     * @return 查询结果
+     * Query the record of sending the specified mobile phone number
+     *
+     * @param phone    Mobile phone number
+     * @param sendDate Send date，Format for yyyy-MM-dd
+     * @param page     Query page
+     * @param row      No more than 50 pages per page
+     * @return Query results
      */
     public String findSendDetail(String phone, String sendDate, long page, long row) {
         if (row > 50) {

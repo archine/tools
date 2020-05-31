@@ -16,10 +16,10 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "snow.auth")
+@ConfigurationProperties(prefix = "tools.auth")
 public class AuthorizationInfo implements Serializable {
     /**
-     * 加密盐
+     * 加密的盐
      */
     private String salt = "2b93fbdf27d43547bec8794054c28e00";
 
