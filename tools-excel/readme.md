@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.2.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.2.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.2.0</version>
+    <version>2.2.1</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -646,8 +646,30 @@ public class TestController {
     }
 }
 ```
-![自定义样式](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d463be7?w=562&h=243&f=png&s=15612)
+![自定义样式](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d463be7?w=562&h=243&f=png&s=15612)        
+
 **导出方法调用最后一定要使用``flush()``方法进行数据刷新到Excel文件中**
+### 11、导出Excel模板增加唯一标识
+**导出模板时，增加模板的唯一标识，可以用来防止用户导入不符的Excel文件**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class TestController {
+    @Resource
+    private UserService userService;
+	
+    @GetMapping("/user2")
+    @ApiOperation("下载模板")
+    public void export(HttpServletResponse response) {
+        ExcelFactory.createWriter(SingleHead.class, response)
+                .identifier(true) // 通过该方法设置标识为true
+                .write(null)
+                .flush();
+    }
+}
+```
 ## 三、导入
 ### 1、单表头
 [参考实体](#single)
@@ -832,6 +854,27 @@ public enum Gender {
 }
 ```
 **接口方式这里不在演示，同导出时一样  >>  [导出接口方式转换](#convert_use_interface)**       
+### 7、检查模板
+**检查用户导入的Excel文件是否符合该接口所对应的映射实体**
+```java
+/**
+ * @author Gjing
+ **/
+@RestController
+public class TestController {
+    @Resource
+    private UserService userService;
+	
+    @PostMapping("/user_import")
+    @ApiOperation("导入单表头")
+    public void userImport(MultipartFile file) throws IOException {
+        ExcelFactory.createReader(file, SingleHead.class)
+                .check(true) // 通过该方法设置检查为true
+                .read()
+                .finish();
+    }
+}
+```
 
 **在导入调用结束后，一定要在最后调用``finish()``方法对流进行关闭**    
 

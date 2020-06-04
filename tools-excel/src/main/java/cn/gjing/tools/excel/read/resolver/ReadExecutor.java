@@ -16,6 +16,7 @@ import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.read.valid.ExcelAssert;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
+import cn.gjing.tools.excel.util.ParamUtils;
 import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -49,6 +50,17 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
 
     @Override
     public void read(int headerIndex, String sheetName) {
+        if (this.context.isCheckTemplate()) {
+            if (this.context.getWorkbook().getSheetIndex("identificationSheet") == -1) {
+                throw new ExcelTemplateException();
+            }
+            for (Row row : this.context.getWorkbook().getSheet("identificationSheet")) {
+                if (!ParamUtils.equals(this.context.getExcelClass().getSimpleName(), row.getCell(0).getStringCellValue(), false)) {
+                    throw new ExcelTemplateException();
+                }
+                break;
+            }
+        }
         Sheet sheet = this.context.getWorkbook().getSheet(sheetName);
         if (sheet == null) {
             throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
@@ -126,14 +138,6 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                     }
                 }
                 continue;
-            }
-            if (row.getRowNum() == 0) {
-                if (this.context.isCheckTemplate()) {
-                    Cell checkCell = row.getCell(this.context.getExcelFields().size());
-                    if (checkCell == null || !this.context.getExcelClass().getSimpleName().equals(checkCell.getStringCellValue())) {
-                        throw new ExcelTemplateException();
-                    }
-                }
             }
             if (this.context.isMetaInfo()) {
                 boolean isHead = row.getRowNum() == headerIndex;

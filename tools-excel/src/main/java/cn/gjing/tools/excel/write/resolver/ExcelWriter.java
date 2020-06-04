@@ -209,7 +209,7 @@ public final class ExcelWriter {
     }
 
     /**
-     * Whether enable excel valid,Please use to valid()
+     * Whether enable excel valid,Please use to {@link #valid(boolean)}
      *
      * @return this
      */
@@ -242,7 +242,7 @@ public final class ExcelWriter {
     }
 
     /**
-     * Whether close multi excel head
+     * Whether close multi excel head, please to use {@link #multiHead(boolean)}
      *
      * @return this
      */
@@ -260,6 +260,18 @@ public final class ExcelWriter {
      */
     public ExcelWriter multiHead(boolean multi) {
         this.context.setMultiHead(multi);
+        return this;
+    }
+
+    /**
+     * Whether you need to add a file identifier when exporting an Excel file,
+     * which can be used for template validation of the file at import time
+     *
+     * @param identifier Need file indentifier
+     * @return this
+     */
+    public ExcelWriter identifier(boolean identifier) {
+        this.context.setIdentifier(identifier);
         return this;
     }
 
@@ -326,6 +338,13 @@ public final class ExcelWriter {
      */
     public void flush() {
         ListenerChain.doWorkbookFlushBefore(this.context);
+        if (this.context.getIdentifier()) {
+            this.context.getWorkbook().createSheet("identificationSheet")
+                    .createRow(0)
+                    .createCell(0)
+                    .setCellValue(this.context.getExcelClass().getSimpleName());
+            this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex("identificationSheet"), true);
+        }
         this.writerResolver.flush(this.response, this.context);
         if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
             ((SXSSFWorkbook) this.context.getWorkbook()).dispose();

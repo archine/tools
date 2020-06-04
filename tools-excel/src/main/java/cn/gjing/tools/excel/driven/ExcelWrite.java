@@ -80,4 +80,12 @@ public @interface ExcelWrite {
      * @return boolean
      */
     boolean initDefaultStyle() default true;
+
+    /**
+     * Whether you need to add a file identifier when exporting an Excel file,
+     * which can be used for template validation of the file at import time
+     *
+     * @return boolean
+     */
+    boolean identifier() default false;
 }

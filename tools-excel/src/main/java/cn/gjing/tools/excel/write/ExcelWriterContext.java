@@ -68,6 +68,13 @@ public final class ExcelWriterContext {
     private Class<?> excelClass;
 
     /**
+     * Whether you need to add a file identifier when exporting an Excel file,
+     * which can be used for template validation of the file at import time
+     */
+    @Builder.Default
+    private Boolean identifier = false;
+
+    /**
      * Export listener cache
      */
     @Builder.Default

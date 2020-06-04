@@ -63,9 +63,6 @@ class WriteExecutor {
         int endOffset = startOffset + bigTitle.getLines() - 1;
         for (int i = 0; i < bigTitle.getLines(); i++) {
             Row row = this.context.getSheet().createRow(startOffset + i);
-            if (startOffset == 0) {
-                this.createIdentifier(row, this.context.getHeadNames().size());
-            }
             row.setHeight(bigTitle.getRowHeight());
             Cell cell = row.createCell(0);
             cell.setCellValue(bigTitle.getContent());
@@ -95,9 +92,6 @@ class WriteExecutor {
             int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
             for (int index = 0, headRowSize = this.context.getHeadNames().get(0).length; index < headRowSize; index++) {
                 headRow = this.context.getSheet().createRow(rowIndex + index);
-                if (rowIndex == 0) {
-                    this.createIdentifier(headRow, headSize);
-                }
                 for (int colIndex = 0; colIndex < headSize; colIndex++) {
                     Field field = this.context.getExcelFields().get(colIndex);
                     ExcelField excelField = field.getAnnotation(ExcelField.class);
@@ -335,16 +329,5 @@ class WriteExecutor {
             ExcelUtils.addCustomValid(ecv.formula(), this.context.getSheet(), firstRow, ecv.rows() == 0 ? firstRow : ecv.rows() + firstRow - 1,
                     colIndex, ecv.showErrorBox(), ecv.rank(), ecv.errorTitle(), ecv.errorContent());
         }
-    }
-
-    /**
-     * Create an identifier corresponding to excel
-     *
-     * @param row      row
-     * @param colIndex current col index
-     */
-    private void createIdentifier(Row row, int colIndex) {
-        row.createCell(colIndex).setCellValue(this.context.getExcelClass().getSimpleName());
-        this.context.getSheet().setColumnHidden(colIndex, true);
     }
 }
