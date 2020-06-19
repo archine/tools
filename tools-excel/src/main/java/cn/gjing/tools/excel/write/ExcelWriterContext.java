@@ -72,7 +72,7 @@ public final class ExcelWriterContext {
      * which can be used for template validation of the file at import time
      */
     @Builder.Default
-    private Boolean identifier = false;
+    private boolean identifier = true;
 
     /**
      * Export listener cache

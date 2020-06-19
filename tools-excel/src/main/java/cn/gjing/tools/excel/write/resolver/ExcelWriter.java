@@ -338,7 +338,7 @@ public final class ExcelWriter {
      */
     public void flush() {
         ListenerChain.doWorkbookFlushBefore(this.context);
-        if (this.context.getIdentifier()) {
+        if (this.context.isIdentifier()) {
             this.context.getWorkbook().createSheet("identificationSheet")
                     .createRow(0)
                     .createCell(0)

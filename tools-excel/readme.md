@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.2.1-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.2.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.2.1</version>
+    <version>2.2.2</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -650,7 +650,7 @@ public class TestController {
 
 **导出方法调用最后一定要使用``flush()``方法进行数据刷新到Excel文件中**
 ### 11、导出Excel模板增加唯一标识
-**导出模板时，增加模板的唯一标识，可以用来防止用户导入不符的Excel文件**
+**导出模板时，增加模板的唯一标识（``默认开启``），可以用来防止用户导入不符的Excel文件**
 ```java
 /**
  * @author Gjing
@@ -664,7 +664,7 @@ public class TestController {
     @ApiOperation("下载模板")
     public void export(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead.class, response)
-                .identifier(true) // 通过该方法设置标识为true
+                .identifier(true) // 通过该方法手动设置是否开启
                 .write(null)
                 .flush();
     }
@@ -855,7 +855,7 @@ public enum Gender {
 ```
 **接口方式这里不在演示，同导出时一样  >>  [导出接口方式转换](#convert_use_interface)**       
 ### 7、检查模板
-**检查用户导入的Excel文件是否符合该接口所对应的映射实体**
+**检查用户导入的Excel文件是否符合该接口所对应的映射实体（``默认关闭``）**
 ```java
 /**
  * @author Gjing
@@ -869,7 +869,7 @@ public class TestController {
     @ApiOperation("导入单表头")
     public void userImport(MultipartFile file) throws IOException {
         ExcelFactory.createReader(file, SingleHead.class)
-                .check(true) // 通过该方法设置检查为true
+                .check(true) // 通过该方法手动设置是否开启
                 .read()
                 .finish();
     }

@@ -25,7 +25,7 @@ public @interface ExcelRead {
      * Whether to check whether the Excel template matches when importing
      * @return check
      */
-    boolean check() default true;
+    boolean check() default false;
 
     /**
      * Whether is need meta info(Such as header,title)

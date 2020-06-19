@@ -87,5 +87,5 @@ public @interface ExcelWrite {
      *
      * @return boolean
      */
-    boolean identifier() default false;
+    boolean identifier() default true;
 }

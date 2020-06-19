@@ -50,7 +50,7 @@ public class ExcelReaderContext<R> {
     /**
      * Whether to check whether the Excel template matches when importing
      */
-    private boolean checkTemplate = true;
+    private boolean checkTemplate = false;
 
     /**
      * Whether is need meta info(Such as header,title)
