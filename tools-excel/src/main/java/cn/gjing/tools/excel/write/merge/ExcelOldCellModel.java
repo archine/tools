@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Excel front cell
+ *
  * @author Gjing
  **/
 @Data
@@ -13,12 +14,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class ExcelOldCellModel {
     /**
-     * Last cell value
+     * The last cell value
      */
     private Object lastCellValue;
 
     /**
-     * last cell index
+     * The last cell index
      */
     private int lastCellIndex;
 }

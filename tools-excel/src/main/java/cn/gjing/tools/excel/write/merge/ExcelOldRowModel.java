@@ -4,6 +4,7 @@ import lombok.*;
 
 /**
  * Excel front row
+ *
  * @author Gjing
  **/
 @Getter
@@ -16,6 +17,7 @@ public final class ExcelOldRowModel {
      * The last row cell value
      */
     private Object oldRowCellValue;
+
     /**
      * The ord row index
      */

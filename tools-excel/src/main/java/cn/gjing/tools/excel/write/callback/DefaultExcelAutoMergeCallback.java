@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
  **/
 public final class DefaultExcelAutoMergeCallback implements ExcelAutoMergeCallback<Object> {
     @Override
-    public boolean mergeY(Object o, Field field, int colIndex, int index) {
+    public boolean mergeY(Object o, Field field, String key, int colIndex, int index) {
         return true;
     }
 }

@@ -22,18 +22,17 @@ public final class BigTitle {
     private int lines = 2;
 
     /**
-     * First col index, default 0
+     * First col index
      */
     private int firstCol;
 
     /**
-     * Last col index, default is the number of following excel header size
+     * Last col index, 0 is the number of following excel header size
      */
     private int lastCols;
 
     /**
-     * Style index, if the style of the index exists,
-     * it will take the existing one,
+     * Style index, if the style of the index exists, it will take the existing one,
      * otherwise it will create a new one
      */
     private int index;

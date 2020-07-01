@@ -13,7 +13,7 @@ public enum ValidType {
     DECIMAL(2),
     TEXT_LENGTH(6);
 
-    private int type;
+    private final int type;
 
     ValidType(int type) {
         this.type = type;

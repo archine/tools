@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Default excel style listener
+ * The Excel write type is a style listener of the binding type
  *
  * @author Gjing
  **/
-public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteListener {
+public final class DefaultExcelStyleListener implements ExcelStyleWriteListener {
     private Workbook workbook;
     private Map<Integer, CellStyle> titleStyles;
     private Map<Integer, CellStyle> headStyle;
@@ -54,7 +54,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
         CellStyle cellStyle = this.headStyle.get(colIndex);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
-            cellStyle.setFillForegroundColor(excelField.color() == ExcelColor.NONE ? ExcelColor.LIME.index : excelField.color().index);
+            cellStyle.setFillForegroundColor(excelField == null ? ExcelColor.LIME.index : excelField.color().index);
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             cellStyle.setWrapText(true);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -67,7 +67,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             cellStyle.setRightBorderColor(IndexedColors.GREY_40_PERCENT.index);
             Font font = workbook.createFont();
             font.setBold(true);
-            font.setColor(excelField.fontColor() == ExcelColor.NONE ? IndexedColors.WHITE.index : excelField.fontColor().index);
+            font.setColor(excelField == null ? ExcelColor.WHITE.index : excelField.fontColor().index);
             cellStyle.setFont(font);
             this.headStyle.put(colIndex, cellStyle);
         }
@@ -82,7 +82,7 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setWrapText(true);
-            cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField.format()));
+            cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField == null ? "" : excelField.format()));
             this.bodyStyle.put(colIndex, cellStyle);
         }
         cell.setCellStyle(cellStyle);
@@ -97,9 +97,9 @@ public final class DefaultExcelStyleWriteListener implements ExcelStyleWriteList
                 cellStyle.setAlignment(HorizontalAlignment.CENTER);
                 cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
                 cellStyle.setWrapText(true);
-                cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField.format()));
+                cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField == null ? "" : excelField.format()));
                 sheet.setDefaultColumnStyle(colIndex, cellStyle);
-                sheet.setColumnWidth(colIndex, excelField.width());
+                sheet.setColumnWidth(colIndex, excelField == null ? 5120 : excelField.width());
             }
             this.setHeadStyle(row, cell, excelField, field, index, colIndex);
             return;

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.2.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.2.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.2.2</version>
+    <version>2.2.3</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -648,7 +648,6 @@ public class TestController {
 ```
 ![自定义样式](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d463be7?w=562&h=243&f=png&s=15612)        
 
-**导出方法调用最后一定要使用``flush()``方法进行数据刷新到Excel文件中**
 ### 11、导出Excel模板增加唯一标识
 **导出模板时，增加模板的唯一标识（``默认开启``），可以用来防止用户导入不符的Excel文件**
 ```java
@@ -670,6 +669,39 @@ public class TestController {
     }
 }
 ```
+### 12、不使用映射实体导出
+**导出Excel时，想动态的设置表头，且没有对应的实体类, ``该方式不支持增加数据校验和设置数据转换器``**
+```java
+@RestController
+public class TestController {
+    @GetMapping("/test")
+    public void test(HttpServletResponse response) {
+        // 模拟添加表头数据
+        List<String[]> headers = new ArrayList<>();
+        headers.add(new String[]{"姓名"});
+        headers.add(new String[]{"年龄"});
+        // 模拟添加要导出的数据
+        List<List<Object>> data = new ArrayList<>();
+        List<Object> s;
+        for (int i = 0; i < 3; i++) {
+            s = new ArrayList<>();
+            s.add("小红");
+            s.add(i);
+            data.add(s);
+        }
+        // 设置自动合并，key为表头名称，value为你自定义的合并回调接口
+        Map<String, ExcelAutoMergeCallback<?>> callbackMap = new HashMap<>(8);
+        callbackMap.put("姓名", new MyCallback());
+        // 这里与之前的导出不同，这里是创建SimpleWriter，方法调用顺序与之前的还是一致
+        ExcelFactory.createSimpleWriter("测试", response, ExcelType.XLS)
+                .head(headers) // 通过此方法将你要定义的表头传入
+                .writeTitle(new BigTitle("啦啦啦"))
+                .write(data, callbackMap)
+                .flush();
+    }
+}
+```
+**导出方法调用最后一定要使用``flush()``方法进行数据刷新到Excel文件中**
 ## 三、导入
 ### 1、单表头
 [参考实体](#single)

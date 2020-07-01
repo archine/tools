@@ -19,7 +19,7 @@ public enum OperatorType {
     LESS_OR_EQUAL(7),
     IGNORED(0);
 
-    private int type;
+    private final int type;
 
     OperatorType(int type) {
         this.type = type;

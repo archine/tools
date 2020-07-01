@@ -1,12 +1,14 @@
 package cn.gjing.tools.excel;
 
 import cn.gjing.tools.excel.exception.ExcelInitException;
+import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.resolver.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
-import cn.gjing.tools.excel.write.resolver.ExcelWriter;
+import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
+import cn.gjing.tools.excel.write.resolver.ExcelSimpleWriter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +44,7 @@ public final class ExcelFactory {
      *                   then it is ignored
      * @return ExcelWriter
      */
-    public static ExcelWriter createWriter(Class<?> excelClass, HttpServletResponse response, String... ignores) {
+    public static ExcelBindWriter createWriter(Class<?> excelClass, HttpServletResponse response, String... ignores) {
         return createWriter(null, excelClass, response, true, ignores);
     }
 
@@ -58,7 +60,7 @@ public final class ExcelFactory {
      * @param initDefaultStyle Whether init  default excel style
      * @return ExcelWriter
      */
-    public static ExcelWriter createWriter(Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
+    public static ExcelBindWriter createWriter(Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
         return createWriter(null, excelClass, response, initDefaultStyle, ignores);
     }
 
@@ -74,7 +76,7 @@ public final class ExcelFactory {
      * @param fileName   Excel file name，The priority is higher than the annotation specification
      * @return ExcelWriter
      */
-    public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
+    public static ExcelBindWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, String... ignores) {
         return createWriter(fileName, excelClass, response, true, ignores);
     }
 
@@ -88,20 +90,81 @@ public final class ExcelFactory {
      *                         there are more than one child table heads under the ignored table head,
      *                         then the child table head will be ignored, if the ignored table head is from the table head
      *                         then it is ignored
-     * @param initDefaultStyle Whether init  default excel style
+     * @param initDefaultStyle Whether init default excel style
      * @return ExcelWriter
      */
-    public static ExcelWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
+    public static ExcelBindWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
         List<String[]> headerArr = new ArrayList<>();
         ExcelWriterContext context = ExcelWriterContext.builder()
                 .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr))
                 .headNames(headerArr)
+                .excelType(excel.type())
                 .fileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().toString() : excel.value() : fileName)
                 .excelClass(excelClass)
                 .build();
-        return new ExcelWriter(context, excel, response, initDefaultStyle);
+        return new ExcelBindWriter(context, excel, response, initDefaultStyle);
+    }
+
+    /**
+     * Create an excel writer
+     *
+     * @param fileName         Excel file name
+     * @param response         response
+     * @param initDefaultStyle Whether init  default excel style
+     * @return ExcelSimpleWriter
+     */
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, boolean initDefaultStyle) {
+        return createSimpleWriter(fileName, response, ExcelType.XLS, 500, initDefaultStyle);
+    }
+
+    /**
+     * Create an excel writer
+     *
+     * @param fileName         Excel file name
+     * @param response         response
+     * @param excelType        Excel file type
+     * @return ExcelSimpleWriter
+     */
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType) {
+        return createSimpleWriter(fileName, response, excelType, 500, true);
+    }
+
+    /**
+     * Create an excel writer
+     *
+     * @param fileName         Excel file name
+     * @param response         response
+     * @param excelType        Excel file type
+     * @param windowSize       Window size, which is flushed to disk when exported
+     *                         if the data that has been written out exceeds the specified size
+     *                         only for xlsx
+     * @return ExcelSimpleWriter
+     */
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
+        return createSimpleWriter(fileName, response, excelType, windowSize, true);
+    }
+
+    /**
+     * Create an excel writer
+     *
+     * @param fileName         Excel file name
+     * @param response         response
+     * @param excelType        Excel file type
+     * @param windowSize       Window size, which is flushed to disk when exported
+     *                         if the data that has been written out exceeds the specified size
+     *                         only for xlsx
+     * @param initDefaultStyle Whether init  default excel style
+     * @return ExcelSimpleWriter
+     */
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize, boolean initDefaultStyle) {
+        ExcelWriterContext context = ExcelWriterContext.builder()
+                .fileName(fileName)
+                .excelType(excelType)
+                .excelClass(Void.class)
+                .build();
+        return new ExcelSimpleWriter(context, windowSize, response, initDefaultStyle);
     }
 
     /**

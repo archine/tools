@@ -38,14 +38,14 @@ import java.util.Map;
 /**
  * @author Gjing
  **/
-class WriteExecutor {
+public final class ExcelWriteExecutor {
     private final ExcelWriterContext context;
     private final Map<Class<? extends DataConvert<?>>, DataConvert<?>> dataConvertMap;
     private Map<Class<? extends ExcelAutoMergeCallback<?>>, ExcelAutoMergeCallback<?>> mergeCallbackMap;
     private Map<Integer, ExcelOldRowModel> oldRowModelMap;
     private final Gson gson;
 
-    public WriteExecutor(ExcelWriterContext context) {
+    public ExcelWriteExecutor(ExcelWriterContext context) {
         this.gson = new Gson();
         this.context = context;
         this.dataConvertMap = new HashMap<>(16);
@@ -57,7 +57,7 @@ class WriteExecutor {
      *
      * @param bigTitle Big title
      */
-    public void setBigTitle(BigTitle bigTitle) {
+    public void writeTitle(BigTitle bigTitle) {
         List<ExcelWriteListener> cellListeners = this.context.getWriteListenerCache().get(ExcelCellWriteListener.class);
         int startOffset = this.context.getSheet().getPhysicalNumberOfRows();
         int endOffset = startOffset + bigTitle.getLines() - 1;
@@ -81,49 +81,47 @@ class WriteExecutor {
      * @param needHead  Whether to set header
      * @param boxValues Excel dropdown box value
      */
-    public void setHead(boolean needHead, Map<String, String[]> boxValues) {
-        if (this.context.getHeadNames().isEmpty()) {
+    public void writeHead(boolean needHead, Map<String, String[]> boxValues) {
+        if (this.context.getHeadNames().isEmpty() || !needHead) {
             return;
         }
-        if (needHead) {
-            Row headRow;
-            ExcelOldCellModel oldCellModel = null;
-            int headSize = this.context.getHeadNames().size();
-            int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
-            for (int index = 0, headRowSize = this.context.getHeadNames().get(0).length; index < headRowSize; index++) {
-                headRow = this.context.getSheet().createRow(rowIndex + index);
-                for (int colIndex = 0; colIndex < headSize; colIndex++) {
-                    Field field = this.context.getExcelFields().get(colIndex);
-                    ExcelField excelField = field.getAnnotation(ExcelField.class);
-                    String headName = this.context.getHeadNames().get(colIndex)[index];
-                    Cell headCell = headRow.createCell(colIndex);
-                    headName = (String) ListenerChain.doAssignmentBefore(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true, headName);
-                    headCell.setCellValue(headName);
-                    if (this.context.getMultiHead()) {
-                        if (oldCellModel == null) {
-                            oldCellModel = new ExcelOldCellModel();
-                        }
-                        if (this.oldRowModelMap == null) {
-                            this.oldRowModelMap = new HashMap<>(12);
-                        }
-                        try {
-                            ExcelUtils.mergeX(oldCellModel, this.context.getSheet(), headRow, excelField.autoMerge().empty(), colIndex, headName, headSize, true);
-                            ExcelUtils.mergeY(this.oldRowModelMap, this.context.getSheet(), headRow, excelField.autoMerge().empty(), index, colIndex, headName, headRowSize, true);
-                        } catch (Exception e) {
-                            throw new ExcelResolverException("Auto merge failure, " + e.getMessage());
-                        }
+        Row headRow;
+        ExcelOldCellModel oldCellModel = null;
+        int headSize = this.context.getHeadNames().size();
+        int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
+        for (int index = 0, headRowSize = this.context.getHeadNames().get(0).length; index < headRowSize; index++) {
+            headRow = this.context.getSheet().createRow(rowIndex + index);
+            for (int colIndex = 0; colIndex < headSize; colIndex++) {
+                Field field = this.context.getExcelFields().get(colIndex);
+                ExcelField excelField = field.getAnnotation(ExcelField.class);
+                String headName = this.context.getHeadNames().get(colIndex)[index];
+                Cell headCell = headRow.createCell(colIndex);
+                headName = (String) ListenerChain.doAssignmentBefore(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true, headName);
+                headCell.setCellValue(headName);
+                if (this.context.getMultiHead()) {
+                    if (oldCellModel == null) {
+                        oldCellModel = new ExcelOldCellModel();
                     }
-                    if (this.context.getNeedValid() && index == headRowSize - 1) {
-                        try {
-                            this.addValid(field, headRow, colIndex, boxValues);
-                        } catch (Exception e) {
-                            throw new ExcelResolverException("Add excel validation failure, " + e.getMessage());
-                        }
+                    if (this.oldRowModelMap == null) {
+                        this.oldRowModelMap = new HashMap<>(12);
                     }
-                    ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true);
+                    try {
+                        ExcelUtils.mergeX(oldCellModel, this.context.getSheet(), headRow, excelField.autoMerge().empty(), colIndex, headName, headSize, true);
+                        ExcelUtils.mergeY(this.oldRowModelMap, this.context.getSheet(), headRow, excelField.autoMerge().empty(), index, colIndex, headName, headRowSize, true);
+                    } catch (Exception e) {
+                        throw new ExcelResolverException("Auto merge failure, " + e.getMessage());
+                    }
                 }
-                ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(), rowIndex, true);
+                if (this.context.getNeedValid() && index == headRowSize - 1) {
+                    try {
+                        this.addValid(field, headRow, colIndex, boxValues);
+                    } catch (Exception e) {
+                        throw new ExcelResolverException("Add excel validation failure, " + e.getMessage());
+                    }
+                }
+                ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index, colIndex, true);
             }
+            ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(), rowIndex, true);
         }
     }
 
@@ -132,7 +130,7 @@ class WriteExecutor {
      *
      * @param data Export data
      */
-    public void setValue(List<?> data) {
+    public void writeBody(List<?> data) {
         if (data == null) {
             return;
         }
@@ -156,12 +154,91 @@ class WriteExecutor {
                 try {
                     value = this.convert(field, value, o, parser, excelDataConvert, context, dataConvert);
                     value = ListenerChain.doAssignmentBefore(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, index, colIndex, false, value);
-                    ExcelUtils.setCellValue(valueCell, value, field);
+                    ExcelUtils.setCellValue(valueCell, value);
                     if (excelField.autoMerge().enable()) {
                         autoMergeCallback = this.createMergeCallback(field, excelField);
-                        this.autoMergeY(autoMergeCallback, valueRow, field, excelField, index, colIndex, value, o, dataSize);
+                        this.autoMergeY(autoMergeCallback, valueRow, excelField.autoMerge().empty(), index, colIndex, value, o, dataSize, field, null);
                     }
                     ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field, index, colIndex, false);
+                } catch (Exception e) {
+                    throw new ExcelResolverException(e.getMessage());
+                }
+            }
+            ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, o, index, false);
+        }
+    }
+
+    /**
+     * Set excel header for simple type
+     *
+     * @param needHead Whether to set header
+     */
+    public void simpleWriteHead(boolean needHead) {
+        if (this.context.getHeadNames().isEmpty() || !needHead) {
+            return;
+        }
+        Row headRow;
+        ExcelOldCellModel oldCellModel = null;
+        int headSize = this.context.getHeadNames().size();
+        int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
+        for (int index = 0, headRowSize = this.context.getHeadNames().get(0).length; index < headRowSize; index++) {
+            headRow = this.context.getSheet().createRow(rowIndex + index);
+            for (int colIndex = 0; colIndex < headSize; colIndex++) {
+                String headName = this.context.getHeadNames().get(colIndex)[index];
+                Cell headCell = headRow.createCell(colIndex);
+                headName = (String) ListenerChain.doAssignmentBefore(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, null, null, index, colIndex, true, headName);
+                headCell.setCellValue(headName);
+                if (this.context.getMultiHead()) {
+                    if (oldCellModel == null) {
+                        oldCellModel = new ExcelOldCellModel();
+                    }
+                    if (this.oldRowModelMap == null) {
+                        this.oldRowModelMap = new HashMap<>(12);
+                    }
+                    try {
+                        ExcelUtils.mergeX(oldCellModel, this.context.getSheet(), headRow, true, colIndex, headName, headSize, true);
+                        ExcelUtils.mergeY(this.oldRowModelMap, this.context.getSheet(), headRow, true, index, colIndex, headName, headRowSize, true);
+                    } catch (Exception e) {
+                        throw new ExcelResolverException("Auto merge failure, " + e.getMessage());
+                    }
+                }
+                ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, null, null, index, colIndex, true);
+            }
+            ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(), rowIndex, true);
+        }
+    }
+
+    /**
+     * Set excel body for simple type
+     *
+     * @param data          Exported data
+     * @param mergeEmpty    Whether Whether null merges are allowed
+     * @param callbackCache Merge callbacks at export time
+     */
+    public void simpleWriteBody(List<List<Object>> data, boolean mergeEmpty, Map<String, ExcelAutoMergeCallback<?>> callbackCache) {
+        if (data == null) {
+            return;
+        }
+        int rowIndex = this.context.getSheet().getLastRowNum() + 1;
+        for (int index = 0, dataSize = data.size(); index < dataSize; index++) {
+            List<?> o = data.get(index);
+            Row valueRow = this.context.getSheet().createRow(rowIndex + index);
+            for (int colIndex = 0, headSize = o.size(); colIndex < headSize; colIndex++) {
+                Object value = o.get(colIndex);
+                Cell valueCell = valueRow.createCell(colIndex);
+                try {
+                    value = ListenerChain.doAssignmentBefore(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, null, null, index, colIndex, false, value);
+                    ExcelUtils.setCellValue(valueCell, value);
+                    String[] headArr = this.context.getHeadNames().get(colIndex);
+                    String key = headArr[headArr.length - 1];
+                    ExcelAutoMergeCallback<?> mergeCallback = callbackCache.get(key);
+                    if (mergeCallback != null) {
+                        if (this.oldRowModelMap == null) {
+                            this.oldRowModelMap = new HashMap<>(16);
+                        }
+                        this.autoMergeY(mergeCallback, valueRow, mergeEmpty, index, colIndex, value, o, dataSize, null, key);
+                    }
+                    ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, null, null, index, colIndex, false);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -221,24 +298,25 @@ class WriteExecutor {
      *
      * @param autoMergeCallback AutoMergeCallback
      * @param row               Current row
-     * @param field             Current field
-     * @param excelField        ExcelField annotation on current field
+     * @param mergeEmpty        Whether null merges are allowed
+     * @param field             The field corresponding to the current callback has a value only when the simple type is exported
+     * @param key               The key corresponding to the current callback has a value only when the simple type is exported
      * @param index             Line index, index type according to isHead
      * @param dataSize          Excel head data size or body data size,
      * @param colIndex          Current col index
      * @param cellValue         Current cell value
      * @param obj               The object corresponding to the current row
      */
-    private void autoMergeY(ExcelAutoMergeCallback<?> autoMergeCallback, Row row, Field field, ExcelField excelField, int index, int colIndex,
-                            Object cellValue, Object obj, int dataSize) {
+    private void autoMergeY(ExcelAutoMergeCallback<?> autoMergeCallback, Row row, boolean mergeEmpty, int index, int colIndex,
+                            Object cellValue, Object obj, int dataSize, Field field, String key) {
         if (index == 0) {
-            autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, colIndex, index);
+            autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, key, colIndex, index);
             this.oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
             return;
         }
         ExcelOldRowModel excelOldRowModel = this.oldRowModelMap.get(colIndex);
-        if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, colIndex, index)) {
-            if (ParamUtils.equals(cellValue, excelOldRowModel.getOldRowCellValue(), excelField.autoMerge().empty())) {
+        if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, key, colIndex, index)) {
+            if (ParamUtils.equals(cellValue, excelOldRowModel.getOldRowCellValue(), mergeEmpty)) {
                 if (index == dataSize - 1) {
                     this.context.getSheet().addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum(), colIndex, colIndex));
                 }
@@ -248,16 +326,18 @@ class WriteExecutor {
                 this.context.getSheet().addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum() - 1, colIndex, colIndex));
             }
             if (index != dataSize - 1) {
-                this.oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
+                excelOldRowModel.setOldRowCellValue(cellValue);
+                excelOldRowModel.setOldRowIndex(row.getRowNum());
+                this.oldRowModelMap.put(colIndex, excelOldRowModel);
             }
             return;
         }
         if (excelOldRowModel.getOldRowIndex() + 1 < row.getRowNum()) {
             this.context.getSheet().addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum() - 1, colIndex, colIndex));
-            excelOldRowModel.setOldRowCellValue(cellValue);
-            excelOldRowModel.setOldRowIndex(row.getRowNum());
-            this.oldRowModelMap.put(colIndex, excelOldRowModel);
         }
+        excelOldRowModel.setOldRowCellValue(cellValue);
+        excelOldRowModel.setOldRowIndex(row.getRowNum());
+        this.oldRowModelMap.put(colIndex, excelOldRowModel);
     }
 
     /**

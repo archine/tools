@@ -98,7 +98,7 @@ public @interface ExcelField {
      * @return index
      * @see ExcelColor
      */
-    ExcelColor color() default ExcelColor.NONE;
+    ExcelColor color() default ExcelColor.LIME;
 
     /**
      * Font color index, can control the current header value color,
@@ -107,5 +107,5 @@ public @interface ExcelField {
      * @return index
      * @see ExcelColor
      */
-    ExcelColor fontColor() default ExcelColor.NONE;
+    ExcelColor fontColor() default ExcelColor.WHITE;
 }

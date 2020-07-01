@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.write;
 
+import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import lombok.*;
@@ -73,6 +74,12 @@ public final class ExcelWriterContext {
      */
     @Builder.Default
     private boolean identifier = true;
+
+    /**
+     * Exported Excel type
+     */
+    @Builder.Default
+    private ExcelType excelType = ExcelType.XLS;
 
     /**
      * Export listener cache
