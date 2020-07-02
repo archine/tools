@@ -6,6 +6,7 @@ import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
 import cn.gjing.tools.excel.write.valid.OperatorType;
 import cn.gjing.tools.excel.write.valid.Rank;
 import cn.gjing.tools.excel.write.valid.ValidType;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -195,9 +196,15 @@ public final class ExcelUtils {
      */
     public static void addRepeatValid(Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
                                       String errorTitle, String errorContent) {
-
         String index = ParamUtils.numberToEn(colIndex);
-        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + (firstRow + 1) + ")=1", sheet, firstRow, lastRow, colIndex, showErrorBox, errorBoxRank, errorTitle, errorContent);
+        int start;
+        if (sheet instanceof HSSFSheet) {
+            start = firstRow == 1 ? 1 : (firstRow - sheet.getLastRowNum());
+        } else {
+            start = firstRow == 1 ? 1 : (firstRow + 1);
+        }
+        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + start + ")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
+                errorBoxRank, errorTitle, errorContent);
     }
 
     /**

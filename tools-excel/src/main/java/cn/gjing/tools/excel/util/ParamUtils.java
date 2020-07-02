@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.util;
 
+import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 
 import java.util.Iterator;
@@ -153,14 +154,17 @@ public final class ParamUtils {
      * Check the file type is excel
      *
      * @param fileName file name
-     * @return is Excel
+     * @return File extension
      */
-    public static boolean isExcel(String fileName) {
+    public static String isExcel(String fileName) {
         if (fileName == null) {
-            return false;
+            return "";
         }
         int pos = fileName.lastIndexOf(".") + 1;
         String extension = fileName.substring(pos);
-        return "xls".equals(extension) || "xlsx".equals(extension);
+        if (!"xls".equals(extension) && !"xlsx".equals(extension)) {
+            throw new ExcelInitException("File type error, file suffix name need to be xls or xlsx");
+        }
+        return extension;
     }
 }

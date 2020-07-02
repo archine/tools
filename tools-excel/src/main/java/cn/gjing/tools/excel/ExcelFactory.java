@@ -122,9 +122,9 @@ public final class ExcelFactory {
     /**
      * Create an excel writer
      *
-     * @param fileName         Excel file name
-     * @param response         response
-     * @param excelType        Excel file type
+     * @param fileName  Excel file name
+     * @param response  response
+     * @param excelType Excel file type
      * @return ExcelSimpleWriter
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType) {
@@ -134,12 +134,12 @@ public final class ExcelFactory {
     /**
      * Create an excel writer
      *
-     * @param fileName         Excel file name
-     * @param response         response
-     * @param excelType        Excel file type
-     * @param windowSize       Window size, which is flushed to disk when exported
-     *                         if the data that has been written out exceeds the specified size
-     *                         only for xlsx
+     * @param fileName   Excel file name
+     * @param response   response
+     * @param excelType  Excel file type
+     * @param windowSize Window size, which is flushed to disk when exported
+     *                   if the data that has been written out exceeds the specified size
+     *                   only for xlsx
      * @return ExcelSimpleWriter
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
@@ -182,9 +182,7 @@ public final class ExcelFactory {
         if (file == null) {
             throw new ExcelInitException("File cannot be null");
         }
-        if (!ParamUtils.isExcel(file.getOriginalFilename())) {
-            throw new ExcelInitException("File type error, file suffix name need to be xls or xlsx");
-        }
+        ParamUtils.isExcel(file.getOriginalFilename());
         try {
             return createReader(file.getInputStream(), excelClass, ignores);
         } catch (IOException e) {
@@ -207,9 +205,7 @@ public final class ExcelFactory {
         if (file == null) {
             throw new ExcelInitException("File cannot be null");
         }
-        if (!ParamUtils.isExcel(file.getName())) {
-            throw new ExcelInitException("File type error, file suffix name need to be xls or xlsx");
-        }
+        ParamUtils.isExcel(file.getName());
         try {
             return createReader(new FileInputStream(file), excelClass, ignores);
         } catch (IOException e) {
