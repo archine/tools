@@ -3,7 +3,6 @@ package cn.gjing.tools.excel.write.style;
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.metadata.ExcelColor;
 import cn.gjing.tools.excel.write.BigTitle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 
 import java.lang.reflect.Field;
@@ -82,7 +81,10 @@ public final class DefaultExcelStyleListener implements ExcelStyleWriteListener 
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setWrapText(true);
-            cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(excelField == null ? "" : excelField.format()));
+            String format = excelField == null ? "" : excelField.format();
+            if (!"".equals(format)) {
+                cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
+            }
             this.bodyStyle.put(colIndex, cellStyle);
         }
         cell.setCellStyle(cellStyle);
@@ -97,7 +99,10 @@ public final class DefaultExcelStyleListener implements ExcelStyleWriteListener 
                 cellStyle.setAlignment(HorizontalAlignment.CENTER);
                 cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
                 cellStyle.setWrapText(true);
-                cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(excelField == null ? "" : excelField.format()));
+                String format = excelField == null ? "" : excelField.format();
+                if (!"".equals(format)) {
+                    cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
+                }
                 sheet.setDefaultColumnStyle(colIndex, cellStyle);
                 sheet.setColumnWidth(colIndex, excelField == null ? 5120 : excelField.width());
             }
