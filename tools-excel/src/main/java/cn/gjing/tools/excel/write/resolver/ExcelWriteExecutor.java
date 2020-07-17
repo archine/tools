@@ -88,7 +88,7 @@ public final class ExcelWriteExecutor {
         Row headRow;
         ExcelOldCellModel oldCellModel = null;
         int headSize = this.context.getHeadNames().size();
-        int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
+        int rowIndex = this.context.getSheet().getPhysicalNumberOfRows();
         for (int index = 0, headRowSize = this.context.getHeadNames().get(0).length; index < headRowSize; index++) {
             headRow = this.context.getSheet().createRow(rowIndex + index);
             for (int colIndex = 0; colIndex < headSize; colIndex++) {
@@ -134,7 +134,7 @@ public final class ExcelWriteExecutor {
         if (data == null) {
             return;
         }
-        int rowIndex = this.context.getSheet().getLastRowNum() + 1;
+        int rowIndex = this.context.getSheet().getPhysicalNumberOfRows();
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
         ExcelAutoMergeCallback<?> autoMergeCallback;
@@ -180,7 +180,7 @@ public final class ExcelWriteExecutor {
         Row headRow;
         ExcelOldCellModel oldCellModel = null;
         int headSize = this.context.getHeadNames().size();
-        int rowIndex = this.context.getSheet().getLastRowNum() == 0 ? 0 : this.context.getSheet().getLastRowNum() + 1;
+        int rowIndex = this.context.getSheet().getPhysicalNumberOfRows();
         for (int index = 0, headRowSize = this.context.getHeadNames().get(0).length; index < headRowSize; index++) {
             headRow = this.context.getSheet().createRow(rowIndex + index);
             for (int colIndex = 0; colIndex < headSize; colIndex++) {
@@ -219,7 +219,7 @@ public final class ExcelWriteExecutor {
         if (data == null) {
             return;
         }
-        int rowIndex = this.context.getSheet().getLastRowNum() + 1;
+        int rowIndex = this.context.getSheet().getPhysicalNumberOfRows();
         for (int index = 0, dataSize = data.size(); index < dataSize; index++) {
             List<?> o = data.get(index);
             Row valueRow = this.context.getSheet().createRow(rowIndex + index);

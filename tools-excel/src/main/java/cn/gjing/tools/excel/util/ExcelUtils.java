@@ -196,14 +196,17 @@ public final class ExcelUtils {
      */
     public static void addRepeatValid(Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
                                       String errorTitle, String errorContent) {
-        String index = ParamUtils.numberToEn(colIndex);
-        int start;
+        int startRow;
+        int startCol;
         if (sheet instanceof HSSFSheet) {
-            start = firstRow == 1 ? 1 : (firstRow - sheet.getLastRowNum());
+            startRow = firstRow == 1 ? 1 : (firstRow - sheet.getLastRowNum());
+            startCol = 0;
         } else {
-            start = firstRow == 1 ? 1 : (firstRow + 1);
+            startRow = firstRow == 1 ? 1 : (firstRow + 1);
+            startCol = colIndex;
         }
-        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + start + ")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
+        String index = ParamUtils.numberToEn(startCol);
+        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + ")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
                 errorBoxRank, errorTitle, errorContent);
     }
 
