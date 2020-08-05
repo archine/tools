@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.util;
 
-import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
+import cn.gjing.tools.excel.exception.ExcelTemplateException;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -114,6 +114,7 @@ public final class ParamUtils {
 
     /**
      * Number to English letter
+     *
      * @param number number
      * @return letter
      */
@@ -154,17 +155,18 @@ public final class ParamUtils {
      * Check the file type is excel
      *
      * @param fileName file name
-     * @return File extension
      */
-    public static String isExcel(String fileName) {
+    public static void isExcel(String fileName, String version) {
         if (fileName == null) {
-            return "";
+            return;
         }
         int pos = fileName.lastIndexOf(".") + 1;
         String extension = fileName.substring(pos);
         if (!"xls".equals(extension) && !"xlsx".equals(extension)) {
-            throw new ExcelInitException("File type error, file suffix name need to be xls or xlsx");
+            throw new ExcelTemplateException("File type error, file suffix name need to be xls or xlsx");
         }
-        return extension;
+        if (!version.equals(extension)) {
+            throw new ExcelTemplateException();
+        }
     }
 }

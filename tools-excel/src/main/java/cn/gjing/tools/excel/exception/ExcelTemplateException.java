@@ -9,4 +9,8 @@ public class ExcelTemplateException extends ExcelResolverException {
     public ExcelTemplateException() {
         super("Excel template mismatch");
     }
+
+    public ExcelTemplateException(String message) {
+        super(message);
+    }
 }
