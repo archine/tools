@@ -300,7 +300,7 @@ public final class ParamUtils {
      * @return boolean
      */
     public static boolean isMobileNumber(String phone) {
-        String regex = "^1([3-8])\\d{9}$";
+        String regex = "^1([3-9])\\d{9}$";
         return Pattern.compile(regex).matcher(phone).matches();
     }
 
