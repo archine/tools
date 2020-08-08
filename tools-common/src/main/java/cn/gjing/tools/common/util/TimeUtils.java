@@ -14,10 +14,12 @@ public final class TimeUtils {
     public static SimpleDateFormat DATE_FORMAT;
     public static SimpleDateFormat DATE_TIME_FORMAT;
     public static SimpleDateFormat TIME_FORMAT;
+    public static SimpleDateFormat MINUTE_FORMAT;
 
     static {
         DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
         DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        MINUTE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
     }
 
@@ -31,7 +33,7 @@ public final class TimeUtils {
      * @param date date
      * @return 文本时间
      */
-    public static String dateToText(Date date) {
+    public static String toText(Date date) {
         return DATE_FORMAT.format(date);
     }
 
@@ -42,123 +44,8 @@ public final class TimeUtils {
      * @param format format
      * @return 文本时间
      */
-    public static String dateToText(Date date, SimpleDateFormat format) {
+    public static String toText(Date date, SimpleDateFormat format) {
         return format.format(date);
-    }
-
-    /**
-     * 获取文本格式时间
-     *
-     * @param date date
-     * @return 文本时间
-     */
-    public static String datetimeToText(Date date) {
-        return DATE_TIME_FORMAT.format(date);
-    }
-
-    /**
-     * 自定义格式获取文本时间
-     *
-     * @param date   date
-     * @param format 格式("yyyy-MM-dd")
-     * @return string 文本
-     */
-    public static String dateToText(Date date, String format) {
-        SimpleDateFormat format1 = new SimpleDateFormat(format);
-        return format1.format(date);
-    }
-
-    /**
-     * 获取时间对象
-     *
-     * @param date 文本格式时间
-     * @return 时间对象
-     */
-    public static Date textToDate(String date) {
-        try {
-            return DATE_FORMAT.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
-        }
-    }
-
-    /**
-     * 获取时间对象
-     *
-     * @param date 文本格式时间
-     * @return 时间对象
-     */
-    public static Date textToDatetime(String date) {
-        try {
-            return DATE_TIME_FORMAT.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
-        }
-    }
-
-    /**
-     * 获取时间对象
-     *
-     * @param date   文本格式时间
-     * @param format format
-     * @return 时间对象
-     */
-    public static Date textToDatetime(String date, SimpleDateFormat format) {
-        try {
-            return format.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
-        }
-    }
-
-    /**
-     * 自定义格式获取时间对象
-     *
-     * @param date   文本时间
-     * @param format format 转化格式
-     * @return 时间对象
-     */
-    public static Date textToDate(String date, String format) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-        try {
-            return dateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new Date();
-        }
-    }
-
-    /**
-     * date 转localDateTime
-     *
-     * @param date date
-     * @return localDateTime
-     */
-    public static LocalDateTime toLocalDateTime(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-    }
-
-    /**
-     * date 转localDate
-     *
-     * @param date date
-     * @return localDate
-     */
-    public static LocalDate dateToLocalDate(Date date) {
-        return toLocalDateTime(date).toLocalDate();
-    }
-
-    /**
-     * localDate转date
-     *
-     * @param localDate localDate
-     * @return date
-     */
-    public static Date toDate(LocalDate localDate) {
-        return localDateTimeToDate(localDate.atStartOfDay());
     }
 
     /**
@@ -192,6 +79,185 @@ public final class TimeUtils {
     }
 
     /**
+     * 日期转文本时间
+     *
+     * @param calendar 日期
+     * @param format   格式
+     * @return 文本时间
+     */
+    public static String toText(Calendar calendar, String format) {
+        return toText(calendar.getTime(), format);
+    }
+
+    /**
+     * 将时间戳转换为文本时间
+     *
+     * @param timeStamp 时间戳
+     * @return 文本时间
+     */
+    public static String toText(Long timeStamp) {
+        return toText(new Date(timeStamp));
+    }
+
+    /**
+     * 将时间戳转换为文本时间
+     *
+     * @param timeStamp 时间戳
+     * @param format    格式
+     * @return 文本时间
+     */
+    public static String toText(Long timeStamp, String format) {
+        return toText(new Date(timeStamp), format);
+    }
+
+    /**
+     * 将时间戳转换为文本时间
+     *
+     * @param timeStamp 时间戳
+     * @param format    格式
+     * @return 文本时间
+     */
+    public static String toText(Long timeStamp, SimpleDateFormat format) {
+        return toText(new Date(timeStamp), format);
+    }
+
+    /**
+     * 自定义格式获取文本时间
+     *
+     * @param date   date
+     * @param format 格式("yyyy-MM-dd")
+     * @return string 文本
+     */
+    public static String toText(Date date, String format) {
+        SimpleDateFormat format1 = new SimpleDateFormat(format);
+        return format1.format(date);
+    }
+
+    /**
+     * 获取文本格式时间
+     *
+     * @param date date
+     * @return 文本时间
+     */
+    public static String toText2(Date date) {
+        return DATE_TIME_FORMAT.format(date);
+    }
+
+    /**
+     * 获取时间对象
+     *
+     * @param date 文本格式时间
+     * @return 时间对象
+     */
+    public static Date toDate(String date) {
+        try {
+            return DATE_FORMAT.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    /**
+     * 获取时间对象
+     *
+     * @param date 文本格式时间
+     * @return 时间对象
+     */
+    public static Date toDate2(String date) {
+        try {
+            return DATE_TIME_FORMAT.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    /**
+     * 获取时间对象
+     *
+     * @param date   文本格式时间
+     * @param format format
+     * @return 时间对象
+     */
+    public static Date toDate(String date, SimpleDateFormat format) {
+        try {
+            return format.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    /**
+     * 自定义格式获取时间对象
+     *
+     * @param date   文本时间
+     * @param format format 转化格式
+     * @return 时间对象
+     */
+    public static Date toDate(String date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        try {
+            return dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date();
+        }
+    }
+
+    /**
+     * localDateTime转date
+     *
+     * @param dateTime local
+     * @return date
+     */
+    public static Date toDate(LocalDateTime dateTime) {
+        return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * localDate转date
+     *
+     * @param localDate localDate
+     * @return date
+     */
+    public static Date toDate(LocalDate localDate) {
+        return toDate(localDate.atStartOfDay());
+    }
+
+    /**
+     * 日期转时间
+     *
+     * @param calendar 日期
+     * @param format   格式
+     * @return 时间
+     */
+    public static Date toDate(Calendar calendar, String format) {
+        return toDate(toText(calendar, format));
+    }
+
+    /**
+     * date 转localDateTime
+     *
+     * @param date date
+     * @return localDateTime
+     */
+    public static LocalDateTime toLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    }
+
+    /**
+     * date 转localDate
+     *
+     * @param date date
+     * @return localDate
+     */
+    public static LocalDate toLocalDate(Date date) {
+        return toLocalDateTime(date).toLocalDate();
+    }
+
+    /**
      * 文本日期转LocalDate
      *
      * @param date date
@@ -212,16 +278,6 @@ public final class TimeUtils {
     }
 
     /**
-     * localDateTime转date
-     *
-     * @param dateTime local
-     * @return date
-     */
-    public static Date localDateTimeToDate(LocalDateTime dateTime) {
-        return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
-    }
-
-    /**
      * 获得时间戳
      *
      * @param localDateTime lo
@@ -231,6 +287,73 @@ public final class TimeUtils {
         ZoneId zone = ZoneId.systemDefault();
         Instant instant = localDateTime.atZone(zone).toInstant();
         return instant.toEpochMilli();
+    }
+
+    /**
+     * Long类型时间戳转化为LocalDateTime
+     *
+     * @param timestamp 时间戳
+     * @return LocalDateTime
+     */
+    public static LocalDateTime toLocalDateTime(Long timestamp) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+    }
+
+    /**
+     * 将文本时间转换为时间戳
+     *
+     * @param date date
+     * @return 时间戳
+     */
+    public static Long toTimestamp(String date) {
+        return toDate(date).getTime();
+    }
+
+    /**
+     * 将文本时间转换为时间戳
+     *
+     * @param date date
+     * @return 时间戳
+     */
+    public static Long toTimestamp2(String date) {
+        return toDate2(date).getTime();
+    }
+
+    /**
+     * 将文本时间转换为时间戳
+     *
+     * @param date date
+     * @return 时间戳
+     */
+    public static Long toTimestamp(String date, SimpleDateFormat format) {
+        return toDate(date, format).getTime();
+    }
+
+    /**
+     * 将文本时间转换为时间戳
+     *
+     * @param date date
+     * @return 时间戳
+     */
+    public static Long toTimestamp(String date, String format) {
+        return toDate(date, format).getTime();
+    }
+
+    /**
+     * 文本时间转化为日期
+     *
+     * @param date 文本时间
+     * @return 日期
+     */
+    public static Calendar toCalendar(String date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+        Calendar calendar = Calendar.getInstance();
+        try {
+            calendar.setTime(simpleDateFormat.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return calendar;
     }
 
     /**
@@ -262,55 +385,6 @@ public final class TimeUtils {
         } else {
             return date.until(currentDate).getYears();
         }
-    }
-
-    /**
-     * Long类型时间戳转化为LocalDateTime
-     *
-     * @param timestamp 时间戳
-     * @return LocalDateTime
-     */
-    public static LocalDateTime toLocalDateTime(Long timestamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
-    }
-
-    /**
-     * 文本时间转化为日期
-     *
-     * @param date 文本时间
-     * @return 日期
-     */
-    public static Calendar toCalendar(String date) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
-        Calendar calendar = Calendar.getInstance();
-        try {
-            calendar.setTime(simpleDateFormat.parse(date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return calendar;
-    }
-
-    /**
-     * 日期转时间
-     *
-     * @param calendar 日期
-     * @param format   格式
-     * @return 时间
-     */
-    public static Date toDate(Calendar calendar, String format) {
-        return textToDate(toText(calendar, format));
-    }
-
-    /**
-     * 日期转文本时间
-     *
-     * @param calendar 日期
-     * @param format   格式
-     * @return 文本时间
-     */
-    public static String toText(Calendar calendar, String format) {
-        return dateToText(calendar.getTime(), format);
     }
 
     /**
@@ -390,27 +464,6 @@ public final class TimeUtils {
     }
 
     /**
-     * 将文本时间转换为时间戳
-     *
-     * @param date date
-     * @return 时间戳
-     */
-    public static Long toTimestamp(String date) {
-        return textToDate(date).getTime();
-    }
-
-    /**
-     * 将时间戳转换为文本时间
-     *
-     * @param timeStamp 时间戳
-     * @return 文本时间
-     */
-    public static String toText(Long timeStamp) {
-        long l = timeStamp;
-        return dateToText(new Date(l));
-    }
-
-    /**
      * 获取两个日期（不含时分秒）相差的天数，不包含今天
      *
      * @param startDate 开始时间
@@ -418,8 +471,8 @@ public final class TimeUtils {
      * @return 相差的天数
      */
     public static int dateBetween(String startDate, String endDate) {
-        Date dateStart = textToDate(startDate, "yyyy-MM-dd");
-        Date dateEnd = textToDate(endDate, "yyyy-MM-dd");
+        Date dateStart = toDate(startDate);
+        Date dateEnd = toDate(endDate);
         return (int) ((dateEnd.getTime() - dateStart.getTime()) / 1000 / 60 / 60 / 24);
     }
 
