@@ -179,7 +179,7 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
             case FORMULA:
                 return gson.fromJson(gson.toJson(cell.getStringCellValue()), field.getType());
             default:
-                return cell.getStringCellValue();
+                return excelField.trim() ? cell.getStringCellValue().trim() : cell.getStringCellValue();
         }
         return null;
     }

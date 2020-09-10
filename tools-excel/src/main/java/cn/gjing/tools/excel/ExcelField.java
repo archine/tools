@@ -83,6 +83,13 @@ public @interface ExcelField {
     boolean required() default false;
 
     /**
+     * Remove white space on both sides of the text when importing
+     *
+     * @return boolean
+     */
+    boolean trim() default false;
+
+    /**
      * Data convert, which you can use to change data during import and export,
      * before the cell are populated and converted to entity field
      *

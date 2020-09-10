@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.2.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.2.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.2.7</version>
+    <version>2.2.8</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -33,6 +33,7 @@
 |format|表头所在列的整列单元格格式，格式参照Excel文件中的单元格格式，默认``常规``|
 |autoMerge|表头下方是否开启纵向合并|
 |required|导入时，表头下方的单元格是否必填，默认``false``，该配置一旦配置，会在导入时触发非空监听器|
+|trim|导入时是否需要去除文本两边的空格，默认``false``|
 |color|表头填充颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过此处配置|
 |fontColor|表头字体颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过此处配置|
 |convert|数据转换器，可以在导入导出时对数据进行转换, 在每一次的导入导出时``相同的转换器实例只会出现一个``|      
