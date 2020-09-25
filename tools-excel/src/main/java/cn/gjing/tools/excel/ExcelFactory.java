@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public final class ExcelFactory {
                 .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr))
                 .headNames(headerArr)
                 .excelType(excel.type())
-                .fileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().toString() : excel.value() : fileName)
+                .fileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value() : fileName)
                 .excelClass(excelClass)
                 .build();
         return new ExcelBindWriter(context, excel, response, initDefaultStyle);

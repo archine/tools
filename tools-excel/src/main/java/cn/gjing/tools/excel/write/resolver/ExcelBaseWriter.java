@@ -67,7 +67,27 @@ public abstract class ExcelBaseWriter {
                     .setCellValue(this.context.getExcelClass().getSimpleName());
             this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex("identificationSheet"), true);
         }
-        this.writerResolver.flush(this.response, this.context, this.context.getExcelType());
+        this.writerResolver.flush(this.response, this.context);
+        if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
+            ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
+        }
+    }
+
+    /**
+     * Flush all content to excel of the cache to local
+     *
+     * @param path Absolute path to the directory where the file is stored
+     */
+    public void flushToLocal(String path) {
+        ListenerChain.doWorkbookFlushBefore(this.context);
+        if (this.context.isIdentifier()) {
+            this.context.getWorkbook().createSheet("identificationSheet")
+                    .createRow(0)
+                    .createCell(0)
+                    .setCellValue(this.context.getExcelClass().getSimpleName());
+            this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex("identificationSheet"), true);
+        }
+        this.writerResolver.flushToLocal(path, this.context);
         if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
             ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
         }

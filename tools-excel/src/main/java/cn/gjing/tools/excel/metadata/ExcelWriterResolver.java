@@ -9,6 +9,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
@@ -23,8 +24,6 @@ import java.util.Objects;
  * @author Gjing
  **/
 public abstract class ExcelWriterResolver {
-    public ExcelWriterContext context;
-
     /**
      * Init resolver
      *
@@ -78,7 +77,7 @@ public abstract class ExcelWriterResolver {
      * @param context  Excel write context
      * @param response response
      */
-    public void flush(HttpServletResponse response, ExcelWriterContext context, ExcelType excelType) {
+    public void flush(HttpServletResponse response, ExcelWriterContext context) {
         response.setContentType("application/vnd.ms-excel");
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         OutputStream outputStream = null;
@@ -88,16 +87,44 @@ public abstract class ExcelWriterResolver {
             } else {
                 context.setFileName(URLEncoder.encode(context.getFileName(), "UTF-8"));
             }
-            response.setHeader("Content-disposition", "attachment;filename=" + context.getFileName() + (excelType == ExcelType.XLS ? ".xls" : ".xlsx"));
+            response.setHeader("Content-disposition", "attachment;filename=" + context.getFileName() + (context.getExcelType() == ExcelType.XLS ? ".xls" : ".xlsx"));
             outputStream = response.getOutputStream();
             context.getWorkbook().write(outputStream);
         } catch (IOException e) {
-            throw new ExcelResolverException("Excel cache data refresh failure, " + e.getMessage());
+            throw new ExcelResolverException("Excel cache data flush failure, " + e.getMessage());
         } finally {
             try {
                 if (outputStream != null) {
                     outputStream.flush();
                     outputStream.close();
+                }
+                if (context.getWorkbook() != null) {
+                    context.getWorkbook().close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Output the contents of the cache to local
+     *
+     * @param path    Absolute path to the directory where the file is stored
+     * @param context Excel write context
+     */
+    public void flushToLocal(String path, ExcelWriterContext context) {
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream((path.endsWith("/") ? path : path + "/") + context.getFileName() + (context.getExcelType() == ExcelType.XLS ? ".xls" : ".xlsx"));
+            context.getWorkbook().write(fileOutputStream);
+        } catch (IOException e) {
+            throw new ExcelResolverException("Excel cache data flush failure, " + e.getMessage());
+        } finally {
+            try {
+                if (fileOutputStream != null) {
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
                 }
                 if (context.getWorkbook() != null) {
                     context.getWorkbook().close();

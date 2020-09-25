@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.2.8-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.2.9-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的导入导出Excel**     
@@ -8,7 +8,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.2.8</version>
+    <version>2.2.9</version>
 </dependency>
 ```
 ## 二、注解说明
