@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.0.4-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.5-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
  ![](https://img.shields.io/badge/builder-success-green.svg)      
  
 > 阿里云OSS和短信工具
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-aliyun</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 </dependency>
 ```
 ## 一、OSS
@@ -16,11 +16,15 @@
 ```yaml
 tools:
   aliyun:
-    # 用户key，在阿里云获取
+    # 用户key，在阿里云获取，此处为全局配置，短信和oss未单独设置则会默认调用此处配置
     access-key: xxxxxxx
-    # 用户秘钥，在阿里云获取
+    # 用户秘钥，在阿里云获取，此处为全局配置，短信和OSS都会默认调用此处的key
     access-key-secret: xxxxxxx
     oss:
+     # 用户key，在阿里云获取，此处优先级高于全局配置
+     access-key: xxxxxxx
+     # 用户秘钥，此处优先级高于全局配置
+     access-key-secret: xxxxxxx
      # 节点, 前往阿里云查看
      end-point: xxxxxxxx
      # 存储空间, 不存在会创建
@@ -158,6 +162,10 @@ tools:
     # 用户秘钥，在阿里云获取
     access-key-secret: xxxxxx
     sms:
+      # 用户key，在阿里云获取，此处优先级高于全局配置
+      access-key: xxxxxxx
+      # 用户秘钥，此处优先级高于全局配置
+      access-key-secret: xxxxxxx
       # 短信模板ID，必须是已添加并审核通过的
       template-code: xxxxxxx
       # 短信签名名称，必须是已添加并审核通过的

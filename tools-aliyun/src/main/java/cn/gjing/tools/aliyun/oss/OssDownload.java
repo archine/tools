@@ -6,6 +6,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.OSSObject;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -99,6 +100,6 @@ public class OssDownload {
         conf.setSocketTimeout(this.ossMeta.getSocketTimeout());
         conf.setConnectionTimeout(this.ossMeta.getConnectionTimeout());
         conf.setIdleConnectionTime(this.ossMeta.getIdleTime());
-        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.aliyunMeta.getAccessKey(), this.aliyunMeta.getAccessKeySecret(), conf);
-    }
+        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), StringUtils.isEmpty(this.ossMeta.getAccessKey()) ? this.aliyunMeta.getAccessKey() : this.ossMeta.getAccessKey(),
+                StringUtils.isEmpty(this.ossMeta.getAccessKeySecret()) ? this.aliyunMeta.getAccessKeySecret() : this.ossMeta.getAccessKeySecret(), conf);    }
 }

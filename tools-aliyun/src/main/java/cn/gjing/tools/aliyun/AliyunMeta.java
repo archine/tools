@@ -15,12 +15,12 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "tools.aliyun")
 public class AliyunMeta {
     /**
-     * Ali cloud user accesskey
+     * Ali cloud user global accesskey
      */
     private String accessKey;
 
     /**
-     * Ali cloud user access key secret
+     * Ali cloud user global access key secret
      */
     private String accessKeySecret;
 }

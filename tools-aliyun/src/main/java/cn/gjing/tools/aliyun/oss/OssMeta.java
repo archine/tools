@@ -14,6 +14,16 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "tools.aliyun.oss")
 public class OssMeta {
     /**
+     * Ali cloud user accesskey, Priority is greater than global configuration
+     */
+    private String accessKey;
+
+    /**
+     * Ali cloud user access key secret, Priority is greater than global configuration
+     */
+    private String accessKeySecret;
+
+    /**
      * End point
      */
     private String endPoint;

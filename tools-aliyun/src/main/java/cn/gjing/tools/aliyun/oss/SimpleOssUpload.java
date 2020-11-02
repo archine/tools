@@ -6,6 +6,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.PutObjectRequest;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -98,7 +99,7 @@ public final class SimpleOssUpload implements OssUpload {
 
     @Override
     public String upload(byte[] file, String fileName) {
-        return this.upload(file, fileName,this.ossMeta.getBucket());
+        return this.upload(file, fileName, this.ossMeta.getBucket());
     }
 
     @Override
@@ -114,7 +115,8 @@ public final class SimpleOssUpload implements OssUpload {
         conf.setSocketTimeout(this.ossMeta.getSocketTimeout());
         conf.setConnectionTimeout(this.ossMeta.getConnectionTimeout());
         conf.setIdleConnectionTime(this.ossMeta.getIdleTime());
-        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), this.aliyunMeta.getAccessKey(), this.aliyunMeta.getAccessKeySecret(), conf);
+        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), StringUtils.isEmpty(this.ossMeta.getAccessKey()) ? this.aliyunMeta.getAccessKey() : this.ossMeta.getAccessKey(),
+                StringUtils.isEmpty(this.ossMeta.getAccessKeySecret()) ? this.aliyunMeta.getAccessKeySecret() : this.ossMeta.getAccessKeySecret(), conf);
     }
 
     private void createBucket(String bucket) {

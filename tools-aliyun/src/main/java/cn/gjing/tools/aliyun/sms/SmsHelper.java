@@ -10,6 +10,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.google.gson.Gson;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
@@ -26,7 +27,8 @@ public class SmsHelper {
 
     public SmsHelper(AliyunMeta aliyunMeta, SmsMeta smsMeta) {
         this.smsMeta = smsMeta;
-        DefaultProfile profile = DefaultProfile.getProfile(this.smsMeta.getRegion(), aliyunMeta.getAccessKey(), aliyunMeta.getAccessKeySecret());
+        DefaultProfile profile = DefaultProfile.getProfile(this.smsMeta.getRegion(), StringUtils.isEmpty(this.smsMeta.getAccessKey()) ? aliyunMeta.getAccessKey() : this.smsMeta.getAccessKey(),
+                StringUtils.isEmpty(this.smsMeta.getAccessKeySecret()) ? aliyunMeta.getAccessKeySecret() : this.smsMeta.getAccessKeySecret());
         this.client = new DefaultAcsClient(profile);
     }
 
