@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Import completion result listener. If not set, no data will be collected.
- * You can set it by subscription method{@link ExcelReader}
+ * You can set it by subscript method{@link ExcelReader#subscribe(ExcelResultReadListener)}
  *
  * @author Gjing
  **/

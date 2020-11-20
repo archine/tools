@@ -1,7 +1,6 @@
 package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
-import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 
@@ -14,16 +13,11 @@ import java.util.Map;
  * @author Gjing
  **/
 class ExcelWriteXlsResolver extends ExcelWriterResolver {
-    private ExcelWriteExecutor excelWriteExecutor;
+    private final ExcelWriteExecutor excelWriteExecutor;
 
-    @Override
-    public void init(ExcelWriterContext context) {
+    public ExcelWriteXlsResolver(ExcelWriterContext context) {
+        super(context);
         this.excelWriteExecutor = new ExcelWriteExecutor(context);
-    }
-
-    @Override
-    public void writeTitle(BigTitle bigTitle) {
-        this.excelWriteExecutor.writeTitle(bigTitle);
     }
 
     @Override

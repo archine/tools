@@ -36,7 +36,7 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
             ExcelFactory.createWriter(wrapper.getFileName() == null ? writerAnno.value() : wrapper.getFileName(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(),
                     wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores())
                     .valid(writerAnno.needValid())
-                    .identifier(writerAnno.identifier())
+                    .bind(writerAnno.bind())
                     .multiHead(writerAnno.multiHead())
                     .writeTitle(wrapper.getBigTitle())
                     .addListener(wrapper.getWriteListeners())
@@ -47,7 +47,7 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
         if (o == null) {
             ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
                     .valid(writerAnno.needValid())
-                    .identifier(writerAnno.identifier())
+                    .bind(writerAnno.bind())
                     .multiHead(writerAnno.multiHead())
                     .write(null, writerAnno.sheet(), writerAnno.needHead())
                     .flush();
@@ -56,7 +56,7 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
         if (o instanceof Collection) {
             ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
                     .valid(writerAnno.needValid())
-                    .identifier(writerAnno.identifier())
+                    .bind(writerAnno.bind())
                     .multiHead(writerAnno.multiHead())
                     .write((List<?>) o, writerAnno.sheet(), writerAnno.needHead())
                     .flush();
@@ -65,7 +65,7 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
         if (o instanceof BigTitle) {
             ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
                     .valid(writerAnno.needValid())
-                    .identifier(writerAnno.identifier())
+                    .bind(writerAnno.bind())
                     .multiHead(writerAnno.multiHead())
                     .writeTitle((BigTitle) o)
                     .write(null, writerAnno.sheet(), writerAnno.needHead())

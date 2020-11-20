@@ -33,7 +33,9 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     /**
      * Set the Excel header
      *
-     * @param headNames Excel header name
+     * @param headNames Excel header name arrays, According to the first header array
+     *                  size to determine the header hierarchy,
+     *                  the subsequent header array must be the same size as the first
      * @return this
      */
     public ExcelSimpleWriter head(List<String[]> headNames) {
@@ -72,7 +74,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     /**
      * To write
      *
-     * @param data data
+     * @param data Sequential padding, which needs to correspond to the header sequence
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data) {
@@ -176,25 +178,13 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Whether close multi excel head
+     * Enable multi excel head
      *
-     * @param multi Is multi head
+     * @param enable Whether enable multi excel head
      * @return this
      */
-    public ExcelSimpleWriter multiHead(boolean multi) {
-        this.context.setMultiHead(multi);
-        return this;
-    }
-
-    /**
-     * Whether you need to add a file identifier when exporting an Excel file,
-     * which can be used for template validation of the file at import time
-     *
-     * @param identifier Need file indentifier
-     * @return this
-     */
-    public ExcelSimpleWriter identifier(boolean identifier) {
-        this.context.setIdentifier(identifier);
+    public ExcelSimpleWriter multiHead(boolean enable) {
+        this.context.setMultiHead(enable);
         return this;
     }
 

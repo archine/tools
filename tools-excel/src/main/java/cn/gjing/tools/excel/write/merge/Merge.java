@@ -13,15 +13,7 @@ import java.lang.annotation.*;
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface Merge {
     /**
-     * Whether to enable vertical merge, please to use enable
-     *
-     * @return false
-     */
-    @Deprecated
-    boolean open() default false;
-
-    /**
-     * Whether to enable vertical merge
+     * Enable automatic merge of same vertical content
      *
      * @return false
      */

@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
+import cn.gjing.tools.excel.read.resolver.ExcelReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.BigTitle;
@@ -176,68 +177,24 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Whether enable excel valid
+     * Enable validation annotations
      *
+     * @param enable Whether validation annotations are enabled
      * @return this
      */
-    @Deprecated
-    public ExcelBindWriter enableValid() {
-        this.context.setNeedValid(true);
+    public ExcelBindWriter valid(boolean enable) {
+        this.context.setNeedValid(enable);
         return this;
     }
 
     /**
-     * Whether enable excel valid,Please use to {@link #valid(boolean)}
+     * Enable multi excel head
      *
+     * @param enable Whether enable multi excel head
      * @return this
      */
-    @Deprecated
-    public ExcelBindWriter closeValid() {
-        this.context.setNeedValid(false);
-        return this;
-    }
-
-    /**
-     * Whether enable excel valid
-     *
-     * @param valid Enable validation
-     * @return this
-     */
-    public ExcelBindWriter valid(boolean valid) {
-        this.context.setNeedValid(valid);
-        return this;
-    }
-
-    /**
-     * Whether enable multi excel head
-     *
-     * @return this
-     */
-    @Deprecated
-    public ExcelBindWriter enableMultiHead() {
-        this.context.setMultiHead(true);
-        return this;
-    }
-
-    /**
-     * Whether close multi excel head, please to use {@link #multiHead(boolean)}
-     *
-     * @return this
-     */
-    @Deprecated
-    public ExcelBindWriter closeMultiHead() {
-        this.context.setMultiHead(false);
-        return this;
-    }
-
-    /**
-     * Whether close multi excel head
-     *
-     * @param multi Is multi head
-     * @return this
-     */
-    public ExcelBindWriter multiHead(boolean multi) {
-        this.context.setMultiHead(multi);
+    public ExcelBindWriter multiHead(boolean enable) {
+        this.context.setMultiHead(enable);
         return this;
     }
 
@@ -247,9 +204,24 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      *
      * @param identifier Need file indentifier
      * @return this
+     * @deprecated Change the method name to make it easier to understand, Used {@link #bind(boolean)}
      */
+    @Deprecated
     public ExcelBindWriter identifier(boolean identifier) {
-        this.context.setIdentifier(identifier);
+        this.context.setBind(identifier);
+        return this;
+    }
+
+    /**
+     * Bind the exported Excel file to the currently set mapped entity,
+     * and if it is not set and detection is enabled in {@link ExcelReader#check(boolean)},
+     * an ExcelTemplateException will be thrown
+     *
+     * @param enable Whether enable bind, default true
+     * @return this
+     */
+    public ExcelBindWriter bind(boolean enable) {
+        this.context.setBind(enable);
         return this;
     }
 

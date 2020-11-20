@@ -35,24 +35,24 @@ public final class ExcelWriterContext {
     private Sheet sheet;
 
     /**
-     * The Excel file name to be exported
+     * Excel file name
      */
     private String fileName;
 
     /**
-     * Whether to add validation when exporting Excel templates
+     * Whether validation annotations are enabled
      */
     @Builder.Default
-    private Boolean needValid = false;
+    private boolean needValid = false;
 
     /**
      * Whether to open multistage Excel headers
      */
     @Builder.Default
-    private Boolean multiHead = false;
+    private boolean multiHead = false;
 
     /**
-     * Excel headers
+     * Excel header fields
      */
     @Builder.Default
     private List<Field> excelFields = new ArrayList<>();
@@ -73,10 +73,10 @@ public final class ExcelWriterContext {
      * which can be used for template validation of the file at import time
      */
     @Builder.Default
-    private boolean identifier = true;
+    private boolean bind = true;
 
     /**
-     * Exported Excel type
+     * Excel type
      */
     @Builder.Default
     private ExcelType excelType = ExcelType.XLS;

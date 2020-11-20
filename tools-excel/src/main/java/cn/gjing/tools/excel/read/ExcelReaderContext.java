@@ -48,7 +48,7 @@ public class ExcelReaderContext<R> {
     private List<Field> excelFields;
 
     /**
-     * Whether to check whether the Excel template matches when importing
+     * Check that the Excel file is bound to the currently set mapping entity
      */
     private boolean checkTemplate = false;
 

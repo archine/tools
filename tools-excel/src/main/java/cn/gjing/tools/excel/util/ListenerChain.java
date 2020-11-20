@@ -33,7 +33,7 @@ public final class ListenerChain {
      * @param sheet          Current sheet
      * @param row            Current row
      * @param cell           Current cell
-     * @param index          Line index, index type according to isHead, Starting from 0
+     * @param index          The data index, table header, and body all start at 0
      * @param colIndex       Current cell index
      * @param isHead         Whether is excel head
      * @param excelField     ExcelField annotation of current field
@@ -54,7 +54,7 @@ public final class ListenerChain {
      * @param sheet          Current sheet
      * @param row            Current row
      * @param cell           Current cell
-     * @param index          Line index, index type according to isHead, Starting from 0
+     * @param index          The data index, table header, and body all start at 0
      * @param colIndex       Current cell index
      * @param isHead         Whether is excel head
      * @param excelField     ExcelField annotation of current field
@@ -80,7 +80,7 @@ public final class ListenerChain {
      * @param sheet          Current sheet
      * @param row            Create the finished row
      * @param obj            Current java object
-     * @param index          Line index, index type according to isHead，Starting from 0
+     * @param index          The data index, table header, and body all start at 0
      * @param isHead         Whether is excel head
      */
     public static void doCompleteRow(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Object obj, int index, boolean isHead) {
@@ -123,7 +123,6 @@ public final class ListenerChain {
      * @param isHead           Whether is excel head
      * @param otherValues      Except for the content of the body
      * @param <R>              R
-     * @param isBody           Whether is excel body
      * @return Whether to stop reading
      */
     @SuppressWarnings("unchecked")
@@ -142,7 +141,6 @@ public final class ListenerChain {
      *
      * @param listeners Excel read listeners
      * @param context   Excel reader context
-     * @param <R>       Mapping entity
      */
     @SuppressWarnings("unchecked")
     public static <R> void doReadBefore(List<ExcelReadListener> listeners, ExcelReaderContext<R> context) {

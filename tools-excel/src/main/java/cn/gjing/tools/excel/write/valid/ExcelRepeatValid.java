@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Column duplicate data check
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)

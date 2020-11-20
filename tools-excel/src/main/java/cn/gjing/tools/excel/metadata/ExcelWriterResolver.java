@@ -4,6 +4,12 @@ import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
+import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
+import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -24,19 +30,34 @@ import java.util.Objects;
  * @author Gjing
  **/
 public abstract class ExcelWriterResolver {
-    /**
-     * Init resolver
-     *
-     * @param context Excel write context
-     */
-    public abstract void init(ExcelWriterContext context);
+    public final ExcelWriterContext context;
+
+    public ExcelWriterResolver(ExcelWriterContext context) {
+        this.context = context;
+    }
 
     /**
      * Write excel big title
      *
      * @param bigTitle Excel big title
      */
-    public abstract void writeTitle(BigTitle bigTitle);
+    public void writeTitle(BigTitle bigTitle) {
+        List<ExcelWriteListener> cellListeners = this.context.getWriteListenerCache().get(ExcelCellWriteListener.class);
+        int startOffset = this.context.getSheet().getPhysicalNumberOfRows();
+        int endOffset = startOffset + bigTitle.getLines() - 1;
+        for (int i = 0; i < bigTitle.getLines(); i++) {
+            Row row = this.context.getSheet().createRow(startOffset + i);
+            row.setHeight(bigTitle.getRowHeight());
+            Cell cell = row.createCell(0);
+            cell.setCellValue(bigTitle.getContent());
+            cellListeners.forEach(e -> {
+                if (e instanceof ExcelStyleWriteListener) {
+                    ((ExcelStyleWriteListener) e).setTitleStyle(bigTitle, cell);
+                }
+            });
+        }
+        this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCols()));
+    }
 
     /**
      * Write excel body

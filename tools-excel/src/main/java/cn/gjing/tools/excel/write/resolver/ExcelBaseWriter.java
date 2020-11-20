@@ -42,13 +42,11 @@ public abstract class ExcelBaseWriter {
         switch (this.context.getExcelType()) {
             case XLS:
                 context.setWorkbook(new HSSFWorkbook());
-                this.writerResolver = new ExcelWriteXlsResolver();
-                this.writerResolver.init(context);
+                this.writerResolver = new ExcelWriteXlsResolver(context);
                 break;
             case XLSX:
                 context.setWorkbook(new SXSSFWorkbook(windowSize));
-                this.writerResolver = new ExcelWriteXlsxResolver();
-                this.writerResolver.init(context);
+                this.writerResolver = new ExcelWriteXlsxResolver(context);
                 break;
             default:
                 throw new ExcelResolverException("No corresponding resolver was found");
@@ -60,7 +58,7 @@ public abstract class ExcelBaseWriter {
      */
     public void flush() {
         ListenerChain.doWorkbookFlushBefore(this.context);
-        if (this.context.isIdentifier()) {
+        if (this.context.isBind()) {
             this.context.getWorkbook().createSheet("identificationSheet")
                     .createRow(0)
                     .createCell(0)
@@ -80,7 +78,7 @@ public abstract class ExcelBaseWriter {
      */
     public void flushToLocal(String path) {
         ListenerChain.doWorkbookFlushBefore(this.context);
-        if (this.context.isIdentifier()) {
+        if (this.context.isBind()) {
             this.context.getWorkbook().createSheet("identificationSheet")
                     .createRow(0)
                     .createCell(0)

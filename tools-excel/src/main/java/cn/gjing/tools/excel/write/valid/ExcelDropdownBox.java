@@ -3,7 +3,7 @@ package cn.gjing.tools.excel.write.valid;
 import java.lang.annotation.*;
 
 /**
- * Excel clear scope data validation annotations
+ * Excel dropdown box
  *
  * @author Gjing
  **/

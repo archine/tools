@@ -50,7 +50,7 @@ public final class BeanUtils {
     }
 
     /**
-     * Gets all annotated fields of the parent and child classes
+     * Get all excel fields of the parent and child classes
      *
      * @param excelClass Excel mapped entity
      * @param ignores    The exported field is to be ignored
@@ -104,7 +104,7 @@ public final class BeanUtils {
     }
 
     /**
-     * Gets the corresponding enum by value
+     * Get the corresponding enum by value
      *
      * @param enumClass The enum class to get
      * @param value     Enum value

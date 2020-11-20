@@ -3,7 +3,7 @@ package cn.gjing.tools.excel.write.callback;
 import java.lang.reflect.Field;
 
 /**
- * Auto merge callback
+ * Body automatic merge callback
  *
  * @author Gjing
  **/
@@ -12,12 +12,12 @@ public interface ExcelAutoMergeCallback<T> {
     /**
      * Vertical merge
      *
-     * @param t        The excel mapping entity for the current row, Null in the header case
-     * @param field    The field corresponding to the current callback has a value only when the simple type is exported
-     * @param key      The key corresponding to the current callback has a value only when the simple type is exported
-     * @param colIndex colIndex
-     * @param index    Line index, index type according to isHead
+     * @param entity     The excel mapping entity for the current row
+     * @param field      The corresponding entity field, only when the bind type is exported exist，otherwise is null
+     * @param headerName The corresponding header name, only when the simple type is exported exist，otherwise is null
+     * @param colIndex   Current column Index
+     * @param index      The data index, start at 0
      * @return true is need merge
      */
-    boolean mergeY(T t, Field field, String key, int colIndex, int index);
+    boolean mergeY(T entity, Field field, String headerName, int colIndex, int index);
 }

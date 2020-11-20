@@ -6,6 +6,7 @@ import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
+import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -156,21 +157,7 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Whether is need meta info(Such as header,title)
-     *
-     * @param need          Read meta info
-     * @param checkTemplate Check that the excel template matches the entity
-     * @return this
-     */
-    @Deprecated
-    public ExcelReader<R> metaInfo(boolean need, boolean checkTemplate) {
-        this.context.setMetaInfo(need);
-        this.context.setCheckTemplate(checkTemplate);
-        return this;
-    }
-
-    /**
-     * Whether is need meta info(Such as header,title)
+     * Whether is need to read meta info(Such as header,big title)
      *
      * @param need Read meta info
      * @return this
@@ -181,22 +168,15 @@ public class ExcelReader<R> {
     }
 
     /**
-     * Whether to check whether the Excel template matches when importing
+     * Check that the Excel file is bound to the currently set mapping entity
+     * @see ExcelBindWriter#bind(boolean)
      *
-     * @param checkTemplate Check that the excel template matches the entity
+     * @param enable Whether enable check
      * @return this
      */
-    public ExcelReader<R> check(boolean checkTemplate) {
-        this.context.setCheckTemplate(checkTemplate);
+    public ExcelReader<R> check(boolean enable) {
+        this.context.setCheckTemplate(enable);
         return this;
-    }
-
-    /**
-     * The Excel read data end，please use finish method
-     */
-    @Deprecated
-    public void end() {
-        this.finish();
     }
 
     /**

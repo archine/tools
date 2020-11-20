@@ -1,14 +1,13 @@
-![](https://img.shields.io/badge/version-2.2.9-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2.3.0-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
-**简单、快速的导入导出Excel**     
-<span id="top"></span>
-## 一、安装依赖
+**简单、快速的在项目中进行Excel导入导出**
+## 一、导入依赖
 ```xml
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.2.9</version>
+    <version>2.3.0</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -33,10 +32,10 @@
 |format|表头所在列的整列单元格格式，格式参照Excel文件中的单元格格式，默认``常规``|
 |autoMerge|表头下方是否开启纵向合并|
 |required|导入时，表头下方的单元格是否必填，默认``false``，该配置一旦配置，会在导入时触发非空监听器|
-|trim|导入时是否需要去除文本两边的空格，默认``false``|
+|trim|导入时，是否去除文本两边的空格，默认``false``|
 |color|表头填充颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过此处配置|
 |fontColor|表头字体颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过此处配置|
-|convert|数据转换器，可以在导入导出时对数据进行转换, 在每一次的导入导出时``相同的转换器实例只会出现一个``|      
+|convert|数据转换器，可以在导入导出时对数据进行转换, 同一次导入导出时``相同的转换器只会实例化一次``|      
 <span id="convert"></span>
 ### 3、@ExcelDataConvert
 **数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)，     [查看用例](#convert_use)**    
@@ -134,7 +133,7 @@
 |参数|描述|
 |---|---|
 |value|要读取的Sheet名称，默认``Sheet1``|
-|check|是否检查Excel文件与映射实体是否匹配，默认``true``|
+|check|是否检查Excel文件与当前映射实体是否绑定，默认``false``|
 |metaInfo|是否需要读取元信息，比如表头、标题，默认``false``|
 |ignores|导入时要忽略的表头，如果表头是父级表头的话，那么下面的子表头也会被忽略|
 |headerIndex|真实表头的开始下标，如：导出的模板设置了大标题，且行数为2，那么开始下标就为2，如果是2级表头，那么开始下标是1|      
@@ -152,6 +151,7 @@
 |needHead|是否需要表头，默认``true``|
 |multiHead|是否为多级表头，默认``false``|
 |initDefaultStyle|是否使用默认样式监听器，默认``true``|
+|bind|到处时设置excel文件与当前实体类进行绑定，默认``true``|
 ## 三、常用类说明
 ### 1、BigTitle
 **用于给Excel文件增加大标题**        
@@ -243,7 +243,7 @@ public class UserController {
 ![single](https://user-gold-cdn.xitu.io/2020/4/10/171637e42b1f4cdc?w=565&h=161&f=png&s=3242)
 <span id="multi"></span>
 ### 2、多级表头
-**数组中的每个值代表着一级表头**
+**数组中的每个值代表着一级表头, 表头的``层级根据第一个字段指定的数组长度``，``每个字段数组长度必须相同``**
 ```java
 /**
  * @author Gjing
@@ -298,7 +298,7 @@ public class TestController {
     @ApiOperation("含大标题")
     public void testExport(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead.class, response)
-                //大标题占用两行
+                //大标题默认占用两行
                 .writeTitle(new BigTitle("我是大标题"))
                 .write(null)
                 .flush();
@@ -336,7 +336,7 @@ public class TestController {
     @ApiOperation("带下拉框")
     public void testExport(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead.class, response)
-                //需要在write前激活校验
+                //需要在write前激活校验注解
                 .valid(true)
                 .write(null)
                 .flush();
@@ -401,7 +401,7 @@ public class TestController {
         boxValues.put("男", new String[]{"游戏", "运动"});
         boxValues.put("女", new String[]{"逛街", "吃"});
         ExcelFactory.createWriter(SingleHead.class, response)
-                //需要在write前激活校验
+                //需要在write前激活校验注解
                 .valid(true)
                 //使用默认的级联下拉框监听器
                 .addListener(new DefaultCascadingDropdownBoxListener(boxValues))
@@ -640,7 +640,7 @@ public class TestController {
     public void testExport(HttpServletResponse response) {
         //关闭初始化默认样式监听器
         ExcelFactory.createWriter(SingleHead.class, response, false)
-                //加入自己定义的样式，要在write方法前调用
+                //加入自己定义的样式，要在write方法前设置
                 .addListener(new MyStyleListener())
                 .write(this.userService.userList())
                 .flush();
@@ -649,8 +649,8 @@ public class TestController {
 ```
 ![自定义样式](https://user-gold-cdn.xitu.io/2020/4/10/171637e45d463be7?w=562&h=243&f=png&s=15612)        
 
-### 11、导出Excel模板增加唯一标识
-**导出模板时，增加模板的唯一标识（``默认开启``），可以用来防止用户导入不符的Excel文件**
+### 11、导出Excel模板时将文件与当前实体绑定
+**导出模板时，进行文件与实体类进行绑定（``默认开启``），可以用来防止用户导入不符的Excel文件**
 ```java
 /**
  * @author Gjing
@@ -664,14 +664,14 @@ public class TestController {
     @ApiOperation("下载模板")
     public void export(HttpServletResponse response) {
         ExcelFactory.createWriter(SingleHead.class, response)
-                .identifier(true) // 通过该方法手动设置是否开启
+                .bind(true) // 可以通过该方法手动开启或者关闭, 默认是开启的，在导出时可以不调用该方法
                 .write(null)
                 .flush();
     }
 }
 ```
 ### 12、不使用映射实体导出
-**导出Excel时，想动态的设置表头，且没有对应的实体类, ``该方式不支持增加数据校验和设置数据转换器``**
+**导出Excel时，想动态的设置表头，且没有对应的实体类, ``该方式不支持增加数据校验和设置数据转换器``，可以通过监听器进行拓展操作。数据与表头的顺序要一致，因为导出时会顺序填充**
 ```java
 @RestController
 public class TestController {
@@ -828,7 +828,7 @@ public class TestController {
 }
 ```
 <span id="assert_use"></span>
-### 5、数据校验
+### 5、数据断言
 **在导入时对数据进行校验，这里演示导入时姓名不能为空  >>  [注解参考](#assert)**
 ```java
 /**
@@ -888,7 +888,7 @@ public enum Gender {
 ```
 **接口方式这里不在演示，同导出时一样  >>  [导出接口方式转换](#convert_use_interface)**       
 ### 7、检查模板
-**检查用户导入的Excel文件是否符合该接口所对应的映射实体（``默认关闭``）**
+**检查用户导入的Excel文件是否与对应的映射实体绑定，不通过检查会抛出模板匹配异常，``默认不检查``**
 ```java
 /**
  * @author Gjing
@@ -902,7 +902,7 @@ public class TestController {
     @ApiOperation("导入单表头")
     public void userImport(MultipartFile file) throws IOException {
         ExcelFactory.createReader(file, SingleHead.class)
-                .check(true) // 通过该方法手动设置是否开启
+                .check(true) // 通过该方法手动开启或者关闭，默认false
                 .read()
                 .finish();
     }
@@ -913,7 +913,7 @@ public class TestController {
 
 <span id="driven"></span>
 ## 五、注解驱动方式的导入导出
-如果要使用注解驱动方式，需要先在启动类或者配置类使用 >>>  [EnableExcelDrivenMode](#driven_annotation)    
+主要是对使用方式进行简单化，不再需要每次通过工厂创建读写器吗，如果要使用注解驱动方式，需要先在启动类或者配置类使用 >>>  [EnableExcelDrivenMode](#driven_annotation)    
 
 <span id="driven_write"></span>
 ### 1、导出
@@ -1074,4 +1074,4 @@ public class ExcelDriveController {
 [**置顶**](#top)
 
 ---
-**更多案例可以查看Demo：[excel-demo](https://github.com/archine/excel-demo)**
+**Demo地址：[excel-demo](https://github.com/archine/excel-demo)**

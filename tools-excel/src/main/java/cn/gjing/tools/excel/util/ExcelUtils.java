@@ -196,6 +196,7 @@ public final class ExcelUtils {
      */
     public static void addRepeatValid(Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
                                       String errorTitle, String errorContent) {
+
         int startRow;
         int startCol;
         if (sheet instanceof HSSFSheet) {
@@ -242,7 +243,7 @@ public final class ExcelUtils {
      * @param oldRowModelMap  oldRowModelMap
      * @param sheet           Current sheet
      * @param row             Current row
-     * @param index           Line index, index type according to isHead
+     * @param index           The data index, table header, and body all start at 0
      * @param dataSize        Excel head data size or body data size,
      * @param colIndex        Current col index
      * @param cellValue       Current cell value
@@ -251,11 +252,11 @@ public final class ExcelUtils {
      */
     public static void mergeY(Map<Integer, ExcelOldRowModel> oldRowModelMap, Sheet sheet, Row row, boolean allowMergeEmpty, int index, int colIndex,
                               Object cellValue, int dataSize, boolean toMerge) {
-        if (index == 0) {
+        ExcelOldRowModel excelOldRowModel = oldRowModelMap.get(colIndex);
+        if (excelOldRowModel == null) {
             oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
             return;
         }
-        ExcelOldRowModel excelOldRowModel = oldRowModelMap.get(colIndex);
         if (toMerge) {
             if (ParamUtils.equals(cellValue, excelOldRowModel.getOldRowCellValue(), allowMergeEmpty)) {
                 if (index == dataSize - 1) {
@@ -266,9 +267,7 @@ public final class ExcelUtils {
             if (excelOldRowModel.getOldRowIndex() + 1 < row.getRowNum()) {
                 sheet.addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum() - 1, colIndex, colIndex));
             }
-            if (index != dataSize - 1) {
-                oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
-            }
+            oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
             return;
         }
         if (excelOldRowModel.getOldRowIndex() + 1 < row.getRowNum()) {
@@ -309,10 +308,8 @@ public final class ExcelUtils {
             if (oldCellModel.getLastCellIndex() + 1 < colIndex) {
                 sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), oldCellModel.getLastCellIndex(), colIndex - 1));
             }
-            if (colIndex != colSize - 1) {
-                oldCellModel.setLastCellValue(cellValue);
-                oldCellModel.setLastCellIndex(colIndex);
-            }
+            oldCellModel.setLastCellValue(cellValue);
+            oldCellModel.setLastCellIndex(colIndex);
             return;
         }
         if (oldCellModel.getLastCellIndex() + 1 < colIndex) {
@@ -320,6 +317,30 @@ public final class ExcelUtils {
             oldCellModel.setLastCellIndex(colIndex);
             oldCellModel.setLastCellValue(cellValue);
         }
+    }
+
+    /**
+     * Merge cells
+     *
+     * @param sheet    Current sheet
+     * @param firstCol First column index
+     * @param lastCol  last column index
+     * @param firstRow First row index
+     * @param LastRow  Last row index
+     */
+    private static void merge(Sheet sheet, int firstCol, int lastCol, int firstRow, int LastRow) {
+        sheet.addMergedRegion(new CellRangeAddress(firstRow, LastRow, firstCol, lastCol));
+    }
+
+    /**
+     * Get cell range address object
+     *
+     * @param sheet Current sheet
+     * @param index address index, start of 0
+     * @return CellRangeAddress
+     */
+    private static CellRangeAddress getCellRangeAddress(Sheet sheet, int index) {
+        return sheet.getMergedRegion(index);
     }
 
     /**

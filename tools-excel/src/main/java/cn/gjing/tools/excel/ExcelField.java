@@ -25,25 +25,18 @@ public @interface ExcelField {
      * The last one in the array belongs to the real header,
      * and if you are importing a multilevel header Excel file,
      * you need to specify the real header start subscript
+     * The header array size must be the same
      *
      * @return header names
      */
     String[] value() default {""};
 
     /**
-     * Excel header width
+     * Column width of the excel header
      *
-     * @return cell width
+     * @return Column width
      */
     int width() default 5120;
-
-    /**
-     * List header sort, Please to use order
-     *
-     * @return sort index
-     */
-    @Deprecated
-    int sort() default 0;
 
     /**
      * List header sort, if not set will default entity property order
@@ -68,14 +61,6 @@ public @interface ExcelField {
     Merge autoMerge() default @Merge;
 
     /**
-     * Whether null values are supported when imported,Please to use required
-     *
-     * @return boolean
-     */
-    @Deprecated
-    boolean allowEmpty() default true;
-
-    /**
      * Whether the contents in the cell below the current header are required when importing
      *
      * @return boolean
@@ -83,7 +68,7 @@ public @interface ExcelField {
     boolean required() default false;
 
     /**
-     * Remove white space on both sides of the text when importing
+     * Remove white space on both sides of the string when importing
      *
      * @return boolean
      */

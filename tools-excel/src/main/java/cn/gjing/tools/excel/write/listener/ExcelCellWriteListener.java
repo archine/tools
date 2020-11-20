@@ -20,7 +20,7 @@ public interface ExcelCellWriteListener extends ExcelWriteListener {
      * @param sheet      Current sheet
      * @param row        Current row
      * @param cell       Current cell
-     * @param index      Line index, index type according to isHead, Starting from 0
+     * @param index      The data index, table header, and body all start at 0
      * @param colIndex   Current cell index
      * @param isHead     Whether is excel head
      * @param excelField ExcelField annotation of current field
@@ -34,7 +34,7 @@ public interface ExcelCellWriteListener extends ExcelWriteListener {
      * @param sheet      Current sheet
      * @param row        Current row
      * @param cell       Current cell
-     * @param index      Line index, index type according to isHead, Starting from 0
+     * @param index      The data index, table header, and body all start at 0
      * @param colIndex   Current cell index
      * @param isHead     Whether is excel head
      * @param excelField ExcelField annotation of current field
