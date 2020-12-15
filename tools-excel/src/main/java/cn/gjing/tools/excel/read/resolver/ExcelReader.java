@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.read.resolver;
 
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelInitException;
+import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
@@ -9,6 +10,9 @@ import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
+import org.apache.poi.poifs.filesystem.NotOLE2FileException;
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.IOException;
@@ -44,19 +48,27 @@ public class ExcelReader<R> {
             case XLS:
                 try {
                     this.context.setWorkbook(new HSSFWorkbook(this.context.getInputStream()));
+                } catch (NotOLE2FileException | OfficeXmlFileException exception ) {
+                    exception.printStackTrace();
+                    throw new ExcelTemplateException();
                 } catch (IOException e) {
                     throw new ExcelInitException("Init workbook error, " + e.getMessage());
                 }
                 break;
             case XLSX:
-                Workbook workbook = StreamingReader.builder()
-                        .rowCacheSize(excel.cacheRowSize())
-                        .bufferSize(excel.bufferSize())
-                        .open(this.context.getInputStream());
+                Workbook workbook;
+                try {
+                    workbook = StreamingReader.builder()
+                            .rowCacheSize(excel.cacheRowSize())
+                            .bufferSize(excel.bufferSize())
+                            .open(this.context.getInputStream());
+                } catch (NotOfficeXmlFileException e) {
+                    e.printStackTrace();
+                    throw new ExcelTemplateException();
+                }
                 this.context.setWorkbook(workbook);
                 break;
             default:
-                throw new ExcelInitException("No corresponding resolver was found");
         }
         this.readerResolver = new ReadExecutor<>();
         this.readerResolver.init(this.context);
@@ -169,10 +181,10 @@ public class ExcelReader<R> {
 
     /**
      * Check that the Excel file is bound to the currently set mapping entity
-     * @see ExcelBindWriter#bind(boolean)
      *
      * @param enable Whether enable check
      * @return this
+     * @see ExcelBindWriter#bind(boolean)
      */
     public ExcelReader<R> check(boolean enable) {
         this.context.setCheckTemplate(enable);

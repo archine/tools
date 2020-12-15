@@ -122,7 +122,7 @@ public class ExcelReadWrapper<R> {
     }
 
     /**
-     * Which table heads to be ignored when importing
+     * Which excel heads to be ignored when importing
      *
      * @param ignores ignore head
      * @return this

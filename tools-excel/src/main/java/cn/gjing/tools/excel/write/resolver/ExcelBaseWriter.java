@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel.write.resolver;
 
-import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
@@ -49,7 +48,6 @@ public abstract class ExcelBaseWriter {
                 this.writerResolver = new ExcelWriteXlsxResolver(context);
                 break;
             default:
-                throw new ExcelResolverException("No corresponding resolver was found");
         }
     }
 

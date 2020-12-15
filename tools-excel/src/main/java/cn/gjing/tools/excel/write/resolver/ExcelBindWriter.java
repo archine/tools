@@ -199,20 +199,6 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Whether you need to add a file identifier when exporting an Excel file,
-     * which can be used for template validation of the file at import time
-     *
-     * @param identifier Need file indentifier
-     * @return this
-     * @deprecated Change the method name to make it easier to understand, Used {@link #bind(boolean)}
-     */
-    @Deprecated
-    public ExcelBindWriter identifier(boolean identifier) {
-        this.context.setBind(identifier);
-        return this;
-    }
-
-    /**
      * Bind the exported Excel file to the currently set mapped entity,
      * and if it is not set and detection is enabled in {@link ExcelReader#check(boolean)},
      * an ExcelTemplateException will be thrown

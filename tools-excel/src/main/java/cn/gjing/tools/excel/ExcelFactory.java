@@ -95,6 +95,7 @@ public final class ExcelFactory {
      * @return ExcelWriter
      */
     public static ExcelBindWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
+        ParamUtils.requireNonNull(excelClass, "Excel mapping class cannot be null");
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
         List<String[]> headerArr = new ArrayList<>();
@@ -161,7 +162,7 @@ public final class ExcelFactory {
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize, boolean initDefaultStyle) {
         ExcelWriterContext context = ExcelWriterContext.builder()
-                .fileName(fileName)
+                .fileName(StringUtils.isEmpty(fileName) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : fileName)
                 .excelType(excelType)
                 .excelClass(Void.class)
                 .build();
@@ -180,14 +181,8 @@ public final class ExcelFactory {
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) {
-        if (file == null) {
-            throw new ExcelInitException("File cannot be null");
-        }
-        Excel excel = excelClass.getAnnotation(Excel.class);
-        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        ParamUtils.isExcel(file.getOriginalFilename(), excel.type().name().toLowerCase());
         try {
-            return createReader(file.getInputStream(), excelClass, excel, ignores);
+            return createReader(file.getInputStream(), excelClass, ignores);
         } catch (IOException e) {
             throw new ExcelInitException("Create excel reader error," + e.getMessage());
         }
@@ -205,14 +200,8 @@ public final class ExcelFactory {
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass, String... ignores) {
-        if (file == null) {
-            throw new ExcelInitException("File cannot be null");
-        }
-        Excel excel = excelClass.getAnnotation(Excel.class);
-        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        ParamUtils.isExcel(file.getName(), excel.type().name().toLowerCase());
         try {
-            return createReader(new FileInputStream(file), excelClass, excel, ignores);
+            return createReader(new FileInputStream(file), excelClass, ignores);
         } catch (IOException e) {
             throw new ExcelInitException("Create excel reader error," + e.getMessage());
         }
@@ -230,12 +219,9 @@ public final class ExcelFactory {
      * @return ExcelReader
      */
     public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass, String... ignores) {
+        ParamUtils.requireNonNull(excelClass, "Excel mapping class cannot be null");
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        return createReader(inputStream, excelClass, excel, ignores);
-    }
-
-    private static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass, Excel excel, String... ignores) {
         List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, ignores, null);
         ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(inputStream, excelClass, excelFieldList);
         return new ExcelReader<>(readerContext, excel);

@@ -156,6 +156,7 @@ public final class ParamUtils {
      *
      * @param fileName file name
      */
+    @Deprecated
     public static void isExcel(String fileName, String version) {
         if (fileName == null) {
             return;
