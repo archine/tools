@@ -5,7 +5,7 @@ package cn.gjing.http;
  **/
 public enum HttpMethod {
     /**
-     *
+     * Request method
      */
     GET,
     HEAD,

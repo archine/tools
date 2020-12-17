@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>2.0.5</version>
+        <version>2.6.0</version>
     </parent>
     <artifactId>tools-httpclient</artifactId>
-    <version>1.2.7</version>
+    <version>1.2.8</version>
     <name>tools-httpclient</name>
     <description>http request tool</description>
 

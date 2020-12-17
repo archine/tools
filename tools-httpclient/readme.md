@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.2.7-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
+![](https://img.shields.io/badge/version-1.2.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg)     
   
 **Http请求工具**
 ## 一、添加依赖
@@ -6,7 +6,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-httpclient</artifactId>
-    <version>1.2.7</version>
+    <version>1.2.8</version>
 </dependency>
 ```
 ## 二、使用说明
@@ -142,4 +142,3 @@ public class Test{
 }
 ```
 ---
-**更多教程可前往博客查看: [Java http请求工具](https://yq.aliyun.com/articles/703132?spm=a2c4e.11155435.0.0.73393312Egko4y)**

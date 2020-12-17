@@ -1,9 +1,11 @@
 package cn.gjing.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.nio.charset.Charset;
@@ -15,7 +17,7 @@ import java.util.Objects;
  **/
 public class HttpClient<T> implements AutoCloseable {
     private String requestUrl;
-    private Class<T> responseType;
+    private TypeReference<T> responseType;
     private T data;
     private Map<String, String> header;
     private String paramsStr;
@@ -29,7 +31,7 @@ public class HttpClient<T> implements AutoCloseable {
     private int connectTimeout = 2000;
     private int readTimeout = 5000;
 
-    private HttpClient(String url, HttpMethod method, Class<T> responseType) {
+    private HttpClient(String url, HttpMethod method, TypeReference<T> responseType) {
         this.requestUrl = url;
         this.httpMethod = method;
         this.responseType = responseType;
@@ -53,6 +55,28 @@ public class HttpClient<T> implements AutoCloseable {
      * @return this
      */
     public static <T> HttpClient<T> builder(String url, HttpMethod method, Class<T> responseType) {
+        try (final HttpClient<T> httpClient = new HttpClient<>(url, method, new TypeReference<T>() {
+            @Override
+            public Type getType() {
+                return responseType;
+            }
+        })) {
+            return httpClient;
+        } catch (Exception e) {
+            throw new HttpException("Create httpclient error");
+        }
+    }
+
+    /**
+     * Build a httpClient
+     *
+     * @param url          Request url
+     * @param method       Request method
+     * @param responseType Response class
+     * @param <T>          Response type
+     * @return this
+     */
+    public static <T> HttpClient<T> builder(String url, HttpMethod method, TypeReference<T> responseType) {
         try (final HttpClient<T> httpClient = new HttpClient<>(url, method, responseType)) {
             return httpClient;
         } catch (Exception e) {
@@ -74,6 +98,7 @@ public class HttpClient<T> implements AutoCloseable {
 
     /**
      * Set request timeout time
+     *
      * @param connectTimeout Connect time
      * @return this
      */
@@ -84,6 +109,7 @@ public class HttpClient<T> implements AutoCloseable {
 
     /**
      * Set request timeout time
+     *
      * @param readTimeout Read time
      * @return this
      */
@@ -134,7 +160,7 @@ public class HttpClient<T> implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public HttpClient<T> execute() {
-        ConnectionFactory connectionFactory = new ConnectionFactory(this.requestUrl,this.connectTimeout,this.readTimeout);
+        ConnectionFactory connectionFactory = new ConnectionFactory(this.requestUrl, this.connectTimeout, this.readTimeout);
         HttpURLConnection connection = requestUrl.startsWith("http") ? connectionFactory.getHttp() : connectionFactory.getHttps();
         connection.setRequestProperty("Content-type", json == null ? "application/x-www-form-urlencoded" : "application/json");
         try {
