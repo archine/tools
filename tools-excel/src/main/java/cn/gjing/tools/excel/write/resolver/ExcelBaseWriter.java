@@ -35,7 +35,9 @@ public abstract class ExcelBaseWriter {
     /**
      * Choose resolver
      *
-     * @param context Excel write context
+     * @param context    Excel write context
+     * @param windowSize Window size, which is flushed to disk when exported
+     *                   if the data that has been written out exceeds the specified size
      */
     protected void chooseResolver(ExcelWriterContext context, int windowSize) {
         switch (this.context.getExcelType()) {

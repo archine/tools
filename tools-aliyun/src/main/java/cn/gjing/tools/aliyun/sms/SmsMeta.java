@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "tools.aliyun.sms")
 public class SmsMeta {
     /**
-     * Ali cloud user accesskey, Priority is greater than global configuration
+     * Ali cloud user access key, Priority is greater than global configuration
      */
     private String accessKey;
 

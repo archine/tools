@@ -155,6 +155,7 @@ public final class ParamUtils {
      * Check the file type is excel
      *
      * @param fileName file name
+     * @param version  File type, xls or xlsx
      */
     @Deprecated
     public static void isExcel(String fileName, String version) {

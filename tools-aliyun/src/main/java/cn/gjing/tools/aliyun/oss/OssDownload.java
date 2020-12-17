@@ -1,12 +1,9 @@
 package cn.gjing.tools.aliyun.oss;
 
 import cn.gjing.tools.aliyun.AliyunMeta;
-import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.OSSObject;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -17,14 +14,12 @@ import java.util.function.Predicate;
  * @author Gjing
  **/
 public class OssDownload {
-    private OSS ossClient;
+    private final OSS ossClient;
     private final OssMeta ossMeta;
-    private final AliyunMeta aliyunMeta;
 
     public OssDownload(OssMeta ossMeta, AliyunMeta aliyunMeta) {
         this.ossMeta = ossMeta;
-        this.aliyunMeta = aliyunMeta;
-        this.ossInit();
+        this.ossClient = ossMeta.getOssClient(aliyunMeta);
     }
 
     /**
@@ -93,13 +88,4 @@ public class OssDownload {
         Predicate<String> predicate = e -> e.indexOf("/", e.length() - 1) != -1;
         this.ossClient.getObject(new GetObjectRequest(this.ossMeta.getBucket(), fileName), new File(predicate.test(dir) ? dir + fileName : dir + "/" + fileName));
     }
-
-    private void ossInit() {
-        ClientBuilderConfiguration conf = new ClientBuilderConfiguration();
-        conf.setMaxConnections(this.ossMeta.getMaxConnections());
-        conf.setSocketTimeout(this.ossMeta.getSocketTimeout());
-        conf.setConnectionTimeout(this.ossMeta.getConnectionTimeout());
-        conf.setIdleConnectionTime(this.ossMeta.getIdleTime());
-        this.ossClient = new OSSClientBuilder().build(this.ossMeta.getEndPoint(), StringUtils.isEmpty(this.ossMeta.getAccessKey()) ? this.aliyunMeta.getAccessKey() : this.ossMeta.getAccessKey(),
-                StringUtils.isEmpty(this.ossMeta.getAccessKeySecret()) ? this.aliyunMeta.getAccessKeySecret() : this.ossMeta.getAccessKeySecret(), conf);    }
 }

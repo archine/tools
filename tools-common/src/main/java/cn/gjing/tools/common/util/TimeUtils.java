@@ -333,6 +333,7 @@ public final class TimeUtils {
      * 将文本时间转换为时间戳
      *
      * @param date date
+     * @param format 转换格式
      * @return 时间戳
      */
     public static Long toTimestamp(String date, String format) {

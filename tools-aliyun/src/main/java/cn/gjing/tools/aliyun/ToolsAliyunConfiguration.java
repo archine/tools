@@ -1,8 +1,8 @@
 package cn.gjing.tools.aliyun;
 
+import cn.gjing.tools.aliyun.oss.MultipartOssUpload;
 import cn.gjing.tools.aliyun.oss.OssDownload;
 import cn.gjing.tools.aliyun.oss.OssMeta;
-import cn.gjing.tools.aliyun.oss.OssUpload;
 import cn.gjing.tools.aliyun.oss.SimpleOssUpload;
 import cn.gjing.tools.aliyun.sms.SmsHelper;
 import cn.gjing.tools.aliyun.sms.SmsMeta;
@@ -34,9 +34,15 @@ class ToolsAliyunConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(OssUpload.class)
-    public OssUpload baseOssUpload(OssMeta ossMeta, AliyunMeta aliyunMeta) {
-        return new SimpleOssUpload(ossMeta,aliyunMeta);
+    @ConditionalOnMissingBean(SimpleOssUpload.class)
+    public SimpleOssUpload baseOssUpload() {
+        return new SimpleOssUpload(ossMeta(),aliyunMeta());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(MultipartOssUpload.class)
+    public MultipartOssUpload multipartOssUpload() {
+        return new MultipartOssUpload(aliyunMeta(), ossMeta());
     }
 
     @Bean
