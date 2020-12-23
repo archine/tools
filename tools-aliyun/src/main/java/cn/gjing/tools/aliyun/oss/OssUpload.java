@@ -24,7 +24,7 @@ public abstract class OssUpload {
      */
     public void createBucket(String bucket) {
         try {
-            if (this.ossMeta.getOssClient(this.aliyunMeta).doesBucketExist(bucket)) {
+            if (!this.ossMeta.getOssClient(this.aliyunMeta).doesBucketExist(bucket)) {
                 this.ossMeta.getOssClient(this.aliyunMeta).createBucket(bucket);
             }
         } catch (Exception e) {
