@@ -1,8 +1,10 @@
 package cn.gjing.tools.excel;
 
+
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.metadata.ExcelColor;
+import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
 import cn.gjing.tools.excel.write.merge.Merge;
 
 import java.lang.annotation.*;
@@ -61,7 +63,9 @@ public @interface ExcelField {
     Merge autoMerge() default @Merge;
 
     /**
-     * Whether the contents in the cell below the current header are required when importing
+     * Is the cell content required when importing? Once set to true,
+     * the current row is automatically skipped when a null value is encountered.
+     * Of course, you can customize the processing logic by {@link ExcelEmptyReadListener} to it
      *
      * @return boolean
      */

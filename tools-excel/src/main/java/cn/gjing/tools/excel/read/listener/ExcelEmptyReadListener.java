@@ -5,7 +5,7 @@ import cn.gjing.tools.excel.ExcelField;
 import java.lang.reflect.Field;
 
 /**
- * Reads to a nonexistent cell or the cell content is empty
+ * Empty value listener
  *
  * @author Gjing
  **/
@@ -13,15 +13,15 @@ import java.lang.reflect.Field;
 public interface ExcelEmptyReadListener<R> extends ExcelReadListener {
 
     /**
-     * When a body cell is read, if the cell does not exist or the value is null,
-     * and you set the header to which the cell belongs not to be null, {@link ExcelField}
+     * When a body cell is read, if the cell does not exist or the value is empty,
+     * and header is set as required in the mapping entity {@link ExcelField#required()}
      *
      * @param r          Current Java object
      * @param field      Current field
      * @param excelField ExcelField annotation on that field
      * @param rowIndex   The index of the current row
      * @param colIndex   The index of the current col
-     * @return Whether to continue reading this line
+     * @return Whether to continue reading this line, or start the next line if false
      */
     boolean readEmpty(R r, Field field, ExcelField excelField, int rowIndex, int colIndex);
 }

@@ -5,7 +5,7 @@ import cn.gjing.tools.excel.exception.ExcelAssertException;
 import java.lang.annotation.*;
 
 /**
- * Assert when Excel import
+ * Assert when Excel import, An assertion failure throws An {@link ExcelAssertException},
  *
  * @author Gjing
  **/
@@ -22,10 +22,9 @@ public @interface ExcelAssert {
     String expr();
 
     /**
-     * A validation failure throws an {@link ExcelAssertException},
-     * which is used to configure the error information to be thrown
+     * Error message
      *
      * @return message
      */
-    String message() default "There is an error in the content";
+    String message() default "The cell value does not meet the requirements";
 }

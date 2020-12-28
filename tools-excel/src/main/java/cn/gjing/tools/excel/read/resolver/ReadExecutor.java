@@ -240,7 +240,8 @@ class ReadExecutor<R> implements ExcelReaderResolver<R> {
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
                 return;
             }
-            throw new IllegalArgumentException("Unsupported data type, you can use a data converter to convert " + value.getClass().getTypeName() + " to " + field.getType().getTypeName());
+            throw new IllegalArgumentException("Unsupported data type, the current cell value type is " + value.getClass().getTypeName()
+                    + ", but " + field.getName() + " is " + field.getType().getTypeName());
         }
     }
 
