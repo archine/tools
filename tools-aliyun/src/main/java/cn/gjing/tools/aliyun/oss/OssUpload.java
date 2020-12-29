@@ -2,6 +2,7 @@ package cn.gjing.tools.aliyun.oss;
 
 import cn.gjing.tools.aliyun.AliyunMeta;
 import com.aliyun.oss.model.DeleteObjectsRequest;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -9,7 +10,9 @@ import java.util.List;
  * @author Gjing
  **/
 public abstract class OssUpload {
+    @Getter
     protected AliyunMeta aliyunMeta;
+    @Getter
     protected OssMeta ossMeta;
 
     protected OssUpload(AliyunMeta aliyunMeta, OssMeta ossMeta) {
@@ -30,6 +33,25 @@ public abstract class OssUpload {
         } catch (Exception e) {
             throw new IllegalStateException("创建Bucket失败,请核对Bucket名称(规则：只能包含小写字母、数字和短横线，必须以小写字母和数字开头和结尾，长度在3-63之间)");
         }
+    }
+
+    /**
+     * Determine if the file exists on OSS
+     * @param fileName file name
+     * @param bucket bucket name
+     * @return true is exist
+     */
+    public boolean existFile(String fileName, String bucket) {
+        return this.ossMeta.getOssClient(this.aliyunMeta).doesObjectExist(bucket, fileName);
+    }
+
+    /**
+     * Determine if the file exists on OSS
+     * @param fileName file name
+     * @return true is exist
+     */
+    public boolean existFile(String fileName) {
+        return this.existFile(fileName, this.ossMeta.getBucket());
     }
 
     /**

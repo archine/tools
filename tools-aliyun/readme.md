@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-1.0.8-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-1.0.9-green.svg) &nbsp; ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp;
 ![](https://img.shields.io/badge/builder-success-green.svg)
 
 > 阿里云OSS和短信工具
@@ -10,7 +10,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-aliyun</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 </dependency>
 ```
 
@@ -51,8 +51,11 @@ tools:
 
 适用于上传小文件，成功后会返回文件名，前端只需要将文件名与bucket域名拼接即可，bucket域名可在oss控制台，
 点击bucket列表，找到你使用的bucket点进去后点击概览，就可以在右边界面看到了，或者自己拼接：``https://<bucket>.<endPoint>``。
+
 ```java
 import cn.gjing.tools.aliyun.oss.SimpleOssUpload;
+import org.springframework.web.bind.annotation.PostMapping;
+
 /**
  * @author Gjing
  **/
@@ -89,6 +92,12 @@ public class TestController {
     public String deleteFiles(String[] fileNames) {
         // 批量删除, 会在执行完成后会返回删除成功的文件名列表，批量删除最多同时删除``1000``个
         return this.simpleOssUpload.deleteFiles(Arrays.asList(fileNames)).toString();
+    }
+
+    @PostMapping("/test3")
+    public boolean existFile(String fileName) {
+        // 判断文件是否存在，存在返回true
+        return this.simpleOssUpload.existFile(fileName);
     }
 }
 ```
