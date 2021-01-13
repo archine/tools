@@ -27,7 +27,7 @@
 **如下为全部配置参数，在项目中可选择自己需要的参数进行配置**
 
 ```yaml
-kit:
+tools:
   doc:
     contact:
       # 联系邮箱
@@ -84,7 +84,7 @@ spring:
   application:
     name: doc-demo
 # 如果不需要配置扫描包，那么可以不用配置其他的，直接全部走默认的即可
-kit:
+tools:
   doc:
     # 一般配置好扫描的controller包路径就好了，
     base-package: com.xxx.xxx.controller
@@ -121,7 +121,7 @@ zuul:
       serviceId: demo
       path: /demo/**
 # 文档配置
-kit:
+tools:
   doc:
     group:
       # 服务列表
@@ -162,7 +162,7 @@ eureka:
     prefer-ip-address: true
     instance-id: gateway
 # 文档配置
-kit:
+tools:
   doc:
     group:
       # 服务列表
