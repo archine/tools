@@ -8,11 +8,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 开启单项目文档
+ * Open a single project document for all SpringBoot projects
+ * The SpringBoot version is recommended for 2.2.x +
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.ANNOTATION_TYPE})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Import(SingleDocConfiguration.class)
 public @interface EnableSingleDoc {
 }

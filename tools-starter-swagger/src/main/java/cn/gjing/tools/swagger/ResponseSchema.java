@@ -3,7 +3,7 @@ package cn.gjing.tools.swagger;
 import lombok.*;
 
 /**
- * 全局响应
+ * Global response structure
  *
  * @author Gjing
  **/
@@ -14,15 +14,15 @@ import lombok.*;
 @AllArgsConstructor
 public class ResponseSchema {
     /**
-     * 状态码
+     * Response status
      */
     private Integer code;
     /**
-     * 信息
+     * Response message
      */
     private String message;
     /**
-     * 结果Bean的名称
+     * Result bean name
      */
     private String schema;
 }

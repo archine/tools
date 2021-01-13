@@ -6,7 +6,7 @@ package cn.gjing.tools.swagger;
 
 public enum PathType {
     /**
-     * 接口选择类型
+     * Interface matching rules
      */
     ANT,REGEX
 }

@@ -14,11 +14,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GroupService {
     /**
-     * 描述
+     * The service description
      */
     private String desc;
+
     /**
-     * 目标服务url或者服务名
+     * The target service name is the name of the "spring.application.name" parameter
+     * set in your project configuration file
      */
-    private String url;
+    private String target;
+
+    /**
+     * Document address, the default can be
+     */
+    @Builder.Default
+    private String location = "/v2/api-docs";
 }

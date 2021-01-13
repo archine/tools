@@ -3,12 +3,13 @@ package cn.gjing.tools.swagger.core;
 import cn.gjing.tools.swagger.Doc;
 import cn.gjing.tools.swagger.DocContact;
 import cn.gjing.tools.swagger.PathType;
-import com.google.common.base.Predicates;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.*;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
@@ -17,16 +18,16 @@ import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author Gjing
  **/
-@EnableSwagger2
+@EnableOpenApi
 class DefaultSingleDocHandler {
     @Resource
     private Doc doc;
@@ -71,23 +72,46 @@ class DefaultSingleDocHandler {
             docket.globalOperationParameters(parameterList);
         }
         ApiSelectorBuilder builder = docket.select();
-        if (this.doc.getPathType() == PathType.ANT) {
-            builder.paths(PathSelectors.ant(this.doc.getPathPattern()));
-            for (String exclude : doc.getExcludePattern()) {
-                builder.paths(Predicates.not(PathSelectors.ant(this.doc.getPathPattern())));
-            }
-        } else {
-            builder.paths(PathSelectors.regex(this.doc.getPathPattern()));
-            for (String exclude : doc.getExcludePattern()) {
-                builder.paths(Predicates.not(PathSelectors.regex(this.doc.getPathPattern())));
-            }
-        }
         if (this.doc.getBasePackage().isEmpty()) {
             LoggerFactory.getLogger(DefaultSingleDocHandler.class).warn("Swagger basePackage value is default , Please set your own project interface path");
             builder.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class));
         } else {
             builder.apis(RequestHandlerSelectors.basePackage(doc.getBasePackage()));
         }
+        if (this.doc.getPathType() == PathType.ANT) {
+            builder.paths(PathSelectors.ant(this.doc.getPathPattern()));
+            for (String exclude : this.doc.getExcludePattern()) {
+                builder.paths(notAnt(exclude));
+            }
+        } else {
+            builder.paths(PathSelectors.regex(this.doc.getPathPattern()));
+            for (String exclude : this.doc.getExcludePattern()) {
+                builder.paths(notRegex(exclude));
+            }
+        }
         return builder.build();
+    }
+
+    /**
+     * No ant match
+     *
+     * @param antPattern ant pattern
+     * @return Predicate
+     */
+    public static Predicate<String> notAnt(final String antPattern) {
+        return input -> {
+            AntPathMatcher matcher = new AntPathMatcher();
+            return !matcher.match(antPattern, input);
+        };
+    }
+
+    /**
+     * No regex match
+     *
+     * @param pathRegex path regex
+     * @return Predicate
+     */
+    public static Predicate<String> notRegex(final String pathRegex) {
+        return input -> !input.matches(pathRegex);
     }
 }

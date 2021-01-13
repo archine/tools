@@ -3,7 +3,7 @@ package cn.gjing.tools.swagger;
 import lombok.*;
 
 /**
- * 请求头
+ * Global request header
  *
  * @author Gjing
  **/
@@ -14,15 +14,15 @@ import lombok.*;
 @AllArgsConstructor
 public class RequestHeader {
     /**
-     * 请求头名称
+     * Request header name
      */
     private String name;
     /**
-     * 描述
+     * Header description
      */
     private String desc;
     /**
-     * 是否必填, 默认true
+     * Whether must
      */
     private boolean required = false;
 }

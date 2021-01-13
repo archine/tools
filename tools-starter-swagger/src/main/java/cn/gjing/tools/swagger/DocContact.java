@@ -18,17 +18,17 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("tools.doc.contact")
 public class DocContact {
     /**
-     * 联系人姓名
+     * The contact
      */
     @Builder.Default
     private String name = "";
     /**
-     * 联系人个人url
+     * Contact Website
      */
     @Builder.Default
     private String url = "";
     /**
-     * 联系人邮箱
+     * Contact email
      */
     @Builder.Default
     private String email = "";

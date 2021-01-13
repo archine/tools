@@ -8,7 +8,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 开启分组文档
+ * Enable the document aggregation pattern,
+ * which applies to the SpringCloud pattern
+ * and applies to the gateway service
+ *
  * @author Gjing
  **/
 @Retention(RetentionPolicy.RUNTIME)

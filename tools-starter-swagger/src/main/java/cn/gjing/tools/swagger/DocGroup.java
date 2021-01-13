@@ -21,19 +21,13 @@ import java.util.List;
 @ConfigurationProperties("tools.doc.group")
 public class DocGroup {
     /**
-     * 是否开启文档聚合
+     * Open the aggregate document
      */
     @Builder.Default
-    private boolean enable = false;
+    private boolean enable = true;
 
     /**
-     * 聚合类型
-     */
-    @Builder.Default
-    private GroupType type = GroupType.URL;
-
-    /**
-     * 服务列表
+     * Set of services
      */
     @Builder.Default
     private List<GroupService> serviceList = new ArrayList<>();

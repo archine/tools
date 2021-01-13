@@ -3,6 +3,7 @@ package cn.gjing.tools.swagger.core;
 import cn.gjing.tools.swagger.DocGroup;
 import cn.gjing.tools.swagger.DocGroupHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Primary;
 class GroupDocConfiguration {
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "tools.doc.group.enable",havingValue = "true")
     public DocGroup swaggerResources() {
         return new DocGroup();
     }
@@ -19,14 +21,8 @@ class GroupDocConfiguration {
     @Bean
     @Primary
     @ConditionalOnMissingBean
-    public DocGroupHandler swaggerResourceHandler(DocGroup docGroup) {
-        switch (docGroup.getType()) {
-            case URL:
-                return new DefaultUrlGroupDocHandler();
-            case NAME:
-                return new DefaultNameGroupDocHandler();
-            default:
-                throw new IllegalArgumentException("Cannot found your doc handler");
-        }
+    @ConditionalOnProperty(name = "tools.doc.group.enable",havingValue = "true")
+    public DocGroupHandler swaggerResourceHandler() {
+        return new DefaultNameGroupDocHandler();
     }
 }

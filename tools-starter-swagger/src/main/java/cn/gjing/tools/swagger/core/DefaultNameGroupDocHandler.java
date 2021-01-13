@@ -19,14 +19,13 @@ class DefaultNameGroupDocHandler implements DocGroupHandler {
     @Override
     public List<SwaggerResource> get() {
         List<SwaggerResource> swaggerResourceList = new ArrayList<>();
-        String suffix = "/v2/api-docs";
         SwaggerResource swaggerResource;
         List<GroupService> serviceList = this.resources.getServiceList();
         for (GroupService service : serviceList) {
             swaggerResource = new SwaggerResource();
             swaggerResource.setName(service.getDesc());
-            swaggerResource.setSwaggerVersion("2.0");
-            swaggerResource.setLocation("/" + service.getUrl() + suffix);
+            swaggerResource.setSwaggerVersion("3.0");
+            swaggerResource.setLocation("/" + service.getTarget() + service.getLocation());
             swaggerResourceList.add(swaggerResource);
         }
         return swaggerResourceList;
