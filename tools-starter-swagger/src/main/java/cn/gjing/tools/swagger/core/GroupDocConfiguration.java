@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Primary;
 class GroupDocConfiguration {
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(name = "kit.doc.group.enable",havingValue = "true")
+    @ConditionalOnProperty(name = "tools.doc.group.enable",havingValue = "true")
     public DocGroup swaggerResources() {
         return new DocGroup();
     }
@@ -21,7 +21,7 @@ class GroupDocConfiguration {
     @Bean
     @Primary
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(name = "kit.doc.group.enable",havingValue = "true")
+    @ConditionalOnProperty(name = "tools.doc.group.enable",havingValue = "true")
     public BaseAggregatedDocumentProcessor swaggerResourceHandler() {
         return new AggregatedDocumentProcessor();
     }

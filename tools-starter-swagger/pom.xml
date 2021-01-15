@@ -5,10 +5,10 @@
     <parent>
         <groupId>cn.gjing</groupId>
         <artifactId>tools</artifactId>
-        <version>2.6.5</version>
+        <version>2.6.6</version>
     </parent>
     <artifactId>tools-starter-swagger</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <name>tools-starter-swagger</name>
     <description>SpringBoot、SpringCloud快速集成Swagger文档</description>
 

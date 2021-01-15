@@ -75,7 +75,7 @@ public class Doc {
      * Document version
      */
     @Builder.Default
-    private String version = "v3.0";
+    private String version = "v1.0";
     /**
      * Document license
      */

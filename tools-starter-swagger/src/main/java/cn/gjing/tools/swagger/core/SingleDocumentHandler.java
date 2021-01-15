@@ -49,7 +49,7 @@ class SingleDocumentHandler {
     @Bean
     @SuppressWarnings("all")
     public Docket restApiDocket() {
-        final Docket docket = new Docket(DocumentationType.OAS_30)
+        final Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .enable(doc.isEnable())
                 .groupName(this.doc.getGroup())
