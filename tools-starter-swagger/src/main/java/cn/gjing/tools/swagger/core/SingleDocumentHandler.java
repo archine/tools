@@ -6,15 +6,14 @@ import cn.gjing.tools.swagger.PathType;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.*;
 import springfox.documentation.oas.annotations.EnableOpenApi;
-import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
-import springfox.documentation.service.Parameter;
-import springfox.documentation.service.ResponseMessage;
+import springfox.documentation.service.RequestParameter;
+import springfox.documentation.service.Response;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -28,7 +27,7 @@ import java.util.function.Predicate;
  * @author Gjing
  **/
 @EnableOpenApi
-class DefaultSingleDocHandler {
+class SingleDocumentHandler {
     @Resource
     private Doc doc;
     @Resource
@@ -49,31 +48,45 @@ class DefaultSingleDocHandler {
 
     @Bean
     @SuppressWarnings("all")
-    public Docket createRestApi() {
-        final Docket docket = new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).enable(doc.isEnable());
+    public Docket restApiDocket() {
+        final Docket docket = new Docket(DocumentationType.OAS_30)
+                .apiInfo(apiInfo())
+                .enable(doc.isEnable())
+                .groupName(this.doc.getGroup())
+                .protocols(this.doc.getProtocols());
         if (!doc.getGlobalResponseSchemas().isEmpty()) {
-            List<ResponseMessage> responseMessageList = new ArrayList<>();
+            List<Response> responseMessageList = new ArrayList<>();
             doc.getGlobalResponseSchemas().forEach(e -> {
-                responseMessageList.add(new ResponseMessageBuilder().code(e.getCode()).message(e.getMessage())
-                        .responseModel(new ModelRef(e.getSchema())).build());
+                responseMessageList.add(new ResponseBuilder()
+                        .code(e.getCode())
+                        .description(e.getMessage())
+                        .isDefault(e.isDefault())
+                        .build());
             });
-            docket.globalResponseMessage(RequestMethod.GET, responseMessageList)
-                    .globalResponseMessage(RequestMethod.DELETE, responseMessageList)
-                    .globalResponseMessage(RequestMethod.POST, responseMessageList)
-                    .globalResponseMessage(RequestMethod.PUT, responseMessageList)
-                    .globalResponseMessage(RequestMethod.PATCH, responseMessageList);
+            docket.globalResponses(HttpMethod.GET, responseMessageList)
+                    .globalResponses(HttpMethod.DELETE, responseMessageList)
+                    .globalResponses(HttpMethod.POST, responseMessageList)
+                    .globalResponses(HttpMethod.PUT, responseMessageList)
+                    .globalResponses(HttpMethod.PATCH, responseMessageList);
         }
-        if (!doc.getGlobalHeaders().isEmpty()) {
-            List<Parameter> parameterList = new ArrayList<>();
-            doc.getGlobalHeaders().forEach(e -> {
-                parameterList.add(new ParameterBuilder().name(e.getName()).description(e.getDesc()).required(e.isRequired())
-                        .modelRef(new ModelRef("String")).parameterType("header").build());
+        if (!doc.getGlobalParameters().isEmpty()) {
+            List<RequestParameter> parameterList = new ArrayList<>();
+            doc.getGlobalParameters().forEach(e -> {
+                parameterList.add(new RequestParameterBuilder()
+                        .description(e.getDesc())
+                        .name(e.getName())
+                        .parameterIndex(e.getIndex())
+                        .deprecated(e.isDeprecated())
+                        .hidden(e.isHidden())
+                        .in(e.getType())
+                        .required(e.isRequired())
+                        .build());
             });
-            docket.globalOperationParameters(parameterList);
+            docket.globalRequestParameters(parameterList);
         }
         ApiSelectorBuilder builder = docket.select();
         if (this.doc.getBasePackage().isEmpty()) {
-            LoggerFactory.getLogger(DefaultSingleDocHandler.class).warn("Swagger basePackage value is default , Please set your own project interface path");
+            LoggerFactory.getLogger(SingleDocumentHandler.class).warn("Swagger basePackage value is default , Please set your own project interface path");
             builder.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class));
         } else {
             builder.apis(RequestHandlerSelectors.basePackage(doc.getBasePackage()));

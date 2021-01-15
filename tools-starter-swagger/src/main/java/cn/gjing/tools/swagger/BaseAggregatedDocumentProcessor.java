@@ -7,5 +7,5 @@ import springfox.documentation.swagger.web.SwaggerResourcesProvider;
  *
  * @author Gjing
  **/
-public interface DocGroupHandler extends SwaggerResourcesProvider {
+public interface BaseAggregatedDocumentProcessor extends SwaggerResourcesProvider {
 }

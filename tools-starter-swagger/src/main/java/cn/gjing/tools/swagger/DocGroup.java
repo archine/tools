@@ -23,8 +23,7 @@ public class DocGroup {
     /**
      * Open the aggregate document
      */
-    @Builder.Default
-    private boolean enable = true;
+    private boolean enable;
 
     /**
      * Set of services

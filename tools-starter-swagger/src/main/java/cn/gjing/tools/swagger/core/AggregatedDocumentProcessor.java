@@ -1,7 +1,7 @@
 package cn.gjing.tools.swagger.core;
 
+import cn.gjing.tools.swagger.BaseAggregatedDocumentProcessor;
 import cn.gjing.tools.swagger.DocGroup;
-import cn.gjing.tools.swagger.DocGroupHandler;
 import cn.gjing.tools.swagger.GroupService;
 import springfox.documentation.swagger.web.SwaggerResource;
 
@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Aggregate document handlers to generate target service access addresses
+ *
  * @author Gjing
  **/
-class DefaultNameGroupDocHandler implements DocGroupHandler {
+class AggregatedDocumentProcessor implements BaseAggregatedDocumentProcessor {
     @Resource
     private DocGroup resources;
 
@@ -24,8 +26,8 @@ class DefaultNameGroupDocHandler implements DocGroupHandler {
         for (GroupService service : serviceList) {
             swaggerResource = new SwaggerResource();
             swaggerResource.setName(service.getDesc());
-            swaggerResource.setSwaggerVersion("3.0");
-            swaggerResource.setLocation("/" + service.getTarget() + service.getLocation());
+            swaggerResource.setSwaggerVersion("v3.0");
+            swaggerResource.setLocation("/" + service.getTarget() + service.getContextPath() + service.getLocation());
             swaggerResourceList.add(swaggerResource);
         }
         return swaggerResourceList;

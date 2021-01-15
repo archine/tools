@@ -15,6 +15,6 @@ import java.lang.annotation.Target;
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-@Import(SingleDocConfiguration.class)
+@Import(SingleDocSelector.class)
 public @interface EnableSingleDoc {
 }

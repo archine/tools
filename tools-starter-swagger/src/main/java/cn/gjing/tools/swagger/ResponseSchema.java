@@ -7,6 +7,7 @@ import lombok.*;
  *
  * @author Gjing
  **/
+@Builder
 @Setter
 @Getter
 @ToString
@@ -16,7 +17,7 @@ public class ResponseSchema {
     /**
      * Response status
      */
-    private Integer code;
+    private String code;
     /**
      * Response message
      */
@@ -24,5 +25,11 @@ public class ResponseSchema {
     /**
      * Result bean name
      */
+    @Deprecated
     private String schema;
+    /**
+     * Whether is default
+     */
+    @Builder.Default
+    private boolean isDefault = false;
 }

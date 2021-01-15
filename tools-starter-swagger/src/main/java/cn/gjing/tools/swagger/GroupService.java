@@ -17,16 +17,20 @@ public class GroupService {
      * The service description
      */
     private String desc;
-
     /**
-     * The target service name is the name of the "spring.application.name" parameter
-     * set in your project configuration file
+     * The application name of the target service,
+     * if the "spring.application.name" parameter is configured in the target project
      */
     private String target;
-
     /**
      * Document address, the default can be
      */
     @Builder.Default
     private String location = "/v2/api-docs";
+    /**
+     * The context path of the target service,
+     * if the "servlet.context-path" parameter is configured in the target project
+     */
+    @Builder.Default
+    private String contextPath = "";
 }

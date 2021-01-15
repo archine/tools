@@ -1,5 +1,5 @@
 # tools-starter-swagger
-![](https://img.shields.io/badge/version-2.0.0-green.svg) &nbsp; 
+![](https://img.shields.io/badge/version-2.0.1-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/author-Gjing-green.svg) &nbsp; 
 ![](https://img.shields.io/badge/builder-success-green.svg)   
 **快速在SpringBoot、SpringCloud项目中集成Swagger接口文档**
@@ -8,8 +8,14 @@
 <dependency>
      <groupId>cn.gjing</groupId>
      <artifactId>tools-starter-swagger</artifactId>
-     <version>2.0.0</version>
+     <version>2.0.1</version>
 </dependency>
+```
+
+**![](https://img.shields.io/badge/warn-%E5%89%8D%E8%A8%80-yellow)**
+```text
+如果项目中有设置拦截器或者引入了带有拦截器的第三方依赖，那么需要给每个拦截器配置排除Swagger的     
+相关路径: /error, /v2/**, /v3/**, /**/doc.html, /webjars/**, /swagger-ui/**, /swagger-resources/**
 ```
 
 ## 二、注解说明
@@ -66,8 +72,8 @@ tools:
         schema: ResultVO
       - code: 400
         message: 错误
-    # 全局请求头，设置后每一个接口的参数列表都会加上请求头参数
-    global-headers:
+    # 全局请求参数，设置会为每一个方法加上此参数
+    global-parameters:
       # 请求头名称
       - name: token
         # 请求头描述
@@ -93,11 +99,10 @@ tools:
 
 **注意事项：**
 
-* **全局响应信息，结果Bean的类名一定要在``Controller方法出现过``，否则文档无法展示其结构**
 * **方法返回值为``void``时，设置``状态码为200``的schema才``有效``，否则会采用方法本身的返回值，如需自定义，必须采用方法上使用``@ApiResponses``进行设置的方式，其他的状态码就没啥关系**
-* **全局配置的方式``优先级小于``方法或者类单独配置的方式**
-* **全局配置方式无法更改``状态码为200``的提示信息，如需更改必须采用在方法或者类上配置``@ApiResponses``的方式**
-* **配置全局会出现在``所有方法``里面，不与你在某个方法单独加个请求头冲突，``两者会合并``**
+* **全局返回值全局配置的方式``优先级小于``方法或者类单独配置的方式**
+* **全局配置返回值方式无法更改``状态码为200``的提示信息，如需更改必须采用在方法或者类上配置``@ApiResponses``的方式**
+* **配置全局参数会出现在``所有方法``里面，不与你在某个方法单独加个请求头冲突，``两者会合并``**
 
 ## 四、SpringCloud环境配置案例
 
@@ -124,12 +129,16 @@ zuul:
 tools:
   doc:
     group:
+      # 开启聚合文档
+      enable: true
       # 服务列表
       service-list:
         # 下拉选择时展示的名称
         - desc: 项目A
           # Zuul route中配置的serviceId
           target: demo
+          # 如果目标服务配置了servlet.context-path，那么也需要在此进行配置
+          contextPath: xxx
 ```
 
 ### 2、SpringCloud Gateway网关配置案例
@@ -165,6 +174,7 @@ eureka:
 tools:
   doc:
     group:
+      enable: true
       # 服务列表
       service-list:
         # 下拉选择时展示的名称
