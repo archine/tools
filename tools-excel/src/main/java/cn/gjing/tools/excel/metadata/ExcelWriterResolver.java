@@ -8,6 +8,7 @@ import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -49,12 +50,22 @@ public abstract class ExcelWriterResolver {
             Row row = this.context.getSheet().createRow(startOffset + i);
             row.setHeight(bigTitle.getRowHeight());
             Cell cell = row.createCell(0);
-            cell.setCellValue(bigTitle.getContent());
             cellListeners.forEach(e -> {
                 if (e instanceof ExcelStyleWriteListener) {
                     ((ExcelStyleWriteListener) e).setTitleStyle(bigTitle, cell);
                 }
             });
+            Object content = bigTitle.getCallback().apply(this.context.getWorkbook(), cell, bigTitle);
+            if (content instanceof String){
+                cell.setCellValue((String) content);
+            }else if (content instanceof RichTextString){
+                if ("XLSX".equals(this.context.getExcelType().name())) {
+                    throw new ExcelResolverException("XLSX does not support rich text for now");
+                }
+                cell.setCellValue((RichTextString) content);
+            }else {
+                throw new ExcelResolverException("Big title content type invalid, String and RichTextString are allowed!");
+            }
         }
         this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCols()));
     }

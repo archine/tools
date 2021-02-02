@@ -1,8 +1,11 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.metadata.ExcelColor;
+import cn.gjing.tools.excel.metadata.function.TFunction;
 import lombok.*;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
 
 /**
  * Excel big title
@@ -79,6 +82,13 @@ public final class BigTitle {
     @Builder.Default
     private boolean bold = false;
 
+    /**
+     * Big title callback, which starts after the title style is set
+     */
+    @Builder.Default
+    private TFunction<Workbook, Cell, BigTitle, Object> callback = (workbook, cell, bigTitle) -> bigTitle.getContent();
+
+    @Deprecated
     public BigTitle(String content) {
         this.lines = 2;
         this.content = content;
@@ -88,5 +98,6 @@ public final class BigTitle {
         this.alignment = HorizontalAlignment.LEFT;
         this.bold = false;
         this.fontHeight = 280;
+        this.callback = (workbook, cell, bigTitle) -> bigTitle.getContent();
     }
 }

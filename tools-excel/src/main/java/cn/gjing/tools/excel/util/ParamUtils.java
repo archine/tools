@@ -171,4 +171,19 @@ public final class ParamUtils {
             throw new ExcelTemplateException();
         }
     }
+
+    /**
+     * Check the file type is excel
+     *
+     * @param fileName Excel file name
+     * @return true is excel file
+     */
+    public static boolean isExcel(String fileName) {
+        if (fileName == null) {
+            return false;
+        }
+        int pos = fileName.lastIndexOf(".") + 1;
+        String extension = fileName.substring(pos);
+        return "xls".equals(extension) || "xlsx".equals(extension);
+    }
 }

@@ -6,6 +6,7 @@ import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
 import cn.gjing.tools.excel.write.valid.OperatorType;
 import cn.gjing.tools.excel.write.valid.Rank;
 import cn.gjing.tools.excel.write.valid.ValidType;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -207,7 +208,7 @@ public final class ExcelUtils {
             startCol = colIndex;
         }
         String index = ParamUtils.numberToEn(startCol);
-        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + ")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
+        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + "&\"*\")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
                 errorBoxRank, errorTitle, errorContent);
     }
 
@@ -374,5 +375,37 @@ public final class ExcelUtils {
             return suffix + "(" + ParamUtils.createFormulaY(firstColIndex, firstRowIndex, lastRowIndex) + ")";
         }
         throw new IllegalArgumentException();
+    }
+
+    /**
+     * Create a font
+     *
+     * @param workbook workbook
+     * @return Font
+     */
+    public static Font createFont(Workbook workbook) {
+        return workbook.createFont();
+    }
+
+    /**
+     * Create rich text string
+     *
+     * @param workbook workbook
+     * @param content  Rich text content
+     * @return RichTextString
+     */
+    public static RichTextString createRichText(Workbook workbook, String content) {
+        return workbook.getCreationHelper().createRichTextString(content);
+    }
+
+    /**
+     * Create hyper link
+     *
+     * @param workbook workbook
+     * @param type     link type
+     * @return Hyperlink
+     */
+    public static Hyperlink createLink(Workbook workbook, HyperlinkType type) {
+        return workbook.getCreationHelper().createHyperlink(type);
     }
 }
