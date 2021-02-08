@@ -32,7 +32,7 @@ public final class BigTitle {
     /**
      * Last col index, 0 is the number of following excel header size
      */
-    private int lastCols;
+    private int lastCol;
 
     /**
      * Style index, if the style of the index exists, it will take the existing one,
@@ -88,6 +88,10 @@ public final class BigTitle {
     @Builder.Default
     private TFunction<Workbook, Cell, BigTitle, Object> callback = (workbook, cell, bigTitle) -> bigTitle.getContent();
 
+    /**
+     * @param content Big title value
+     * @deprecated Please use BigTitle.builder().build()
+     */
     @Deprecated
     public BigTitle(String content) {
         this.lines = 2;

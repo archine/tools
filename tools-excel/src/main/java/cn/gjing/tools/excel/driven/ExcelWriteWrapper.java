@@ -4,7 +4,6 @@ import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.valid.ExcelDropdownBox;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,16 +15,15 @@ import java.util.Map;
  * @author Gjing
  **/
 @Getter
-@ToString
 public class ExcelWriteWrapper {
     private List<ExcelWriteListener> writeListeners;
-    private BigTitle bigTitle;
-    private List<?> data;
     private Map<String, String[]> boxValues;
     private String[] ignores;
     private String fileName;
+    private final List<Object> dataList;
 
     private ExcelWriteWrapper() {
+        this.dataList = new ArrayList<>();
     }
 
     /**
@@ -58,6 +56,15 @@ public class ExcelWriteWrapper {
         return new ExcelWriteWrapper().fileName(fileName).data(data);
     }
 
+    /**
+     * Build a write wrapper
+     *
+     * @param fileName Excel file name
+     * @return ExcelWriteWrapper
+     */
+    public static ExcelWriteWrapper build(String fileName) {
+        return new ExcelWriteWrapper().fileName(fileName);
+    }
 
     /**
      * Add write listener
@@ -94,7 +101,7 @@ public class ExcelWriteWrapper {
      * @return this
      */
     public ExcelWriteWrapper title(BigTitle bigTitle) {
-        this.bigTitle = bigTitle;
+        this.dataList.add(bigTitle);
         return this;
     }
 
@@ -105,7 +112,7 @@ public class ExcelWriteWrapper {
      * @return this
      */
     public ExcelWriteWrapper data(List<?> data) {
-        this.data = data;
+        this.dataList.add(data);
         return this;
     }
 
@@ -123,7 +130,7 @@ public class ExcelWriteWrapper {
     /**
      * Which table heads to be ignored when exporting
      *
-     * @param ignores ignore head
+     * @param ignores ignore heads
      * @return this
      */
     public ExcelWriteWrapper ignores(String... ignores) {

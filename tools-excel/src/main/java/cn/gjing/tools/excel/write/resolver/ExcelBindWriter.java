@@ -147,8 +147,8 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     public ExcelBindWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
             this.createSheet(sheetName);
-            if (bigTitle.getLastCols() < 1) {
-                bigTitle.setLastCols(this.context.getExcelFields().size() - 1);
+            if (bigTitle.getLastCol() < 1) {
+                bigTitle.setLastCol(this.context.getExcelFields().size() - 1);
             }
             this.writerResolver.writeTitle(bigTitle);
         }
@@ -243,9 +243,9 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @param excelWriteResolver Excel write Resolver
      * @return this
      */
+    @Deprecated
     public ExcelBindWriter resetResolver(Supplier<? extends ExcelWriterResolver> excelWriteResolver) {
-        this.writerResolver = excelWriteResolver.get();
+//        this.writerResolver = excelWriteResolver.get();
         return this;
     }
-
 }

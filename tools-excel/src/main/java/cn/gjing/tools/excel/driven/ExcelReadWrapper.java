@@ -1,8 +1,10 @@
 package cn.gjing.tools.excel.driven;
 
 import cn.gjing.tools.excel.exception.ExcelInitException;
+import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
+import cn.gjing.tools.excel.util.ParamUtils;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +50,9 @@ public class ExcelReadWrapper<R> {
      */
     public ExcelReadWrapper<R> data(MultipartFile file) {
         try {
+            if (!ParamUtils.isExcel(file.getOriginalFilename())) {
+                throw new ExcelTemplateException("File type does not belong to Excel");
+            }
             this.inputStream = file.getInputStream();
         } catch (IOException e) {
             throw new ExcelInitException("Initialize read wrapper error," + e.getMessage());
@@ -63,6 +68,9 @@ public class ExcelReadWrapper<R> {
      */
     public ExcelReadWrapper<R> data(File file) {
         try {
+            if (!ParamUtils.isExcel(file.getName())) {
+                throw new ExcelTemplateException("File type does not belong to Excel");
+            }
             this.inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             throw new ExcelInitException("Initialize read wrapper error," + e.getMessage());

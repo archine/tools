@@ -3,6 +3,7 @@ package cn.gjing.tools.excel.driven;
 import cn.gjing.tools.excel.ExcelFactory;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.write.BigTitle;
+import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.NonNull;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -28,20 +29,37 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
     public void handleReturnValue(Object o, @NonNull MethodParameter methodParameter, @NonNull ModelAndViewContainer modelAndViewContainer,
                                   @NonNull NativeWebRequest nativeWebRequest) throws Exception {
         ExcelWrite writerAnno = methodParameter.getMethodAnnotation(ExcelWrite.class);
-        assert writerAnno != null;
+        if (writerAnno == null) {
+            return;
+        }
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
         modelAndViewContainer.setRequestHandled(true);
         if (o instanceof ExcelWriteWrapper) {
             ExcelWriteWrapper wrapper = (ExcelWriteWrapper) o;
-            ExcelFactory.createWriter(wrapper.getFileName() == null ? writerAnno.value() : wrapper.getFileName(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(),
-                    wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores())
+            ExcelBindWriter writer = ExcelFactory.createWriter(wrapper.getFileName() == null ? writerAnno.value() : wrapper.getFileName(), writerAnno.mapping(), response,
+                    writerAnno.initDefaultStyle(), wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores())
                     .valid(writerAnno.needValid())
                     .bind(writerAnno.bind())
                     .multiHead(writerAnno.multiHead())
-                    .writeTitle(wrapper.getBigTitle())
-                    .addListener(wrapper.getWriteListeners())
-                    .write(wrapper.getData(), writerAnno.sheet(), writerAnno.needHead(), wrapper.getBoxValues())
-                    .flush();
+                    .addListener(wrapper.getWriteListeners());
+            if (wrapper.getDataList().isEmpty()) {
+                writer.write(null).flush();
+                return;
+            }
+            boolean needHead = writerAnno.needHead();
+            for (Object e : wrapper.getDataList()) {
+                if (e instanceof BigTitle) {
+                    writer.writeTitle((BigTitle) e);
+                    continue;
+                }
+                if (e instanceof Collection) {
+                    writer.write((List<?>) e, writerAnno.sheet(), needHead, wrapper.getBoxValues());
+                    needHead = false;
+                    continue;
+                }
+                throw new ExcelResolverException("Invalid wrapper data type, currently supported BigTitle and Collection");
+            }
+            writer.flush();
             return;
         }
         if (o == null) {
@@ -72,6 +90,6 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
                     .flush();
             return;
         }
-        throw new ExcelResolverException("Method return value type must be ExcelWriteWrapper: " + methodParameter.getExecutable().getName());
+        throw new ExcelResolverException("Method return value type is not supported, currently supported BigTitle and Collection and ExcelWriteWrapper: " + methodParameter.getExecutable().getName());
     }
 }

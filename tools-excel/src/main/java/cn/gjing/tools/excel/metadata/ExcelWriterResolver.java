@@ -67,7 +67,7 @@ public abstract class ExcelWriterResolver {
                 throw new ExcelResolverException("Big title content type invalid, String and RichTextString are allowed!");
             }
         }
-        this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCols()));
+        this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCol()));
     }
 
     /**

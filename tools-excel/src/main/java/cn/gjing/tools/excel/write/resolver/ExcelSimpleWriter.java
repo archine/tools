@@ -63,8 +63,8 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     public ExcelSimpleWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
             this.createSheet(sheetName);
-            if (bigTitle.getLastCols() < 1) {
-                bigTitle.setLastCols(this.context.getHeadNames().size() - 1);
+            if (bigTitle.getLastCol() < 1) {
+                bigTitle.setLastCol(this.context.getHeadNames().size() - 1);
             }
             this.writerResolver.writeTitle(bigTitle);
         }
@@ -220,8 +220,9 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @param excelWriteResolver Excel write Resolver
      * @return this
      */
+    @Deprecated
     public ExcelSimpleWriter resetResolver(Supplier<? extends ExcelWriterResolver> excelWriteResolver) {
-        this.writerResolver = excelWriteResolver.get();
+//        this.writerResolver = excelWriteResolver.get();
         return this;
     }
 }

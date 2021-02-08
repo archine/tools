@@ -23,27 +23,29 @@ public @interface ExcelRead {
 
     /**
      * Whether to check whether the Excel template matches when importing
+     *
      * @return check
      */
     boolean check() default false;
 
     /**
      * Whether is need meta info(Such as header,title)
+     *
      * @return metaInfo
      */
     boolean metaInfo() default false;
 
     /**
-     * Table headers to be ignored when importing, the number of table headers typically
-     * used in Excel files does not match the number of mapped entity fields,
-     * or some table headers are ignored when exporting templates
+     * The name of the header to be ignored during import.
+     * If it is the parent header, all children below it will be ignored
      *
      * @return ignores
      */
     String[] ignores() default {};
 
     /**
-     * Excel real header start index
+     * The actual subscript of the Excel header,
+     * subscript is evaluated from 0
      *
      * @return headerIndex
      */

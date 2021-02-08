@@ -48,7 +48,7 @@ public class ExcelReader<R> {
             case XLS:
                 try {
                     this.context.setWorkbook(new HSSFWorkbook(this.context.getInputStream()));
-                } catch (NotOLE2FileException | OfficeXmlFileException exception ) {
+                } catch (NotOLE2FileException | OfficeXmlFileException exception) {
                     exception.printStackTrace();
                     throw new ExcelTemplateException();
                 } catch (IOException e) {
@@ -99,7 +99,8 @@ public class ExcelReader<R> {
      * Specifies that the Excel subscript to start reading.
      * This line must be a real subscript,
      *
-     * @param headerIndex subscript is evaluated from 0
+     * @param headerIndex The actual subscript of the Excel header,
+     *                    subscript is evaluated from 0
      * @return this
      */
     public ExcelReader<R> read(int headerIndex) {
@@ -110,7 +111,8 @@ public class ExcelReader<R> {
     /**
      * Read the specified sheet
      *
-     * @param headerIndex Excel header starter index
+     * @param headerIndex The actual subscript of the Excel header,
+     *                    subscript is evaluated from 0
      * @param sheetName   Excel Sheet name
      * @return this
      */
@@ -125,9 +127,10 @@ public class ExcelReader<R> {
      * @param excelReaderResolver Excel read resolver
      * @return this
      */
+    @Deprecated
     public ExcelReader<R> resetResolver(Supplier<? extends ExcelReaderResolver<R>> excelReaderResolver) {
-        this.readerResolver = excelReaderResolver.get();
-        this.readerResolver.init(this.context);
+//        this.readerResolver = excelReaderResolver.get();
+//        this.readerResolver.init(this.context);
         return this;
     }
 

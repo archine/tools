@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2.3.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2021.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的在项目中进行Excel导入导出**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2.3.3</version>
+    <version>2021.2</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -26,19 +26,19 @@
 
 |参数|描述|
 |---|---|
-|value|表头名称，该参数为一个数组，数组中的``最后一个值为实际的表头名称``，每一个值都表示为一级表头，如：你填了两个值，那么就会出现二级表头。``同一个映射实体每个表头字段的值数量必须一致``|
+|value|表头名称，数组大小为表头级数，数组中最后一个值为最下级表头，``同一个映射实体每个字段数组大小必须一致``|
 |width|表头所在列的整列宽度|
 |order|表头出现在Excel文件中的先后顺序，建议要么都配置要么全不配置，不配置的情况下``默认按实体中字段顺序``|
 |format|表头所在列的整列单元格格式，格式参照Excel文件中的单元格格式，默认``常规``|
-|autoMerge|表头下方是否开启纵向合并|
-|required|导入时，表头下方的单元格是否必填，默认``false``，该配置一旦配置，会在导入时触发非空监听器|
-|trim|导入时，是否去除文本两边的空格，默认``false``|
-|color|表头填充颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过此处配置|
-|fontColor|表头字体颜色索引,默认会使用样式监听器中的配置,当这个表头要使用独立的颜色时可通过此处配置|
-|convert|数据转换器，可以在导入导出时对数据进行转换, 同一次导入导出时``相同的转换器只会实例化一次``|      
+|autoMerge|表头下方开启纵向合并，默认``关闭``|
+|required|导入时，表头下方的单元格是否必填，默认``false``，会在导入时触发非空监听器|
+|trim|导入时，去除文本两边的空格，默认``false``|
+|color|表头背景填充色|
+|fontColor|表头字体颜色|
+|convert|数据转换器, 每次导入导出所有流程结束前``相同的转换器只会实例化一次``|      
 <span id="convert"></span>
 ### 3、@ExcelDataConvert
-**数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)，     [查看用例](#convert_use)**    
+**数据转换器，可以用于在导入导出时对内容进行转换，[EL表达式用法参考](http://www.manongjc.com/article/8467.html)  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[查看用例](#convert_use)**    
 
 |参数|描述|
 |---|---|
@@ -46,20 +46,20 @@
 |expr2|导入时的EL表达式|     
 <span id="assert"></span>
 ### 4、@ExcelAssert
-**导入时对单元格的内容进行数据校验，[查看用例](#assert_use)**     
+**导入时对单元格的内容进行数据断言，[查看用例](#assert_use)**     
 
 |参数|描述|
 |---|---|
-|expr|EL表达式，结果必须满足``Boolean``类型|
+|expr|EL表达式，在导入时会校验单元格的内容是否满足此表达式，不满足会触发``ExcelAssertException``|
 |message|不满足表达式条件时抛出的异常信息|       
 <span id="dropdown"></span>
 ### 5、@ExcelDropdownBox
-**导出时给列表头下方的单元格增加下拉选项，[查看用例](#dropdown_use)**      
+**导出时给表头下方的单元格增加下拉框 [查看用例](#dropdown_use)**      
 
 |参数|描述|
 |---|---|
-|combobox|选项内容，此处配置的选项``不允许超过25个``，大量选项的情况请通过方法设置。两种方式都存在时会以方法设置的为准|
-|rows|列表头下方需要给多少行加上下拉框|
+|combobox|下拉框内容，此处配置的选项``不允许超过25个``，大量选项的情况请通过方法设置。两种方式都存在时会以方法设置的为准|
+|rows|表头下方需要给多少行加上下拉框|
 |showErrorBox|填入单元格的内容不是下拉框中的选项，是否打开错误框|
 |rank|错误框级别|
 |errorTitle|错误框标题|
@@ -71,7 +71,7 @@
 
 |参数|描述|
 |---|---|
-|rows|列表头下方需要给多少行加上下拉框|
+|rows|表头下方需要给多少行加上下拉框|
 |pattern|时间格式|
 |operatorType|操作类型，可选择小于、大于、区间等|
 |expr1|时间表达式1，如：2020-04-10|
@@ -89,7 +89,7 @@
 
 |参数|描述|
 |---|---|
-|rows|列表头下方需要给多少行加上下拉框|
+|rows|表头下方需要给多少行加上下拉框|
 |operatorType|操作类型，可选择小于、大于、区间等|
 |validType|校验类型，可选择整数、文本、小数|
 |expr1|表达式1，如：校验类型为整数、操作类型为小于时，表达式填了``1``, 表示输入的数字必须小于1|
@@ -107,7 +107,7 @@
 
 |参数|描述|
 |---|---|
-|rows|列表头下方多少航需要加入数据校验|
+|rows|表头下方多少行需要加入数据校验|
 |showErrorBox|填入单元格的内容不是下拉框中的选项，是否打开错误框|
 |rank|错误框级别|
 |errorTitle|错误框标题|
@@ -123,11 +123,14 @@
 |rank|错误框级别|
 |errorTitle|错误框标题|
 |errorContent|错误提示信息|      
+## 三、注解驱动模式的注解
 <span id="driven_annotation"></span>   
-### 10、@EnableExcelDrivenMode
-**在启动类或者配置类上使用即可开启Excel注解驱动模式，当开启了驱动模式时即可在方法上通过注解对Excel进行导入导出，不需要在通过Excel工厂创建**   
+### 1、@EnableExcelDrivenMode
+**在启动类或者配置类上使用即可开启Excel注解驱动模式，当开启了驱动模式时即可在方法上通过注解对Excel进行导入导出，不需要在通过Excel工厂创建**
+> **提示:** 注解驱动模式目前``只支持单sheet和单映射实体``，如果使用过程中需要用到多sheet导入导出或者多映射实体，那么还是使用工厂创建方式    
+
 <span id="driven_read_annotation"></span>  
-### 11、@ExcelRead
+### 2、@ExcelRead
 **注解驱动模式下的Excel导入，[查看用例](#driven_read)**      
 
 |参数|描述|
@@ -136,9 +139,9 @@
 |check|是否检查Excel文件与当前映射实体是否绑定，默认``false``|
 |metaInfo|是否需要读取元信息，比如表头、标题，默认``false``|
 |ignores|导入时要忽略的表头，如果表头是父级表头的话，那么下面的子表头也会被忽略|
-|headerIndex|真实表头的开始下标，如：导出的模板设置了大标题，且行数为2，那么开始下标就为2，如果是2级表头，那么开始下标是1|      
+|headerIndex|开始读取的表头下标，默认0|      
 <span id="driven_write_annotation"></span>
-### 12、@ExcelWrite
+### 3、@ExcelWrite
 **注解驱动模式下的Excel导出, [查看用例](#driven_write)**      
      
 |参数|描述|
@@ -152,7 +155,7 @@
 |multiHead|是否为多级表头，默认``false``|
 |initDefaultStyle|是否使用默认样式监听器，默认``true``|
 |bind|到处时设置excel文件与当前实体类进行绑定，默认``true``|
-## 三、常用类说明
+## 四、常用类说明
 ### 1、BigTitle
 **用于给Excel文件增加大标题**        
 
@@ -160,7 +163,7 @@
 |---|---|
 |lines|大标题需要占用多少行，默认``2``|
 |firstCol|起始单元格下标，默认第一个单元格下标|
-|lastCols|截止单元格下标，默认为最后一个表头的下标|
+|lastCol|截止单元格下标，默认为最后一个表头的下标|
 |content|大标题中的内容|
 |color|背景填充颜色|
 |fontColor|字体颜色，默认``黑色``|
@@ -168,7 +171,8 @@
 |alignment|水平位置，默认``靠左``|
 |bold|字体是否加粗，默认``false``|
 |fontHeight|字体高度，默认``250``|
-|index|样式下标，默认0，如果设置的样式下标已存在则会取已存在的，否则会新创建一个样式|
+|index|样式索引，默认0，如果设置的样式索引已存在则会取已存在的，否则会新创建一个样式|
+|callback|大标题设值回调，会在填充内容前进行触发|
 ### 2、ExcelReadWrapper
 **注解驱动方式导入时的数据构造器**       
 
@@ -198,7 +202,9 @@
 使用自己的样式监听器时需要实现``ExcelStyleWriteListener``接口并在导出时将你实现的样式监听器通过``addListener()``方法加入**
 ### 6、ExcelUtils
 **Excel工具类，里面包含创建公式、纵向合并、横向合并、添加下拉框等工具方法。。。**
-## 四、Excel导出
+## 五、Excel导出     
+> 大标题和数据出现的顺序由使用时调用的顺序决定，注解驱动模式下也一样    
+
 <span id="single"></span>
 ### 1、单表头
 **定义Excel映射实体, ``@Data``是lombok的注解**
@@ -243,7 +249,7 @@ public class UserController {
 ![single](https://user-gold-cdn.xitu.io/2020/4/10/171637e42b1f4cdc?w=565&h=161&f=png&s=3242)
 <span id="multi"></span>
 ### 2、多级表头
-**数组中的每个值代表着一级表头, 表头的``层级根据第一个字段指定的数组长度``，``每个字段数组长度必须相同``**
+**以下设置了二级表头**
 ```java
 /**
  * @author Gjing
@@ -286,7 +292,6 @@ public class TestController {
 ### 3、带大标题
 [参考实体](#single)    
 
-**大标题的起始行是你要插入的sheet中最后一条数据的下一行，如果sheet中没有数据，就是第一行。你可以配置大标题占用的行数和起始单元格下标(默认第一个单元格)和结束单元格下标(默认跟随表头的数量)**
 ```java
 /**
  * @author Gjing
@@ -343,8 +348,9 @@ public class TestController {
     }
 }
 ```
-* 通过方法设置
-**使用方法设置时，也需要在实体字段上使用``@ExcelDropdownBox``注解，只是不需要在注解中指定下拉框内容，这里不在展示实体代码**
+* **通过方法设置**
+
+使用方法设置下拉框内容时，``同样需要``在实体指定的字段上使用``@ExcelDropdownBox``注解，但不需要在设置``combobox``参数，这里不在展示实体代码
 ```java
 /**
  * @author Gjing
@@ -356,7 +362,7 @@ public class TestController {
     @ApiOperation("带下拉框")
     public void testExport(HttpServletResponse response) {
         Map<String, String[]> genderMap = new HashMap<>(8);
-        //key为实体类的字段名，使用方法进行设置时，实体字段的@ExcelDropdownBox注解不在需要指定combobox
+        //key为实体类的字段名
         //如果指定了也会去覆盖注解中的值
         genderMap.put("gender", new String[]{"男", "女"});
         ExcelFactory.createWriter(SingleHead.class, response)
@@ -704,6 +710,7 @@ public class TestController {
 ```
 **导出方法调用最后一定要使用``flush()``方法进行数据刷新到Excel文件中**
 ## 三、导入
+> **提示:** 很多同学对表头开始下标计算不是很理解，这里主要讲解一下，公式为: ``大标题占用行数+表头级数-1``。例：导出模板时设置了大标题，且大标题设置占用3行，表头只有一级，那么开始下标就为``3+1-1``
 ### 1、单表头
 [参考实体](#single)
 ```java
@@ -912,8 +919,8 @@ public class TestController {
 **在导入调用结束后，一定要在最后调用``finish()``方法对流进行关闭**    
 
 <span id="driven"></span>
-## 五、注解驱动方式的导入导出
-主要是对使用方式进行简单化，不再需要每次通过工厂创建读写器吗，如果要使用注解驱动方式，需要先在启动类或者配置类使用 >>>  [EnableExcelDrivenMode](#driven_annotation)    
+## 六、注解驱动方式的导入导出
+主要是对使用方式进行简单化，不再需要每次通过工厂创建读写器，如果要使用注解驱动方式，需要先在启动类或者配置类使用 >>>  [EnableExcelDrivenMode](#driven_annotation)    
 
 <span id="driven_write"></span>
 ### 1、导出
@@ -935,7 +942,7 @@ public class ExcelDriveController {
 }
 ```
 #### b、导出带标题的模板
-**导出带大标题的模板，你可以直接设置方法的返回值为``bigTitle``，也可以使用``ExcelWriteWrapper``包装器进行数据构造**       
+**导出带大标题的模板，你可以直接设置方法的返回值为``BigTitle``，也可以使用``ExcelWriteWrapper``包装器进行数据构造**       
 * 直接返回方式
 ```java
 @RestController
@@ -950,6 +957,7 @@ public class ExcelDriveController {
 }
 ```
 * 包装器方式
+
 ```java
 @RestController
 public class ExcelDriveController {
@@ -959,7 +967,7 @@ public class ExcelDriveController {
     @ExcelWrite(mapping = SingleHead.class)
     public ExcelWriteWrapper excelDrive() {
         return ExcelWriteWrapper.build()
-                .title(new BigTitle(2, "啦啦啦"));
+                .title(BigTitle.builder().build());
     }
 }
 ```
@@ -1018,7 +1026,7 @@ public class ExcelDriveController {
 ### 2、导入
 **导入的方法上需要增加``@ExcelRead``注解 >>  [注解参考](#driven_read_annotation)**
 #### a、导入普通的模板
-**导入时，需要将方法返回值设置为``ExcelReadWrapper``，这是导入时的数据包装器，用于设置一些属性，如文件流、监听器、结果订阅。。。**
+**导入时，需要将方法返回值设置为``ExcelReadWrapper``，这是导入时的数据包装器，用于设置一些属性，如文件流、监听器。。。**
 ```java
 @RestController
 public class ExcelDriveController {
@@ -1036,7 +1044,7 @@ public class ExcelDriveController {
 }
 ```
 #### b、导入带大标题的模板
-**如果模板带有大标题，需要我们指定表头开始下标，下标要根据你的模板标题有多少行而定，我们在导出时设置了两行，所以这里配置真实表头开始下标为2**
+**如果模板带有大标题，需要指定最下级表头开始下标**
 ```java
 @RestController
 public class ExcelDriveController {
@@ -1054,7 +1062,7 @@ public class ExcelDriveController {
 }
 ```
 #### c、导入时忽略某些表头
-**导入时如果Excel文件中的表头数量与映射实体不匹配，或者在你导出模板时有忽略某些表头，这时可以通过忽略某些表头来进行正确读取**
+**导入时忽略某些表头不进行读取**
 ```java
 @RestController
 public class ExcelDriveController {
