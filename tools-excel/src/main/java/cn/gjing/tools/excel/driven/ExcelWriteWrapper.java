@@ -101,7 +101,9 @@ public class ExcelWriteWrapper {
      * @return this
      */
     public ExcelWriteWrapper title(BigTitle bigTitle) {
-        this.dataList.add(bigTitle);
+        if (bigTitle != null) {
+            this.dataList.add(bigTitle);
+        }
         return this;
     }
 
@@ -112,7 +114,7 @@ public class ExcelWriteWrapper {
      * @return this
      */
     public ExcelWriteWrapper data(List<?> data) {
-        this.dataList.add(data);
+        this.dataList.add(data == null ? new ArrayList<>() : data);
         return this;
     }
 

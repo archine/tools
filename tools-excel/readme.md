@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2021.2-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2021.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的在项目中进行Excel导入导出**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2021.2</version>
+    <version>2021.3</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -967,7 +967,8 @@ public class ExcelDriveController {
     @ExcelWrite(mapping = SingleHead.class)
     public ExcelWriteWrapper excelDrive() {
         return ExcelWriteWrapper.build()
-                .title(BigTitle.builder().build());
+                .title(BigTitle.builder().build())
+                .data(null);
     }
 }
 ```
