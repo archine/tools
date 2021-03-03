@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2021.3-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2021.4-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;     
 
 **简单、快速的在项目中进行Excel导入导出**
@@ -7,7 +7,7 @@
 <dependency>
     <groupId>cn.gjing</groupId>
     <artifactId>tools-excel</artifactId>
-    <version>2021.3</version>
+    <version>2021.4</version>
 </dependency>
 ```
 ## 二、注解说明
@@ -127,7 +127,7 @@
 <span id="driven_annotation"></span>   
 ### 1、@EnableExcelDrivenMode
 **在启动类或者配置类上使用即可开启Excel注解驱动模式，当开启了驱动模式时即可在方法上通过注解对Excel进行导入导出，不需要在通过Excel工厂创建**
-> **提示:** 注解驱动模式目前``只支持单sheet和单映射实体``，如果使用过程中需要用到多sheet导入导出或者多映射实体，那么还是使用工厂创建方式    
+> **提示:** 注解驱动模式目前``只支持单sheet和单映射实体``，如果使用过程中需要用到多sheet导入导出或者多映射实体，那么还是使用工厂创建方式，也就是ExcelFactory.xx()方式
 
 <span id="driven_read_annotation"></span>  
 ### 2、@ExcelRead

@@ -205,7 +205,7 @@ public final class ExcelWriteExecutor {
         for (int index = 0, dataSize = data.size(); index < dataSize; index++) {
             List<?> o = data.get(index);
             Row valueRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
-            for (int colIndex = 0, headSize = o.size(); colIndex < headSize; colIndex++) {
+            for (int colIndex = 0, headSize = this.context.getHeadNames().size(); colIndex < headSize; colIndex++) {
                 Object value = o.get(colIndex);
                 Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
                 try {
