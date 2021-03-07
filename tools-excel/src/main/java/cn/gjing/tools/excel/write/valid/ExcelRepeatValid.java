@@ -1,5 +1,7 @@
 package cn.gjing.tools.excel.write.valid;
 
+import cn.gjing.tools.excel.ExcelField;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,6 +28,16 @@ public @interface ExcelRepeatValid {
      * @return boolean
      */
     boolean showErrorBox() default true;
+
+    /**
+     * If the number of long text exceeds 15 digits,
+     * the Excel file will automatically convert the number after 15 digits to 0,
+     * indirectly causing duplicate content check error.
+     * Once set to true, the cell of the current column needs to be formatted as text {@link ExcelField#format()}
+     *
+     * @return boolean
+     */
+    boolean longTextNumber() default false;
 
     /**
      * Error box level

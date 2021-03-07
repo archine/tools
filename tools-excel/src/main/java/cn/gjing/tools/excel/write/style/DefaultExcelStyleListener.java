@@ -2,7 +2,9 @@ package cn.gjing.tools.excel.write.style;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.metadata.ExcelColor;
+import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.write.BigTitle;
+import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
 import org.apache.poi.ss.usermodel.*;
 
 import java.lang.reflect.Field;
@@ -14,7 +16,7 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-public final class DefaultExcelStyleListener implements ExcelStyleWriteListener {
+public final class DefaultExcelStyleListener implements ExcelStyleWriteListener, ExcelCellWriteListener {
     private Workbook workbook;
     private Map<Integer, CellStyle> titleStyles;
     private Map<Integer, CellStyle> headStyle;
@@ -54,9 +56,7 @@ public final class DefaultExcelStyleListener implements ExcelStyleWriteListener 
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
             cellStyle.setFillForegroundColor(excelField == null ? ExcelColor.LIME.index : excelField.color().index);
-            cellStyle.setAlignment(HorizontalAlignment.CENTER);
-            cellStyle.setWrapText(true);
-            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            this.setAlignment(cellStyle);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             cellStyle.setBorderBottom(BorderStyle.THIN);
             cellStyle.setBottomBorderColor(IndexedColors.GREY_40_PERCENT.index);
@@ -78,9 +78,7 @@ public final class DefaultExcelStyleListener implements ExcelStyleWriteListener 
         CellStyle cellStyle = this.bodyStyle.get(colIndex);
         if (cellStyle == null) {
             cellStyle = this.workbook.createCellStyle();
-            cellStyle.setAlignment(HorizontalAlignment.CENTER);
-            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-            cellStyle.setWrapText(true);
+            this.setAlignment(cellStyle);
             String format = excelField == null ? "" : excelField.format();
             if (!"".equals(format)) {
                 cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
@@ -92,13 +90,11 @@ public final class DefaultExcelStyleListener implements ExcelStyleWriteListener 
 
     @Override
     public void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, int index,
-                             int colIndex, boolean isHead) {
-        if (isHead) {
+                             int colIndex, RowType rowType) {
+        if (rowType == RowType.HEAD) {
             if (index == 0) {
                 CellStyle cellStyle = this.workbook.createCellStyle();
-                cellStyle.setAlignment(HorizontalAlignment.CENTER);
-                cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-                cellStyle.setWrapText(true);
+                this.setAlignment(cellStyle);
                 String format = excelField == null ? "" : excelField.format();
                 if (!"".equals(format)) {
                     cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
@@ -112,10 +108,9 @@ public final class DefaultExcelStyleListener implements ExcelStyleWriteListener 
         this.setBodyStyle(row, cell, excelField, field, index, colIndex);
     }
 
-    @Override
-    public void completeRow(Sheet sheet, Row row, Object obj, int index, boolean isHead) {
-        if (isHead) {
-            row.setHeight((short) 370);
-        }
+    private void setAlignment(CellStyle cellStyle) {
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setWrapText(true);
     }
 }

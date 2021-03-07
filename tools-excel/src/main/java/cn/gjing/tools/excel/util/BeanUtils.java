@@ -5,10 +5,7 @@ import cn.gjing.tools.excel.ExcelField;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -54,33 +51,60 @@ public final class BeanUtils {
      *
      * @param excelClass Excel mapped entity
      * @param ignores    The exported field is to be ignored
-     * @param headerArr  excel header array
+     * @param headNames  Excel header names
      * @return Excel fields
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String[]> headerArr) {
-        Field[] declaredFields = excelClass.getDeclaredFields();
-        List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
-        Class<?> superclass = excelClass.getSuperclass();
-        while (superclass != Object.class) {
-            fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
-            superclass = superclass.getSuperclass();
-        }
+    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String[]> headNames) {
+        List<Field> fieldList = getAllFields(excelClass);
         fieldList = fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).order()))
                 .filter(e -> {
-                    String[] headNames = e.getAnnotation(ExcelField.class).value();
-                    for (String name : headNames) {
+                    String[] headNameArray = e.getAnnotation(ExcelField.class).value();
+                    for (String name : headNameArray) {
                         if (ParamUtils.contains(ignores, name)) {
                             return false;
                         }
                     }
-                    if (headerArr != null) {
-                        headerArr.add(headNames);
+                    if (headNames != null) {
+                        headNames.add(headNameArray);
                     }
                     return true;
                 })
                 .collect(Collectors.toList());
+        return fieldList;
+    }
+
+    /**
+     * Generate excel field Map
+     *
+     * @param excelClass Excel mapped entity
+     * @return Excel field map
+     */
+    public static Map<String, Field> getExcelFieldsMap(Class<?> excelClass) {
+        List<Field> fieldList = getAllFields(excelClass);
+        return fieldList.stream()
+                .filter(e -> e.isAnnotationPresent(ExcelField.class))
+                .collect(Collectors.toMap(e -> {
+                    String[] headArray = e.getAnnotation(ExcelField.class).value();
+                    return headArray[headArray.length - 1];
+                }, f -> f));
+    }
+
+    /**
+     * Get all fields of the parent and child classes
+     *
+     * @param clazz Class
+     * @return Field list
+     */
+    public static List<Field> getAllFields(Class<?> clazz) {
+        Field[] declaredFields = clazz.getDeclaredFields();
+        List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
+        Class<?> superclass = clazz.getSuperclass();
+        while (superclass != Object.class) {
+            fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
+            superclass = superclass.getSuperclass();
+        }
         return fieldList;
     }
 

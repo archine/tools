@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.read.listener;
 
+import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 
 import java.lang.reflect.Field;
@@ -15,12 +16,11 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
      *
      * @param r           Generated Java object , Null when not in the body
      * @param rowIndex    The index of the current row
-     * @param isHead      Whether is excel header
-     * @param isBody      Whether is excel body
+     * @param rowType     Current row type
      * @param otherValues Except for the content of the body
-     * @return Whether to stop reading
+     * @return Whether to stop reading, true is stop
      */
-    boolean readRow(R r, List<Object> otherValues, int rowIndex, boolean isHead, boolean isBody);
+    boolean readRow(R r, List<?> otherValues, int rowIndex, RowType rowType);
 
     /**
      * Read each cell successfully
@@ -29,25 +29,26 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
      * @param field     Current field
      * @param rowIndex  Current row index
      * @param colIndex  Current col index
-     * @param isHead    Whether is excel header
-     * @param isBody    Whether is excel body
+     * @param rowType   Current row type
      * @return cellValue
      */
-    default Object readCell(Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead, boolean isBody) {
+    default Object readCell(Object cellValue, Field field, int rowIndex, int colIndex, RowType rowType) {
         return cellValue;
     }
 
     /**
-     * End of the import
+     * File data read finished
      *
      * @param context Excel reader context
      */
-    default void readFinish(ExcelReaderContext<R> context) {}
+    default void readFinish(ExcelReaderContext<R> context) {
+    }
 
     /**
      * Before you start reading the data
      *
      * @param context Excel reader context
      */
-    default void readBefore(ExcelReaderContext<R> context) {}
+    default void readBefore(ExcelReaderContext<R> context) {
+    }
 }

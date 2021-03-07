@@ -76,6 +76,11 @@ public final class ExcelWriterContext {
     private boolean bind = true;
 
     /**
+     * The unique key
+     */
+    private String uniqueKey;
+
+    /**
      * Excel type
      */
     @Builder.Default
@@ -86,6 +91,24 @@ public final class ExcelWriterContext {
      */
     @Builder.Default
     private Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache = new HashMap<>(8);
+
+    /**
+     * Excel head row height
+     */
+    @Builder.Default
+    private short headerHeight = 400;
+
+    /**
+     * Excel body row height
+     */
+    @Builder.Default
+    private short bodyHeight = 370;
+
+    /**
+     * Excel header series
+     */
+    @Builder.Default
+    private int headerSeries = 1;
 
     /**
      * Add write listener

@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write.listener;
 
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.metadata.RowType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -8,25 +9,26 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.lang.reflect.Field;
 
 /**
- * Cell lifestyle listener
+ * The Excel cell writes out the listener,
+ * Can be used to change the value of a cell or to make additional extensions to the cell when exporting
  *
  * @author Gjing
  **/
 @FunctionalInterface
 public interface ExcelCellWriteListener extends ExcelWriteListener {
     /**
-     * Cell assignment complete,the current cell end
+     * Cell assignment complete,the current cell end, About to start reading the next cell
      *
      * @param sheet      Current sheet
      * @param row        Current row
      * @param cell       Current cell
-     * @param index      The data index, table header, and body all start at 0
+     * @param index      Data indexing, depending on the row type, starts at 0
      * @param colIndex   Current cell index
-     * @param isHead     Whether is excel head
+     * @param rowType    Current row type
      * @param excelField ExcelField annotation of current field
      * @param field      Current field
      */
-    void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex, boolean isHead);
+    void completeCell(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex, RowType rowType);
 
     /**
      * Cell are assigned before, then after the data converter and before the auto merge
@@ -34,15 +36,15 @@ public interface ExcelCellWriteListener extends ExcelWriteListener {
      * @param sheet      Current sheet
      * @param row        Current row
      * @param cell       Current cell
-     * @param index      The data index, table header, and body all start at 0
+     * @param index      Data indexing, depending on the row type, starts at 0
      * @param colIndex   Current cell index
-     * @param isHead     Whether is excel head
+     * @param rowType    Current row type
      * @param excelField ExcelField annotation of current field
      * @param field      Current field
      * @param value      Cell value
-     * @return Cell value
+     * @return Cell value, If null, no assignment will take place
      */
-    default Object assignmentBefore(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex, boolean isHead, Object value) {
+    default Object assignmentBefore(Sheet sheet, Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex, RowType rowType, Object value) {
         return value;
     }
 }

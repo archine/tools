@@ -19,7 +19,7 @@ public interface ExcelReaderResolver<R> {
     /**
      * Start Import excel
      *
-     * @param headerIndex Excel header start index
+     * @param headerIndex Excel really header start index
      * @param sheetName   sheetName
      */
     void read(int headerIndex, String sheetName);

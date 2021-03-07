@@ -7,7 +7,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.lang.reflect.Field;
 
 /**
- * Cascading dropdown box listener
+ * Cascading dropdown box listener,
+ * When {@link ExcelDropdownBox} is used in the header field of the mapped entity and a valid {@link ExcelDropdownBox#link()} parameter is set
  *
  * @author Gjing
  **/

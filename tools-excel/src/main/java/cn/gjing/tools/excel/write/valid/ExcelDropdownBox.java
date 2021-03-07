@@ -41,8 +41,8 @@ public @interface ExcelDropdownBox {
     Rank rank() default Rank.STOP;
 
     /**
-     * If you specify a parent cell, then you need to add a cascading drop-down listener.{@link DefaultCascadingDropdownBoxListener}
-     * Of course, you can implement the listener yourself and pass it to me.The column index starts at 0
+     * If you specify a parent cell index,
+     * then you need to add a cascading drop-down listener {@link DefaultCascadingDropdownBoxListener}
      *
      * @return link
      */

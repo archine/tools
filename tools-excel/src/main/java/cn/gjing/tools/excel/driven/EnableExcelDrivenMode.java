@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * Enable excel annotation-driven mode
+ * After use, it can be easily imported and exported through {@link ExcelWrite} and {@link ExcelRead}
  *
  * @author Gjing
  **/

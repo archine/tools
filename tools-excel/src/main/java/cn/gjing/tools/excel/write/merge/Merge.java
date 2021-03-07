@@ -6,6 +6,8 @@ import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 import java.lang.annotation.*;
 
 /**
+ * Custom merge cells that are adjacent to the same column
+ *
  * @author Gjing
  **/
 @Documented
@@ -13,7 +15,7 @@ import java.lang.annotation.*;
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface Merge {
     /**
-     * Enable automatic merge of same vertical content
+     * Enable automatic merge
      *
      * @return false
      */

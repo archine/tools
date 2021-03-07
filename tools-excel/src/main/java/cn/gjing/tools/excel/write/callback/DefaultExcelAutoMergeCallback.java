@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 
 /**
  * Default auto merge callback of export excel
+ * Whenever adjacent cells in the same column have the same content, they are merged
+ *
  * @author Gjing
  **/
 public final class DefaultExcelAutoMergeCallback implements ExcelAutoMergeCallback<Object> {

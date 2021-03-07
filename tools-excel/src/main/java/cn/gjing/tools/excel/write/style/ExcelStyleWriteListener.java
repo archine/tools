@@ -2,8 +2,7 @@ package cn.gjing.tools.excel.write.style;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.write.BigTitle;
-import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
-import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -15,7 +14,7 @@ import java.lang.reflect.Field;
  *
  * @author Gjing
  **/
-public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRowWriteListener {
+public interface ExcelStyleWriteListener extends ExcelWriteListener {
     /**
      * Init Style write listener
      *
@@ -26,7 +25,7 @@ public interface ExcelStyleWriteListener extends ExcelCellWriteListener, ExcelRo
     /**
      * Set excel big title style
      *
-     * @param cell Current cell
+     * @param cell     Current cell
      * @param bigTitle Bit title
      */
     void setTitleStyle(BigTitle bigTitle, Cell cell);

@@ -3,13 +3,12 @@ package cn.gjing.tools.excel.read;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import cn.gjing.tools.excel.util.ListenerChain;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +18,7 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-@Getter
-@Setter
+@Data
 public class ExcelReaderContext<R> {
     /**
      * Current workbook
@@ -28,14 +26,14 @@ public class ExcelReaderContext<R> {
     private Workbook workbook;
 
     /**
-     * Current sheet
+     * Current read sheet
      */
     private Sheet sheet;
 
     /**
-     * File inputStream
+     * Header data for an Excel file
      */
-    private InputStream inputStream;
+    private List<String> headNames;
 
     /**
      * Current excel mapping entity
@@ -43,9 +41,9 @@ public class ExcelReaderContext<R> {
     private Class<R> excelClass;
 
     /**
-     * Current excel header mapping field
+     * Excel header mapping field
      */
-    private List<Field> excelFields;
+    private Map<String, Field> excelFieldMap;
 
     /**
      * Check that the Excel file is bound to the currently set mapping entity
@@ -53,21 +51,35 @@ public class ExcelReaderContext<R> {
     private boolean checkTemplate = false;
 
     /**
-     * Whether is need meta info(Such as header,title)
+     * Read rows before the header
      */
-    private boolean metaInfo = false;
+    private boolean headBefore = false;
+
+    /**
+     * The unique key
+     */
+    private String uniqueKey;
+
+    /**
+     * Ignore the array of actual Excel table headers that you read when importing
+     */
+    private String[] ignores;
 
     /**
      * Read listener cache
      */
     private Map<Class<? extends ExcelReadListener>, List<ExcelReadListener>> readListenersCache = new HashMap<>(8);
 
+    /**
+     * Read result listener
+     */
     private ExcelResultReadListener<R> resultReadListener;
 
-    public ExcelReaderContext(InputStream inputStream, Class<R> excelClass, List<Field> excelFields) {
-        this.inputStream = inputStream;
+    public ExcelReaderContext(Class<R> excelClass, Map<String, Field> excelFieldMap, String[] ignores) {
         this.excelClass = excelClass;
-        this.excelFields = excelFields;
+        this.excelFieldMap = excelFieldMap;
+        this.headNames = new ArrayList<>();
+        this.ignores = ignores;
     }
 
     public void addListener(ExcelReadListener readListener) {

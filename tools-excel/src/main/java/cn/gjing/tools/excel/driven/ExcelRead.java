@@ -31,9 +31,18 @@ public @interface ExcelRead {
     /**
      * Whether is need meta info(Such as header,title)
      *
+     * @deprecated Please use {{@link #headBefore()}}
      * @return metaInfo
      */
+    @Deprecated
     boolean metaInfo() default false;
+
+    /**
+     * Whether to read all rows before the header
+     *
+     * @return head before
+     */
+    boolean headBefore() default false;
 
     /**
      * The name of the header to be ignored during import.

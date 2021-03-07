@@ -2,7 +2,7 @@ package cn.gjing.tools.excel.driven;
 
 import cn.gjing.tools.excel.ExcelFactory;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
-import cn.gjing.tools.excel.read.resolver.ExcelReader;
+import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.NonNull;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -29,10 +29,10 @@ class ExcelDrivenReadHandler implements HandlerMethodReturnValueHandler {
             ExcelRead readAnno = methodParameter.getMethodAnnotation(ExcelRead.class);
             assert readAnno != null;
             ExcelReadWrapper wrapper = (ExcelReadWrapper) o;
-            ExcelReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(), wrapper.getIgnores() == null ? readAnno.ignores() : wrapper.getIgnores());
+            ExcelBindReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(), wrapper.getIgnores() == null ? readAnno.ignores() : wrapper.getIgnores());
             reader.addListener(wrapper.getReadListeners())
                     .subscribe(wrapper.getResultReadListener())
-                    .metaInfo(readAnno.metaInfo())
+                    .headBefore(readAnno.headBefore())
                     .check(readAnno.check())
                     .read(readAnno.headerIndex(), readAnno.value())
                     .finish();

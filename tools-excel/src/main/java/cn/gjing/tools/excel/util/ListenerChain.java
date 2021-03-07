@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelReadListener;
@@ -33,17 +34,17 @@ public final class ListenerChain {
      * @param sheet          Current sheet
      * @param row            Current row
      * @param cell           Current cell
-     * @param index          The data index, table header, and body all start at 0
+     * @param index          Data indexing, depending on the row type, starts at 0
      * @param colIndex       Current cell index
-     * @param isHead         Whether is excel head
+     * @param rowType        Current row type
      * @param excelField     ExcelField annotation of current field
      * @param field          Current field
      */
     public static void doCompleteCell(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
-                                      ExcelField excelField, Field field, int index, int colIndex, boolean isHead) {
+                                      ExcelField excelField, Field field, int index, int colIndex, RowType rowType) {
         List<ExcelWriteListener> cellListeners = excelListeners.get(ExcelCellWriteListener.class);
         if (cellListeners != null) {
-            cellListeners.forEach(e -> ((ExcelCellWriteListener) e).completeCell(sheet, row, cell, excelField, field, index, colIndex, isHead));
+            cellListeners.forEach(e -> ((ExcelCellWriteListener) e).completeCell(sheet, row, cell, excelField, field, index, colIndex, rowType));
         }
     }
 
@@ -54,23 +55,37 @@ public final class ListenerChain {
      * @param sheet          Current sheet
      * @param row            Current row
      * @param cell           Current cell
-     * @param index          The data index, table header, and body all start at 0
+     * @param index          Data indexing, depending on the row type, starts at 0
      * @param colIndex       Current cell index
-     * @param isHead         Whether is excel head
+     * @param rowType        Current row type
      * @param excelField     ExcelField annotation of current field
      * @param field          Current field
      * @param value          Cell value
      * @return Cell value
      */
     public static Object doAssignmentBefore(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Cell cell,
-                                            ExcelField excelField, Field field, int index, int colIndex, boolean isHead, Object value) {
+                                            ExcelField excelField, Field field, int index, int colIndex, RowType rowType, Object value) {
         List<ExcelWriteListener> cellListeners = excelListeners.get(ExcelCellWriteListener.class);
         if (cellListeners != null) {
             for (ExcelWriteListener cellListener : cellListeners) {
-                value = ((ExcelCellWriteListener) cellListener).assignmentBefore(sheet, row, cell, excelField, field, index, colIndex, isHead, value);
+                value = ((ExcelCellWriteListener) cellListener).assignmentBefore(sheet, row, cell, excelField, field, index, colIndex, rowType, value);
             }
         }
         return value;
+    }
+
+    /**
+     * Before you create a row
+     *
+     * @param sheet   Current sheet
+     * @param index   Data indexing, depending on the row type, starts at 0
+     * @param rowType Current row type
+     */
+    public static void doCreateRowBefore(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, int index, RowType rowType) {
+        List<ExcelWriteListener> rowListeners = excelListeners.get(ExcelRowWriteListener.class);
+        if (rowListeners != null) {
+            rowListeners.forEach(e -> ((ExcelRowWriteListener) e).createBefore(sheet, index, rowType));
+        }
     }
 
     /**
@@ -80,13 +95,13 @@ public final class ListenerChain {
      * @param sheet          Current sheet
      * @param row            Create the finished row
      * @param obj            Current java object
-     * @param index          The data index, table header, and body all start at 0
-     * @param isHead         Whether is excel head
+     * @param index          Data indexing, depending on the row type, starts at 0
+     * @param rowType        Current row type
      */
-    public static void doCompleteRow(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Object obj, int index, boolean isHead) {
+    public static void doCompleteRow(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, Row row, Object obj, int index, RowType rowType) {
         List<ExcelWriteListener> rowListeners = excelListeners.get(ExcelRowWriteListener.class);
         if (rowListeners != null) {
-            rowListeners.forEach(e -> ((ExcelRowWriteListener) e).completeRow(sheet, row, obj, index, isHead));
+            rowListeners.forEach(e -> ((ExcelRowWriteListener) e).completeRow(sheet, row, obj, index, rowType));
         }
     }
 
@@ -120,18 +135,17 @@ public final class ListenerChain {
      * @param rowReadListeners rowReadListeners
      * @param r                Generated Java object
      * @param rowIndex         The index of the current row
-     * @param isHead           Whether is excel head
      * @param otherValues      Except for the content of the body
-     * @param isBody           Whether is excel body
+     * @param rowType          Current row type
      * @param <R>              R
      * @return Whether to stop reading
      */
     @SuppressWarnings("unchecked")
-    public static <R> boolean doReadRow(List<ExcelReadListener> rowReadListeners, R r, List<Object> otherValues, int rowIndex, boolean isHead, boolean isBody) {
+    public static <R> boolean doReadRow(List<ExcelReadListener> rowReadListeners, R r, List<?> otherValues, int rowIndex, RowType rowType) {
         boolean stop = false;
         if (rowReadListeners != null) {
             for (ExcelReadListener rowReadListener : rowReadListeners) {
-                stop = ((ExcelRowReadListener<R>) rowReadListener).readRow(r, otherValues, rowIndex, isHead, isBody);
+                stop = ((ExcelRowReadListener<R>) rowReadListener).readRow(r, otherValues, rowIndex, rowType);
             }
         }
         return stop;
@@ -159,15 +173,14 @@ public final class ListenerChain {
      * @param field            Current field
      * @param rowIndex         Current row index
      * @param colIndex         Current col index
-     * @param isHead           Whether is excel header
-     * @param isBody           Whether is excel body
+     * @param rowType          Current row type
      * @return cellValue
      */
     @SuppressWarnings("rawtypes")
-    public static Object doReadCell(List<ExcelReadListener> rowReadListeners, Object cellValue, Field field, int rowIndex, int colIndex, boolean isHead, boolean isBody) {
+    public static Object doReadCell(List<ExcelReadListener> rowReadListeners, Object cellValue, Field field, int rowIndex, int colIndex, RowType rowType) {
         if (rowReadListeners != null) {
             for (ExcelReadListener rowReadListener : rowReadListeners) {
-                cellValue = ((ExcelRowReadListener) rowReadListener).readCell(cellValue, field, rowIndex, colIndex, isHead, isBody);
+                cellValue = ((ExcelRowReadListener) rowReadListener).readCell(cellValue, field, rowIndex, colIndex, rowType);
             }
         }
         return cellValue;
@@ -232,7 +245,9 @@ public final class ListenerChain {
      */
     public static void addWriteListener(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache, ExcelWriteListener listener, Workbook workbook) {
         if (listener instanceof ExcelStyleWriteListener) {
+            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelStyleWriteListener.class, k -> new ArrayList<>());
             ((ExcelStyleWriteListener) listener).init(workbook);
+            listeners.add(listener);
         }
         if (listener instanceof ExcelSheetWriteListener) {
             List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelSheetWriteListener.class, k -> new ArrayList<>());

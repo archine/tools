@@ -1,17 +1,19 @@
 package cn.gjing.tools.excel.write.resolver;
 
-import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
+import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
+import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.style.DefaultExcelStyleListener;
+import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Excel exports in simple mode, not through mapped entities
@@ -19,7 +21,7 @@ import java.util.function.Supplier;
  * @author Gjing
  **/
 public final class ExcelSimpleWriter extends ExcelBaseWriter {
-    private boolean mergeEmpty = true;
+    private boolean mergeEmpty = false;
 
     public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response, boolean initDefaultStyle) {
         super(context, windowSize, response, initDefaultStyle);
@@ -39,7 +41,32 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter head(List<String[]> headNames) {
-        this.context.setHeadNames(headNames);
+        if (headNames != null && !headNames.isEmpty()) {
+            this.context.setHeadNames(headNames);
+            this.context.setHeaderSeries(headNames.get(0).length);
+        }
+        return this;
+    }
+
+    /**
+     * Set excel head row height
+     *
+     * @param rowHeight Row height
+     * @return this
+     */
+    public ExcelSimpleWriter headHeight(short rowHeight) {
+        this.context.setHeaderHeight(rowHeight);
+        return this;
+    }
+
+    /**
+     * Set excel body row height
+     *
+     * @param rowHeight Row height
+     * @return this
+     */
+    public ExcelSimpleWriter bodyHeight(short rowHeight) {
+        this.context.setBodyHeight(rowHeight);
         return this;
     }
 
@@ -167,7 +194,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Whether null data is allowed to initiate a merge callback
+     * Is it necessary to merge a null value when automatic vertical merge is implemented
      *
      * @param mergeEmpty mergeEmpty
      * @return this
@@ -215,14 +242,32 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Reset the write resolver before you are ready to call the write method
+     * Remove style listener
      *
-     * @param excelWriteResolver Excel write Resolver
      * @return this
      */
-    @Deprecated
-    public ExcelSimpleWriter resetResolver(Supplier<? extends ExcelWriterResolver> excelWriteResolver) {
-//        this.writerResolver = excelWriteResolver.get();
+    public ExcelSimpleWriter removeStyleListener() {
+        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelStyleWriteListener.class);
+        return this;
+    }
+
+    /**
+     * Remove excel row write listener
+     *
+     * @return this
+     */
+    public ExcelSimpleWriter removeRowListener() {
+        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelRowWriteListener.class);
+        return this;
+    }
+
+    /**
+     * Remove excel cell write listener
+     *
+     * @return this
+     */
+    public ExcelSimpleWriter removeCellListener() {
+        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelCellWriteListener.class);
         return this;
     }
 }

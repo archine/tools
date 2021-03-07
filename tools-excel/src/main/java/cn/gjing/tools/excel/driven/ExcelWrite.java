@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.driven;
 
 import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.write.BigTitle;
 
 import java.lang.annotation.ElementType;
@@ -22,7 +23,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface ExcelWrite {
     /**
-     * Excel file name,If it is not set and the mapping entity
+     * Excel file name, If it is not set and the mapping entity
      * is not set at the same time, the current date is default
      *
      * @return value
@@ -80,8 +81,9 @@ public @interface ExcelWrite {
     boolean initDefaultStyle() default true;
 
     /**
-     * Whether you need to add a file identifier when exporting an Excel file,
-     * which can be used for template validation of the file at import time
+     * Bind the exported Excel file to the currently set mapped entity,
+     * and if it is not set and detection is enabled in {@link ExcelBindReader#check(boolean)},
+     * an ExcelTemplateException will be thrown
      *
      * @return bind
      */

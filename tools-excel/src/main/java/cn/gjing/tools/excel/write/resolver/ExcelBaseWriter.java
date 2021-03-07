@@ -1,15 +1,21 @@
 package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
+import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.util.ListenerChain;
+import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 /**
+ * Excel base writer
+ *
  * @author Gjing
  **/
 public abstract class ExcelBaseWriter {
@@ -58,13 +64,6 @@ public abstract class ExcelBaseWriter {
      */
     public void flush() {
         ListenerChain.doWorkbookFlushBefore(this.context);
-        if (this.context.isBind()) {
-            this.context.getWorkbook().createSheet("identificationSheet")
-                    .createRow(0)
-                    .createCell(0)
-                    .setCellValue(this.context.getExcelClass().getSimpleName());
-            this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex("identificationSheet"), true);
-        }
         this.writerResolver.flush(this.response, this.context);
         if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
             ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
@@ -78,13 +77,6 @@ public abstract class ExcelBaseWriter {
      */
     public void flushToLocal(String path) {
         ListenerChain.doWorkbookFlushBefore(this.context);
-        if (this.context.isBind()) {
-            this.context.getWorkbook().createSheet("identificationSheet")
-                    .createRow(0)
-                    .createCell(0)
-                    .setCellValue(this.context.getExcelClass().getSimpleName());
-            this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex("identificationSheet"), true);
-        }
         this.writerResolver.flushToLocal(path, this.context);
         if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
             ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
@@ -102,6 +94,23 @@ public abstract class ExcelBaseWriter {
             sheet = this.context.getWorkbook().createSheet(sheetName);
             context.setSheet(sheet);
             ListenerChain.doCompleteSheet(context);
+            if (this.context.isBind()) {
+                this.bind();
+            }
         }
+    }
+
+    /**
+     * Bind the exported Excel file to the currently set mapped entity,
+     * and if it is not set and detection is enabled in {@link ExcelBindReader#check(boolean)},
+     * an ExcelTemplateException will be thrown
+     **/
+    private void bind() {
+        String sheet = "unq-" + this.context.getSheet().getSheetName();
+        Sheet extensionSheet = this.context.getWorkbook().createSheet(sheet);
+        extensionSheet.protectSheet(UUID.randomUUID().toString().replaceAll("-", ""));
+        Row extensionSheetRow = extensionSheet.createRow(0);
+        extensionSheetRow.createCell(0).setCellValue(ParamUtils.encodeMd5(this.context.getUniqueKey()));
+        this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex(sheet), true);
     }
 }

@@ -4,7 +4,6 @@ import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
-import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
@@ -43,7 +42,7 @@ public abstract class ExcelWriterResolver {
      * @param bigTitle Excel big title
      */
     public void writeTitle(BigTitle bigTitle) {
-        List<ExcelWriteListener> cellListeners = this.context.getWriteListenerCache().get(ExcelCellWriteListener.class);
+        List<ExcelWriteListener> cellListeners = this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class);
         int startOffset = this.context.getSheet().getPhysicalNumberOfRows();
         int endOffset = startOffset + bigTitle.getLines() - 1;
         for (int i = 0; i < bigTitle.getLines(); i++) {

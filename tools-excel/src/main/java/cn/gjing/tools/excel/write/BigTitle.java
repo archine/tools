@@ -79,8 +79,7 @@ public final class BigTitle {
     /**
      * Font bold
      */
-    @Builder.Default
-    private boolean bold = false;
+    private boolean bold;
 
     /**
      * Big title callback, which starts after the title style is set
@@ -88,20 +87,16 @@ public final class BigTitle {
     @Builder.Default
     private TFunction<Workbook, Cell, BigTitle, Object> callback = (workbook, cell, bigTitle) -> bigTitle.getContent();
 
-    /**
-     * @param content Big title value
-     * @deprecated Please use BigTitle.builder().build()
-     */
-    @Deprecated
-    public BigTitle(String content) {
-        this.lines = 2;
-        this.content = content;
-        this.color = ExcelColor.TAN;
-        this.rowHeight = 350;
-        this.fontColor = ExcelColor.BLACK;
-        this.alignment = HorizontalAlignment.LEFT;
-        this.bold = false;
-        this.fontHeight = 280;
-        this.callback = (workbook, cell, bigTitle) -> bigTitle.getContent();
+    public static BigTitle of(String content) {
+        return BigTitle.builder()
+                .content(content)
+                .build();
+    }
+
+    public static BigTitle of(String content, int lines) {
+        return BigTitle.builder()
+                .content(content)
+                .lines(lines)
+                .build();
     }
 }

@@ -4,7 +4,7 @@ import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
-import cn.gjing.tools.excel.read.resolver.ExcelReader;
+import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -100,6 +99,10 @@ public final class ExcelFactory {
                 .excelType(excel.type())
                 .fileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value() : fileName)
                 .excelClass(excelClass)
+                .headerHeight(excel.headerHeight())
+                .bodyHeight(excel.bodyHeight())
+                .headerSeries(headerArr.get(0).length)
+                .uniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey())
                 .build();
         return new ExcelBindWriter(context, excel, response, initDefaultStyle);
     }
@@ -160,6 +163,7 @@ public final class ExcelFactory {
                 .fileName(StringUtils.isEmpty(fileName) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : fileName)
                 .excelType(excelType)
                 .excelClass(Void.class)
+                .bind(false)
                 .build();
         return new ExcelSimpleWriter(context, windowSize, response, initDefaultStyle);
     }
@@ -174,7 +178,7 @@ public final class ExcelFactory {
      * @param <R>        Entity type
      * @return ExcelReader
      */
-    public static <R> ExcelReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) {
+    public static <R> ExcelBindReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) {
         try {
             if (!ParamUtils.isExcel(file.getOriginalFilename())) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
@@ -195,7 +199,7 @@ public final class ExcelFactory {
      * @param <R>        Entity type
      * @return ExcelReader
      */
-    public static <R> ExcelReader<R> createReader(File file, Class<R> excelClass, String... ignores) {
+    public static <R> ExcelBindReader<R> createReader(File file, Class<R> excelClass, String... ignores) {
         try {
             if (!ParamUtils.isExcel(file.getName())) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
@@ -211,17 +215,16 @@ public final class ExcelFactory {
      *
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity
-     * @param ignores     The name of the header to be ignored during import.
-     *                    If it is the parent header, all children below it will be ignored
+     * @param ignores     Ignore the array of actual Excel table headers that you read when importing
      * @param <R>         Entity type
      * @return ExcelReader
      */
-    public static <R> ExcelReader<R> createReader(InputStream inputStream, Class<R> excelClass, String... ignores) {
+    public static <R> ExcelBindReader<R> createReader(InputStream inputStream, Class<R> excelClass, String... ignores) {
         ParamUtils.requireNonNull(excelClass, "Excel mapping class cannot be null");
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<Field> excelFieldList = BeanUtils.getExcelFields(excelClass, ignores, null);
-        ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(inputStream, excelClass, excelFieldList);
-        return new ExcelReader<>(readerContext, excel);
+        ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(excelClass, BeanUtils.getExcelFieldsMap(excelClass), ignores);
+        readerContext.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
+        return new ExcelBindReader<>(readerContext, inputStream, excel);
     }
 }

@@ -1,25 +1,28 @@
 package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
-import cn.gjing.tools.excel.read.resolver.ExcelReader;
+import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
+import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.style.DefaultExcelStyleListener;
+import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
- * Excel writer
+ * Excel bind mode writer.
+ * The writer needs a mapping entity to correspond to it
  *
  * @author Gjing
+ * @see Excel
  **/
 public final class ExcelBindWriter extends ExcelBaseWriter {
 
@@ -155,23 +158,42 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
         return this;
     }
 
+
     /**
-     * Reset Excel mapped entity
+     * Reset Excel mapped entity, Excel file name and file type are not reset
+     *
+     * @param excelClass Excel mapped entity
+     * @param ignores    The exported field is to be ignored
+     * @return this
+     */
+    public ExcelBindWriter resetExcelClass(Class<?> excelClass, String... ignores) {
+        return this.resetExcelClass(excelClass, false, false, ignores);
+    }
+
+    /**
+     * Reset Excel mapped entity, Excel file name and file type are not reset
      *
      * @param excelClass    Excel mapped entity
      * @param ignores       The exported field is to be ignored
      * @param resetListener Whether to reset the listener
+     * @param initStyle     Whether to init default style listener,The prerequisite is to activate the reset listener
      * @return this
      */
-    public ExcelBindWriter resetExcelClass(Class<?> excelClass, boolean resetListener, String... ignores) {
+    public ExcelBindWriter resetExcelClass(Class<?> excelClass, boolean resetListener, boolean initStyle, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "Failed to reset Excel class, the @Excel annotation was not found on the " + excelClass);
         List<String[]> headNames = new ArrayList<>();
         this.context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, headNames));
         this.context.setHeadNames(headNames);
         this.context.setExcelClass(excelClass);
+        this.context.setBodyHeight(excel.bodyHeight());
+        this.context.setHeaderHeight(excel.headerHeight());
+        this.context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         if (resetListener) {
             this.context.getWriteListenerCache().clear();
+            if (initStyle) {
+                this.context.addListener(new DefaultExcelStyleListener());
+            }
         }
         return this;
     }
@@ -200,7 +222,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
 
     /**
      * Bind the exported Excel file to the currently set mapped entity,
-     * and if it is not set and detection is enabled in {@link ExcelReader#check(boolean)},
+     * and if it is not set and detection is enabled in {@link ExcelBindReader#check(boolean)},
      * an ExcelTemplateException will be thrown
      *
      * @param enable Whether enable bind, default true
@@ -238,14 +260,32 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Reset the write resolver before you are ready to call the write method
+     * Remove style listener
      *
-     * @param excelWriteResolver Excel write Resolver
      * @return this
      */
-    @Deprecated
-    public ExcelBindWriter resetResolver(Supplier<? extends ExcelWriterResolver> excelWriteResolver) {
-//        this.writerResolver = excelWriteResolver.get();
+    public ExcelBindWriter removeStyleListener() {
+        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelStyleWriteListener.class);
+        return this;
+    }
+
+    /**
+     * Remove excel row write listener
+     *
+     * @return this
+     */
+    public ExcelBindWriter removeRowListener() {
+        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelRowWriteListener.class);
+        return this;
+    }
+
+    /**
+     * Remove excel cell write listener
+     *
+     * @return this
+     */
+    public ExcelBindWriter removeCellListener() {
+        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelCellWriteListener.class);
         return this;
     }
 }

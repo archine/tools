@@ -3,7 +3,7 @@ package cn.gjing.tools.excel.write.listener;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 
 /**
- * Sheet lifecycle listener
+ * The Excel Workbook writes out the listener
  *
  * @author Gjing
  **/

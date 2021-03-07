@@ -3,6 +3,8 @@ package cn.gjing.tools.excel.util;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -29,6 +31,36 @@ public final class ParamUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * MD5 encryption
+     *
+     * @param body need to encryption
+     * @return encrypted string
+     */
+    public static String encodeMd5(String body) {
+        StringBuilder buf = new StringBuilder();
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(body.getBytes());
+            byte[] b = md.digest();
+            int i;
+            for (byte b1 : b) {
+                i = b1;
+                if (i < 0) {
+                    i += 256;
+                }
+                if (i < 16) {
+                    buf.append("0");
+                }
+                buf.append(Integer.toHexString(i));
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+        return buf.toString();
     }
 
     /**
@@ -140,11 +172,11 @@ public final class ParamUtils {
      * @param map HashMap
      * @param key Specified key
      */
-    public static void deleteMapKey(Map<?, ?> map, String key) {
+    public static void deleteMapKey(Map<?, ?> map, Object key) {
         Iterator<? extends Map.Entry<?, ?>> iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<?, ?> next = iterator.next();
-            if (next.getKey().equals(key)) {
+            Map.Entry<?, ?> entry = iterator.next();
+            if (entry.getKey() == key || entry.getKey().equals(key)) {
                 iterator.remove();
                 break;
             }

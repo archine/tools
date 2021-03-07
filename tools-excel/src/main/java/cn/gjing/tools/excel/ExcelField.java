@@ -25,8 +25,7 @@ public @interface ExcelField {
      * If multiple headers appear in the array and you want to merge the same header when exporting,
      * you need to activate the multi-header mode before the export is executed.
      * The last one in the array belongs to the real header,
-     * and if you are importing a multilevel header Excel file,
-     * you need to specify the real header start subscript
+     * and if you are importing a multilevel header Excel file, you need to specify the real header start subscript.
      * The header array size must be the same
      *
      * @return header names
@@ -41,15 +40,27 @@ public @interface ExcelField {
     int width() default 5120;
 
     /**
-     * List header sort, if not set will default entity property order
+     * List header sort defaults to the order in which entity fields appear.
+     * If the current class inherits from the parent class,
+     * the fields of the parent class are appended to the fields of the current subclass.
+     * If the ORDER parameter is set, the order is sorted from smallest to largest
      *
      * @return sort index
      */
     int order() default 0;
 
     /**
-     * The format of the cells under the current table header when exported,
-     * default to normal format
+     * Cell format
+     * The cell format of the current column is set when exporting,
+     * which defaults to general，
+     * Some commonly used formats are {
+     * <p>
+     * ------- @ as text
+     * ------- 0 as integer
+     * ------- 0.00 is two decimal places
+     * ------- yyyy-MM-dd  as 年-月-日
+     * }
+     * See Excel's official cell format for more information
      *
      * @return format
      */

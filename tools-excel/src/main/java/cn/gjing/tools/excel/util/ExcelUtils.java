@@ -186,17 +186,18 @@ public final class ExcelUtils {
     /**
      * Add repeat validation when export
      *
-     * @param sheet        Current sheet
-     * @param firstRow     Start row
-     * @param lastRow      End row
-     * @param colIndex     Column index
-     * @param showErrorBox Whether show error box
-     * @param errorBoxRank Error box rank
-     * @param errorTitle   Error box title
-     * @param errorContent Error box value
+     * @param sheet          Current sheet
+     * @param firstRow       Start row
+     * @param lastRow        End row
+     * @param colIndex       Column index
+     * @param showErrorBox   Whether show error box
+     * @param errorBoxRank   Error box rank
+     * @param errorTitle     Error box title
+     * @param errorContent   Error box value
+     * @param longTextNumber Whether is long text number
      */
     public static void addRepeatValid(Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
-                                      String errorTitle, String errorContent) {
+                                      String errorTitle, String errorContent, boolean longTextNumber) {
 
         int startRow;
         int startCol;
@@ -204,12 +205,17 @@ public final class ExcelUtils {
             startRow = firstRow == 1 ? 1 : (firstRow - sheet.getLastRowNum());
             startCol = 0;
         } else {
-            startRow = firstRow == 1 ? 1 : (firstRow + 1);
+            startRow = firstRow + 1;
             startCol = colIndex;
         }
         String index = ParamUtils.numberToEn(startCol);
-        addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + "&\"*\")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
-                errorBoxRank, errorTitle, errorContent);
+        if (longTextNumber) {
+            addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + "&\"*\")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
+                    errorBoxRank, errorTitle, errorContent);
+        } else {
+            addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + ")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
+                    errorBoxRank, errorTitle, errorContent);
+        }
     }
 
     /**
@@ -329,7 +335,7 @@ public final class ExcelUtils {
      * @param firstRow First row index
      * @param LastRow  Last row index
      */
-    private static void merge(Sheet sheet, int firstCol, int lastCol, int firstRow, int LastRow) {
+    public static void merge(Sheet sheet, int firstCol, int lastCol, int firstRow, int LastRow) {
         sheet.addMergedRegion(new CellRangeAddress(firstRow, LastRow, firstCol, lastCol));
     }
 
@@ -340,7 +346,7 @@ public final class ExcelUtils {
      * @param index address index, start of 0
      * @return CellRangeAddress
      */
-    private static CellRangeAddress getCellRangeAddress(Sheet sheet, int index) {
+    public static CellRangeAddress getCellRangeAddress(Sheet sheet, int index) {
         return sheet.getMergedRegion(index);
     }
 
