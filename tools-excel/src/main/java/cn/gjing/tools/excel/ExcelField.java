@@ -4,6 +4,7 @@ package cn.gjing.tools.excel;
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.metadata.ExcelColor;
+import cn.gjing.tools.excel.metadata.RuleType;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
 import cn.gjing.tools.excel.write.merge.Merge;
 
@@ -30,7 +31,7 @@ public @interface ExcelField {
      *
      * @return header names
      */
-    String[] value() default {""};
+    String[] value() default "";
 
     /**
      * Column width of the excel header
@@ -99,20 +100,31 @@ public @interface ExcelField {
     Class<? extends DataConvert<?>> convert() default DefaultDataConvert.class;
 
     /**
-     * Color index, can control the current header fill color,
-     * default use style listener color configuration
+     * The header background color array corresponds to the header array.
+     * If the array length is smaller than the header series,
+     * the header of the subsequent series will use the last element in the color array
      *
      * @return index
      * @see ExcelColor
      */
-    ExcelColor color() default ExcelColor.LIME;
+    ExcelColor[] color() default ExcelColor.LIME;
 
     /**
-     * Font color index, can control the current header value color,
-     * default use style listener color configuration
+     * The header Font color array corresponds to the header array.
+     * If the array length is smaller than the header series,
+     * the header of the subsequent series will use the last element in the font color array
      *
      * @return index
      * @see ExcelColor
      */
-    ExcelColor fontColor() default ExcelColor.WHITE;
+    ExcelColor[] fontColor() default ExcelColor.WHITE;
+
+    /**
+     * Multilevel header merges rules that correspond to an array of headers.
+     * If the array length is smaller than that of the series,
+     * then the following series will use the last element in the array of rules
+     *
+     * @return AUTO
+     */
+    RuleType[] rules() default RuleType.AUTO;
 }

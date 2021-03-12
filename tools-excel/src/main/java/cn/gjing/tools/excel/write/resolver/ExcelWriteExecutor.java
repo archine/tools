@@ -7,6 +7,7 @@ import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.RowType;
+import cn.gjing.tools.excel.metadata.RuleType;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
@@ -80,13 +81,28 @@ public final class ExcelWriteExecutor {
                         oldCellModel = new ExcelOldCellModel();
                     }
                     if (this.oldRowModelMap == null) {
-                        this.oldRowModelMap = new HashMap<>(12);
+                        this.oldRowModelMap = new HashMap<>(32);
                     }
                     try {
-                        ExcelUtils.mergeX(oldCellModel, this.context.getSheet(), headRow, excelField.autoMerge().empty(), headCell.getColumnIndex(), headName,
-                                headSize < headRow.getLastCellNum() ? headRow.getLastCellNum() : headSize, true);
-                        ExcelUtils.mergeY(this.oldRowModelMap, this.context.getSheet(), headRow, excelField.autoMerge().empty(), index, headCell.getColumnIndex(),
-                                headName, this.context.getHeaderSeries(), true);
+                        RuleType[] rules = excelField.rules();
+                        RuleType rule = rules[rules.length > index + 1 ? index : rules.length - 1];
+                        switch (rule) {
+                            case X:
+                                ExcelUtils.mergeX(oldCellModel, this.context.getSheet(), headRow, excelField.autoMerge().empty(), headCell.getColumnIndex(), headName,
+                                        headSize < headRow.getLastCellNum() ? headRow.getLastCellNum() : headSize, true);
+                                break;
+                            case Y:
+                                ExcelUtils.mergeY(this.oldRowModelMap, this.context.getSheet(), headRow, excelField.autoMerge().empty(), index, headCell.getColumnIndex(),
+                                        headName, this.context.getHeaderSeries(), true);
+                                break;
+                            case AUTO:
+                                ExcelUtils.mergeX(oldCellModel, this.context.getSheet(), headRow, excelField.autoMerge().empty(), headCell.getColumnIndex(), headName,
+                                        headSize < headRow.getLastCellNum() ? headRow.getLastCellNum() : headSize, true);
+                                ExcelUtils.mergeY(this.oldRowModelMap, this.context.getSheet(), headRow, excelField.autoMerge().empty(), index, headCell.getColumnIndex(),
+                                        headName, this.context.getHeaderSeries(), true);
+                                break;
+                            default:
+                        }
                     } catch (Exception e) {
                         throw new ExcelResolverException("Auto merge failure, " + e.getMessage());
                     }
