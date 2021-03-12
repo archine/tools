@@ -34,6 +34,15 @@ public @interface ExcelField {
     String[] value() default "";
 
     /**
+     * The header above the Excel column that will be concatenated with the real header name ,
+     * when imported to match the header in the Excel file to an Excel column header matches the Excel column
+     * with the header based on the actual header name
+     *
+     * @return title
+     */
+    String title() default "";
+
+    /**
      * Column width of the excel header
      *
      * @return Column width

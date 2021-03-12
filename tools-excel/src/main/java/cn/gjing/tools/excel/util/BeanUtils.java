@@ -86,8 +86,9 @@ public final class BeanUtils {
         return fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .collect(Collectors.toMap(e -> {
-                    String[] headArray = e.getAnnotation(ExcelField.class).value();
-                    return headArray[headArray.length - 1];
+                    ExcelField excelField = e.getAnnotation(ExcelField.class);
+                    String[] headArray = excelField.value();
+                    return headArray[headArray.length - 1] + excelField.title();
                 }, f -> f));
     }
 
