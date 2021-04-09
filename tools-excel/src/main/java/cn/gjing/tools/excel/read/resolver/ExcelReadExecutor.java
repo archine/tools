@@ -8,11 +8,11 @@ import cn.gjing.tools.excel.exception.ExcelAssertException;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
-import cn.gjing.tools.excel.metadata.ExcelReaderResolver;
 import cn.gjing.tools.excel.metadata.RowType;
+import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
+import cn.gjing.tools.excel.metadata.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
-import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.read.valid.ExcelAssert;
 import cn.gjing.tools.excel.util.BeanUtils;
@@ -89,7 +89,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
      * @param headerIndex Excel header index
      * @param dataList    All data
      */
-    private void reader(int headerIndex, List<R> dataList, List<ExcelReadListener> rowReadListeners,ExpressionParser parser, EvaluationContext context) {
+    private void reader(int headerIndex, List<R> dataList, List<ExcelReadListener> rowReadListeners, ExpressionParser parser, EvaluationContext context) {
         R r;
         this.save = true;
         boolean stop = false;
@@ -114,7 +114,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 for (Cell cell : row) {
                     String value = cell.getStringCellValue();
                     if (ParamUtils.contains(this.context.getIgnores(), value)) {
-                        value = "ig";
+                        value = "ignored";
                     }
                     this.context.getHeadNames().add(String.valueOf(ListenerChain.doReadCell(rowReadListeners, value, null, row.getRowNum(), cell.getColumnIndex(), RowType.HEAD)));
                 }
@@ -130,7 +130,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
                 for (int c = 0, size = this.context.getHeadNames().size(); c < size && save; c++) {
                     String head = this.context.getHeadNames().get(c);
-                    if ("ig".equals(head)) {
+                    if ("ignored".equals(head)) {
                         continue;
                     }
                     Field field = this.context.getExcelFieldMap().get(head);

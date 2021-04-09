@@ -1,6 +1,4 @@
-package cn.gjing.tools.excel.write.listener;
-
-import cn.gjing.tools.excel.metadata.ExcelListener;
+package cn.gjing.tools.excel.metadata.listener;
 
 /**
  * Excel export listener

@@ -19,7 +19,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 @NoArgsConstructor
 public final class BigTitle {
     /**
-     * How many lines
+     * The starting row index, -1 is the latest row added to the current Excel file
+     */
+    @Builder.Default
+    private int firstRow = -1;
+
+    /**
+     * Occupied rows, less than 1 is automatically set to 1
      */
     @Builder.Default
     private int lines = 2;
@@ -27,12 +33,14 @@ public final class BigTitle {
     /**
      * First col index
      */
-    private int firstCol;
+    @Builder.Default
+    private int firstCol = 0;
 
     /**
-     * Last col index, 0 is the number of following excel header size
+     * Last col index, -1 is the number of following excel header size
      */
-    private int lastCol;
+    @Builder.Default
+    private int lastCol = -1;
 
     /**
      * Style index, if the style of the index exists, it will take the existing one,
@@ -97,6 +105,15 @@ public final class BigTitle {
         return BigTitle.builder()
                 .content(content)
                 .lines(lines)
+                .build();
+    }
+
+    public static BigTitle of(String content, int lines, int firstRow, int firstCol) {
+        return BigTitle.builder()
+                .content(content)
+                .lines(lines)
+                .firstRow(firstRow)
+                .firstCol(firstCol)
                 .build();
     }
 }

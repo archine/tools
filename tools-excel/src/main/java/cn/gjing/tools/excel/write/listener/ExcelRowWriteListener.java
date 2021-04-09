@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write.listener;
 
 import cn.gjing.tools.excel.metadata.RowType;
+import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 

@@ -1,14 +1,11 @@
 package cn.gjing.tools.excel.write.resolver;
 
-import cn.gjing.tools.excel.util.ParamUtils;
+import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
+import cn.gjing.tools.excel.metadata.listener.DefaultMultiHeadListener;
+import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
-import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
-import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
-import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
-import cn.gjing.tools.excel.write.style.DefaultExcelStyleListener;
-import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -29,7 +26,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
 
     @Override
     protected void initStyle() {
-        this.context.addListener(new DefaultExcelStyleListener());
+        this.addListener(new DefaultExcelStyleListener());
     }
 
     /**
@@ -212,6 +209,9 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter multiHead(boolean enable) {
         this.context.setMultiHead(enable);
+        if (enable) {
+            return this.addListener(new DefaultMultiHeadListener());
+        }
         return this;
     }
 
@@ -223,7 +223,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter addListener(ExcelWriteListener listener) {
         if (listener != null) {
-            this.context.addListener(listener);
+            super.addListenerCache(listener);
         }
         return this;
     }
@@ -236,38 +236,8 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter addListener(List<? extends ExcelWriteListener> listeners) {
         if (listeners != null) {
-            listeners.forEach(this.context::addListener);
+            listeners.forEach(this::addListener);
         }
-        return this;
-    }
-
-    /**
-     * Remove style listener
-     *
-     * @return this
-     */
-    public ExcelSimpleWriter removeStyleListener() {
-        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelStyleWriteListener.class);
-        return this;
-    }
-
-    /**
-     * Remove excel row write listener
-     *
-     * @return this
-     */
-    public ExcelSimpleWriter removeRowListener() {
-        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelRowWriteListener.class);
-        return this;
-    }
-
-    /**
-     * Remove excel cell write listener
-     *
-     * @return this
-     */
-    public ExcelSimpleWriter removeCellListener() {
-        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelCellWriteListener.class);
         return this;
     }
 }

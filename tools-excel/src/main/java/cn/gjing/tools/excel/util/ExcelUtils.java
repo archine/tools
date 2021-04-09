@@ -1,8 +1,6 @@
 package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.Excel;
-import cn.gjing.tools.excel.write.merge.ExcelOldCellModel;
-import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
 import cn.gjing.tools.excel.write.valid.OperatorType;
 import cn.gjing.tools.excel.write.valid.Rank;
 import cn.gjing.tools.excel.write.valid.ValidType;
@@ -16,7 +14,6 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author Gjing
@@ -244,89 +241,6 @@ public final class ExcelUtils {
     }
 
     /**
-     * Vertical merge
-     * OldRowModelMap should be global, with minimum partitioning to each export
-     *
-     * @param oldRowModelMap  oldRowModelMap
-     * @param sheet           Current sheet
-     * @param row             Current row
-     * @param index           The data index, table header, and body all start at 0
-     * @param dataSize        Excel head data size or body data size,
-     * @param colIndex        Current col index
-     * @param cellValue       Current cell value
-     * @param allowMergeEmpty Whether is allow merge empty
-     * @param toMerge         Whether is to merge
-     */
-    public static void mergeY(Map<Integer, ExcelOldRowModel> oldRowModelMap, Sheet sheet, Row row, boolean allowMergeEmpty, int index, int colIndex,
-                              Object cellValue, int dataSize, boolean toMerge) {
-        ExcelOldRowModel excelOldRowModel = oldRowModelMap.get(colIndex);
-        if (excelOldRowModel == null) {
-            oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
-            return;
-        }
-        if (toMerge) {
-            if (ParamUtils.equals(cellValue, excelOldRowModel.getOldRowCellValue(), allowMergeEmpty)) {
-                if (index == dataSize - 1) {
-                    sheet.addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum(), colIndex, colIndex));
-                }
-                return;
-            }
-            if (excelOldRowModel.getOldRowIndex() + 1 < row.getRowNum()) {
-                sheet.addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum() - 1, colIndex, colIndex));
-            }
-            oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
-            return;
-        }
-        if (excelOldRowModel.getOldRowIndex() + 1 < row.getRowNum()) {
-            sheet.addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum() - 1, colIndex, colIndex));
-            excelOldRowModel.setOldRowCellValue(cellValue);
-            excelOldRowModel.setOldRowIndex(row.getRowNum());
-            oldRowModelMap.put(colIndex, excelOldRowModel);
-        }
-    }
-
-    /**
-     * Horizontal merge
-     * You need to make sure that the ExcelOldCellModel object is a singleton on each line, or is written out at once
-     *
-     * @param oldCellModel    oldCellModel
-     * @param sheet           Current sheet
-     * @param row             Current row
-     * @param colIndex        Current col index
-     * @param cellValue       Current cell value
-     * @param colSize         Total col
-     * @param allowMergeEmpty Whether is allow merge empty
-     * @param toMerge         Whether is to merge
-     */
-    public static void mergeX(ExcelOldCellModel oldCellModel, Sheet sheet, Row row, boolean allowMergeEmpty, int colIndex, Object cellValue,
-                              int colSize, boolean toMerge) {
-        if (colIndex == 0) {
-            oldCellModel.setLastCellValue(cellValue);
-            oldCellModel.setLastCellIndex(colIndex);
-            return;
-        }
-        if (toMerge) {
-            if (ParamUtils.equals(cellValue, oldCellModel.getLastCellValue(), allowMergeEmpty)) {
-                if (colIndex == colSize - 1) {
-                    sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), oldCellModel.getLastCellIndex(), colIndex));
-                }
-                return;
-            }
-            if (oldCellModel.getLastCellIndex() + 1 < colIndex) {
-                sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), oldCellModel.getLastCellIndex(), colIndex - 1));
-            }
-            oldCellModel.setLastCellValue(cellValue);
-            oldCellModel.setLastCellIndex(colIndex);
-            return;
-        }
-        if (oldCellModel.getLastCellIndex() + 1 < colIndex) {
-            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), oldCellModel.getLastCellIndex(), colIndex - 1));
-            oldCellModel.setLastCellIndex(colIndex);
-            oldCellModel.setLastCellValue(cellValue);
-        }
-    }
-
-    /**
      * Merge cells
      *
      * @param sheet    Current sheet
@@ -413,5 +327,29 @@ public final class ExcelUtils {
      */
     public static Hyperlink createLink(Workbook workbook, HyperlinkType type) {
         return workbook.getCreationHelper().createHyperlink(type);
+    }
+
+    /**
+     * Determines whether a cell has been merged
+     * @param sheet Current sheet
+     * @param row Current row number
+     * @param column current column number
+     * @return True is merged
+     */
+    public static boolean isMerge(Sheet sheet, int row , int column) {
+        int sheetMergeCount = sheet.getNumMergedRegions();
+        for (int i = 0; i < sheetMergeCount; i++) {
+            CellRangeAddress range = sheet.getMergedRegion(i);
+            int firstColumn = range.getFirstColumn();
+            int lastColumn = range.getLastColumn();
+            int firstRow = range.getFirstRow();
+            int lastRow = range.getLastRow();
+            if(row >= firstRow && row <= lastRow){
+                if(column >= firstColumn && column <= lastColumn){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

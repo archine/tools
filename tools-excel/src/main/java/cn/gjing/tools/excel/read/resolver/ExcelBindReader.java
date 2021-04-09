@@ -1,12 +1,9 @@
 package cn.gjing.tools.excel.read.resolver;
 
 import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
-import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
-import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
-import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
-import cn.gjing.tools.excel.util.ParamUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -111,7 +108,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      */
     public ExcelBindReader<R> addListener(List<ExcelReadListener> readListenerList) {
         if (readListenerList != null) {
-            readListenerList.forEach(this.context::addListener);
+            readListenerList.forEach(this::addListener);
         }
         return this;
     }
@@ -124,7 +121,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      */
     public ExcelBindReader<R> addListener(ExcelReadListener readListener) {
         if (readListener != null) {
-            this.context.addListener(readListener);
+            super.addListenerCache(readListener);
         }
         return this;
     }
@@ -141,32 +138,30 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
     }
 
     /**
-     * Remove read empty listener
+     * Deletes the current listener cache
      *
+     * @param key { ExcelEmptyReadListener.class
+     *            ExcelRowReadListener.class
+     *            }
      * @return this
      */
-    public ExcelBindReader<R> removeEmptyListener() {
-        ParamUtils.deleteMapKey(this.context.getReadListenersCache(), ExcelEmptyReadListener.class);
-        return this;
+    public ExcelBindReader<R> removeListener(Class<? extends ExcelReadListener> key) {
+        return this.removeListener(false, key);
     }
 
     /**
-     * Remove excel read row listener
+     * Deletes the current listener cache
      *
+     * @param all Whether to delete listeners flagged by @ListenerNative
+     * @param key { ExcelEmptyReadListener.class
+     *            ExcelRowReadListener.class
+     *            }
      * @return this
      */
-    public ExcelBindReader<R> removeRowListener() {
-        ParamUtils.deleteMapKey(this.context.getReadListenersCache(), ExcelRowReadListener.class);
-        return this;
-    }
-
-    /**
-     * Remove excel read result listener
-     *
-     * @return this
-     */
-    public ExcelBindReader<R> removeResultListener() {
-        this.context.setResultReadListener(null);
+    public ExcelBindReader<R> removeListener(boolean all, Class<? extends ExcelReadListener> key) {
+        if (key != null) {
+            super.removeListenerCache(key, all);
+        }
         return this;
     }
 }

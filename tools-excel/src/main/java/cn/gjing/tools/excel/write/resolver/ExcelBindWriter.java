@@ -1,16 +1,15 @@
 package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
+import cn.gjing.tools.excel.metadata.listener.DefaultMultiHeadListener;
+import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
-import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
-import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
-import cn.gjing.tools.excel.write.listener.ExcelWriteListener;
-import cn.gjing.tools.excel.write.style.DefaultExcelStyleListener;
-import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
+import cn.gjing.tools.excel.write.listener.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
 
     @Override
     protected void initStyle() {
-        this.context.addListener(new DefaultExcelStyleListener());
+        this.addListener(new DefaultExcelStyleListener());
     }
 
     /**
@@ -150,9 +149,6 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     public ExcelBindWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
             this.createSheet(sheetName);
-            if (bigTitle.getLastCol() < 1) {
-                bigTitle.setLastCol(this.context.getExcelFields().size() - 1);
-            }
             this.writerResolver.writeTitle(bigTitle);
         }
         return this;
@@ -167,7 +163,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelBindWriter resetExcelClass(Class<?> excelClass, String... ignores) {
-        return this.resetExcelClass(excelClass, false, false, ignores);
+        return this.resetExcelClass(excelClass, false, ignores);
     }
 
     /**
@@ -175,11 +171,10 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      *
      * @param excelClass    Excel mapped entity
      * @param ignores       The exported field is to be ignored
-     * @param resetListener Whether to reset the listener
-     * @param initStyle     Whether to init default style listener,The prerequisite is to activate the reset listener
+     * @param resetListener Clear all listener caches, but do not clear listeners flagged by @ListenerNative
      * @return this
      */
-    public ExcelBindWriter resetExcelClass(Class<?> excelClass, boolean resetListener, boolean initStyle, String... ignores) {
+    public ExcelBindWriter resetExcelClass(Class<?> excelClass, boolean resetListener, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "Failed to reset Excel class, the @Excel annotation was not found on the " + excelClass);
         List<String[]> headNames = new ArrayList<>();
@@ -190,10 +185,12 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
         this.context.setHeaderHeight(excel.headerHeight());
         this.context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         if (resetListener) {
-            this.context.getWriteListenerCache().clear();
-            if (initStyle) {
-                this.context.addListener(new DefaultExcelStyleListener());
-            }
+            this.removeListener(ExcelStyleWriteListener.class);
+            this.removeListener(ExcelCascadingDropdownBoxListener.class);
+            this.removeListener(ExcelCellWriteListener.class);
+            this.removeListener(ExcelRowWriteListener.class);
+            this.removeListener(ExcelSheetWriteListener.class);
+            this.removeListener(ExcelWorkbookWriteListener.class);
         }
         return this;
     }
@@ -217,6 +214,9 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter multiHead(boolean enable) {
         this.context.setMultiHead(enable);
+        if (enable) {
+            return this.addListener(new DefaultMultiHeadListener());
+        }
         return this;
     }
 
@@ -241,7 +241,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter addListener(ExcelWriteListener listener) {
         if (listener != null) {
-            this.context.addListener(listener);
+            super.addListenerCache(listener);
         }
         return this;
     }
@@ -254,38 +254,44 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter addListener(List<? extends ExcelWriteListener> listeners) {
         if (listeners != null) {
-            listeners.forEach(this.context::addListener);
+            listeners.forEach(this::addListener);
         }
         return this;
     }
 
     /**
-     * Remove style listener
+     * Deletes the current listener cache, save the listener marked with the @ListenerNative annotation
      *
+     * @param key { ExcelStyleWriteListener.class
+     *            ExcelCascadingDropdownBoxListener.class
+     *            ExcelCellWriteListener.class
+     *            ExcelRowWriteListener.class
+     *            ExcelSheetWriteListener.class
+     *            ExcelWorkbookWriteListener.class
+     *            }
      * @return this
      */
-    public ExcelBindWriter removeStyleListener() {
-        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelStyleWriteListener.class);
-        return this;
+    public ExcelBindWriter removeListener(Class<? extends ExcelWriteListener> key) {
+        return this.removeListener(false, key);
     }
 
     /**
-     * Remove excel row write listener
+     * Deletes the current listener cache
      *
+     * @param all Whether to delete listeners flagged by @ListenerNative
+     * @param key { ExcelStyleWriteListener.class
+     *            ExcelCascadingDropdownBoxListener.class
+     *            ExcelCellWriteListener.class
+     *            ExcelRowWriteListener.class
+     *            ExcelSheetWriteListener.class
+     *            ExcelWorkbookWriteListener.class
+     *            }
      * @return this
      */
-    public ExcelBindWriter removeRowListener() {
-        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelRowWriteListener.class);
-        return this;
-    }
-
-    /**
-     * Remove excel cell write listener
-     *
-     * @return this
-     */
-    public ExcelBindWriter removeCellListener() {
-        ParamUtils.deleteMapKey(this.context.getWriteListenerCache(), ExcelCellWriteListener.class);
+    public ExcelBindWriter removeListener(boolean all, Class<? extends ExcelWriteListener> key) {
+        if (key != null) {
+            super.delListenerCache(key, all);
+        }
         return this;
     }
 }

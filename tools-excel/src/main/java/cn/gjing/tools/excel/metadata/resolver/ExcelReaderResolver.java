@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel.metadata;
+package cn.gjing.tools.excel.metadata.resolver;
 
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 

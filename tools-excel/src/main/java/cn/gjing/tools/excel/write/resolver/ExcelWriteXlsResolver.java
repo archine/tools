@@ -1,6 +1,6 @@
 package cn.gjing.tools.excel.write.resolver;
 
-import cn.gjing.tools.excel.metadata.ExcelWriterResolver;
+import cn.gjing.tools.excel.metadata.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 

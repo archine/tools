@@ -6,7 +6,9 @@ import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.metadata.ExcelColor;
 import cn.gjing.tools.excel.metadata.RuleType;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
+import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.write.merge.Merge;
+import org.apache.poi.ss.usermodel.Sheet;
 
 import java.lang.annotation.*;
 
@@ -109,9 +111,8 @@ public @interface ExcelField {
     Class<? extends DataConvert<?>> convert() default DefaultDataConvert.class;
 
     /**
-     * The header background color array corresponds to the header array.
-     * If the array length is smaller than the header series,
-     * the header of the subsequent series will use the last element in the color array
+     * Color index array, If the size of the color array is smaller than the number of series in the header,
+     * all subsequent headers will use the last one in the color array
      *
      * @return index
      * @see ExcelColor
@@ -119,9 +120,8 @@ public @interface ExcelField {
     ExcelColor[] color() default ExcelColor.LIME;
 
     /**
-     * The header Font color array corresponds to the header array.
-     * If the array length is smaller than the header series,
-     * the header of the subsequent series will use the last element in the font color array
+     * Font color index array, If the size of the color array is smaller than the number of series in the header,
+     * all subsequent headers will use the last one in the color array
      *
      * @return index
      * @see ExcelColor
@@ -129,11 +129,13 @@ public @interface ExcelField {
     ExcelColor[] fontColor() default ExcelColor.WHITE;
 
     /**
-     * Multilevel header merges rules that correspond to an array of headers.
-     * If the array length is smaller than that of the series,
-     * then the following series will use the last element in the array of rules
+     * Rules for merging multi-level headers, If the size of the color array is smaller than the number of series in the header,
+     * all subsequent headers will use the last one in the color array
      *
-     * @return AUTO
+     * @return x
+     * @deprecated You need to control the direction of the merge dynamically by setting in the listener
+     * @see ExcelUtils#merge(Sheet, int, int, int, int)
      */
-    RuleType[] rules() default RuleType.AUTO;
+    @Deprecated
+    RuleType[] rules() default RuleType.X;
 }

@@ -2,21 +2,22 @@ package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.metadata.RowType;
+import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
+import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
-import cn.gjing.tools.excel.read.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
-import cn.gjing.tools.excel.write.listener.*;
-import cn.gjing.tools.excel.write.style.ExcelStyleWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelSheetWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelWorkbookWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -77,10 +78,10 @@ public final class ListenerChain {
     /**
      * Before you create a row
      *
-     * @param excelListeners excelListeners
      * @param sheet   Current sheet
      * @param index   Data indexing, depending on the row type, starts at 0
      * @param rowType Current row type
+     * @param excelListeners write listeners
      */
     public static void doCreateRowBefore(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> excelListeners, Sheet sheet, int index, RowType rowType) {
         List<ExcelWriteListener> rowListeners = excelListeners.get(ExcelRowWriteListener.class);
@@ -234,58 +235,6 @@ public final class ListenerChain {
     public static <R> void doResultNotify(ExcelResultReadListener<R> resultReadListener, List<R> data) {
         if (data != null) {
             resultReadListener.notify(data);
-        }
-    }
-
-    /**
-     * Add a write listener
-     *
-     * @param writeListenerCache writeListenerCache
-     * @param listener           Write listener
-     * @param workbook           workbook
-     */
-    public static void addWriteListener(Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache, ExcelWriteListener listener, Workbook workbook) {
-        if (listener instanceof ExcelStyleWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelStyleWriteListener.class, k -> new ArrayList<>());
-            ((ExcelStyleWriteListener) listener).init(workbook);
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelSheetWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelSheetWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelRowWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelRowWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelCellWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelCellWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelCascadingDropdownBoxListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelCascadingDropdownBoxListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-        if (listener instanceof ExcelWorkbookWriteListener) {
-            List<ExcelWriteListener> listeners = writeListenerCache.computeIfAbsent(ExcelWorkbookWriteListener.class, k -> new ArrayList<>());
-            listeners.add(listener);
-        }
-    }
-
-    /**
-     * Add a read listener
-     *
-     * @param readListenersCache readListenersCache
-     * @param readListener       read Listener
-     */
-    public static void addReadListener(Map<Class<? extends ExcelReadListener>, List<ExcelReadListener>> readListenersCache, ExcelReadListener readListener) {
-        if (readListener instanceof ExcelRowReadListener) {
-            List<ExcelReadListener> readListeners = readListenersCache.computeIfAbsent(ExcelRowReadListener.class, k -> new ArrayList<>());
-            readListeners.add(readListener);
-        }
-        if (readListener instanceof ExcelEmptyReadListener) {
-            List<ExcelReadListener> readListeners = readListenersCache.computeIfAbsent(ExcelEmptyReadListener.class, k -> new ArrayList<>());
-            readListeners.add(readListener);
         }
     }
 }

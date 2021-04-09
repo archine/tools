@@ -1,10 +1,12 @@
-package cn.gjing.tools.excel.write.style;
+package cn.gjing.tools.excel.metadata.listener;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.metadata.ExcelColor;
 import cn.gjing.tools.excel.metadata.RowType;
+import cn.gjing.tools.excel.metadata.annotation.ListenerNative;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.listener.ExcelCellWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelStyleWriteListener;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.*;
 
@@ -19,6 +21,7 @@ import java.util.Map;
  *
  * @author Gjing
  **/
+@ListenerNative
 public class DefaultExcelStyleListener implements ExcelStyleWriteListener, ExcelCellWriteListener {
     private Workbook workbook;
     @Getter
@@ -33,7 +36,7 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
         this.workbook = workbook;
         this.headStyle = new HashMap<>(32);
         this.bodyStyle = new HashMap<>(32);
-        this.titleStyles = new HashMap<>(8);
+        this.titleStyles = new HashMap<>(16);
     }
 
     @Override
@@ -76,10 +79,10 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
                 int maxIndex = Math.max(excelField.color().length, excelField.fontColor().length);
                 for (int i = 0; i < maxIndex; i++) {
                     cellStyle = this.workbook.createCellStyle();
-                    cellStyle.setFillForegroundColor(excelField.color()[excelField.color().length > index + 1 ? index : excelField.color().length - 1].index);
+                    cellStyle.setFillForegroundColor(excelField.color()[excelField.color().length > i + 1 ? i : excelField.color().length - 1].index);
                     Font font = workbook.createFont();
                     font.setBold(true);
-                    font.setColor(excelField.fontColor()[excelField.fontColor().length > index + 1 ? index : excelField.fontColor().length - 1].index);
+                    font.setColor(excelField.fontColor()[excelField.fontColor().length > i + 1 ? i : excelField.fontColor().length - 1].index);
                     cellStyle.setFont(font);
                     this.setColorAndBorder(cellStyle);
                     this.setAlignment(cellStyle);
@@ -87,7 +90,7 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
                 }
             }
         }
-        cell.setCellStyle(index + 1 == cellStyleList.size() ? cellStyleList.get(index) : cellStyleList.get(cellStyleList.size() - 1));
+        cell.setCellStyle(index + 1 <= cellStyleList.size() ? cellStyleList.get(index) : cellStyleList.get(cellStyleList.size() - 1));
     }
 
     @Override
