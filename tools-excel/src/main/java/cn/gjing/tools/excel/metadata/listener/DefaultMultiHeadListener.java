@@ -4,7 +4,7 @@ import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
-import cn.gjing.tools.excel.write.listener.ExcelSheetWriteListener;
+import cn.gjing.tools.excel.write.listener.ExcelWriteContextListener;
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
 import cn.gjing.tools.excel.write.resolver.ExcelSimpleWriter;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,15 +18,15 @@ import org.apache.poi.ss.usermodel.Sheet;
  *
  * @author Gjing
  **/
-public class DefaultMultiHeadListener implements ExcelRowWriteListener, ExcelSheetWriteListener {
+public class DefaultMultiHeadListener implements ExcelRowWriteListener, ExcelWriteContextListener {
     private ExcelWriterContext writerContext;
 
     public DefaultMultiHeadListener() {
     }
 
     @Override
-    public void completeSheet(ExcelWriterContext context) {
-        this.writerContext = context;
+    public void setContext(ExcelWriterContext writerContext) {
+        this.writerContext = writerContext;
     }
 
     @Override

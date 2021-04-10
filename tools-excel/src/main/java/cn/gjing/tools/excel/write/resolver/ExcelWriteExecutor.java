@@ -7,16 +7,15 @@ import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.RowType;
-import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
-import cn.gjing.tools.excel.write.listener.ExcelCascadingDropdownBoxListener;
+import cn.gjing.tools.excel.write.listener.ExcelStyleWriteListener;
 import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
-import cn.gjing.tools.excel.write.valid.*;
+import cn.gjing.tools.excel.write.valid.handle.*;
 import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,8 +25,10 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,7 @@ public final class ExcelWriteExecutor {
                 }
                 ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index,
                         headCell.getColumnIndex(), RowType.HEAD);
+                ListenerChain.doSetHeadStyle(this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class), headRow, headCell, excelField, field, index, colIndex);
             }
             ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(), index, RowType.HEAD);
         }
@@ -121,6 +123,7 @@ public final class ExcelWriteExecutor {
                     }
                     ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field,
                             index, valueCell.getColumnIndex(), RowType.BODY);
+                    ListenerChain.doSetBodyStyle(this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class), valueRow, valueCell, excelField, field, index, colIndex);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -152,6 +155,7 @@ public final class ExcelWriteExecutor {
                 headCell.setCellValue(headName);
                 ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, headCell, null, null,
                         index, headCell.getColumnIndex(), RowType.HEAD);
+                ListenerChain.doSetHeadStyle(this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class), headRow, headCell, null, null, index, colIndex);
             }
             ListenerChain.doCompleteRow(this.context.getWriteListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(),
                     index, RowType.HEAD);
@@ -192,6 +196,7 @@ public final class ExcelWriteExecutor {
                     }
                     ListenerChain.doCompleteCell(this.context.getWriteListenerCache(), this.context.getSheet(), valueRow, valueCell, null,
                             null, index, valueCell.getColumnIndex(), RowType.BODY);
+                    ListenerChain.doSetBodyStyle(this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class), valueRow, valueCell, null, null, index, colIndex);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -283,11 +288,13 @@ public final class ExcelWriteExecutor {
             }
             excelOldRowModel.setOldRowCellValue(cellValue);
             excelOldRowModel.setOldRowIndex(row.getRowNum());
-            this.oldRowModelMap.put(colIndex, excelOldRowModel);
             return;
         }
         if (index == dataSize - 1) {
-            this.context.getSheet().addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum() - 1, colIndex, colIndex));
+            int lastRow = row.getRowNum() - 1;
+            if (lastRow > excelOldRowModel.getOldRowIndex()) {
+                this.context.getSheet().addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum() - 1, colIndex, colIndex));
+            }
             return;
         }
         excelOldRowModel.setOldRowIndex(row.getRowNum());
@@ -318,49 +325,23 @@ public final class ExcelWriteExecutor {
     /**
      * Call the macro to set Excel data validation
      *
-     * @param field    Current field
-     * @param row      Current row
-     * @param colIndex Current col index
+     * @param field     Current field
+     * @param row       Current row
+     * @param colIndex  Current col index
+     * @param boxValues Dropdown box value map
      */
     private void addValid(Field field, Row row, int colIndex, Map<String, String[]> boxValues) {
-        ExcelDropdownBox ev = field.getAnnotation(ExcelDropdownBox.class);
-        ExcelDateValid dv = field.getAnnotation(ExcelDateValid.class);
-        ExcelNumericValid nv = field.getAnnotation(ExcelNumericValid.class);
-        ExcelCustomValid ecv = field.getAnnotation(ExcelCustomValid.class);
-        ExcelRepeatValid epv = field.getAnnotation(ExcelRepeatValid.class);
-        int firstRow = row.getRowNum() + 1;
-        if (epv != null) {
-            ExcelUtils.addRepeatValid(this.context.getSheet(), firstRow, epv.rows() == 0 ? firstRow : epv.rows() + firstRow - 1, colIndex, epv.showErrorBox(), epv.rank(),
-                    epv.errorTitle(), epv.errorContent(), epv.longTextNumber());
-            return;
-        }
-        if (ev != null) {
-            if ("".equals(ev.link())) {
-                ExcelUtils.addDropdownBox(ev.combobox(), ev.showErrorBox(), ev.rank(), ev.errorTitle(), ev.errorContent(), this.context.getWorkbook(), this.context.getSheet(),
-                        firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, boxValues == null ? null : boxValues.get(field.getName()));
-            } else {
-                List<ExcelWriteListener> dropdownListeners = this.context.getWriteListenerCache().get(ExcelCascadingDropdownBoxListener.class);
-                if (dropdownListeners == null) {
-                    return;
-                }
-                dropdownListeners.forEach(e -> ((ExcelCascadingDropdownBoxListener) e)
-                        .addCascadingDropdownBox(ev, this.context.getWorkbook(), this.context.getSheet(), firstRow, ev.rows() == 0 ? firstRow : ev.rows() + firstRow - 1, colIndex, field));
-            }
-            return;
-        }
-        if (dv != null) {
-            ExcelUtils.addDateValid(dv.operatorType(), dv.expr1(), dv.expr2(), dv.pattern(), this.context.getSheet(), firstRow, dv.rows() == 0 ? firstRow : dv.rows() + firstRow - 1,
-                    colIndex, dv.showErrorBox(), dv.rank(), dv.errorTitle(), dv.errorContent(), dv.showTip(), dv.tipTitle(), dv.tipContent());
-            return;
-        }
-        if (nv != null) {
-            ExcelUtils.addNumericValid(nv.validType(), nv.operatorType(), nv.expr1(), nv.expr2(), this.context.getSheet(), firstRow, nv.rows() == 0 ? firstRow : nv.rows() + firstRow - 1,
-                    colIndex, nv.showErrorBox(), nv.rank(), nv.errorTitle(), nv.errorContent(), nv.showTip(), nv.tipTitle(), nv.tipContent());
-            return;
-        }
-        if (ecv != null) {
-            ExcelUtils.addCustomValid(ecv.formula(), this.context.getSheet(), firstRow, ecv.rows() == 0 ? firstRow : ecv.rows() + firstRow - 1,
-                    colIndex, ecv.showErrorBox(), ecv.rank(), ecv.errorTitle(), ecv.errorContent());
-        }
+        Arrays.asList(
+                new CustomValidHandler(),
+                new DateValidHandler(),
+                new DropdownBoxValidHandler(),
+                new NumericValidHandler(),
+                new RepeatValidHandler())
+                .forEach(e -> {
+                    Annotation annotation = field.getAnnotation(e.getAnnotationClass());
+                    if (annotation != null) {
+                        e.handle(annotation, this.context, field, row, colIndex, boxValues);
+                    }
+                });
     }
 }

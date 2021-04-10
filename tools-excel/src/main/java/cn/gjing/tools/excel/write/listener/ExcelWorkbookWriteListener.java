@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write.listener;
 
 import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
-import cn.gjing.tools.excel.write.ExcelWriterContext;
+import org.apache.poi.ss.usermodel.Workbook;
 
 /**
  * The Excel Workbook writes out the listener
@@ -13,7 +13,14 @@ public interface ExcelWorkbookWriteListener extends ExcelWriteListener {
     /**
      * The data is written, but not flushed to an excel file
      *
-     * @param context Excel write context
+     * @param workbook Current workbook
      */
-    void flushBefore(ExcelWriterContext context);
+    default void flushBefore(Workbook workbook){};
+
+    /**
+     * Has been created
+     *
+     * @param workbook Current created workbook
+     */
+    void completeWorkbook(Workbook workbook);
 }

@@ -90,10 +90,10 @@ public final class BigTitle {
     private boolean bold;
 
     /**
-     * Big title callback, which starts after the title style is set
+     * Title value callback
      */
     @Builder.Default
-    private TFunction<Workbook, Cell, BigTitle, Object> callback = (workbook, cell, bigTitle) -> bigTitle.getContent();
+    private TFunction<Workbook, Cell, Object, Object> callback = (workbook, cell, value) -> value;
 
     public static BigTitle of(String content) {
         return BigTitle.builder()

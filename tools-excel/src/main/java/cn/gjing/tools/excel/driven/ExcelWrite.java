@@ -74,7 +74,7 @@ public @interface ExcelWrite {
     boolean multiHead() default false;
 
     /**
-     * Whether init default excel style
+     * Use the default style listener
      *
      * @return boolean
      */

@@ -110,7 +110,7 @@ public final class ExcelWriterContext {
      */
     @Builder.Default
     @Getter
-    private final Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache = new HashMap<>(8);
+    private final Map<Class<? extends ExcelWriteListener>, List<ExcelWriteListener>> writeListenerCache = new HashMap<>(16);
 
     /**
      * Excel head row height

@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write.listener;
 
 import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
-import cn.gjing.tools.excel.write.ExcelWriterContext;
+import org.apache.poi.ss.usermodel.Sheet;
 
 /**
  * The Excel Sheet writes out the listener
@@ -13,7 +13,7 @@ public interface ExcelSheetWriteListener extends ExcelWriteListener {
     /**
      * Has been created
      *
-     * @param context Excel write context
+     * @param sheet Current created sheet
      */
-    void completeSheet(ExcelWriterContext context);
+    void completeSheet(Sheet sheet);
 }

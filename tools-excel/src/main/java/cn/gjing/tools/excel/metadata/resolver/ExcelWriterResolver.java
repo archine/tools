@@ -2,7 +2,8 @@ package cn.gjing.tools.excel.metadata.resolver;
 
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelType;
-import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
+import cn.gjing.tools.excel.util.ExcelUtils;
+import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
@@ -55,10 +56,9 @@ public abstract class ExcelWriterResolver {
         if (bigTitle.getLines() == 1 && bigTitle.getFirstCol() == bigTitle.getLastCol()) {
             throw new ExcelResolverException("Merged region must contain 2 or more cells");
         }
-        List<ExcelWriteListener> cellListeners = this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class);
         int startOffset = bigTitle.getFirstRow() == -1 ? this.context.getSheet().getPhysicalNumberOfRows() : bigTitle.getFirstRow();
         int endOffset = startOffset + bigTitle.getLines() - 1;
-        Row row = null;
+        Row row;
         for (int i = 0; i < bigTitle.getLines(); i++) {
             row = this.context.getSheet().getRow(startOffset + i);
             if (row == null) {
@@ -66,26 +66,20 @@ public abstract class ExcelWriterResolver {
                 row.setHeight(bigTitle.getRowHeight());
             }
             Cell cell = row.createCell(bigTitle.getFirstCol());
-            cellListeners.forEach(e -> {
-                if (e instanceof ExcelStyleWriteListener) {
-                    ((ExcelStyleWriteListener) e).setTitleStyle(bigTitle, cell);
-                }
-            });
-            Object content = bigTitle.getCallback().apply(this.context.getWorkbook(), cell, bigTitle);
-            if (content instanceof String) {
-                cell.setCellValue((String) content);
-            } else if (content instanceof RichTextString) {
-                if ("XLSX".equals(this.context.getExcelType().name())) {
+            Object content = bigTitle.getCallback().apply(this.context.getWorkbook(), cell, bigTitle.getContent());
+            if (content instanceof RichTextString) {
+                if (this.context.getExcelType() == ExcelType.XLSX) {
                     throw new ExcelResolverException("XLSX does not support rich text for now");
                 }
                 cell.setCellValue((RichTextString) content);
             } else {
-                throw new ExcelResolverException("Big title content type invalid, String and RichTextString are allowed!");
+                ExcelUtils.setCellValue(cell, content);
+            }
+            if (i == 0) {
+                ListenerChain.doSetTitleStyle(this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class), bigTitle, cell);
             }
         }
-        if (row != null) {
-            this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCol()));
-        }
+        this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCol()));
     }
 
     /**

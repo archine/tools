@@ -62,13 +62,14 @@ public abstract class ExcelBaseWriter {
                 break;
             default:
         }
+        ListenerChain.doWorkbookCreated(this.context.getWriteListenerCache().get(ExcelWorkbookWriteListener.class), this.context.getWorkbook());
     }
 
     /**
      * Flush all content to excel of the cache
      */
     public void flush() {
-        ListenerChain.doWorkbookFlushBefore(this.context);
+        ListenerChain.doWorkbookFlushBefore(this.context.getWriteListenerCache().get(ExcelWorkbookWriteListener.class), this.context.getWorkbook());
         this.writerResolver.flush(this.response, this.context);
         if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
             ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
@@ -81,7 +82,7 @@ public abstract class ExcelBaseWriter {
      * @param path Absolute path to the directory where the file is stored
      */
     public void flushToLocal(String path) {
-        ListenerChain.doWorkbookFlushBefore(this.context);
+        ListenerChain.doWorkbookFlushBefore(this.context.getWriteListenerCache().get(ExcelWorkbookWriteListener.class), this.context.getWorkbook());
         this.writerResolver.flushToLocal(path, this.context);
         if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
             ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
@@ -98,7 +99,7 @@ public abstract class ExcelBaseWriter {
         if (sheet == null) {
             sheet = this.context.getWorkbook().createSheet(sheetName);
             context.setSheet(sheet);
-            ListenerChain.doCompleteSheet(context);
+            ListenerChain.doCompleteSheet(this.context.getWriteListenerCache().get(ExcelSheetWriteListener.class), sheet);
             if (this.context.isBind()) {
                 this.bind();
             }
@@ -150,6 +151,11 @@ public abstract class ExcelBaseWriter {
             List<ExcelWriteListener> listeners = this.context.getWriteListenerCache().computeIfAbsent(ExcelWorkbookWriteListener.class, k -> new ArrayList<>());
             listeners.add(excelWriteListener);
         }
+        if (excelWriteListener instanceof ExcelWriteContextListener) {
+            List<ExcelWriteListener> listeners = this.context.getWriteListenerCache().computeIfAbsent(ExcelWriteContextListener.class, k -> new ArrayList<>());
+            listeners.add(excelWriteListener);
+            ((ExcelWriteContextListener) excelWriteListener).setContext(this.context);
+        }
     }
 
     /**
@@ -162,6 +168,7 @@ public abstract class ExcelBaseWriter {
      *            ExcelRowWriteListener.class
      *            ExcelSheetWriteListener.class
      *            ExcelWorkbookWriteListener.class
+     *            ExcelWriteContextListener.class
      *            }
      */
     protected void delListenerCache(Class<? extends ExcelWriteListener> key, boolean all) {

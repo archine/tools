@@ -56,7 +56,7 @@ public final class ExcelFactory {
      * @param response         response
      * @param ignores          The name of the header to be ignored when exporting.
      *                         If it is a parent, all children below it will be ignored as well
-     * @param initDefaultStyle Whether init  default excel style
+     * @param initDefaultStyle Use the default style listener
      * @return ExcelWriter
      */
     public static ExcelBindWriter createWriter(Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
@@ -85,7 +85,7 @@ public final class ExcelFactory {
      * @param response         response
      * @param ignores          The name of the header to be ignored when exporting.
      *                         If it is a parent, all children below it will be ignored as well
-     * @param initDefaultStyle Whether init default excel style
+     * @param initDefaultStyle Use the default style listener
      * @return ExcelWriter
      */
     public static ExcelBindWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
@@ -112,7 +112,7 @@ public final class ExcelFactory {
      *
      * @param fileName         Excel file name
      * @param response         response
-     * @param initDefaultStyle Whether init  default excel style
+     * @param initDefaultStyle Use the default style listener
      * @return ExcelSimpleWriter
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, boolean initDefaultStyle) {
