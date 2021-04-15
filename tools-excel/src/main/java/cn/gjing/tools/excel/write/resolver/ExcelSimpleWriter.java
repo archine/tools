@@ -1,5 +1,7 @@
 package cn.gjing.tools.excel.write.resolver;
 
+import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
+import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
 import cn.gjing.tools.excel.metadata.listener.DefaultMultiHeadListener;
 import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
@@ -222,8 +224,12 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter addListener(ExcelWriteListener listener) {
-        if (listener != null) {
-            super.addListenerCache(listener);
+        this.context.addListener(listener);
+        if (listener instanceof ExcelWriteContextAware) {
+            ((ExcelWriteContextAware) listener).setContext(this.context);
+        }
+        if (listener instanceof ExcelWorkbookAware) {
+            ((ExcelWorkbookAware) listener).setWorkbook(this.context.getWorkbook());
         }
         return this;
     }

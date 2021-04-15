@@ -3,6 +3,7 @@ package cn.gjing.tools.excel.metadata.listener;
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.metadata.ExcelColor;
 import cn.gjing.tools.excel.metadata.annotation.ListenerNative;
+import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.listener.ExcelSheetWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelStyleWriteListener;
@@ -21,20 +22,23 @@ import java.util.Map;
  * @author Gjing
  **/
 @ListenerNative
-public class DefaultExcelStyleListener implements ExcelStyleWriteListener, ExcelSheetWriteListener {
+public class DefaultExcelStyleListener implements ExcelStyleWriteListener, ExcelSheetWriteListener, ExcelWorkbookAware {
     private Workbook workbook;
     private Sheet currentSheet;
-    private Map<Integer, CellStyle> titleStyles;
-    private Map<Integer, List<CellStyle>> headStyle;
-    private Map<String, CellStyle> bodyStyle;
+    private final Map<Integer, CellStyle> titleStyles;
+    private final Map<Integer, List<CellStyle>> headStyle;
+    private final Map<String, CellStyle> bodyStyle;
     private boolean set = true;
 
-    @Override
-    public void init(Workbook workbook) {
-        this.workbook = workbook;
+    public DefaultExcelStyleListener() {
         this.headStyle = new HashMap<>(32);
         this.bodyStyle = new HashMap<>(16);
         this.titleStyles = new HashMap<>(16);
+    }
+
+    @Override
+    public void setWorkbook(Workbook workbook) {
+        this.workbook = workbook;
     }
 
     @Override

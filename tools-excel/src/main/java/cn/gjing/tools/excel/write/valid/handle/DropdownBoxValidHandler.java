@@ -1,6 +1,6 @@
 package cn.gjing.tools.excel.write.valid.handle;
 
-import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
+import cn.gjing.tools.excel.metadata.listener.ExcelListener;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.listener.ExcelCascadingDropdownBoxListener;
@@ -29,15 +29,20 @@ public class DropdownBoxValidHandler extends ExcelValidAnnotationHandler {
         if ("".equals(excelDropdownBox.link())) {
             ExcelUtils.addDropdownBox(excelDropdownBox.combobox(), excelDropdownBox.showErrorBox(), excelDropdownBox.rank(), excelDropdownBox.errorTitle(),
                     excelDropdownBox.errorContent(), writerContext.getWorkbook(), writerContext.getSheet(),
-                    firstRow, excelDropdownBox.rows() == 0 ? firstRow : excelDropdownBox.rows() + firstRow - 1, colIndex, boxValues == null ? null : boxValues.get(field.getName()));
+                    firstRow, excelDropdownBox.rows() == 0 ? firstRow : excelDropdownBox.rows() + firstRow - 1,
+                    colIndex, boxValues == null ? null : boxValues.get(field.getName()));
         } else {
-            List<ExcelWriteListener> dropdownListeners = writerContext.getWriteListenerCache().get(ExcelCascadingDropdownBoxListener.class);
+            List<ExcelListener> dropdownListeners = writerContext.getListenerCache();
             if (dropdownListeners == null) {
                 return;
             }
-            dropdownListeners.forEach(e -> ((ExcelCascadingDropdownBoxListener) e)
-                    .addCascadingDropdownBox(excelDropdownBox, writerContext.getWorkbook(), writerContext.getSheet(), firstRow,
-                            excelDropdownBox.rows() == 0 ? firstRow : excelDropdownBox.rows() + firstRow - 1, colIndex, field));
+            for (ExcelListener listener : dropdownListeners) {
+                if (listener instanceof ExcelCascadingDropdownBoxListener) {
+                    ((ExcelCascadingDropdownBoxListener) listener)
+                            .addCascadingDropdownBox(excelDropdownBox, writerContext.getWorkbook(), writerContext.getSheet(), firstRow,
+                                    excelDropdownBox.rows() == 0 ? firstRow : excelDropdownBox.rows() + firstRow - 1, colIndex, field);
+                }
+            }
         }
     }
 }

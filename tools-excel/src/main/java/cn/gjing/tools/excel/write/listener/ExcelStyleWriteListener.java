@@ -5,7 +5,6 @@ import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.BigTitle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 
@@ -15,13 +14,6 @@ import java.lang.reflect.Field;
  * @author Gjing
  **/
 public interface ExcelStyleWriteListener extends ExcelWriteListener {
-    /**
-     * Init Style write listener
-     *
-     * @param workbook workbook
-     */
-    void init(Workbook workbook);
-
     /**
      * Set excel big title style
      *

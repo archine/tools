@@ -9,11 +9,9 @@ import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.RowType;
-import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
+import cn.gjing.tools.excel.metadata.listener.ExcelListener;
 import cn.gjing.tools.excel.metadata.resolver.ExcelReaderResolver;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
-import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
-import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.read.valid.ExcelAssert;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
@@ -79,7 +77,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
             }
             this.context.setSheet(sheet);
         }
-        this.reader(headerIndex, this.context.getResultReadListener() == null ? null : new ArrayList<>(), this.context.getReadListenersCache().get(ExcelRowReadListener.class),
+        this.reader(headerIndex, this.context.getResultReadListener() == null ? null : new ArrayList<>(), this.context.getListenerCache(),
                 new SpelExpressionParser(), new StandardEvaluationContext());
     }
 
@@ -89,12 +87,12 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
      * @param headerIndex Excel header index
      * @param dataList    All data
      */
-    private void reader(int headerIndex, List<R> dataList, List<ExcelReadListener> rowReadListeners, ExpressionParser parser, EvaluationContext context) {
+    private void reader(int headerIndex, List<R> dataList, List<ExcelListener> rowReadListeners, ExpressionParser parser, EvaluationContext context) {
         R r;
         this.save = true;
         boolean stop = false;
         List<Object> otherValues;
-        ListenerChain.doReadBefore(rowReadListeners, this.context);
+        ListenerChain.doReadBefore(rowReadListeners);
         for (Row row : this.context.getSheet()) {
             if (stop) {
                 break;
@@ -180,10 +178,11 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                     }
                 }
             }
-
         }
-        ListenerChain.doReadFinish(rowReadListeners, this.context);
-        ListenerChain.doResultNotify(this.context.getResultReadListener(), dataList);
+        ListenerChain.doReadFinish(rowReadListeners);
+        if (this.context.getResultReadListener() != null) {
+            this.context.getResultReadListener().notify(dataList);
+        }
     }
 
     /**
@@ -293,8 +292,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
      */
     private void allowEmpty(R r, Field field, ExcelField excelField, int rowIndex, int colIndex) {
         if (excelField.required()) {
-            this.save = ListenerChain.doReadEmpty(this.context.getReadListenersCache()
-                    .get(ExcelEmptyReadListener.class), r, field, excelField, rowIndex, colIndex);
+            this.save = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, field, excelField, rowIndex, colIndex);
         }
     }
 

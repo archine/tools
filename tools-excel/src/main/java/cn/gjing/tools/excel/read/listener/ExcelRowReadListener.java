@@ -2,7 +2,6 @@ package cn.gjing.tools.excel.read.listener;
 
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
-import cn.gjing.tools.excel.read.ExcelReaderContext;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -39,17 +38,13 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
 
     /**
      * File data read finished
-     *
-     * @param context Excel reader context
      */
-    default void readFinish(ExcelReaderContext<R> context) {
+    default void readFinish() {
     }
 
     /**
      * Before you start reading the data
-     *
-     * @param context Excel reader context
      */
-    default void readBefore(ExcelReaderContext<R> context) {
+    default void readBefore() {
     }
 }

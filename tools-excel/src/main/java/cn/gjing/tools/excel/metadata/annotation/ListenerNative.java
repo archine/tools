@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 
 /**
  * Marks the listener as native,
- * and when a collection of listeners of the specified type is deleted by  {@link ExcelBindWriter#removeListener(Class)}
+ * and when a collection of listeners of the specified type is deleted by  {@link ExcelBindWriter#resetExcelClass(Class, boolean, boolean, String...)}
  * listeners marked with the annotation are skipped
  *
  * @author Gjing

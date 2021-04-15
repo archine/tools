@@ -4,11 +4,8 @@ package cn.gjing.tools.excel;
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.metadata.ExcelColor;
-import cn.gjing.tools.excel.metadata.RuleType;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
-import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.write.merge.Merge;
-import org.apache.poi.ss.usermodel.Sheet;
 
 import java.lang.annotation.*;
 
@@ -127,15 +124,4 @@ public @interface ExcelField {
      * @see ExcelColor
      */
     ExcelColor[] fontColor() default ExcelColor.WHITE;
-
-    /**
-     * Rules for merging multi-level headers, If the size of the color array is smaller than the number of series in the header,
-     * all subsequent headers will use the last one in the color array
-     *
-     * @return x
-     * @deprecated You need to control the direction of the merge dynamically by setting in the listener
-     * @see ExcelUtils#merge(Sheet, int, int, int, int)
-     */
-    @Deprecated
-    RuleType[] rules() default RuleType.X;
 }

@@ -2,9 +2,9 @@ package cn.gjing.tools.excel.metadata.listener;
 
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.util.ExcelUtils;
+import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
-import cn.gjing.tools.excel.write.listener.ExcelWriteContextListener;
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
 import cn.gjing.tools.excel.write.resolver.ExcelSimpleWriter;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,7 +18,7 @@ import org.apache.poi.ss.usermodel.Sheet;
  *
  * @author Gjing
  **/
-public class DefaultMultiHeadListener implements ExcelRowWriteListener, ExcelWriteContextListener {
+public class DefaultMultiHeadListener implements ExcelRowWriteListener, ExcelWriteContextAware {
     private ExcelWriterContext writerContext;
 
     public DefaultMultiHeadListener() {

@@ -93,17 +93,16 @@ public final class ExcelFactory {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
         List<String[]> headerArr = new ArrayList<>();
-        ExcelWriterContext context = ExcelWriterContext.builder()
-                .excelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr))
-                .headNames(headerArr)
-                .excelType(excel.type())
-                .fileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value() : fileName)
-                .excelClass(excelClass)
-                .headerHeight(excel.headerHeight())
-                .bodyHeight(excel.bodyHeight())
-                .headerSeries(headerArr.get(0).length)
-                .uniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey())
-                .build();
+        ExcelWriterContext context = new ExcelWriterContext();
+        context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr));
+        context.setHeadNames(headerArr);
+        context.setExcelClass(excelClass);
+        context.setExcelType(excel.type());
+        context.setFileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value() : fileName);
+        context.setHeaderHeight(excel.headerHeight());
+        context.setHeaderSeries(headerArr.get(0).length);
+        context.setBodyHeight(excel.bodyHeight());
+        context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         return new ExcelBindWriter(context, excel, response, initDefaultStyle);
     }
 
@@ -159,12 +158,11 @@ public final class ExcelFactory {
      * @return ExcelSimpleWriter
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize, boolean initDefaultStyle) {
-        ExcelWriterContext context = ExcelWriterContext.builder()
-                .fileName(StringUtils.isEmpty(fileName) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : fileName)
-                .excelType(excelType)
-                .excelClass(Void.class)
-                .bind(false)
-                .build();
+        ExcelWriterContext context = new ExcelWriterContext();
+        context.setFileName(StringUtils.isEmpty(fileName) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : fileName);
+        context.setExcelType(excelType);
+        context.setExcelClass(Void.class);
+        context.setBind(false);
         return new ExcelSimpleWriter(context, windowSize, response, initDefaultStyle);
     }
 

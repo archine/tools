@@ -7,7 +7,6 @@ import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
-import cn.gjing.tools.excel.write.listener.ExcelStyleWriteListener;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
@@ -66,7 +65,7 @@ public abstract class ExcelWriterResolver {
                 row.setHeight(bigTitle.getRowHeight());
             }
             Cell cell = row.createCell(bigTitle.getFirstCol());
-            Object content = bigTitle.getCallback().apply(this.context.getWorkbook(), cell, bigTitle.getContent());
+            Object content = bigTitle.getCallback().apply(this.context.getWorkbook(), bigTitle.getContent());
             if (content instanceof RichTextString) {
                 if (this.context.getExcelType() == ExcelType.XLSX) {
                     throw new ExcelResolverException("XLSX does not support rich text for now");
@@ -76,7 +75,7 @@ public abstract class ExcelWriterResolver {
                 ExcelUtils.setCellValue(cell, content);
             }
             if (i == 0) {
-                ListenerChain.doSetTitleStyle(this.context.getWriteListenerCache().get(ExcelStyleWriteListener.class), bigTitle, cell);
+                ListenerChain.doSetTitleStyle(this.context.getListenerCache(), bigTitle, cell);
             }
         }
         this.context.getSheet().addMergedRegion(new CellRangeAddress(startOffset, endOffset, bigTitle.getFirstCol(), bigTitle.getLastCol()));

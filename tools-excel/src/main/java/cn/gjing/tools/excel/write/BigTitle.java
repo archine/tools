@@ -1,11 +1,11 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.metadata.ExcelColor;
-import cn.gjing.tools.excel.metadata.function.TFunction;
 import lombok.*;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
+
+import java.util.function.BiFunction;
 
 /**
  * Excel big title
@@ -93,7 +93,7 @@ public final class BigTitle {
      * Title value callback
      */
     @Builder.Default
-    private TFunction<Workbook, Cell, Object, Object> callback = (workbook, cell, value) -> value;
+    private BiFunction<Workbook, Object, Object> callback = (workbook, value) -> value;
 
     public static BigTitle of(String content) {
         return BigTitle.builder()
