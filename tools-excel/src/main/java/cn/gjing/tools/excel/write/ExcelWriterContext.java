@@ -6,7 +6,6 @@ import cn.gjing.tools.excel.write.valid.handle.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -133,12 +132,12 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     public void setNeedValid(boolean needValid) {
         this.needValid = needValid;
         if (needValid) {
-            this.validAnnotationHandlers = Arrays.asList(
-                    new CustomValidHandler(),
-                    new DateValidHandler(),
-                    new DropdownBoxValidHandler(),
-                    new NumericValidHandler(),
-                    new RepeatValidHandler());
+            this.validAnnotationHandlers = new ArrayList<>();
+            this.validAnnotationHandlers.add(new CustomValidHandler());
+            this.validAnnotationHandlers.add(new DateValidHandler());
+            this.validAnnotationHandlers.add(new DropdownBoxValidHandler());
+            this.validAnnotationHandlers.add(new NumericValidHandler());
+            this.validAnnotationHandlers.add(new RepeatValidHandler());
         }
     }
 

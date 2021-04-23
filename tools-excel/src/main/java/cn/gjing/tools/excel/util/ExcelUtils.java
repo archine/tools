@@ -331,12 +331,13 @@ public final class ExcelUtils {
 
     /**
      * Determines whether a cell has been merged
-     * @param sheet Current sheet
-     * @param row Current row number
+     *
+     * @param sheet  Current sheet
+     * @param row    Current row number
      * @param column current column number
      * @return True is merged
      */
-    public static boolean isMerge(Sheet sheet, int row , int column) {
+    public static boolean isMerge(Sheet sheet, int row, int column) {
         int sheetMergeCount = sheet.getNumMergedRegions();
         for (int i = 0; i < sheetMergeCount; i++) {
             CellRangeAddress range = sheet.getMergedRegion(i);
@@ -344,8 +345,8 @@ public final class ExcelUtils {
             int lastColumn = range.getLastColumn();
             int firstRow = range.getFirstRow();
             int lastRow = range.getLastRow();
-            if(row >= firstRow && row <= lastRow){
-                if(column >= firstColumn && column <= lastColumn){
+            if (row >= firstRow && row <= lastRow) {
+                if (column >= firstColumn && column <= lastColumn) {
                     return true;
                 }
             }

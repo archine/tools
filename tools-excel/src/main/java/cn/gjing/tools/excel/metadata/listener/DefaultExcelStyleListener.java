@@ -28,6 +28,7 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
     private final Map<Integer, CellStyle> titleStyles;
     private final Map<Integer, List<CellStyle>> headStyle;
     private final Map<String, CellStyle> bodyStyle;
+    private CellStyle defaultColumnStyle;
     private boolean set = true;
 
     public DefaultExcelStyleListener() {
@@ -44,6 +45,8 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
     @Override
     public void completeSheet(Sheet sheet) {
         this.currentSheet = sheet;
+        this.defaultColumnStyle = this.workbook.createCellStyle();
+        this.setAlignment(this.defaultColumnStyle);
     }
 
     @Override
@@ -98,6 +101,7 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
             }
             this.headStyle.put(colIndex, cellStyleList);
         }
+        this.setColumnDefault(excelField, index, colIndex);
         cell.setCellStyle(cellStyleList.size() > index ? cellStyleList.get(index) : cellStyleList.get(cellStyleList.size() - 1));
     }
 
@@ -113,13 +117,18 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
             }
             this.bodyStyle.put(format, cellStyle);
         }
+        this.setColumnDefault(excelField, index, colIndex);
         cell.setCellStyle(cellStyle);
-        if (index == 0) {
-            if (this.set) {
-                this.currentSheet.setColumnWidth(colIndex, excelField == null ? 5120 : excelField.width());
-            }
-        } else {
+    }
+
+    private void setColumnDefault(ExcelField excelField, int index, int colIndex) {
+        if (index > 0) {
             this.set = false;
+            return;
+        }
+        if (this.set) {
+            this.currentSheet.setColumnWidth(colIndex, excelField == null ? 5120 : excelField.width());
+            this.currentSheet.setDefaultColumnStyle(colIndex, this.defaultColumnStyle);
         }
     }
 
