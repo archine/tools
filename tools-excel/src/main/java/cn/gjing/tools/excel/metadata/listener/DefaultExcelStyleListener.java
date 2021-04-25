@@ -27,13 +27,12 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
     private Sheet currentSheet;
     private final Map<Integer, CellStyle> titleStyles;
     private final Map<Integer, List<CellStyle>> headStyle;
-    private final Map<String, CellStyle> bodyStyle;
-    private CellStyle defaultColumnStyle;
+    private final Map<String, CellStyle> defaultColumnStyle;
     private boolean set = true;
 
     public DefaultExcelStyleListener() {
         this.headStyle = new HashMap<>(32);
-        this.bodyStyle = new HashMap<>(16);
+        this.defaultColumnStyle = new HashMap<>(16);
         this.titleStyles = new HashMap<>(16);
     }
 
@@ -45,8 +44,6 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
     @Override
     public void completeSheet(Sheet sheet) {
         this.currentSheet = sheet;
-        this.defaultColumnStyle = this.workbook.createCellStyle();
-        this.setAlignment(this.defaultColumnStyle);
     }
 
     @Override
@@ -107,18 +104,6 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
 
     @Override
     public void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
-        String format = excelField == null ? "" : excelField.format();
-        CellStyle cellStyle = this.bodyStyle.get(format);
-        if (cellStyle == null) {
-            cellStyle = this.workbook.createCellStyle();
-            this.setAlignment(cellStyle);
-            if (!format.isEmpty()) {
-                cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
-            }
-            this.bodyStyle.put(format, cellStyle);
-        }
-        this.setColumnDefault(excelField, index, colIndex);
-        cell.setCellStyle(cellStyle);
     }
 
     private void setColumnDefault(ExcelField excelField, int index, int colIndex) {
@@ -128,7 +113,17 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
         }
         if (this.set) {
             this.currentSheet.setColumnWidth(colIndex, excelField == null ? 5120 : excelField.width());
-            this.currentSheet.setDefaultColumnStyle(colIndex, this.defaultColumnStyle);
+            String format = excelField == null ? "" : excelField.format();
+            CellStyle cellStyle = this.defaultColumnStyle.get(format);
+            if (cellStyle == null) {
+                cellStyle = this.workbook.createCellStyle();
+                this.setAlignment(cellStyle);
+                if (!format.isEmpty()) {
+                    cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
+                }
+                this.defaultColumnStyle.put(format, cellStyle);
+            }
+            this.currentSheet.setDefaultColumnStyle(colIndex, cellStyle);
         }
     }
 
