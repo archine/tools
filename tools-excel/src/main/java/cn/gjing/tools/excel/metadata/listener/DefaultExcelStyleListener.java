@@ -2,9 +2,11 @@ package cn.gjing.tools.excel.metadata.listener;
 
 import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.metadata.ExcelColor;
+import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.metadata.annotation.ListenerNative;
 import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.write.BigTitle;
+import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelSheetWriteListener;
 import cn.gjing.tools.excel.write.listener.ExcelStyleWriteListener;
 import org.apache.poi.ss.usermodel.*;
@@ -22,7 +24,7 @@ import java.util.Map;
  * @author Gjing
  **/
 @ListenerNative
-public class DefaultExcelStyleListener implements ExcelStyleWriteListener, ExcelSheetWriteListener, ExcelWorkbookAware {
+public class DefaultExcelStyleListener implements ExcelStyleWriteListener, ExcelSheetWriteListener, ExcelWorkbookAware, ExcelRowWriteListener {
     private Workbook workbook;
     private Sheet currentSheet;
     private final Map<Integer, CellStyle> titleStyles;
@@ -98,32 +100,49 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
             }
             this.headStyle.put(colIndex, cellStyleList);
         }
-        this.setColumnDefault(excelField, index, colIndex);
+        if (this.set) {
+            boolean isSimpleType = excelField == null;
+            this.setColumnWidth(excelField, colIndex, isSimpleType);
+            this.currentSheet.setDefaultColumnStyle(colIndex, this.createDefaultStyle(excelField, isSimpleType));
+        }
         cell.setCellStyle(cellStyleList.size() > index ? cellStyleList.get(index) : cellStyleList.get(cellStyleList.size() - 1));
     }
 
     @Override
     public void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
+        boolean isSimpleType = excelField == null;
+        if (this.set) {
+            this.setColumnWidth(excelField, colIndex, isSimpleType);
+        }
+        cell.setCellStyle(this.createDefaultStyle(excelField, isSimpleType));
     }
 
-    private void setColumnDefault(ExcelField excelField, int index, int colIndex) {
-        if (index > 0) {
+    @Override
+    public void completeRow(Sheet sheet, Row row, Object obj, int index, RowType rowType) {
+        if (index == 0) {
             this.set = false;
-            return;
         }
-        if (this.set) {
-            this.currentSheet.setColumnWidth(colIndex, excelField == null ? 5120 : excelField.width());
-            String format = excelField == null ? "" : excelField.format();
-            CellStyle cellStyle = this.defaultColumnStyle.get(format);
-            if (cellStyle == null) {
-                cellStyle = this.workbook.createCellStyle();
-                this.setAlignment(cellStyle);
-                if (!format.isEmpty()) {
-                    cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
-                }
-                this.defaultColumnStyle.put(format, cellStyle);
+    }
+
+    private CellStyle createDefaultStyle(ExcelField excelField, boolean isSimpleType) {
+        String format = isSimpleType ? "" : excelField.format();
+        CellStyle cellStyle = this.defaultColumnStyle.get(format);
+        if (cellStyle == null) {
+            cellStyle = this.workbook.createCellStyle();
+            this.setAlignment(cellStyle);
+            if (!format.isEmpty()) {
+                cellStyle.setDataFormat(this.workbook.createDataFormat().getFormat(format));
             }
-            this.currentSheet.setDefaultColumnStyle(colIndex, cellStyle);
+            this.defaultColumnStyle.put(format, cellStyle);
+        }
+        return cellStyle;
+    }
+
+    private void setColumnWidth(ExcelField excelField, int colIndex, boolean isSimpleType) {
+        int defaultColumnWidth = this.currentSheet.getColumnWidth(colIndex);
+        int newColumnWidth = isSimpleType ? 5120 : excelField.width();
+        if (defaultColumnWidth != newColumnWidth) {
+            this.currentSheet.setColumnWidth(colIndex, newColumnWidth);
         }
     }
 
