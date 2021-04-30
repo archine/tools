@@ -9,7 +9,6 @@
 * <a href="https://github.com/archine/tools/tree/master/tools-starter-swagger" title="swagger包">tools-starter-swagger</a> （快速集成Swagger）
 * <a href="https://github.com/archine/tools/tree/master/tools-httpclient" title="http工具包">tools-httpclient</a> （http请求工具)   
 * <a href="https://github.com/archine/tools/tree/master/tools-cache" title="分布式缓存">tools-cache</a> (分布式缓存)
-* <a href="https://github.com/archine/tools/tree/master/tools-aliyun" title="阿里云OSS和短信工具">tools-aliyun</a> (阿里云OSS和短信工具)
 * <a href="https://github.com/archine/tools/tree/master/tools-auth" title="权限框架">tools-auth</a> (权限框架)
 
 :exclamation: 请注意，项目JDK版本支持1.8+

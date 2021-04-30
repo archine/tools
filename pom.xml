@@ -13,7 +13,6 @@
         <module>tools-httpclient</module>
         <module>tools-cache</module>
         <module>tools-excel</module>
-        <module>tools-aliyun</module>
         <module>tools-auth</module>
     </modules>
     <description>develop tool</description>
