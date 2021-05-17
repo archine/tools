@@ -57,17 +57,17 @@ public abstract class ExcelBaseWriter {
                 break;
             default:
         }
-        ListenerChain.doWorkbookCreated(this.context.getListenerCache(), this.context.getWorkbook());
     }
 
     /**
      * Flush all content to excel of the cache
      */
     public void flush() {
-        ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook());
-        this.writerResolver.flush(this.response, this.context);
-        if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
-            ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
+        if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
+            this.writerResolver.flush(this.response, this.context);
+            if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
+                ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
+            }
         }
     }
 
@@ -77,10 +77,11 @@ public abstract class ExcelBaseWriter {
      * @param path Absolute path to the directory where the file is stored
      */
     public void flushToLocal(String path) {
-        ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook());
-        this.writerResolver.flushToLocal(path, this.context);
-        if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
-            ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
+        if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
+            this.writerResolver.flushToLocal(path, this.context);
+            if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
+                ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
+            }
         }
     }
 

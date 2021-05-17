@@ -132,31 +132,18 @@ public final class ListenerChain {
      *
      * @param workbook          Current workbook
      * @param workbookListeners Workbook listeners
+     * @return  If true, the download will start
      */
-    public static void doWorkbookFlushBefore(List<ExcelListener> workbookListeners, Workbook workbook) {
+    public static boolean doWorkbookFlushBefore(List<ExcelListener> workbookListeners, Workbook workbook) {
+        boolean continueDownload = true;
         if (workbookListeners != null) {
             for (ExcelListener workbookListener : workbookListeners) {
                 if (workbookListener instanceof ExcelWorkbookWriteListener) {
-                    ((ExcelWorkbookWriteListener) workbookListener).flushBefore(workbook);
+                    continueDownload = ((ExcelWorkbookWriteListener) workbookListener).flushBefore(workbook);
                 }
             }
         }
-    }
-
-    /**
-     * Workbook has created
-     *
-     * @param workbook          Current workbook
-     * @param workbookListeners Workbook listeners
-     */
-    public static void doWorkbookCreated(List<ExcelListener> workbookListeners, Workbook workbook) {
-        if (workbookListeners != null) {
-            for (ExcelListener workbookListener : workbookListeners) {
-                if (workbookListener instanceof ExcelWorkbookWriteListener) {
-                    ((ExcelWorkbookWriteListener) workbookListener).completeWorkbook(workbook);
-                }
-            }
-        }
+        return continueDownload;
     }
 
     /**

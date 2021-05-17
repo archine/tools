@@ -11,16 +11,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 @FunctionalInterface
 public interface ExcelWorkbookWriteListener extends ExcelWriteListener {
     /**
-     * The data is written, but not flushed to an excel file
+     * The data is all written to the Excel file stream and the file download is about to begin
      *
      * @param workbook Current workbook
+     * @return If true, the download will start
      */
-    default void flushBefore(Workbook workbook){};
-
-    /**
-     * Has been created
-     *
-     * @param workbook Current created workbook
-     */
-    void completeWorkbook(Workbook workbook);
+    boolean flushBefore(Workbook workbook);
 }
