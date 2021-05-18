@@ -54,7 +54,8 @@ public final class ExcelWriteExecutor {
      * @param boxValues Excel dropdown box value
      */
     public void writeHead(boolean needHead, Map<String, String[]> boxValues) {
-        if (this.context.getHeadNames().isEmpty() || !needHead) {
+        if (!needHead || this.context.getHeadNames().isEmpty()) {
+            this.context.setExistHead(false);
             return;
         }
         Row headRow;
@@ -92,9 +93,6 @@ public final class ExcelWriteExecutor {
      * @param data Export data
      */
     public void writeBody(List<?> data) {
-        if (data == null) {
-            return;
-        }
         ExpressionParser parser = new SpelExpressionParser();
         EvaluationContext context = new StandardEvaluationContext();
         for (int index = 0, dataSize = data.size(); index < dataSize; index++) {
@@ -135,7 +133,8 @@ public final class ExcelWriteExecutor {
      * @param needHead Whether to set header
      */
     public void simpleWriteHead(boolean needHead) {
-        if (this.context.getHeadNames().isEmpty() || !needHead) {
+        if (!needHead || this.context.getHeadNames().isEmpty()) {
+            this.context.setExistHead(false);
             return;
         }
         Row headRow;
@@ -163,13 +162,8 @@ public final class ExcelWriteExecutor {
      * Set excel body for simple type
      *
      * @param data          Exported data
-     * @param mergeEmpty    Whether Whether null merges are allowed
-     * @param callbackCache Merge callbacks at export time
      */
-    public void simpleWriteBody(List<List<Object>> data, boolean mergeEmpty, Map<String, ExcelAutoMergeCallback<?>> callbackCache) {
-        if (data == null) {
-            return;
-        }
+    public void simpleWriteBody(List<List<Object>> data) {
         for (int index = 0, dataSize = data.size(); index < dataSize; index++) {
             List<?> o = data.get(index);
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.BODY);
@@ -179,17 +173,18 @@ public final class ExcelWriteExecutor {
                 Object value = o.get(colIndex);
                 Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
                 try {
+                    value = this.context.getPropSupplier().convert(colIndex, value);
                     value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
                             null, null, index, valueCell.getColumnIndex(), RowType.BODY, value);
                     ExcelUtils.setCellValue(valueCell, value);
                     String[] headArr = this.context.getHeadNames().get(colIndex);
                     String key = headArr[headArr.length - 1];
-                    ExcelAutoMergeCallback<?> mergeCallback = callbackCache.get(key);
+                    ExcelAutoMergeCallback<?> mergeCallback = this.context.getPropSupplier().getAutoMergeCallback(key, colIndex);
                     if (mergeCallback != null) {
                         if (this.oldRowModelMap == null) {
                             this.oldRowModelMap = new HashMap<>(16);
                         }
-                        this.autoMergeY(mergeCallback, valueRow, mergeEmpty, index, valueCell.getColumnIndex(), value, o, dataSize, null, key);
+                        this.autoMergeY(mergeCallback, valueRow, true, index, valueCell.getColumnIndex(), value, o, dataSize, null, key);
                     }
                     ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell, null,
                             null, index, valueCell.getColumnIndex(), RowType.BODY);

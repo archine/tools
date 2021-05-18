@@ -125,8 +125,13 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter write(List<?> data, String sheetName, boolean needHead, Map<String, String[]> boxValues) {
         this.createSheet(sheetName);
-        this.writerResolver.writeHead(needHead, boxValues)
-                .write(data);
+        if (data == null) {
+            this.context.setTemplate(true);
+            this.writerResolver.writeHead(needHead, boxValues);
+        } else {
+            this.writerResolver.writeHead(needHead, boxValues)
+                    .write(data);
+        }
         return this;
     }
 
@@ -189,6 +194,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
         }
         this.context.setBodyHeight(excel.bodyHeight());
         this.context.setHeaderHeight(excel.headerHeight());
+        this.context.setHeaderSeries(headNames.get(0).length);
         this.context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         return this;
     }
@@ -216,6 +222,15 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
             return this.addListener(new DefaultMultiHeadListener());
         }
         return this;
+    }
+
+    /**
+     * Enable multi excel head
+     *
+     * @return this
+     */
+    public ExcelBindWriter multiHead() {
+        return this.multiHead(true);
     }
 
     /**

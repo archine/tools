@@ -9,7 +9,7 @@ import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
-import cn.gjing.tools.excel.write.resolver.ExcelSimpleWriter;
+import cn.gjing.tools.excel.write.resolver.simple.ExcelSimpleWriter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 

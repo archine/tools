@@ -22,7 +22,7 @@ public @interface Merge {
     boolean enable() default false;
 
     /**
-     * Whether to merge when null value is encountered
+     * Whether empty values need to be merged
      *
      * @return boolean
      */

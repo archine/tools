@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.write.callback;
 
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
-import cn.gjing.tools.excel.write.resolver.ExcelSimpleWriter;
+import cn.gjing.tools.excel.write.resolver.simple.ExcelSimpleWriter;
 
 import java.lang.reflect.Field;
 

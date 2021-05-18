@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.metadata.AbstractExcelContext;
 import cn.gjing.tools.excel.metadata.ExcelType;
+import cn.gjing.tools.excel.write.resolver.simple.ExcelSimpleWriterPropSupplier;
 import cn.gjing.tools.excel.write.valid.handle.*;
 
 import java.lang.reflect.Field;
@@ -33,6 +34,16 @@ public final class ExcelWriterContext extends AbstractExcelContext {
      * Whether to open multistage Excel headers
      */
     private boolean multiHead = false;
+
+    /**
+     * Whether a header exists
+     */
+    private boolean existHead = true;
+
+    /**
+     * Whether is excel template file
+     */
+    private boolean isTemplate = false;
 
     /**
      * Excel header fields
@@ -76,30 +87,17 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     private int headerSeries = 1;
 
     /**
+     * Simple type export supplier
+     */
+    private ExcelSimpleWriterPropSupplier propSupplier;
+
+    /**
      * Valid annotation handler
      */
     private List<ExcelValidAnnotationHandler> validAnnotationHandlers;
 
     public ExcelWriterContext() {
         super();
-    }
-
-    public ExcelWriterContext(Class<?> excelClass, String fileName, boolean needValid, boolean multiHead, List<Field> excelFields, List<String[]> headNames,
-                              boolean bind, String uniqueKey, ExcelType excelType, short headerHeight, short bodyHeight, int headerSeries,
-                              List<ExcelValidAnnotationHandler> validAnnotationHandlers) {
-        this.excelClass = excelClass;
-        this.fileName = fileName;
-        this.needValid = needValid;
-        this.multiHead = multiHead;
-        this.excelFields = excelFields;
-        this.headNames = headNames;
-        this.bind = bind;
-        this.uniqueKey = uniqueKey;
-        this.excelType = excelType;
-        this.headerHeight = headerHeight;
-        this.bodyHeight = bodyHeight;
-        this.headerSeries = headerSeries;
-        this.validAnnotationHandlers = validAnnotationHandlers;
     }
 
     public Class<?> getExcelClass() {
@@ -147,6 +145,22 @@ public final class ExcelWriterContext extends AbstractExcelContext {
 
     public void setMultiHead(boolean multiHead) {
         this.multiHead = multiHead;
+    }
+
+    public boolean isExistHead() {
+        return existHead;
+    }
+
+    public void setExistHead(boolean existHead) {
+        this.existHead = existHead;
+    }
+
+    public boolean isTemplate() {
+        return isTemplate;
+    }
+
+    public void setTemplate(boolean template) {
+        isTemplate = template;
     }
 
     public List<Field> getExcelFields() {
@@ -211,6 +225,14 @@ public final class ExcelWriterContext extends AbstractExcelContext {
 
     public void setHeaderSeries(int headerSeries) {
         this.headerSeries = headerSeries;
+    }
+
+    public ExcelSimpleWriterPropSupplier getPropSupplier() {
+        return propSupplier;
+    }
+
+    public void setPropSupplier(ExcelSimpleWriterPropSupplier propSupplier) {
+        this.propSupplier = propSupplier;
     }
 
     public List<ExcelValidAnnotationHandler> getValidAnnotationHandlers() {

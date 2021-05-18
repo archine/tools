@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel.write.resolver;
+package cn.gjing.tools.excel.write.resolver.simple;
 
 import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
@@ -7,12 +7,10 @@ import cn.gjing.tools.excel.metadata.listener.DefaultMultiHeadListener;
 import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
-import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
+import cn.gjing.tools.excel.write.resolver.ExcelBaseWriter;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Excel exports in simple mode, not through mapped entities
@@ -20,7 +18,6 @@ import java.util.Map;
  * @author Gjing
  **/
 public final class ExcelSimpleWriter extends ExcelBaseWriter {
-    private boolean mergeEmpty = false;
 
     public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response, boolean initDefaultStyle) {
         super(context, windowSize, response, initDefaultStyle);
@@ -104,7 +101,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data) {
-        return this.write(data, this.defaultSheetName, true, null);
+        return this.write(data, this.defaultSheetName, true);
     }
 
     /**
@@ -115,7 +112,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data, String sheetName) {
-        return this.write(data, sheetName, true, null);
+        return this.write(data, sheetName, true);
     }
 
     /**
@@ -126,7 +123,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data, boolean needHead) {
-        return this.write(data, this.defaultSheetName, needHead, null);
+        return this.write(data, this.defaultSheetName, needHead);
     }
 
     /**
@@ -138,68 +135,14 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data, String sheetName, boolean needHead) {
-        return this.write(data, sheetName, needHead, null);
-    }
-
-    /**
-     * To write
-     *
-     * @param data     data
-     * @param callback Merge callbacks at export time
-     * @return this
-     */
-    public ExcelSimpleWriter write(List<List<Object>> data, Map<String, ExcelAutoMergeCallback<?>> callback) {
-        return this.write(data, this.defaultSheetName, true, callback);
-    }
-
-    /**
-     * To write
-     *
-     * @param data      data
-     * @param sheetName sheet name
-     * @param callback  Merge callbacks at export time
-     * @return this
-     */
-    public ExcelSimpleWriter write(List<List<Object>> data, String sheetName, Map<String, ExcelAutoMergeCallback<?>> callback) {
-        return this.write(data, sheetName, true, callback);
-    }
-
-    /**
-     * To write
-     *
-     * @param data     data
-     * @param callback Merge callbacks at export time
-     * @param needHead Whether need excel head
-     * @return this
-     */
-    public ExcelSimpleWriter write(List<List<Object>> data, boolean needHead, Map<String, ExcelAutoMergeCallback<?>> callback) {
-        return this.write(data, this.defaultSheetName, needHead, callback);
-    }
-
-    /**
-     * To write
-     *
-     * @param data      data
-     * @param sheetName sheet name
-     * @param callback  Merge callbacks at export time
-     * @param needHead  Whether need excel head
-     * @return this
-     */
-    public ExcelSimpleWriter write(List<List<Object>> data, String sheetName, boolean needHead, Map<String, ExcelAutoMergeCallback<?>> callback) {
         this.createSheet(sheetName);
-        this.writerResolver.simpleWriteHead(needHead)
-                .simpleWrite(data, this.mergeEmpty, callback == null ? new HashMap<>(2) : callback);
-        return this;
-    }
-
-    /**
-     * Is it necessary to merge a null value when automatic vertical merge is implemented
-     *
-     * @param mergeEmpty mergeEmpty
-     * @return this
-     */
-    public ExcelSimpleWriter mergeEmpty(boolean mergeEmpty) {
-        this.mergeEmpty = mergeEmpty;
+        if (data == null) {
+            this.context.setTemplate(true);
+            this.writerResolver.simpleWriteHead(needHead);
+        } else {
+            this.writerResolver.simpleWriteHead(needHead)
+                    .simpleWrite(data);
+        }
         return this;
     }
 
@@ -215,6 +158,15 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
             return this.addListener(new DefaultMultiHeadListener());
         }
         return this;
+    }
+
+    /**
+     * Enable multi excel head
+     *
+     * @return this
+     */
+    public ExcelSimpleWriter multiHead() {
+        return this.multiHead(true);
     }
 
     /**
@@ -243,6 +195,19 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     public ExcelSimpleWriter addListener(List<? extends ExcelWriteListener> listeners) {
         if (listeners != null) {
             listeners.forEach(this::addListener);
+        }
+        return this;
+    }
+
+    /**
+     * Add a properties supplier
+     *
+     * @param supplier Properties supplier
+     * @return this
+     */
+    public ExcelSimpleWriter supply(ExcelSimpleWriterPropSupplier supplier) {
+        if (supplier != null) {
+            this.context.setPropSupplier(supplier);
         }
         return this;
     }
