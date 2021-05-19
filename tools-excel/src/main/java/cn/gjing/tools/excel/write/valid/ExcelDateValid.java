@@ -66,7 +66,7 @@ public @interface ExcelDateValid {
      *
      * @return title
      */
-    String errorTitle() default "错误提示";
+    String errorTitle() default "";
 
     /**
      * Error content
@@ -94,6 +94,6 @@ public @interface ExcelDateValid {
      *
      * @return ""
      */
-    String tipContent() default "格式为年-月-日";
+    String tipContent() default "";
 
 }

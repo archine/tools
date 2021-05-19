@@ -66,7 +66,7 @@ public @interface ExcelNumericValid {
      *
      * @return title
      */
-    String errorTitle() default "错误提示";
+    String errorTitle() default "";
 
     /**
      * Error content
@@ -94,5 +94,5 @@ public @interface ExcelNumericValid {
      *
      * @return ""
      */
-    String tipContent() default "请输入正确的文本长度";
+    String tipContent() default "";
 }

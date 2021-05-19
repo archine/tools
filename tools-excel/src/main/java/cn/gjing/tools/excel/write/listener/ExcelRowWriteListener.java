@@ -18,7 +18,7 @@ public interface ExcelRowWriteListener extends ExcelWriteListener {
      *
      * @param sheet   Current sheet
      * @param row     Current row
-     * @param obj     Current Java object
+     * @param obj     The data corresponding to the current row
      * @param index   Data indexing, depending on the row type, starts at 0
      * @param rowType Current row type
      */

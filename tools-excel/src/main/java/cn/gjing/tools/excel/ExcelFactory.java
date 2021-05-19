@@ -2,6 +2,7 @@ package cn.gjing.tools.excel;
 
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
@@ -9,7 +10,7 @@ import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
-import cn.gjing.tools.excel.write.resolver.simple.ExcelSimpleWriter;
+import cn.gjing.tools.excel.write.resolver.ExcelSimpleWriter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -92,15 +93,15 @@ public final class ExcelFactory {
         ParamUtils.requireNonNull(excelClass, "Excel mapping class cannot be null");
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<String[]> headerArr = new ArrayList<>();
+        List<ExcelFieldProperty> properties = new ArrayList<>();
         ExcelWriterContext context = new ExcelWriterContext();
-        context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, headerArr));
-        context.setHeadNames(headerArr);
+        context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, properties));
         context.setExcelClass(excelClass);
+        context.setFieldProperties(properties);
         context.setExcelType(excel.type());
         context.setFileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value() : fileName);
         context.setHeaderHeight(excel.headerHeight());
-        context.setHeaderSeries(headerArr.get(0).length);
+        context.setHeaderSeries(properties.get(0).getValue().length);
         context.setBodyHeight(excel.bodyHeight());
         context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         return new ExcelBindWriter(context, excel, response, initDefaultStyle);

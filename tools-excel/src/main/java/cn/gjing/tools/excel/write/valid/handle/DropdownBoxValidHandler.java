@@ -30,7 +30,8 @@ public class DropdownBoxValidHandler extends ExcelValidAnnotationHandler {
             ExcelUtils.addDropdownBox(excelDropdownBox.combobox(), excelDropdownBox.showErrorBox(), excelDropdownBox.rank(), excelDropdownBox.errorTitle(),
                     excelDropdownBox.errorContent(), writerContext.getWorkbook(), writerContext.getSheet(),
                     firstRow, excelDropdownBox.rows() == 0 ? firstRow : excelDropdownBox.rows() + firstRow - 1,
-                    colIndex, boxValues == null ? null : boxValues.get(field.getName()));
+                    colIndex, boxValues == null ? null : boxValues.get(field.getName()), excelDropdownBox.showTip(),
+                    excelDropdownBox.tipTitle(), excelDropdownBox.tipContent());
         } else {
             List<ExcelListener> dropdownListeners = writerContext.getListenerCache();
             if (dropdownListeners == null) {

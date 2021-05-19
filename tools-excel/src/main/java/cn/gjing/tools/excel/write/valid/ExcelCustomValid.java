@@ -46,7 +46,7 @@ public @interface ExcelCustomValid {
      *
      * @return title
      */
-    String errorTitle() default "错误提示";
+    String errorTitle() default "";
 
     /**
      * Error content
@@ -54,4 +54,25 @@ public @interface ExcelCustomValid {
      * @return content
      */
     String errorContent() default "输入的内容不符合要求";
+
+    /**
+     * Whether show cell tip
+     *
+     * @return false
+     */
+    boolean showTip() default false;
+
+    /**
+     * Tip title
+     *
+     * @return ""
+     */
+    String tipTitle() default "";
+
+    /**
+     * Tip content
+     *
+     * @return ""
+     */
+    String tipContent() default "";
 }

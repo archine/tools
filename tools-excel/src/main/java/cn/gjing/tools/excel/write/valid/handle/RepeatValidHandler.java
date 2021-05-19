@@ -24,6 +24,7 @@ public class RepeatValidHandler extends ExcelValidAnnotationHandler {
         int firstRow = row.getRowNum() + 1;
         ExcelRepeatValid repeatValid = (ExcelRepeatValid) validAnnotation;
         ExcelUtils.addRepeatValid(writerContext.getSheet(), firstRow, repeatValid.rows() == 0 ? firstRow : repeatValid.rows() + firstRow - 1, colIndex,
-                repeatValid.showErrorBox(), repeatValid.rank(), repeatValid.errorTitle(), repeatValid.errorContent(), repeatValid.longTextNumber());
+                repeatValid.showErrorBox(), repeatValid.rank(), repeatValid.errorTitle(), repeatValid.errorContent(), repeatValid.longTextNumber(),
+                repeatValid.showTip(), repeatValid.tipTitle(), repeatValid.tipContent());
     }
 }

@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/version-2021.6-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
+![](https://img.shields.io/badge/version-2021.7-green.svg) &nbsp; ![](https://img.shields.io/badge/builder-success-green.svg) &nbsp;
 ![](https://img.shields.io/badge/Author-Gjing-green.svg) &nbsp;       
 
 **简单、快速的在项目中进行Excel导入导出**   

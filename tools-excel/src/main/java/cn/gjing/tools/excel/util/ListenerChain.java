@@ -1,6 +1,6 @@
 package cn.gjing.tools.excel.util;
 
-import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.metadata.listener.ExcelListener;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
@@ -25,22 +25,21 @@ public final class ListenerChain {
     /**
      * Execute write cell listener
      *
-     * @param listeners  Listener instances
-     * @param sheet      Current sheet
-     * @param row        Current row
-     * @param cell       Current cell
-     * @param index      Data indexing, depending on the row type, starts at 0
-     * @param colIndex   Current cell index
-     * @param rowType    Current row type
-     * @param excelField ExcelField annotation of current field
-     * @param field      Current field
+     * @param listeners Listener instances
+     * @param sheet     Current sheet
+     * @param row       Current row
+     * @param cell      Current cell
+     * @param index     Data indexing, depending on the row type, starts at 0
+     * @param colIndex  Current cell index
+     * @param rowType   Current row type
+     * @param property  ExcelField property
      */
     public static void doCompleteCell(List<ExcelListener> listeners, Sheet sheet, Row row, Cell cell,
-                                      ExcelField excelField, Field field, int index, int colIndex, RowType rowType) {
+                                      ExcelFieldProperty property, int index, int colIndex, RowType rowType) {
         if (listeners != null) {
             for (ExcelListener cellListener : listeners) {
                 if (cellListener instanceof ExcelCellWriteListener) {
-                    ((ExcelCellWriteListener) cellListener).completeCell(sheet, row, cell, excelField, field, index, colIndex, rowType);
+                    ((ExcelCellWriteListener) cellListener).completeCell(sheet, row, cell, property, index, colIndex, rowType);
                 }
             }
         }
@@ -49,24 +48,23 @@ public final class ListenerChain {
     /**
      * Execute write cell listener
      *
-     * @param listeners  Listener instances
-     * @param sheet      Current sheet
-     * @param row        Current row
-     * @param cell       Current cell
-     * @param index      Data indexing, depending on the row type, starts at 0
-     * @param colIndex   Current cell index
-     * @param rowType    Current row type
-     * @param excelField ExcelField annotation of current field
-     * @param field      Current field
-     * @param value      Cell value
+     * @param listeners Listener instances
+     * @param sheet     Current sheet
+     * @param row       Current row
+     * @param cell      Current cell
+     * @param index     Data indexing, depending on the row type, starts at 0
+     * @param colIndex  Current cell index
+     * @param rowType   Current row type
+     * @param property  ExcelField property
+     * @param value     Cell value
      * @return Cell value
      */
     public static Object doAssignmentBefore(List<ExcelListener> listeners, Sheet sheet, Row row, Cell cell,
-                                            ExcelField excelField, Field field, int index, int colIndex, RowType rowType, Object value) {
+                                            ExcelFieldProperty property, int index, int colIndex, RowType rowType, Object value) {
         if (listeners != null) {
             for (ExcelListener cellListener : listeners) {
                 if (cellListener instanceof ExcelCellWriteListener) {
-                    value = ((ExcelCellWriteListener) cellListener).assignmentBefore(sheet, row, cell, excelField, field, index, colIndex, rowType, value);
+                    value = ((ExcelCellWriteListener) cellListener).assignmentBefore(sheet, row, cell, property, index, colIndex, rowType, value);
                 }
             }
         }
@@ -132,7 +130,7 @@ public final class ListenerChain {
      *
      * @param workbook          Current workbook
      * @param workbookListeners Workbook listeners
-     * @return  If true, the download will start
+     * @return If true, the download will start
      */
     public static boolean doWorkbookFlushBefore(List<ExcelListener> workbookListeners, Workbook workbook) {
         boolean continueDownload = true;
@@ -170,15 +168,14 @@ public final class ListenerChain {
      * @param cell           Current cell
      * @param index          Line index, index type according to isHead
      * @param colIndex       cell index
-     * @param excelField     ExcelField annotation of current field
-     * @param field          Current field
+     * @param property       ExcelField property
      * @param styleListeners Style listeners
      */
-    public static void doSetHeadStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
+    public static void doSetHeadStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex) {
         if (styleListeners != null) {
             for (ExcelListener styleListener : styleListeners) {
                 if (styleListener instanceof ExcelStyleWriteListener) {
-                    ((ExcelStyleWriteListener) styleListener).setHeadStyle(row, cell, excelField, field, index, colIndex);
+                    ((ExcelStyleWriteListener) styleListener).setHeadStyle(row, cell, property, index, colIndex);
                 }
             }
         }
@@ -191,15 +188,14 @@ public final class ListenerChain {
      * @param cell           Current cell
      * @param index          Line index, index type according to isHead
      * @param colIndex       cell index
-     * @param excelField     ExcelField annotation of current field
-     * @param field          Current field
+     * @param property       ExcelField property
      * @param styleListeners Style listeners
      */
-    public static void doSetBodyStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
+    public static void doSetBodyStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex) {
         if (styleListeners != null) {
             for (ExcelListener styleListener : styleListeners) {
                 if (styleListener instanceof ExcelStyleWriteListener) {
-                    ((ExcelStyleWriteListener) styleListener).setBodyStyle(row, cell, excelField, field, index, colIndex);
+                    ((ExcelStyleWriteListener) styleListener).setBodyStyle(row, cell, property, index, colIndex);
                 }
             }
         }
@@ -293,19 +289,18 @@ public final class ListenerChain {
      * @param emptyReadListeners emptyReadListeners
      * @param r                  Current Java object
      * @param field              Current field
-     * @param excelField         ExcelField annotation on that field
      * @param rowIndex           The index of the current row
      * @param colIndex           The index of the current col
      * @param <R>                R
      * @return Whether to save this data
      */
     @SuppressWarnings("unchecked")
-    public static <R> boolean doReadEmpty(List<ExcelListener> emptyReadListeners, R r, Field field, ExcelField excelField, int rowIndex, int colIndex) {
+    public static <R> boolean doReadEmpty(List<ExcelListener> emptyReadListeners, R r, Field field, int rowIndex, int colIndex) {
         boolean isSave = false;
         if (emptyReadListeners != null) {
             for (ExcelListener emptyReadListener : emptyReadListeners) {
                 if (emptyReadListener instanceof ExcelEmptyReadListener) {
-                    isSave = ((ExcelEmptyReadListener<R>) emptyReadListener).readEmpty(r, field, excelField, rowIndex, colIndex);
+                    isSave = ((ExcelEmptyReadListener<R>) emptyReadListener).readEmpty(r, field, rowIndex, colIndex);
                 }
             }
         }

@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
@@ -184,17 +185,17 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     public ExcelBindWriter resetExcelClass(Class<?> excelClass, boolean resetListener, boolean resetAll, String... ignores) {
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "Failed to reset Excel class, the @Excel annotation was not found on the " + excelClass);
-        List<String[]> headNames = new ArrayList<>();
-        this.context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, headNames));
-        this.context.setHeadNames(headNames);
+        List<ExcelFieldProperty> properties = new ArrayList<>();
+        this.context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, properties));
         if (resetListener) {
             this.context.setExcelClass(excelClass, resetAll);
         } else {
             this.context.setExcelClass(excelClass);
         }
+        this.context.setFieldProperties(properties);
         this.context.setBodyHeight(excel.bodyHeight());
         this.context.setHeaderHeight(excel.headerHeight());
-        this.context.setHeaderSeries(headNames.get(0).length);
+        this.context.setHeaderSeries(properties.get(0).getValue().length);
         this.context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         return this;
     }

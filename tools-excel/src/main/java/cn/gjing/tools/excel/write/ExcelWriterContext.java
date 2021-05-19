@@ -1,8 +1,8 @@
 package cn.gjing.tools.excel.write;
 
 import cn.gjing.tools.excel.metadata.AbstractExcelContext;
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.ExcelType;
-import cn.gjing.tools.excel.write.resolver.simple.ExcelSimpleWriterPropSupplier;
 import cn.gjing.tools.excel.write.valid.handle.*;
 
 import java.lang.reflect.Field;
@@ -51,11 +51,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     private List<Field> excelFields = new ArrayList<>();
 
     /**
-     * Excel header names
-     */
-    private List<String[]> headNames = new ArrayList<>();
-
-    /**
      * Whether you need to add a file identifier when exporting an Excel file,
      * which can be used for template validation of the file at import time
      */
@@ -87,9 +82,9 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     private int headerSeries = 1;
 
     /**
-     * Simple type export supplier
+     * Excel filed property
      */
-    private ExcelSimpleWriterPropSupplier propSupplier;
+    private List<ExcelFieldProperty> fieldProperties;
 
     /**
      * Valid annotation handler
@@ -171,14 +166,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
         this.excelFields = excelFields;
     }
 
-    public List<String[]> getHeadNames() {
-        return headNames;
-    }
-
-    public void setHeadNames(List<String[]> headNames) {
-        this.headNames = headNames;
-    }
-
     public boolean isBind() {
         return bind;
     }
@@ -227,12 +214,12 @@ public final class ExcelWriterContext extends AbstractExcelContext {
         this.headerSeries = headerSeries;
     }
 
-    public ExcelSimpleWriterPropSupplier getPropSupplier() {
-        return propSupplier;
+    public List<ExcelFieldProperty> getFieldProperties() {
+        return fieldProperties;
     }
 
-    public void setPropSupplier(ExcelSimpleWriterPropSupplier propSupplier) {
-        this.propSupplier = propSupplier;
+    public void setFieldProperties(List<ExcelFieldProperty> fieldProperties) {
+        this.fieldProperties = fieldProperties;
     }
 
     public List<ExcelValidAnnotationHandler> getValidAnnotationHandlers() {

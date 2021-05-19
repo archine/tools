@@ -1,7 +1,6 @@
 package cn.gjing.tools.excel.metadata.listener;
 
-import cn.gjing.tools.excel.ExcelField;
-import cn.gjing.tools.excel.metadata.ExcelColor;
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.annotation.ListenerNative;
 import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.write.BigTitle;
@@ -9,7 +8,6 @@ import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.listener.ExcelStyleWriteListener;
 import org.apache.poi.ss.usermodel.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +23,7 @@ import java.util.Map;
 public class DefaultExcelStyleListener implements ExcelStyleWriteListener, ExcelWriteContextAware {
     private ExcelWriterContext context;
     private final Map<Integer, CellStyle> titleStyles;
-    private final Map<Class<?>, Map<String, List<CellStyle>>> headStyleData;
+    private final Map<Class<?>, Map<Integer, List<CellStyle>>> headStyleData;
     private final Map<String, CellStyle> defaultColumnStyle;
 
     public DefaultExcelStyleListener() {
@@ -60,66 +58,62 @@ public class DefaultExcelStyleListener implements ExcelStyleWriteListener, Excel
     }
 
     @Override
-    public void setHeadStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
-        Map<String, List<CellStyle>> headStyle = this.headStyleData.computeIfAbsent(this.context.getExcelClass(), k -> new HashMap<>(16));
-        List<CellStyle> cellStyleList = headStyle.get(field.getName());
-        boolean isSimpleType = excelField == null;
+    public void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex) {
+        Map<Integer, List<CellStyle>> headStyle = this.headStyleData.computeIfAbsent(this.context.getExcelClass(), k -> new HashMap<>(32));
+        List<CellStyle> cellStyleList = headStyle.get(colIndex);
         if (cellStyleList == null) {
             cellStyleList = new ArrayList<>();
-            ExcelColor[] color = isSimpleType ? this.context.getPropSupplier().getHeadColor(colIndex) : excelField.color();
-            ExcelColor[] fontColor  = isSimpleType ? this.context.getPropSupplier().getHeadFontColor(colIndex) : excelField.fontColor();
+            int colorLength = property.getColor().length;
+            int fontColorLength = property.getFontColor().length;
             CellStyle cellStyle;
-            int maxIndex = Math.max(color.length, fontColor.length);
+            int maxIndex = Math.max(colorLength, fontColorLength);
             for (int i = 0; i < maxIndex; i++) {
                 cellStyle = this.context.getWorkbook().createCellStyle();
-                cellStyle.setFillForegroundColor(color[color.length > i ? i : color.length - 1].index);
+                cellStyle.setFillForegroundColor(property.getColor()[colorLength > i ? i : colorLength - 1].index);
                 Font font = this.context.getWorkbook().createFont();
                 font.setBold(true);
-                font.setColor(fontColor[fontColor.length > i + 1 ? i : fontColor.length - 1].index);
+                font.setColor(property.getFontColor()[fontColorLength > i + 1 ? i : fontColorLength - 1].index);
                 cellStyle.setFont(font);
                 this.setColorAndBorder(cellStyle);
                 this.setAlignment(cellStyle);
                 cellStyleList.add(cellStyle);
             }
-            headStyle.put(field.getName(), cellStyleList);
+            headStyle.put(colIndex, cellStyleList);
         }
         if (index == 0) {
-            this.setColumnWidth(excelField, colIndex, isSimpleType);
+            this.setColumnWidth(property, colIndex);
             if (this.context.isTemplate()) {
-                this.context.getSheet().setDefaultColumnStyle(colIndex, this.createDefaultStyle(excelField, isSimpleType, colIndex));
+                this.context.getSheet().setDefaultColumnStyle(colIndex, this.createDefaultStyle(property, colIndex));
             }
         }
         cell.setCellStyle(cellStyleList.size() > index ? cellStyleList.get(index) : cellStyleList.get(cellStyleList.size() - 1));
     }
 
     @Override
-    public void setBodyStyle(Row row, Cell cell, ExcelField excelField, Field field, int index, int colIndex) {
-        boolean isSimpleType = excelField == null;
+    public void setBodyStyle(Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex) {
         if (!this.context.isExistHead() && index == 0) {
-            this.setColumnWidth(excelField, colIndex, isSimpleType);
+            this.setColumnWidth(property, colIndex);
         }
-        cell.setCellStyle(this.createDefaultStyle(excelField, isSimpleType, colIndex));
+        cell.setCellStyle(this.createDefaultStyle(property, colIndex));
     }
 
-    private CellStyle createDefaultStyle(ExcelField excelField, boolean isSimpleType, int colIndex) {
-        String format = isSimpleType ? this.context.getPropSupplier().getFormat(colIndex) : excelField.format();
-        CellStyle cellStyle = this.defaultColumnStyle.get(format);
+    private CellStyle createDefaultStyle(ExcelFieldProperty property, int colIndex) {
+        CellStyle cellStyle = this.defaultColumnStyle.get(property.getFormat());
         if (cellStyle == null) {
             cellStyle = this.context.getWorkbook().createCellStyle();
             this.setAlignment(cellStyle);
-            if (!format.isEmpty()) {
-                cellStyle.setDataFormat(this.context.getWorkbook().createDataFormat().getFormat(format));
+            if (!property.getFormat().isEmpty()) {
+                cellStyle.setDataFormat(this.context.getWorkbook().createDataFormat().getFormat(property.getFormat()));
             }
-            this.defaultColumnStyle.put(format, cellStyle);
+            this.defaultColumnStyle.put(property.getFormat(), cellStyle);
         }
         return cellStyle;
     }
 
-    private void setColumnWidth(ExcelField excelField, int colIndex, boolean isSimpleType) {
+    private void setColumnWidth(ExcelFieldProperty property, int colIndex) {
         int defaultColumnWidth = this.context.getSheet().getColumnWidth(colIndex);
-        int newColumnWidth = isSimpleType ? this.context.getPropSupplier().getColWidth(colIndex) : excelField.width();
-        if (newColumnWidth > defaultColumnWidth) {
-            this.context.getSheet().setColumnWidth(colIndex, newColumnWidth);
+        if (property.getWidth() > defaultColumnWidth) {
+            this.context.getSheet().setColumnWidth(colIndex, property.getWidth());
         }
     }
 

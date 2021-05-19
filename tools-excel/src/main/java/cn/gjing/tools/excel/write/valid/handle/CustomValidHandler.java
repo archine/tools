@@ -24,6 +24,7 @@ public class CustomValidHandler extends ExcelValidAnnotationHandler {
         ExcelCustomValid customValid = (ExcelCustomValid) validAnnotation;
         int firstRow = row.getRowNum() + 1;
         ExcelUtils.addCustomValid(customValid.formula(), writerContext.getSheet(), firstRow, customValid.rows() == 0 ? firstRow : customValid.rows() + firstRow - 1,
-                colIndex, customValid.showErrorBox(), customValid.rank(), customValid.errorTitle(), customValid.errorContent());
+                colIndex, customValid.showErrorBox(), customValid.rank(), customValid.errorTitle(), customValid.errorContent(),
+                customValid.showTip(), customValid.tipTitle(), customValid.tipContent());
     }
 }

@@ -1,11 +1,11 @@
 package cn.gjing.tools.excel.write.resolver;
 
-import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ExcelUtils;
@@ -14,6 +14,7 @@ import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
+import cn.gjing.tools.excel.write.valid.handle.ExcelValidAnnotationHandler;
 import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -54,36 +55,36 @@ public final class ExcelWriteExecutor {
      * @param boxValues Excel dropdown box value
      */
     public void writeHead(boolean needHead, Map<String, String[]> boxValues) {
-        if (!needHead || this.context.getHeadNames().isEmpty()) {
+        if (!needHead || this.context.getFieldProperties().isEmpty()) {
             this.context.setExistHead(false);
             return;
         }
         Row headRow;
-        int headSize = this.context.getHeadNames().size();
+        String[] currentRowHeadArray = new String[this.context.getFieldProperties().size()];
         for (int index = 0; index < this.context.getHeaderSeries(); index++) {
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.HEAD);
             headRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
             headRow.setHeight(this.context.getHeaderHeight());
-            for (int colIndex = 0; colIndex < headSize; colIndex++) {
-                Field field = this.context.getExcelFields().get(colIndex);
-                ExcelField excelField = field.getAnnotation(ExcelField.class);
-                String headName = this.context.getHeadNames().get(colIndex)[index];
+            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
+                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
+                String headName = property.getValue()[index];
+                currentRowHeadArray[colIndex] = headName;
                 Cell headCell = headRow.createCell(headRow.getPhysicalNumberOfCells());
                 headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell,
-                        excelField, field, index, headCell.getColumnIndex(), RowType.HEAD, headName);
+                        property, index, headCell.getColumnIndex(), RowType.HEAD, headName);
                 headCell.setCellValue(headName);
                 if (this.context.isNeedValid() && index == this.context.getHeaderSeries() - 1) {
                     try {
-                        this.addValid(field, headRow, headCell.getColumnIndex(), boxValues);
+                        this.addValid(this.context.getExcelFields().get(colIndex), headRow, headCell.getColumnIndex(), boxValues);
                     } catch (Exception e) {
                         throw new ExcelResolverException("Add excel validation failure, " + e.getMessage());
                     }
                 }
-                ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, excelField, field, index,
+                ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property, index,
                         headCell.getColumnIndex(), RowType.HEAD);
-                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, excelField, field, index, colIndex);
+                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
             }
-            ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(), index, RowType.HEAD);
+            ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, currentRowHeadArray, index, RowType.HEAD);
         }
     }
 
@@ -103,22 +104,23 @@ public final class ExcelWriteExecutor {
             valueRow.setHeight(this.context.getBodyHeight());
             for (int colIndex = 0, headSize = this.context.getExcelFields().size(); colIndex < headSize; colIndex++) {
                 Field field = this.context.getExcelFields().get(colIndex);
-                ExcelField excelField = field.getAnnotation(ExcelField.class);
+                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
                 context.setVariable(field.getName(), value);
                 try {
-                    value = this.convert(field, value, o, parser, field.getAnnotation(ExcelDataConvert.class), context, this.createDataConvert(field, excelField));
-                    value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field,
-                            index, valueCell.getColumnIndex(), RowType.BODY, value);
+                    value = this.convert(value, o, parser, field.getAnnotation(ExcelDataConvert.class), context,
+                            this.createDataConvert(colIndex, property));
+                    value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(),
+                            valueRow, valueCell, property, index, valueCell.getColumnIndex(), RowType.BODY, value);
                     ExcelUtils.setCellValue(valueCell, value);
-                    if (excelField.autoMerge().enable()) {
-                        this.autoMergeY(this.createMergeCallback(field, excelField), valueRow, excelField.autoMerge().empty(), index, valueCell.getColumnIndex(), value, o,
-                                dataSize, field, null);
+                    if (property.isAutoMerge()) {
+                        this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
+                                valueCell.getColumnIndex(), value, o, dataSize, field);
                     }
-                    ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell, excelField, field,
-                            index, valueCell.getColumnIndex(), RowType.BODY);
-                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, excelField, field, index, colIndex);
+                    ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
+                            property, index, valueCell.getColumnIndex(), RowType.BODY);
+                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -133,27 +135,29 @@ public final class ExcelWriteExecutor {
      * @param needHead Whether to set header
      */
     public void simpleWriteHead(boolean needHead) {
-        if (!needHead || this.context.getHeadNames().isEmpty()) {
+        if (!needHead || this.context.getFieldProperties().isEmpty()) {
             this.context.setExistHead(false);
             return;
         }
         Row headRow;
-        int headSize = this.context.getHeadNames().size();
+        String[] currentRowHeadArray = new String[this.context.getFieldProperties().size()];
         for (int index = 0; index < this.context.getHeaderSeries(); index++) {
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.HEAD);
             headRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
             headRow.setHeight(this.context.getHeaderHeight());
-            for (int colIndex = 0; colIndex < headSize; colIndex++) {
-                String headName = this.context.getHeadNames().get(colIndex)[index];
+            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
+                String headName = this.context.getFieldProperties().get(colIndex).getValue()[index];
+                currentRowHeadArray[colIndex] = headName;
+                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
                 Cell headCell = headRow.createCell(headRow.getPhysicalNumberOfCells());
-                headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell,
-                        null, null, index, headCell.getColumnIndex(), RowType.HEAD, headName);
+                headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(),
+                        headRow, headCell, property, index, headCell.getColumnIndex(), RowType.HEAD, headName);
                 headCell.setCellValue(headName);
-                ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, null, null,
+                ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property,
                         index, headCell.getColumnIndex(), RowType.HEAD);
-                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, null, null, index, colIndex);
+                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
             }
-            ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, this.context.getHeadNames(),
+            ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, currentRowHeadArray,
                     index, RowType.HEAD);
         }
     }
@@ -161,34 +165,32 @@ public final class ExcelWriteExecutor {
     /**
      * Set excel body for simple type
      *
-     * @param data          Exported data
+     * @param data Exported data
      */
     public void simpleWriteBody(List<List<Object>> data) {
+        ExpressionParser parser = new SpelExpressionParser();
+        EvaluationContext context = new StandardEvaluationContext();
         for (int index = 0, dataSize = data.size(); index < dataSize; index++) {
             List<?> o = data.get(index);
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.BODY);
             Row valueRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
             valueRow.setHeight(this.context.getBodyHeight());
-            for (int colIndex = 0, headSize = this.context.getHeadNames().size(); colIndex < headSize; colIndex++) {
+            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
                 Object value = o.get(colIndex);
+                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
                 Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
                 try {
-                    value = this.context.getPropSupplier().convert(colIndex, value);
+                    value = this.convert(value, o, parser, null, context, this.createDataConvert(colIndex, property));
                     value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
-                            null, null, index, valueCell.getColumnIndex(), RowType.BODY, value);
+                            property, index, valueCell.getColumnIndex(), RowType.BODY, value);
                     ExcelUtils.setCellValue(valueCell, value);
-                    String[] headArr = this.context.getHeadNames().get(colIndex);
-                    String key = headArr[headArr.length - 1];
-                    ExcelAutoMergeCallback<?> mergeCallback = this.context.getPropSupplier().getAutoMergeCallback(key, colIndex);
-                    if (mergeCallback != null) {
-                        if (this.oldRowModelMap == null) {
-                            this.oldRowModelMap = new HashMap<>(16);
-                        }
-                        this.autoMergeY(mergeCallback, valueRow, true, index, valueCell.getColumnIndex(), value, o, dataSize, null, key);
+                    if (property.isAutoMerge()) {
+                        this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
+                                valueCell.getColumnIndex(), value, o, dataSize, null);
                     }
-                    ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell, null,
-                            null, index, valueCell.getColumnIndex(), RowType.BODY);
-                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, null, null, index, colIndex);
+                    ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell, property
+                            , index, valueCell.getColumnIndex(), RowType.BODY);
+                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }
@@ -200,18 +202,18 @@ public final class ExcelWriteExecutor {
     /**
      * Create data convert
      *
-     * @param field      Current field
-     * @param excelField ExcelField annotation on current field
+     * @param colIndex Current column index
+     * @param property ExcelField property
      * @return DataConvert
      */
-    private DataConvert<?> createDataConvert(Field field, ExcelField excelField) {
-        DataConvert<?> dataConvert = dataConvertMap.get(excelField.convert());
+    private DataConvert<?> createDataConvert(int colIndex, ExcelFieldProperty property) {
+        DataConvert<?> dataConvert = this.dataConvertMap.get(property.getConvert());
         if (dataConvert == null) {
             try {
-                dataConvert = excelField.convert().newInstance();
-                this.dataConvertMap.put(excelField.convert(), dataConvert);
+                dataConvert = property.getConvert().newInstance();
+                this.dataConvertMap.put(property.getConvert(), dataConvert);
             } catch (Exception e) {
-                throw new ExcelInitException("Init specified excel header data converter failure " + field.getName() + ", " + e.getMessage());
+                throw new ExcelInitException("Init specified excel header data converter failure, column index is" + colIndex + ", " + e.getMessage());
             }
         }
         return dataConvert;
@@ -220,24 +222,24 @@ public final class ExcelWriteExecutor {
     /**
      * Create merge callback
      *
-     * @param field      Current field
-     * @param excelField ExcelField annotation on current field
+     * @param colIndex Current column index
+     * @param property ExcelField property
      * @return AutoMergeCallback
      */
-    private ExcelAutoMergeCallback<?> createMergeCallback(Field field, ExcelField excelField) {
+    private ExcelAutoMergeCallback<?> createMergeCallback(int colIndex, ExcelFieldProperty property) {
         if (this.mergeCallbackMap == null) {
             this.mergeCallbackMap = new HashMap<>(16);
             if (this.oldRowModelMap == null) {
                 this.oldRowModelMap = new HashMap<>(16);
             }
         }
-        ExcelAutoMergeCallback<?> autoMergeCallback = this.mergeCallbackMap.get(excelField.autoMerge().callback());
+        ExcelAutoMergeCallback<?> autoMergeCallback = this.mergeCallbackMap.get(property.getMergeCallback());
         if (autoMergeCallback == null) {
             try {
-                autoMergeCallback = excelField.autoMerge().callback().newInstance();
-                this.mergeCallbackMap.put(excelField.autoMerge().callback(), autoMergeCallback);
+                autoMergeCallback = property.getMergeCallback().newInstance();
+                this.mergeCallbackMap.put(property.getMergeCallback(), autoMergeCallback);
             } catch (Exception e) {
-                throw new ExcelInitException("Init specified excel header merge callback failure " + field.getName() + ", " + e.getMessage());
+                throw new ExcelInitException("Init specified excel header merge callback failure, column index is" + colIndex + ", " + e.getMessage());
             }
         }
         return autoMergeCallback;
@@ -250,7 +252,6 @@ public final class ExcelWriteExecutor {
      * @param row               Current row
      * @param mergeEmpty        Whether null merges are allowed
      * @param field             The field corresponding to the current callback has a value only when the simple type is exported
-     * @param key               The key corresponding to the current callback has a value only when the simple type is exported
      * @param index             The data index, start at 0
      * @param dataSize          Excel head data size or body data size,
      * @param colIndex          Current col index
@@ -258,9 +259,9 @@ public final class ExcelWriteExecutor {
      * @param obj               The object corresponding to the current row
      */
     private void autoMergeY(ExcelAutoMergeCallback<?> autoMergeCallback, Row row, boolean mergeEmpty, int index, int colIndex,
-                            Object cellValue, Object obj, int dataSize, Field field, String key) {
+                            Object cellValue, Object obj, int dataSize, Field field) {
         if (index == 0) {
-            if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, key, colIndex, index)) {
+            if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, colIndex, index)) {
                 this.oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
             } else {
                 this.oldRowModelMap.put(colIndex, new ExcelOldRowModel(autoMergeCallback.getClass(), row.getRowNum()));
@@ -268,7 +269,7 @@ public final class ExcelWriteExecutor {
             return;
         }
         ExcelOldRowModel excelOldRowModel = this.oldRowModelMap.get(colIndex);
-        if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, key, colIndex, index)) {
+        if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, colIndex, index)) {
             if (ParamUtils.equals(cellValue, excelOldRowModel.getOldRowCellValue(), mergeEmpty)) {
                 if (index == dataSize - 1) {
                     this.context.getSheet().addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum(), colIndex, colIndex));
@@ -295,21 +296,21 @@ public final class ExcelWriteExecutor {
     /**
      * Data convert
      *
-     * @param field            Current field
      * @param value            Attribute values
      * @param obj              Current object
      * @param parser           El parser
      * @param excelDataConvert excelDataConvert
+     * @param dataConvert      dataConvert
      * @param context          EL context
      * @return new value
      */
-    private Object convert(Field field, Object value, Object obj, ExpressionParser parser, ExcelDataConvert excelDataConvert,
+    private Object convert(Object value, Object obj, ExpressionParser parser, ExcelDataConvert excelDataConvert,
                            EvaluationContext context, DataConvert<?> dataConvert) {
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr1())) {
             return parser.parseExpression(excelDataConvert.expr1()).getValue(context);
         }
         if (dataConvert != null) {
-            return dataConvert.toExcelAttribute(this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), value, field);
+            return dataConvert.toExcelAttribute(this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), value);
         }
         return value;
     }
@@ -323,11 +324,12 @@ public final class ExcelWriteExecutor {
      * @param boxValues Dropdown box value map
      */
     private void addValid(Field field, Row row, int colIndex, Map<String, String[]> boxValues) {
-        this.context.getValidAnnotationHandlers().forEach(e -> {
-            Annotation annotation = field.getAnnotation(e.getAnnotationClass());
+        for (ExcelValidAnnotationHandler validAnnotationHandler : this.context.getValidAnnotationHandlers()) {
+            Annotation annotation = field.getAnnotation(validAnnotationHandler.getAnnotationClass());
             if (annotation != null) {
-                e.handle(annotation, this.context, field, row, colIndex, boxValues);
+                validAnnotationHandler.handle(annotation, this.context, field, row, colIndex, boxValues);
+                break;
             }
-        });
+        }
     }
 }

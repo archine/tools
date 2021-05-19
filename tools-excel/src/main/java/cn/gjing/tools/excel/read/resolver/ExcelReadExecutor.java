@@ -28,6 +28,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -101,7 +102,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 if (this.context.isHeadBefore()) {
                     otherValues = new ArrayList<>();
                     for (Cell cell : row) {
-                        Object value = this.getValue(null, cell, null, null, gson, RowType.OTHER);
+                        Object value = this.getValue(null, cell, null, null, RowType.OTHER);
                         otherValues.add(ListenerChain.doReadCell(rowReadListeners, value, null, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER));
                     }
                     stop = ListenerChain.doReadRow(rowReadListeners, null, otherValues, row.getRowNum(), RowType.OTHER);
@@ -143,11 +144,11 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                     Object value;
                     try {
                         if (valueCell != null) {
-                            value = this.getValue(r, valueCell, field, excelField, gson, RowType.BODY);
+                            value = this.getValue(r, valueCell, field, excelField, RowType.BODY);
                             context.setVariable(field.getName(), value);
                             this.assertValue(parser, context, row, c, field, excelField);
                             value = ListenerChain.doReadCell(rowReadListeners, value, field, row.getRowNum(), c, RowType.BODY);
-                            value = this.convert(field, value, parser, context, this.createDataConvert(field, excelField));
+                            value = this.convert(r, value, parser, context, field.getAnnotation(ExcelDataConvert.class), this.createDataConvert(field, excelField));
                             if (save && value != null) {
                                 this.setValue(r, field, value);
                             }
@@ -156,7 +157,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                             context.setVariable(field.getName(), null);
                             this.assertValue(parser, context, row, c, field, excelField);
                             value = ListenerChain.doReadCell(rowReadListeners, null, field, row.getRowNum(), c, RowType.BODY);
-                            value = this.convert(field, value, parser, context, this.createDataConvert(field, excelField));
+                            value = this.convert(r, value, parser, context, field.getAnnotation(ExcelDataConvert.class), this.createDataConvert(field, excelField));
                             this.setValue(r, field, value);
                         }
                         context.setVariable(field.getName(), value);
@@ -191,12 +192,11 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
      * @param cell       cell
      * @param excelField Excel field of current field
      * @param field      Current field
-     * @param gson       Gson
      * @param r          Current row generated row
      * @param rowType    rowType Current row type
      * @return value
      */
-    private Object getValue(R r, Cell cell, Field field, ExcelField excelField, Gson gson, RowType rowType) {
+    private Object getValue(R r, Cell cell, Field field, ExcelField excelField, RowType rowType) {
         switch (cell.getCellType()) {
             case _NONE:
             case BLANK:
@@ -223,18 +223,19 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
     /**
      * Data convert
      *
-     * @param field   Current field
-     * @param value   Attribute values
-     * @param parser  El parser
-     * @param context EL context
+     * @param entity           Current entity
+     * @param value            Attribute values
+     * @param parser           El parser
+     * @param dataConvert      dataConvert
+     * @param excelDataConvert excelDataConvert
+     * @param context          EL context
      * @return new value
      */
-    private Object convert(Field field, Object value, ExpressionParser parser, EvaluationContext context, DataConvert<?> dataConvert) {
-        ExcelDataConvert excelDataConvert = field.getAnnotation(ExcelDataConvert.class);
+    private Object convert(R entity, Object value, ExpressionParser parser, EvaluationContext context, ExcelDataConvert excelDataConvert, DataConvert<?> dataConvert) {
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr2())) {
             return parser.parseExpression(excelDataConvert.expr2()).getValue(context);
         }
-        return dataConvert.toEntityAttribute(value, field);
+        return dataConvert.toEntityAttribute(this.gson.fromJson(this.gson.toJson(entity), (Type) entity.getClass()), value);
     }
 
     /**
@@ -292,7 +293,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
      */
     private void allowEmpty(R r, Field field, ExcelField excelField, int rowIndex, int colIndex) {
         if (excelField.required()) {
-            this.save = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, field, excelField, rowIndex, colIndex);
+            this.save = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, field, rowIndex, colIndex);
         }
     }
 

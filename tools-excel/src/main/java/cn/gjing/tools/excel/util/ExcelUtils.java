@@ -71,9 +71,13 @@ public final class ExcelUtils {
      * @param lastRow      End row
      * @param colIndex     Column index
      * @param values       The dropdown box can be large, but if it's version 07, it's limited by the window size in the Excel annotation{@link Excel}
+     * @param showTip      Whether show tip
+     * @param tipContent   Tip content
+     * @param tipTitle     Tip title
      */
     public static void addDropdownBox(String[] combobox, boolean showErrorBox, Rank errorBoxRank, String errorTitle, String errorContent,
-                                      Workbook workbook, Sheet sheet, int firstRow, int lastRow, int colIndex, String[] values) {
+                                      Workbook workbook, Sheet sheet, int firstRow, int lastRow, int colIndex, String[] values, boolean showTip,
+                                      String tipTitle, String tipContent) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint constraint;
         if (values == null) {
@@ -100,6 +104,9 @@ public final class ExcelUtils {
         dataValidation.setShowErrorBox(showErrorBox);
         dataValidation.setErrorStyle(errorBoxRank.getRank());
         dataValidation.createErrorBox(errorTitle, errorContent);
+        if (showTip) {
+            dataValidation.createPromptBox(tipTitle, tipContent);
+        }
         sheet.addValidationData(dataValidation);
     }
 
@@ -192,9 +199,13 @@ public final class ExcelUtils {
      * @param errorTitle     Error box title
      * @param errorContent   Error box value
      * @param longTextNumber Whether is long text number
+     * @param showTip        Whether show tip
+     * @param tipContent     Tip content
+     * @param tipTitle       Tip title
      */
     public static void addRepeatValid(Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
-                                      String errorTitle, String errorContent, boolean longTextNumber) {
+                                      String errorTitle, String errorContent, boolean longTextNumber, boolean showTip,
+                                      String tipTitle, String tipContent) {
 
         int startRow;
         int startCol;
@@ -208,10 +219,10 @@ public final class ExcelUtils {
         String index = ParamUtils.numberToEn(startCol);
         if (longTextNumber) {
             addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + "&\"*\")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
-                    errorBoxRank, errorTitle, errorContent);
+                    errorBoxRank, errorTitle, errorContent, showTip, tipTitle, tipContent);
         } else {
             addCustomValid("COUNTIF(" + index + ":" + index + "," + index + startRow + ")<2", sheet, firstRow, lastRow, colIndex, showErrorBox,
-                    errorBoxRank, errorTitle, errorContent);
+                    errorBoxRank, errorTitle, errorContent, showTip, tipTitle, tipContent);
         }
     }
 
@@ -227,9 +238,12 @@ public final class ExcelUtils {
      * @param errorBoxRank Error box rank
      * @param errorTitle   Error box title
      * @param errorContent Error box value
+     * @param showTip      Whether show tip
+     * @param tipContent   Tip content
+     * @param tipTitle     Tip title
      */
     public static void addCustomValid(String formula, Sheet sheet, int firstRow, int lastRow, int colIndex, boolean showErrorBox, Rank errorBoxRank,
-                                      String errorTitle, String errorContent) {
+                                      String errorTitle, String errorContent, boolean showTip, String tipTitle, String tipContent) {
         DataValidationHelper helper = sheet.getDataValidationHelper();
         DataValidationConstraint customConstraint = helper.createCustomConstraint(formula);
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, lastRow, colIndex, colIndex);
@@ -237,6 +251,9 @@ public final class ExcelUtils {
         validation.setShowErrorBox(showErrorBox);
         validation.setErrorStyle(errorBoxRank.getRank());
         validation.createErrorBox(errorTitle, errorContent);
+        if (showTip) {
+            validation.createPromptBox(tipTitle, tipContent);
+        }
         sheet.addValidationData(validation);
     }
 

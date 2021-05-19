@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.ExcelField;
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -49,25 +50,40 @@ public final class BeanUtils {
     /**
      * Get all excel fields of the parent and child classes
      *
-     * @param excelClass Excel mapped entity
-     * @param ignores    The exported field is to be ignored
-     * @param headNames  Excel header names
+     * @param excelClass      Excel mapped entity
+     * @param ignores         The exported field is to be ignored
+     * @param fieldProperties Excel field property
      * @return Excel fields
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<String[]> headNames) {
+    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<ExcelFieldProperty> fieldProperties) {
         List<Field> fieldList = getAllFields(excelClass);
         fieldList = fieldList.stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).order()))
                 .filter(e -> {
-                    String[] headNameArray = e.getAnnotation(ExcelField.class).value();
+                    ExcelField excelField = e.getAnnotation(ExcelField.class);
+                    String[] headNameArray = excelField.value();
                     for (String name : headNameArray) {
                         if (ParamUtils.contains(ignores, name)) {
                             return false;
                         }
                     }
-                    if (headNames != null) {
-                        headNames.add(headNameArray);
+                    if (fieldProperties != null) {
+                        fieldProperties.add(ExcelFieldProperty.builder()
+                                .value(excelField.value())
+                                .title(excelField.title())
+                                .width(excelField.width())
+                                .order(excelField.order())
+                                .format(excelField.format())
+                                .autoMerge(excelField.autoMerge().enable())
+                                .mergeEmpty(excelField.autoMerge().empty())
+                                .mergeCallback(excelField.autoMerge().callback())
+                                .trim(excelField.trim())
+                                .required(excelField.required())
+                                .convert(excelField.convert())
+                                .color(excelField.color())
+                                .fontColor(excelField.fontColor())
+                                .build());
                     }
                     return true;
                 })

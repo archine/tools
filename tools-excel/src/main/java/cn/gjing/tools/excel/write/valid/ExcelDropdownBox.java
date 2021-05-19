@@ -55,7 +55,7 @@ public @interface ExcelDropdownBox {
      *
      * @return title
      */
-    String errorTitle() default "错误提示";
+    String errorTitle() default "";
 
     /**
      * Error content
@@ -63,4 +63,25 @@ public @interface ExcelDropdownBox {
      * @return content
      */
     String errorContent() default "请选择下拉框内的值";
+
+    /**
+     * Whether show cell tip
+     *
+     * @return false
+     */
+    boolean showTip() default false;
+
+    /**
+     * Tip title
+     *
+     * @return ""
+     */
+    String tipTitle() default "";
+
+    /**
+     * Tip content
+     *
+     * @return ""
+     */
+    String tipContent() default "";
 }
