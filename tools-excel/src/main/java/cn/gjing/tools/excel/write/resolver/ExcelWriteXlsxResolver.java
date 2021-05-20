@@ -38,7 +38,7 @@ class ExcelWriteXlsxResolver extends ExcelWriterResolver {
     }
 
     @Override
-    public void simpleWrite(List<List<Object>> data, boolean mergeEmpty,Map<String, ExcelAutoMergeCallback<?>> callbackCache) {
-        this.excelWriteExecutor.simpleWriteBody(data, mergeEmpty, callbackCache);
+    public void simpleWrite(List<List<Object>> data) {
+        this.excelWriteExecutor.simpleWriteBody(data);
     }
 }

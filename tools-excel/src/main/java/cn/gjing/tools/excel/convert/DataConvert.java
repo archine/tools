@@ -1,27 +1,25 @@
 package cn.gjing.tools.excel.convert;
 
-import java.lang.reflect.Field;
-
 /**
+ * A data converter that converts the value of a specified field to the content of a cell read
+ *
  * @author Gjing
  **/
 public interface DataConvert<T> {
     /**
      * Convert to an entity field
      *
-     * @param value      Excel cell value
-     * @param field      Current field
+     * @param value Excel cell value
      * @return new value
      */
-    Object toEntityAttribute(Object value, Field field);
+    Object toEntityAttribute(T entity, Object value);
 
     /**
      * Convert to excel cell value
      *
-     * @param obj        Current excel entity
-     * @param value      The value of the current field
-     * @param field      Current field
+     * @param entity Current excel entity
+     * @param value  The value of the current field
      * @return new value
      */
-    Object toExcelAttribute(T obj, Object value, Field field);
+    Object toExcelAttribute(T entity, Object value);
 }

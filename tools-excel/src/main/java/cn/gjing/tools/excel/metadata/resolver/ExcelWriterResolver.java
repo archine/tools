@@ -6,7 +6,6 @@ import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
-import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
@@ -91,11 +90,9 @@ public abstract class ExcelWriterResolver {
     /**
      * Write excel body
      *
-     * @param callbackCache Merge callbacks at export time
      * @param data          Exported data
-     * @param mergeEmpty    Whether null data is allowed to initiate a merge callback
      */
-    public abstract void simpleWrite(List<List<Object>> data, boolean mergeEmpty, Map<String, ExcelAutoMergeCallback<?>> callbackCache);
+    public abstract void simpleWrite(List<List<Object>> data);
 
     /**
      * Write excel header

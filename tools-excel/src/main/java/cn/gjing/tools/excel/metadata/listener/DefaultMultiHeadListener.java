@@ -1,8 +1,8 @@
 package cn.gjing.tools.excel.metadata.listener;
 
 import cn.gjing.tools.excel.metadata.RowType;
-import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
+import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.listener.ExcelRowWriteListener;
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
@@ -45,7 +45,7 @@ public class DefaultMultiHeadListener implements ExcelRowWriteListener, ExcelWri
             int nextHeadIndex = 1;
             for (int i = 0; i < this.writerContext.getHeaderSeries(); i++) {
                 level = i;
-                for (int j = 0, len = this.writerContext.getHeadNames().size(); j < len; j++) {
+                for (int j = 0, len = this.writerContext.getFieldProperties().size(); j < len; j++) {
                     if (nextHeadIndex - j < 1) {
                         nextHeadIndex++;
                     }
@@ -55,13 +55,13 @@ public class DefaultMultiHeadListener implements ExcelRowWriteListener, ExcelWri
                         continue;
                     }
                     // Wide search
-                    while (len > nextHeadIndex && this.writerContext.getHeadNames().get(nextHeadIndex)[level].equals(this.writerContext.getHeadNames().get(nextHeadIndex - 1)[level])) {
+                    while (len > nextHeadIndex && this.writerContext.getFieldProperties().get(nextHeadIndex).getValue()[level].equals(this.writerContext.getFieldProperties().get(nextHeadIndex - 1).getValue()[level])) {
                         endCol = nextHeadIndex;
                         nextHeadIndex++;
                         j = endCol;
                     }
                     // Deep search
-                    while (this.writerContext.getHeaderSeries() - 1 > level && this.writerContext.getHeadNames().get(j)[level].equals(this.writerContext.getHeadNames().get(j)[level + 1])) {
+                    while (this.writerContext.getHeaderSeries() - 1 > level && this.writerContext.getFieldProperties().get(j).getValue()[level].equals(this.writerContext.getFieldProperties().get(j).getValue()[level + 1])) {
                         endRow++;
                         level++;
                     }

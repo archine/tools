@@ -92,13 +92,15 @@ public abstract class ExcelBaseWriter {
      */
     public void createSheet(String sheetName) {
         Sheet sheet = this.context.getWorkbook().getSheet(sheetName);
-        if (sheet == null) {
-            sheet = this.context.getWorkbook().createSheet(sheetName);
-            context.setSheet(sheet);
-            ListenerChain.doCompleteSheet(this.context.getListenerCache(), sheet);
-            if (this.context.isBind()) {
-                this.bind();
-            }
+        if (sheet != null) {
+            this.context.setSheet(sheet);
+            return;
+        }
+        sheet = this.context.getWorkbook().createSheet(sheetName);
+        this.context.setSheet(sheet);
+        ListenerChain.doCompleteSheet(this.context.getListenerCache(), sheet);
+        if (this.context.isBind()) {
+            this.bind();
         }
     }
 

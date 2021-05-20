@@ -19,10 +19,9 @@ public interface ExcelEmptyReadListener<R> extends ExcelReadListener {
      *
      * @param r          Current Java object
      * @param field      Current field
-     * @param excelField ExcelField annotation on that field
      * @param rowIndex   The index of the current row
      * @param colIndex   The index of the current col
      * @return Whether to continue reading this line, or start the next line if false
      */
-    boolean readEmpty(R r, Field field, ExcelField excelField, int rowIndex, int colIndex);
+    boolean readEmpty(R r, Field field, int rowIndex, int colIndex);
 }

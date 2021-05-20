@@ -59,9 +59,11 @@ public class ExcelReaderContext<R> extends AbstractExcelContext {
     private ExcelResultReadListener<R> resultReadListener;
 
     public ExcelReaderContext() {
+        super();
     }
 
     public ExcelReaderContext(Class<R> excelClass, Map<String, Field> excelFieldMap, String[] ignores) {
+        super();
         this.excelClass = excelClass;
         this.excelFieldMap = excelFieldMap;
         this.headNames = new ArrayList<>();
@@ -73,6 +75,7 @@ public class ExcelReaderContext<R> extends AbstractExcelContext {
     public ExcelReaderContext(List<String> headNames, Class<R> excelClass, Map<String, Field> excelFieldMap, boolean checkTemplate,
                               boolean headBefore, String uniqueKey, String[] ignores,
                               ExcelResultReadListener<R> resultReadListener) {
+        super();
         this.headNames = headNames;
         this.excelClass = excelClass;
         this.excelFieldMap = excelFieldMap;

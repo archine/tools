@@ -51,7 +51,7 @@ public @interface ExcelRepeatValid {
      *
      * @return title
      */
-    String errorTitle() default "错误提示";
+    String errorTitle() default "";
 
     /**
      * Error content
@@ -59,4 +59,25 @@ public @interface ExcelRepeatValid {
      * @return content
      */
     String errorContent() default "输入的内容出现重复";
+
+    /**
+     * Whether show cell tip
+     *
+     * @return false
+     */
+    boolean showTip() default false;
+
+    /**
+     * Tip title
+     *
+     * @return ""
+     */
+    String tipTitle() default "";
+
+    /**
+     * Tip content
+     *
+     * @return ""
+     */
+    String tipContent() default "";
 }
