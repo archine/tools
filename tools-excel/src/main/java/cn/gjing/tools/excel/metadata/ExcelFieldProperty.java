@@ -2,7 +2,6 @@ package cn.gjing.tools.excel.metadata;
 
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
-import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
 import cn.gjing.tools.excel.write.callback.DefaultExcelAutoMergeCallback;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 import lombok.*;
@@ -86,20 +85,6 @@ public class ExcelFieldProperty {
      */
     @Builder.Default
     private Class<? extends ExcelAutoMergeCallback<?>> mergeCallback = DefaultExcelAutoMergeCallback.class;
-
-    /**
-     * Is the cell content required when importing? Once set to true,
-     * the current row is automatically skipped when a null value is encountered.
-     * Of course, you can customize the processing logic by {@link ExcelEmptyReadListener} to it
-     */
-    @Builder.Default
-    private boolean required = false;
-
-    /**
-     * Remove white space on both sides of the string when importing
-     */
-    @Builder.Default
-    private boolean trim = false;
 
     /**
      * Data convert, which you can use to change data during import and export,

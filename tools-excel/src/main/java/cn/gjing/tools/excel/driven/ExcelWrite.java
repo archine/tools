@@ -81,11 +81,10 @@ public @interface ExcelWrite {
     boolean initDefaultStyle() default true;
 
     /**
-     * Bind the exported Excel file to the currently set mapped entity,
-     * and if it is not set and detection is enabled in {@link ExcelBindReader#check(boolean)},
-     * an ExcelTemplateException will be thrown
+     * Bind the exported Excel file to the currently set unique key,
+     * Can be used to {@link ExcelBindReader#check} for a match with an entity class when a file is imported.
      *
-     * @return bind
+     * @return boolean
      */
     boolean bind() default true;
 }

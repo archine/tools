@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.driven;
 
 import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
+import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.valid.ExcelDropdownBox;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class ExcelWriteWrapper {
     private String[] ignores;
     private String fileName;
     private final List<Object> dataList;
+    private String unqKey;
 
     private ExcelWriteWrapper() {
         this.dataList = new ArrayList<>();
@@ -114,7 +116,7 @@ public class ExcelWriteWrapper {
      * @return this
      */
     public ExcelWriteWrapper data(List<?> data) {
-        this.dataList.add(data == null ? new ArrayList<>() : data);
+        this.dataList.add(data);
         return this;
     }
 
@@ -148,6 +150,18 @@ public class ExcelWriteWrapper {
      */
     public ExcelWriteWrapper fileName(String fileName) {
         this.fileName = fileName;
+        return this;
+    }
+
+    /**
+     * Bind the exported Excel file to the currently set unique key,
+     * Can be used to {@link ExcelBindReader#check} for a match with an entity class when a file is imported.
+     *
+     * @param key Unique key ,Each exported file recommends that the key be set to be unique
+     * @return this
+     */
+    public ExcelWriteWrapper key(String key) {
+        this.unqKey = key;
         return this;
     }
 }

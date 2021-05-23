@@ -54,7 +54,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
     @Override
     public void read(int headerIndex, String sheetName) {
         if (this.context.isCheckTemplate()) {
-            String key = "unq-" + sheetName;
+            String key = "excelUnqSheet";
             if (this.context.getWorkbook().getSheetIndex(key) == -1) {
                 throw new ExcelTemplateException();
             }
@@ -64,6 +64,7 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
                 }
                 break;
             }
+            this.context.setCheckTemplate(false);
         }
         if (this.context.getWorkbook() instanceof StreamingWorkbook) {
             try {
@@ -215,6 +216,9 @@ class ExcelReadExecutor<R> implements ExcelReaderResolver<R> {
             case FORMULA:
                 return rowType == RowType.BODY ? gson.fromJson(gson.toJson(cell.getStringCellValue()), field.getType()) : cell.getStringCellValue();
             default:
+                if (excelField == null) {
+                    return cell.getStringCellValue();
+                }
                 return excelField.trim() ? cell.getStringCellValue().trim() : cell.getStringCellValue();
         }
         return null;

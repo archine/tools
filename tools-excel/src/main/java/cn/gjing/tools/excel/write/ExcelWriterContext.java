@@ -124,7 +124,7 @@ public final class ExcelWriterContext extends AbstractExcelContext {
 
     public void setNeedValid(boolean needValid) {
         this.needValid = needValid;
-        if (needValid) {
+        if (needValid && this.validAnnotationHandlers == null) {
             this.validAnnotationHandlers = new ArrayList<>();
             this.validAnnotationHandlers.add(new CustomValidHandler());
             this.validAnnotationHandlers.add(new DateValidHandler());

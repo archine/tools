@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
+import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
@@ -28,7 +29,7 @@ import java.util.Map;
 public final class ExcelBindWriter extends ExcelBaseWriter {
 
     public ExcelBindWriter(ExcelWriterContext context, Excel excel, HttpServletResponse response, boolean initDefaultStyle) {
-        super(context, excel.windowSize(), response, initDefaultStyle);
+        super(context, excel.windowSize(), response, initDefaultStyle, ExecType.BIND);
     }
 
     @Override
@@ -196,7 +197,6 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
         this.context.setBodyHeight(excel.bodyHeight());
         this.context.setHeaderHeight(excel.headerHeight());
         this.context.setHeaderSeries(properties.get(0).getValue().length);
-        this.context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         return this;
     }
 
@@ -235,15 +235,49 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Bind the exported Excel file to the currently set mapped entity,
-     * and if it is not set and detection is enabled in {@link ExcelBindReader#check(boolean)},
-     * an ExcelTemplateException will be thrown
+     * Bind the exported Excel file to the currently set unique key,
      *
      * @param enable Whether enable bind, default true
      * @return this
+     * @deprecated Please use {@link #bind(String)}
      */
+    @Deprecated
     public ExcelBindWriter bind(boolean enable) {
         this.context.setBind(enable);
+        return this;
+    }
+
+    /**
+     * Bind the exported Excel file to the currently set unique key,
+     * Can be used to {@link ExcelBindReader#check} for a match with an entity class when a file is imported.
+     *
+     * @param key Unique key ,Each exported file recommends that the key be set to be unique
+     * @return this
+     */
+    public ExcelBindWriter bind(String key) {
+        this.context.setBind(true);
+        this.context.setUniqueKey(key);
+        return this;
+    }
+
+    /**
+     * Unbind the unique key of the file
+     *
+     * @return this
+     */
+    public ExcelBindWriter unbind() {
+        this.context.setBind(false);
+        return this;
+    }
+
+    /**
+     * Whether to set the exported file as a template file when the data is null
+     *
+     * @param isTemp True means to set the exported file to a template file
+     * @return this
+     */
+    public ExcelBindWriter temp(boolean isTemp) {
+        super.nullIsTemp = isTemp;
         return this;
     }
 

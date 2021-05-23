@@ -78,8 +78,6 @@ public final class BeanUtils {
                                 .autoMerge(excelField.autoMerge().enable())
                                 .mergeEmpty(excelField.autoMerge().empty())
                                 .mergeCallback(excelField.autoMerge().callback())
-                                .trim(excelField.trim())
-                                .required(excelField.required())
                                 .convert(excelField.convert())
                                 .color(excelField.color())
                                 .fontColor(excelField.fontColor())

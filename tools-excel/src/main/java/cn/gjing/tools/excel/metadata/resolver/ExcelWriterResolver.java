@@ -2,10 +2,13 @@ package cn.gjing.tools.excel.metadata.resolver;
 
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelType;
+import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
+import cn.gjing.tools.excel.write.resolver.core.ExcelBindWriterExecutor;
+import cn.gjing.tools.excel.write.resolver.core.ExcelSimpleWriterExecutor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
@@ -30,10 +33,16 @@ import java.util.Objects;
  * @author Gjing
  **/
 public abstract class ExcelWriterResolver {
-    public final ExcelWriterContext context;
+    protected final ExcelWriterContext context;
+    protected final ExcelBaseWriteExecutor writeExecutor;
 
-    public ExcelWriterResolver(ExcelWriterContext context) {
+    public ExcelWriterResolver(ExcelWriterContext context, ExecType execType) {
         this.context = context;
+        if (execType == ExecType.BIND) {
+            this.writeExecutor = new ExcelBindWriterExecutor(context);
+        } else {
+            this.writeExecutor = new ExcelSimpleWriterExecutor(context);
+        }
     }
 
     /**
@@ -88,13 +97,6 @@ public abstract class ExcelWriterResolver {
     public abstract void write(List<?> data);
 
     /**
-     * Write excel body
-     *
-     * @param data          Exported data
-     */
-    public abstract void simpleWrite(List<List<Object>> data);
-
-    /**
      * Write excel header
      *
      * @param needHead  Is needHead excel entity or sheet?
@@ -102,14 +104,6 @@ public abstract class ExcelWriterResolver {
      * @return this
      */
     public abstract ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> boxValues);
-
-    /**
-     * Write excel header
-     *
-     * @param needHead Is needHead excel entity or sheet?
-     * @return this
-     */
-    public abstract ExcelWriterResolver simpleWriteHead(boolean needHead);
 
     /**
      * Output the contents of the cache

@@ -1,8 +1,8 @@
 package cn.gjing.tools.excel.write.resolver;
 
+import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
-import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -13,32 +13,19 @@ import java.util.Map;
  * @author Gjing
  **/
 class ExcelWriteXlsxResolver extends ExcelWriterResolver {
-    private final ExcelWriteExecutor excelWriteExecutor;
 
-    public ExcelWriteXlsxResolver(ExcelWriterContext context) {
-        super(context);
-        this.excelWriteExecutor = new ExcelWriteExecutor(context);
+    public ExcelWriteXlsxResolver(ExcelWriterContext context, ExecType execType) {
+        super(context, execType);
     }
 
     @Override
     public ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> boxValues) {
-        this.excelWriteExecutor.writeHead(needHead, boxValues);
-        return this;
-    }
-
-    @Override
-    public ExcelWriterResolver simpleWriteHead(boolean needHead) {
-        this.excelWriteExecutor.simpleWriteHead(needHead);
+        super.writeExecutor.writeHead(needHead, boxValues);
         return this;
     }
 
     @Override
     public void write(List<?> data) {
-        this.excelWriteExecutor.writeBody(data);
-    }
-
-    @Override
-    public void simpleWrite(List<List<Object>> data) {
-        this.excelWriteExecutor.simpleWriteBody(data);
+        super.writeExecutor.writeBody(data);
     }
 }

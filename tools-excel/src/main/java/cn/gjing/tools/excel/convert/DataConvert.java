@@ -9,7 +9,8 @@ public interface DataConvert<T> {
     /**
      * Convert to an entity field
      *
-     * @param value Excel cell value
+     * @param value  Excel cell value
+     * @param entity Current generated excel entity
      * @return new value
      */
     Object toEntityAttribute(T entity, Object value);

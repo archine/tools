@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.read.resolver;
 
 import cn.gjing.tools.excel.Excel;
+import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.aware.ExcelReaderContextAware;
 import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
@@ -92,13 +93,40 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
     }
 
     /**
-     * Detect whether the imported Excel file matches the mapped entity
+     * Detect whether the imported Excel file matches the mapped entity.
+     * Thrown ExcelTemplateException if there is don't match.
      *
      * @param enable Whether enable check
      * @return this
+     * @deprecated Please use {@link #check()}
      */
+    @Deprecated
     public ExcelBindReader<R> check(boolean enable) {
         this.context.setCheckTemplate(enable);
+        return this;
+    }
+
+    /**
+     * Check whether the imported Excel file matches the Excel mapping entity class.
+     * Thrown {@link ExcelTemplateException} if there is don't match.
+     *
+     * @return this
+     **/
+    public ExcelBindReader<R> check() {
+        this.context.setCheckTemplate(true);
+        return this;
+    }
+
+    /**
+     * Check whether the imported Excel file matches the Excel mapping entity class.
+     * Thrown {@link ExcelTemplateException} if there is don't match.
+     *
+     * @param key Unique key
+     * @return this
+     **/
+    public ExcelBindReader<R> check(String key) {
+        this.context.setCheckTemplate(true);
+        this.context.setUniqueKey(key);
         return this;
     }
 

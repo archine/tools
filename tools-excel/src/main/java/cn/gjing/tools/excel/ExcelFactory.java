@@ -103,7 +103,6 @@ public final class ExcelFactory {
         context.setHeaderHeight(excel.headerHeight());
         context.setHeaderSeries(properties.get(0).getValue().length);
         context.setBodyHeight(excel.bodyHeight());
-        context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         return new ExcelBindWriter(context, excel, response, initDefaultStyle);
     }
 
@@ -162,7 +161,7 @@ public final class ExcelFactory {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setFileName(StringUtils.isEmpty(fileName) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : fileName);
         context.setExcelType(excelType);
-        context.setExcelClass(Void.class);
+        context.setExcelClass(Object.class);
         context.setBind(false);
         return new ExcelSimpleWriter(context, windowSize, response, initDefaultStyle);
     }

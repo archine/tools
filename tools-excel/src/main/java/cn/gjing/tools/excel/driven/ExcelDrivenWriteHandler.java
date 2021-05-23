@@ -39,7 +39,7 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
             ExcelBindWriter writer = ExcelFactory.createWriter(wrapper.getFileName() == null ? writerAnno.value() : wrapper.getFileName(), writerAnno.mapping(), response,
                     writerAnno.initDefaultStyle(), wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores())
                     .valid(writerAnno.needValid())
-                    .bind(writerAnno.bind())
+                    .bind(wrapper.getUnqKey())
                     .multiHead(writerAnno.multiHead())
                     .addListener(wrapper.getWriteListeners());
             if (wrapper.getDataList().isEmpty()) {
@@ -48,16 +48,19 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
             }
             boolean needHead = writerAnno.needHead();
             for (Object e : wrapper.getDataList()) {
+                if (e == null) {
+                    writer.write(null, writerAnno.sheet(), needHead, wrapper.getBoxValues());
+                }
                 if (e instanceof BigTitle) {
                     writer.writeTitle((BigTitle) e);
                     continue;
                 }
-                if (e instanceof Collection) {
+                if (e instanceof List) {
                     writer.write((List<?>) e, writerAnno.sheet(), needHead, wrapper.getBoxValues());
                     needHead = false;
                     continue;
                 }
-                throw new ExcelResolverException("Invalid wrapper data type, currently supported BigTitle and Collection");
+                throw new ExcelResolverException("Invalid wrapper data type, currently supported BigTitle and List");
             }
             writer.flush();
             return;

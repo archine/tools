@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
+import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
@@ -21,7 +22,7 @@ import java.util.List;
 public final class ExcelSimpleWriter extends ExcelBaseWriter {
 
     public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response, boolean initDefaultStyle) {
-        super(context, windowSize, response, initDefaultStyle);
+        super(context, windowSize, response, initDefaultStyle, ExecType.SIMPLE);
     }
 
     @Override
@@ -159,10 +160,10 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
         this.createSheet(sheetName);
         if (data == null) {
             this.context.setTemplate(true);
-            this.writerResolver.simpleWriteHead(needHead);
+            this.writerResolver.writeHead(needHead, null);
         } else {
-            this.writerResolver.simpleWriteHead(needHead)
-                    .simpleWrite(data);
+            this.writerResolver.writeHead(needHead, null)
+                    .write(data);
         }
         return this;
     }
@@ -188,6 +189,18 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter multiHead() {
         return this.multiHead(true);
+    }
+
+
+    /**
+     * Whether to set the exported file as a template file when the data is null
+     *
+     * @param isTemp True means to set the exported file to a template file
+     * @return this
+     */
+    public ExcelSimpleWriter temp(boolean isTemp) {
+        super.nullIsTemp = isTemp;
+        return this;
     }
 
     /**
@@ -217,6 +230,29 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
         if (listeners != null) {
             listeners.forEach(this::addListener);
         }
+        return this;
+    }
+
+    /**
+     * Bind the exported Excel file to the currently set unique key,
+     * Can be used to {@link cn.gjing.tools.excel.read.resolver.ExcelBindReader#check} for a match with an entity class when a file is imported.
+     *
+     * @param key Unique key ,Each exported file recommends that the key be set to be unique
+     * @return this
+     */
+    public ExcelSimpleWriter bind(String key) {
+        this.context.setBind(true);
+        this.context.setUniqueKey(key);
+        return this;
+    }
+
+    /**
+     * Unbind the unique key of the file
+     *
+     * @return this
+     */
+    public ExcelSimpleWriter unbind() {
+        this.context.setBind(false);
         return this;
     }
 }

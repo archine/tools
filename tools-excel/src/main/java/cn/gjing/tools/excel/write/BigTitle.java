@@ -58,7 +58,7 @@ public final class BigTitle {
      * Fill color
      */
     @Builder.Default
-    private ExcelColor color = ExcelColor.TAN;
+    private ExcelColor color = ExcelColor.WHITE;
 
     /**
      * Row height

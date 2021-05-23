@@ -2,7 +2,6 @@ package cn.gjing.tools.excel;
 
 
 import cn.gjing.tools.excel.metadata.ExcelType;
-import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 
 import java.lang.annotation.*;
 
@@ -71,10 +70,8 @@ public @interface Excel {
     short bodyHeight() default 370;
 
     /**
-     * The unique key of the mapped entity is used to detect whether the imported Excel file matches the mapped entity.
-     * The default key is the mapping entity class name.
+     * Unique key,Each exported file recommends that the key be set to be unique
      *
-     * @see ExcelBindReader#check(boolean)
      * @return key
      */
     String uniqueKey() default "";
