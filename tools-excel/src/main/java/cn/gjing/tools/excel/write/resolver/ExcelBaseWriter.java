@@ -2,7 +2,6 @@ package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.resolver.ExcelWriterResolver;
-import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
@@ -107,11 +106,6 @@ public abstract class ExcelBaseWriter {
         ListenerChain.doCompleteSheet(this.context.getListenerCache(), sheet);
     }
 
-    /**
-     * Bind the exported Excel file to the currently set mapped entity,
-     * and if it is not set and detection is enabled in {@link ExcelBindReader#check(boolean)},
-     * an ExcelTemplateException will be thrown
-     **/
     private void processBind() {
         if (!this.context.isBind()) {
             return;
@@ -120,7 +114,7 @@ public abstract class ExcelBaseWriter {
         Sheet sheet = this.context.getWorkbook().createSheet(unqSheetName);
         sheet.protectSheet(UUID.randomUUID().toString().replaceAll("-", ""));
         Row row = sheet.createRow(0);
-        row.createCell(0).setCellValue(ParamUtils.encodeMd5(this.context.getUniqueKey() == null ? this.context.getExcelClass().getName() : this.context.getUniqueKey()));
+        row.createCell(0).setCellValue(ParamUtils.encodeMd5(this.context.getUniqueKey()));
         this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex(sheet), true);
     }
 }

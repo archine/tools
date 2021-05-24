@@ -26,6 +26,7 @@ public class ExcelReadWrapper<R> {
     private ExcelResultReadListener<R> resultReadListener;
     private InputStream inputStream;
     private String[] ignores;
+    private String unqKey;
 
     private ExcelReadWrapper(Class<R> mapping) {
         this.mapping = mapping;
@@ -137,6 +138,18 @@ public class ExcelReadWrapper<R> {
      */
     public ExcelReadWrapper<R> ignores(String... ignores) {
         this.ignores = ignores;
+        return this;
+    }
+
+    /**
+     * Check whether the imported Excel file matches the Excel mapping entity class.
+     * Thrown {@link ExcelTemplateException} if there is don't match.
+     *
+     * @param key Unique key
+     * @return this
+     **/
+    public ExcelReadWrapper<R> check(String key) {
+        this.unqKey = key;
         return this;
     }
 }

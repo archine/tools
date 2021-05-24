@@ -7,6 +7,7 @@ import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -126,7 +127,9 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      **/
     public ExcelBindReader<R> check(String key) {
         this.context.setCheckTemplate(true);
-        this.context.setUniqueKey(key);
+        if (!StringUtils.isEmpty(key)) {
+            this.context.setUniqueKey(key);
+        }
         return this;
     }
 

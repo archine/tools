@@ -87,4 +87,11 @@ public @interface ExcelWrite {
      * @return boolean
      */
     boolean bind() default true;
+
+    /**
+     * Whether to set the exported file as a template file when the data is null
+     *
+     * @return boolean
+     */
+    boolean nullIsTemp() default true;
 }

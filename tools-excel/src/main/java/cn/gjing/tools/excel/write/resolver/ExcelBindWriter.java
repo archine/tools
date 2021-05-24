@@ -13,6 +13,7 @@ import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -255,8 +256,10 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelBindWriter bind(String key) {
-        this.context.setBind(true);
-        this.context.setUniqueKey(key);
+        if (!StringUtils.isEmpty(key)) {
+            this.context.setBind(true);
+            this.context.setUniqueKey(key);
+        }
         return this;
     }
 

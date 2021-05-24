@@ -103,6 +103,7 @@ public final class ExcelFactory {
         context.setHeaderHeight(excel.headerHeight());
         context.setHeaderSeries(properties.get(0).getValue().length);
         context.setBodyHeight(excel.bodyHeight());
+        context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
         return new ExcelBindWriter(context, excel, response, initDefaultStyle);
     }
 

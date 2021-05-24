@@ -11,7 +11,6 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,12 +35,8 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
         modelAndViewContainer.setRequestHandled(true);
         if (o instanceof ExcelWriteWrapper) {
             ExcelWriteWrapper wrapper = (ExcelWriteWrapper) o;
-            ExcelBindWriter writer = ExcelFactory.createWriter(wrapper.getFileName() == null ? writerAnno.value() : wrapper.getFileName(), writerAnno.mapping(), response,
-                    writerAnno.initDefaultStyle(), wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores())
-                    .valid(writerAnno.needValid())
-                    .bind(wrapper.getUnqKey())
-                    .multiHead(writerAnno.multiHead())
-                    .addListener(wrapper.getWriteListeners());
+            ExcelBindWriter writer = this.createWriter(wrapper.getFileName() == null ? writerAnno.value() : wrapper.getFileName(), writerAnno.mapping(),
+                    response, writerAnno.initDefaultStyle(), wrapper.getIgnores() == null ? writerAnno.ignores() : wrapper.getIgnores(), writerAnno, wrapper);
             if (wrapper.getDataList().isEmpty()) {
                 writer.write(null).flush();
                 return;
@@ -50,6 +45,7 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
             for (Object e : wrapper.getDataList()) {
                 if (e == null) {
                     writer.write(null, writerAnno.sheet(), needHead, wrapper.getBoxValues());
+                    continue;
                 }
                 if (e instanceof BigTitle) {
                     writer.writeTitle((BigTitle) e);
@@ -66,33 +62,41 @@ class ExcelDrivenWriteHandler implements HandlerMethodReturnValueHandler {
             return;
         }
         if (o == null) {
-            ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
-                    .valid(writerAnno.needValid())
-                    .bind(writerAnno.bind())
-                    .multiHead(writerAnno.multiHead())
+            this.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores(), writerAnno, null)
                     .write(null, writerAnno.sheet(), writerAnno.needHead())
                     .flush();
             return;
         }
-        if (o instanceof Collection) {
-            ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
-                    .valid(writerAnno.needValid())
-                    .bind(writerAnno.bind())
-                    .multiHead(writerAnno.multiHead())
+        if (o instanceof List) {
+            this.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores(), writerAnno, null)
                     .write((List<?>) o, writerAnno.sheet(), writerAnno.needHead())
                     .flush();
             return;
         }
         if (o instanceof BigTitle) {
-            ExcelFactory.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores())
-                    .valid(writerAnno.needValid())
-                    .bind(writerAnno.bind())
-                    .multiHead(writerAnno.multiHead())
+            this.createWriter(writerAnno.value(), writerAnno.mapping(), response, writerAnno.initDefaultStyle(), writerAnno.ignores(), writerAnno, null)
                     .writeTitle((BigTitle) o)
                     .write(null, writerAnno.sheet(), writerAnno.needHead())
                     .flush();
             return;
         }
         throw new ExcelResolverException("Method return value type is not supported, currently supported BigTitle and Collection and ExcelWriteWrapper: " + methodParameter.getExecutable().getName());
+    }
+
+    private ExcelBindWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String[] ignores,
+                                         ExcelWrite excelWrite, ExcelWriteWrapper wrapper) {
+        ExcelBindWriter bindWriter = ExcelFactory.createWriter(fileName, excelClass, response, initDefaultStyle, ignores)
+                .valid(excelWrite.needValid())
+                .multiHead(excelWrite.multiHead())
+                .temp(excelWrite.nullIsTemp());
+        if (wrapper != null) {
+            bindWriter.addListener(wrapper.getWriteListeners());
+            if (excelWrite.bind()) {
+                bindWriter.bind(wrapper.getUnqKey());
+            } else {
+                bindWriter.unbind();
+            }
+        }
+        return bindWriter;
     }
 }

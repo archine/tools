@@ -7,8 +7,10 @@ import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
 import cn.gjing.tools.excel.metadata.listener.DefaultMultiHeadListener;
 import cn.gjing.tools.excel.metadata.listener.ExcelWriteListener;
+import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -235,14 +237,16 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
 
     /**
      * Bind the exported Excel file to the currently set unique key,
-     * Can be used to {@link cn.gjing.tools.excel.read.resolver.ExcelBindReader#check} for a match with an entity class when a file is imported.
+     * Can be used to {@link ExcelBindReader#check} for a match with an entity class when a file is imported.
      *
      * @param key Unique key ,Each exported file recommends that the key be set to be unique
      * @return this
      */
     public ExcelSimpleWriter bind(String key) {
-        this.context.setBind(true);
-        this.context.setUniqueKey(key);
+        if (!StringUtils.isEmpty(key)) {
+            this.context.setBind(true);
+            this.context.setUniqueKey(key);
+        }
         return this;
     }
 
