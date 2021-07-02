@@ -135,7 +135,7 @@ tools:
       service-list:
         # 下拉选择时展示的名称
         - desc: 项目A
-          # Zuul route中配置的serviceId
+          # route中配置的path参数非**的部分
           target: demo
           # 如果目标服务配置了servlet.context-path，那么也需要在此进行配置
           contextPath: xxx
@@ -179,7 +179,7 @@ tools:
       service-list:
         # 下拉选择时展示的名称
         - desc: 项目A
-          # Zuul route中配置的serviceId
+          # route中配置的path参数非**的部分
           target: demo
 ```
 **``使用GateWay作为网关时，需要在每个子服务中eureka中增加如下配置，否则路由失败``**
