@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.driven;
 
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
+import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
 import cn.gjing.tools.excel.util.ParamUtils;
@@ -27,6 +28,7 @@ public class ExcelReadWrapper<R> {
     private InputStream inputStream;
     private String[] ignores;
     private String unqKey;
+    private ExcelType excelType;
 
     private ExcelReadWrapper(Class<R> mapping) {
         this.mapping = mapping;
@@ -51,10 +53,12 @@ public class ExcelReadWrapper<R> {
      */
     public ExcelReadWrapper<R> data(MultipartFile file) {
         try {
-            if (!ParamUtils.isExcel(file.getOriginalFilename())) {
+            ExcelType excelType = ParamUtils.getExcelType(file.getOriginalFilename());
+            if (excelType == null) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
             }
             this.inputStream = file.getInputStream();
+            this.excelType = excelType;
         } catch (IOException e) {
             throw new ExcelInitException("Initialize read wrapper error," + e.getMessage());
         }
@@ -69,10 +73,12 @@ public class ExcelReadWrapper<R> {
      */
     public ExcelReadWrapper<R> data(File file) {
         try {
-            if (!ParamUtils.isExcel(file.getName())) {
+            ExcelType excelType = ParamUtils.getExcelType(file.getName());
+            if (excelType == null) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
             }
             this.inputStream = new FileInputStream(file);
+            this.excelType = excelType;
         } catch (FileNotFoundException e) {
             throw new ExcelInitException("Initialize read wrapper error," + e.getMessage());
         }
@@ -87,6 +93,20 @@ public class ExcelReadWrapper<R> {
      */
     public ExcelReadWrapper<R> data(InputStream inputStream) {
         this.inputStream = inputStream;
+        this.excelType = ExcelType.XLS;
+        return this;
+    }
+
+    /**
+     * Set data
+     *
+     * @param inputStream Excel file inputStream
+     * @param excelType   Excel file type
+     * @return this
+     */
+    public ExcelReadWrapper<R> data(InputStream inputStream, ExcelType excelType) {
+        this.inputStream = inputStream;
+        this.excelType = excelType;
         return this;
     }
 

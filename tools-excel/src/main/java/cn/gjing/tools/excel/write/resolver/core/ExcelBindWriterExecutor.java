@@ -4,7 +4,6 @@ import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.RowType;
-import cn.gjing.tools.excel.metadata.resolver.ExcelBaseWriteExecutor;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
@@ -25,7 +24,7 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-public final class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
+class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
     public ExcelBindWriterExecutor(ExcelWriterContext context) {
         super(context);
     }

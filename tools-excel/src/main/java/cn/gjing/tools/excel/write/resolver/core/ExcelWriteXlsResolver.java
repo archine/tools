@@ -1,7 +1,6 @@
-package cn.gjing.tools.excel.write.resolver;
+package cn.gjing.tools.excel.write.resolver.core;
 
 import cn.gjing.tools.excel.metadata.ExecType;
-import cn.gjing.tools.excel.metadata.resolver.ExcelWriterResolver;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-class ExcelWriteXlsResolver extends ExcelWriterResolver {
+public class ExcelWriteXlsResolver extends ExcelWriterResolver {
 
     public ExcelWriteXlsResolver(ExcelWriterContext context, ExecType execType) {
         super(context, execType);

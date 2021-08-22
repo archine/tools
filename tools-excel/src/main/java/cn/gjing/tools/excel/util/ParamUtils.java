@@ -1,7 +1,7 @@
 package cn.gjing.tools.excel.util;
 
 import cn.gjing.tools.excel.exception.ExcelResolverException;
-import cn.gjing.tools.excel.exception.ExcelTemplateException;
+import cn.gjing.tools.excel.metadata.ExcelType;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -186,36 +186,21 @@ public final class ParamUtils {
     /**
      * Check the file type is excel
      *
-     * @param fileName file name
-     * @param version  File type, xls or xlsx
-     */
-    @Deprecated
-    public static void isExcel(String fileName, String version) {
-        if (fileName == null) {
-            return;
-        }
-        int pos = fileName.lastIndexOf(".") + 1;
-        String extension = fileName.substring(pos);
-        if (!"xls".equals(extension) && !"xlsx".equals(extension)) {
-            throw new ExcelTemplateException("File type error, file suffix name need to be xls or xlsx");
-        }
-        if (!version.equals(extension)) {
-            throw new ExcelTemplateException();
-        }
-    }
-
-    /**
-     * Check the file type is excel
-     *
      * @param fileName Excel file name
-     * @return true is excel file
+     * @return Return NULL to indicate that it is not an Excel file
      */
-    public static boolean isExcel(String fileName) {
+    public static ExcelType getExcelType(String fileName) {
         if (fileName == null) {
-            return false;
+            return null;
         }
         int pos = fileName.lastIndexOf(".") + 1;
         String extension = fileName.substring(pos);
-        return "xls".equals(extension) || "xlsx".equals(extension);
+        if ("xls".equals(extension)) {
+            return ExcelType.XLS;
+        }
+        if ("xlsx".equals(extension)) {
+            return ExcelType.XLSX;
+        }
+        return null;
     }
 }

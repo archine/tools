@@ -29,7 +29,7 @@ class ExcelDrivenReadHandler implements HandlerMethodReturnValueHandler {
             ExcelRead readAnno = methodParameter.getMethodAnnotation(ExcelRead.class);
             assert readAnno != null;
             ExcelReadWrapper wrapper = (ExcelReadWrapper) o;
-            ExcelBindReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(), wrapper.getIgnores() == null ? readAnno.ignores() : wrapper.getIgnores());
+            ExcelBindReader<?> reader = ExcelFactory.createReader(wrapper.getInputStream(), wrapper.getMapping(),wrapper.getExcelType(), wrapper.getIgnores() == null ? readAnno.ignores() : wrapper.getIgnores());
             if (readAnno.check()) {
                 reader.check(wrapper.getUnqKey());
             }

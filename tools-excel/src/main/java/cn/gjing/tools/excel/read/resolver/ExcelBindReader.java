@@ -1,12 +1,12 @@
 package cn.gjing.tools.excel.read.resolver;
 
-import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
-import cn.gjing.tools.excel.metadata.aware.ExcelReaderContextAware;
-import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
+import cn.gjing.tools.excel.metadata.ExcelType;
+import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.listener.ExcelResultReadListener;
+import cn.gjing.tools.excel.read.resolver.core.ExcelBaseReader;
 import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
@@ -19,28 +19,30 @@ import java.util.List;
  * @author Gjing
  **/
 public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
-    public ExcelBindReader(ExcelReaderContext<R> context, InputStream inputStream, Excel excel) {
-        super(context, inputStream, excel);
+    public ExcelBindReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
+        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecType.BIND);
     }
 
     /**
      * Read excel
+     * By default, the index of the first row of Sheet is used as the index of the table head
      *
      * @return this
      */
     public ExcelBindReader<R> read() {
-        this.readerResolver.read(0, this.defaultSheetName);
+        super.baseReadExecutor.read(0, this.defaultSheetName);
         return this;
     }
 
     /**
      * Read the specified sheet
+     * By default, the index of the first row of Sheet is used as the index of the table head
      *
      * @param sheetName sheet name
      * @return this
      */
     public ExcelBindReader<R> read(String sheetName) {
-        this.readerResolver.read(0, sheetName);
+        super.baseReadExecutor.read(0, sheetName);
         return this;
     }
 
@@ -48,25 +50,25 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * Specifies that the Excel subscript to start reading.
      * This line must be a real subscript,
      *
-     * @param headerIndex The actual subscript of the Excel header,
-     *                    subscript is evaluated from 0
+     * @param headerIndex The subscript of the table header. If there are multiple levels of table headers,
+     *                    set the subscript of the bottom level of the table header. The index starts at 0
      * @return this
      */
     public ExcelBindReader<R> read(int headerIndex) {
-        this.readerResolver.read(headerIndex, this.defaultSheetName);
+        super.baseReadExecutor.read(headerIndex, this.defaultSheetName);
         return this;
     }
 
     /**
      * Read the specified sheet
      *
-     * @param headerIndex The actual subscript of the Excel header,
-     *                    subscript is evaluated from 0
+     * @param headerIndex The subscript of the table header. If there are multiple levels of table headers,
+     *                    set the subscript of the bottom level of the table header. The index starts at 0
      * @param sheetName   Excel Sheet name
      * @return this
      */
     public ExcelBindReader<R> read(int headerIndex, String sheetName) {
-        this.readerResolver.read(headerIndex, sheetName);
+        super.baseReadExecutor.read(headerIndex, sheetName);
         return this;
     }
 
@@ -89,7 +91,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @return this
      */
     public ExcelBindReader<R> headBefore(boolean need) {
-        this.context.setHeadBefore(need);
+        super.context.setHeadBefore(need);
         return this;
     }
 
@@ -103,7 +105,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      */
     @Deprecated
     public ExcelBindReader<R> check(boolean enable) {
-        this.context.setCheckTemplate(enable);
+        super.context.setCheckTemplate(enable);
         return this;
     }
 
@@ -114,7 +116,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @return this
      **/
     public ExcelBindReader<R> check() {
-        this.context.setCheckTemplate(true);
+        super.context.setCheckTemplate(true);
         return this;
     }
 
@@ -126,7 +128,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @return this
      **/
     public ExcelBindReader<R> check(String key) {
-        this.context.setCheckTemplate(true);
+        super.context.setCheckTemplate(true);
         if (!StringUtils.isEmpty(key)) {
             this.context.setUniqueKey(key);
         }
@@ -140,9 +142,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @return this
      */
     public ExcelBindReader<R> addListener(List<? extends ExcelReadListener> readListenerList) {
-        if (readListenerList != null) {
-            readListenerList.forEach(this::addListener);
-        }
+        super.addListenerToCache(readListenerList);
         return this;
     }
 
@@ -152,15 +152,8 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @param readListener Read listener
      * @return this
      */
-    @SuppressWarnings("unchecked")
     public ExcelBindReader<R> addListener(ExcelReadListener readListener) {
-        this.context.addListener(readListener);
-        if (readListener instanceof ExcelReaderContextAware) {
-            ((ExcelReaderContextAware<R>) readListener).setContext(this.context);
-        }
-        if (readListener instanceof ExcelWorkbookAware) {
-            ((ExcelWorkbookAware) readListener).setWorkbook(this.context.getWorkbook());
-        }
+        super.addListenerToCache(readListener);
         return this;
     }
 
@@ -171,7 +164,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @return this
      */
     public ExcelBindReader<R> subscribe(ExcelResultReadListener<R> excelResultReadListener) {
-        this.context.setResultReadListener(excelResultReadListener);
+        super.addSubscribe(excelResultReadListener);
         return this;
     }
 }

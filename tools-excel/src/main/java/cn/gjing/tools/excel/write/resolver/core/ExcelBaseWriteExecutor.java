@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel.metadata.resolver;
+package cn.gjing.tools.excel.write.resolver.core;
 
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;

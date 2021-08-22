@@ -6,6 +6,7 @@ import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
+import cn.gjing.tools.excel.read.resolver.ExcelSimpleReader;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
@@ -179,10 +180,11 @@ public final class ExcelFactory {
      */
     public static <R> ExcelBindReader<R> createReader(MultipartFile file, Class<R> excelClass, String... ignores) {
         try {
-            if (!ParamUtils.isExcel(file.getOriginalFilename())) {
+            ExcelType excelType = ParamUtils.getExcelType(file.getOriginalFilename());
+            if (excelType == null) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
             }
-            return createReader(file.getInputStream(), excelClass, ignores);
+            return createReader(file.getInputStream(), excelClass, excelType, ignores);
         } catch (IOException e) {
             throw new ExcelInitException("Create excel reader error," + e.getMessage());
         }
@@ -200,10 +202,11 @@ public final class ExcelFactory {
      */
     public static <R> ExcelBindReader<R> createReader(File file, Class<R> excelClass, String... ignores) {
         try {
-            if (!ParamUtils.isExcel(file.getName())) {
+            ExcelType excelType = ParamUtils.getExcelType(file.getName());
+            if (excelType == null) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
             }
-            return createReader(new FileInputStream(file), excelClass, ignores);
+            return createReader(new FileInputStream(file), excelClass, excelType, ignores);
         } catch (IOException e) {
             throw new ExcelInitException("Create excel reader error," + e.getMessage());
         }
@@ -215,15 +218,116 @@ public final class ExcelFactory {
      * @param inputStream Excel file inputStream
      * @param excelClass  Excel mapped entity
      * @param ignores     Ignore the array of actual Excel table headers that you read when importing
+     * @param excelType   Excel file type
      * @param <R>         Entity type
      * @return ExcelReader
      */
-    public static <R> ExcelBindReader<R> createReader(InputStream inputStream, Class<R> excelClass, String... ignores) {
+    public static <R> ExcelBindReader<R> createReader(InputStream inputStream, Class<R> excelClass, ExcelType excelType, String... ignores) {
         ParamUtils.requireNonNull(excelClass, "Excel mapping class cannot be null");
         Excel excel = excelClass.getAnnotation(Excel.class);
         ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
         ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(excelClass, BeanUtils.getExcelFieldsMap(excelClass), ignores);
         readerContext.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
-        return new ExcelBindReader<>(readerContext, inputStream, excel);
+        return new ExcelBindReader<>(readerContext, inputStream, excelType, excel.cacheRowSize(), excel.bufferSize());
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param file       Excel file
+     * @param ignores    Ignore the array of actual Excel table headers that you read when importing
+     * @param bufferSize buffer size to use when reading InputStream to file, only XLSX
+     * @param cacheRow   How many lines of data in the Excel file need to be saved when imported, only XLSX
+     * @param <R>        Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelSimpleReader<R> createSimpleReader(File file, int cacheRow, int bufferSize, String... ignores) {
+        try {
+            ExcelType excelType = ParamUtils.getExcelType(file.getName());
+            if (excelType == null) {
+                throw new ExcelTemplateException("File type does not belong to Excel");
+            }
+            return createSimpleReader(new FileInputStream(file), excelType, cacheRow, bufferSize, ignores);
+        } catch (IOException e) {
+            throw new ExcelInitException("Create excel reader error," + e.getMessage());
+        }
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param file    Excel file
+     * @param ignores Ignore the array of actual Excel table headers that you read when importing
+     * @param <R>     Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelSimpleReader<R> createSimpleReader(File file, String... ignores) {
+        try {
+            ExcelType excelType = ParamUtils.getExcelType(file.getName());
+            if (excelType == null) {
+                throw new ExcelTemplateException("File type does not belong to Excel");
+            }
+            return createSimpleReader(new FileInputStream(file), excelType, 100, 2048, ignores);
+        } catch (IOException e) {
+            throw new ExcelInitException("Create excel reader error," + e.getMessage());
+        }
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param file       Excel file
+     * @param ignores    Ignore the array of actual Excel table headers that you read when importing
+     * @param bufferSize buffer size to use when reading InputStream to file, only XLSX
+     * @param cacheRow   How many lines of data in the Excel file need to be saved when imported, only XLSX
+     * @param <R>        Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelSimpleReader<R> createSimpleReader(MultipartFile file, int cacheRow, int bufferSize, String... ignores) {
+        try {
+            ExcelType excelType = ParamUtils.getExcelType(file.getOriginalFilename());
+            if (excelType == null) {
+                throw new ExcelTemplateException("File type does not belong to Excel");
+            }
+            return createSimpleReader(file.getInputStream(), excelType, cacheRow, bufferSize, ignores);
+        } catch (IOException e) {
+            throw new ExcelInitException("Create excel reader error," + e.getMessage());
+        }
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param file    Excel file
+     * @param ignores Ignore the array of actual Excel table headers that you read when importing
+     * @param <R>     Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelSimpleReader<R> createSimpleReader(MultipartFile file, String... ignores) {
+        try {
+            ExcelType excelType = ParamUtils.getExcelType(file.getOriginalFilename());
+            if (excelType == null) {
+                throw new ExcelTemplateException("File type does not belong to Excel");
+            }
+            return createSimpleReader(file.getInputStream(), excelType, 100, 2048, ignores);
+        } catch (IOException e) {
+            throw new ExcelInitException("Create excel reader error," + e.getMessage());
+        }
+    }
+
+    /**
+     * Create an Excel reader
+     *
+     * @param inputStream Excel file inputStream
+     * @param ignores     Ignore the array of actual Excel table headers that you read when importing
+     * @param excelType   Excel file type
+     * @param bufferSize  buffer size to use when reading InputStream to file, only XLSX
+     * @param cacheRow    How many lines of data in the Excel file need to be saved when imported, only XLSX
+     * @param <R>         Entity type
+     * @return ExcelReader
+     */
+    public static <R> ExcelSimpleReader<R> createSimpleReader(InputStream inputStream, ExcelType excelType, int cacheRow, int bufferSize, String... ignores) {
+        ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(null, null, ignores);
+        return new ExcelSimpleReader<>(readerContext, inputStream, excelType, cacheRow, bufferSize);
     }
 }

@@ -3,7 +3,6 @@ package cn.gjing.tools.excel.write.resolver.core;
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.RowType;
-import cn.gjing.tools.excel.metadata.resolver.ExcelBaseWriteExecutor;
 import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
@@ -20,7 +19,7 @@ import java.util.Map;
  *
  * @author Gjing
  **/
-public final class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
+class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
     public ExcelSimpleWriterExecutor(ExcelWriterContext context) {
         super(context);
     }

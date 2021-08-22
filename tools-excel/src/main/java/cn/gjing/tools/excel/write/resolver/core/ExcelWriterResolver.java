@@ -1,4 +1,4 @@
-package cn.gjing.tools.excel.metadata.resolver;
+package cn.gjing.tools.excel.write.resolver.core;
 
 import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelType;
@@ -7,8 +7,6 @@ import cn.gjing.tools.excel.util.ExcelUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.write.BigTitle;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
-import cn.gjing.tools.excel.write.resolver.core.ExcelBindWriterExecutor;
-import cn.gjing.tools.excel.write.resolver.core.ExcelSimpleWriterExecutor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;

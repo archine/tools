@@ -1,7 +1,9 @@
 package cn.gjing.tools.excel.write.resolver;
 
 import cn.gjing.tools.excel.metadata.ExecType;
-import cn.gjing.tools.excel.metadata.resolver.ExcelWriterResolver;
+import cn.gjing.tools.excel.write.resolver.core.ExcelWriteXlsResolver;
+import cn.gjing.tools.excel.write.resolver.core.ExcelWriteXlsxResolver;
+import cn.gjing.tools.excel.write.resolver.core.ExcelWriterResolver;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
