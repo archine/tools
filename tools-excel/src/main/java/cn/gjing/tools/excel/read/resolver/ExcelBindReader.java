@@ -14,7 +14,8 @@ import java.util.List;
 
 /**
  * Excel bind mode reader
- * The reader needs a mapping entity to correspond to it
+ * The reader needs a mapping entity to correspond to it,
+ * Automatically convert the data for each row to the corresponding Java entity
  *
  * @author Gjing
  **/
@@ -70,18 +71,6 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
     public ExcelBindReader<R> read(int headerIndex, String sheetName) {
         super.baseReadExecutor.read(headerIndex, sheetName);
         return this;
-    }
-
-    /**
-     * Read rows before the header
-     *
-     * @param need Need
-     * @return this
-     * @deprecated Please use headBefore
-     */
-    @Deprecated
-    public ExcelBindReader<R> metaInfo(boolean need) {
-        return this.headBefore(need);
     }
 
     /**

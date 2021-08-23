@@ -24,7 +24,8 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
     void readRow(R r, Row row, int rowIndex, RowType rowType);
 
     /**
-     * Read each cell successfully
+     * Read each cell successfully.
+     * Occurs after data converter processing, if present
      *
      * @param cellValue Current cell value
      * @param cell      Current cell

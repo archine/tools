@@ -69,9 +69,9 @@ class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
                         throw new ExcelResolverException("Add excel validation failure: " + headName + ", " + e.getMessage());
                     }
                 }
+                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
                 ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property, index,
                         headCell.getColumnIndex(), RowType.HEAD);
-                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
             }
             ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, currentRowHeadArray, index, RowType.HEAD);
         }
@@ -107,9 +107,9 @@ class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
                         this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
                                 valueCell.getColumnIndex(), value, o, dataSize, field);
                     }
+                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
                     ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
                             property, index, valueCell.getColumnIndex(), RowType.BODY);
-                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
                 } catch (Exception e) {
                     throw new ExcelResolverException(e.getMessage());
                 }

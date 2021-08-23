@@ -5,11 +5,11 @@ import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
+import cn.gjing.tools.excel.util.JsonUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
 import cn.gjing.tools.excel.write.ExcelWriterContext;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
-import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.expression.EvaluationContext;
@@ -32,14 +32,12 @@ public abstract class ExcelBaseWriteExecutor {
     protected final Map<Class<? extends DataConvert<?>>, DataConvert<?>> dataConvertMap;
     protected Map<Class<? extends ExcelAutoMergeCallback<?>>, ExcelAutoMergeCallback<?>> mergeCallbackMap;
     protected Map<Integer, ExcelOldRowModel> oldRowModelMap;
-    protected final Gson gson;
     protected final ExpressionParser parser;
 
     public ExcelBaseWriteExecutor(ExcelWriterContext context) {
         this.context = context;
         this.dataConvertMap = new HashMap<>(16);
         this.dataConvertMap.put(DefaultDataConvert.class, new DefaultDataConvert());
-        this.gson = new Gson();
         this.parser = new SpelExpressionParser();
     }
 
@@ -105,7 +103,7 @@ public abstract class ExcelBaseWriteExecutor {
     protected void autoMergeY(ExcelAutoMergeCallback<?> autoMergeCallback, Row row, boolean mergeEmpty, int index, int colIndex,
                               Object cellValue, Object obj, int dataSize, Field field) {
         if (index == 0) {
-            if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, colIndex, index)) {
+            if (autoMergeCallback.mergeY(obj == null ? null : JsonUtils.toObj(JsonUtils.toJson(obj), (Type) obj.getClass()), field, colIndex, index)) {
                 this.oldRowModelMap.put(colIndex, new ExcelOldRowModel(cellValue, row.getRowNum()));
             } else {
                 this.oldRowModelMap.put(colIndex, new ExcelOldRowModel(autoMergeCallback.getClass(), row.getRowNum()));
@@ -113,7 +111,7 @@ public abstract class ExcelBaseWriteExecutor {
             return;
         }
         ExcelOldRowModel excelOldRowModel = this.oldRowModelMap.get(colIndex);
-        if (autoMergeCallback.mergeY(obj == null ? null : this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), field, colIndex, index)) {
+        if (autoMergeCallback.mergeY(obj == null ? null : JsonUtils.toObj(JsonUtils.toJson(obj), (Type) obj.getClass()), field, colIndex, index)) {
             if (ParamUtils.equals(cellValue, excelOldRowModel.getOldRowCellValue(), mergeEmpty)) {
                 if (index == dataSize - 1) {
                     this.context.getSheet().addMergedRegion(new CellRangeAddress(excelOldRowModel.getOldRowIndex(), row.getRowNum(), colIndex, colIndex));
@@ -152,7 +150,7 @@ public abstract class ExcelBaseWriteExecutor {
             return this.parser.parseExpression(excelDataConvert.expr1()).getValue(context);
         }
         if (dataConvert != null) {
-            return dataConvert.toExcelAttribute(this.gson.fromJson(this.gson.toJson(obj), (Type) obj.getClass()), value);
+            return dataConvert.toExcelAttribute(JsonUtils.toObj(JsonUtils.toJson(obj), (Type) obj.getClass()), value);
         }
         return value;
     }

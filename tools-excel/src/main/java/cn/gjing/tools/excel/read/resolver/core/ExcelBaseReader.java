@@ -115,6 +115,7 @@ public abstract class ExcelBaseReader<R> {
                 this.context.setWorkbook(workbook);
                 break;
             default:
+                throw new ExcelInitException("Excel type cannot be null");
         }
         this.baseReadExecutor = execType == ExecType.BIND ? new ExcelBindReadExecutor<>(this.context) : new ExcelSimpleReadExecutor<>(this.context);
     }

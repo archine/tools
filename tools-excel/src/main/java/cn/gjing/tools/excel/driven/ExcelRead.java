@@ -10,7 +10,9 @@ import java.lang.annotation.Target;
  * The return value of this method needs to specify a {@link ExcelReadWrapper} to wrap the data,
  *
  * @author Gjing
+ * @deprecated For flexibility, it was decided to start deprecating in version 2021.8 and will be completely removed in version 2021.9
  **/
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ExcelRead {
@@ -27,15 +29,6 @@ public @interface ExcelRead {
      * @return check
      */
     boolean check() default false;
-
-    /**
-     * Whether is need meta info(Such as header,title)
-     *
-     * @deprecated Please use {{@link #headBefore()}}
-     * @return metaInfo
-     */
-    @Deprecated
-    boolean metaInfo() default false;
 
     /**
      * Whether to read all rows before the header

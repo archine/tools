@@ -18,7 +18,9 @@ import java.lang.annotation.Target;
  * the template if there is a big title you can specify the return value is {@link BigTitle}
  *
  * @author Gjing
+ * @deprecated For flexibility, it was decided to start deprecating in version 2021.8 and will be completely removed in version 2021.9
  **/
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ExcelWrite {

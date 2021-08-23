@@ -12,7 +12,9 @@ import java.lang.annotation.Target;
  * After use, it can be easily imported and exported through {@link ExcelWrite} and {@link ExcelRead}
  *
  * @author Gjing
+ * @deprecated For flexibility, it was decided to start deprecating in version 2021.8 and will be completely removed in version 2021.9
  **/
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Import({ExcelDrivenConfiguration.class})

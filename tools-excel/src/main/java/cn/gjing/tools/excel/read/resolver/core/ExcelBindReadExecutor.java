@@ -14,6 +14,7 @@ import cn.gjing.tools.excel.metadata.listener.ExcelListener;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.valid.ExcelAssert;
 import cn.gjing.tools.excel.util.BeanUtils;
+import cn.gjing.tools.excel.util.JsonUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.util.ParamUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -168,7 +169,7 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr2())) {
             return parser.parseExpression(excelDataConvert.expr2()).getValue(context);
         }
-        return dataConvert.toEntityAttribute(super.gson.fromJson(this.gson.toJson(entity), (Type) entity.getClass()), value);
+        return dataConvert.toEntityAttribute(JsonUtils.toObj(JsonUtils.toJson(entity), (Type) entity.getClass()), value);
     }
 
     /**

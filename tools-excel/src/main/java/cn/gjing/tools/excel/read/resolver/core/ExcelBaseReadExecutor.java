@@ -5,9 +5,9 @@ import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.metadata.listener.ExcelListener;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
+import cn.gjing.tools.excel.util.JsonUtils;
 import cn.gjing.tools.excel.util.ListenerChain;
 import cn.gjing.tools.excel.util.ParamUtils;
-import com.google.gson.Gson;
 import com.monitorjbl.xlsx.impl.StreamingWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -18,18 +18,16 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 /**
- * Excel reader executor
+ * Excel base reader executor
  *
  * @author Gjing
  **/
 public abstract class ExcelBaseReadExecutor<R> {
-    protected Gson gson;
     protected final ExcelReaderContext<R> context;
     protected Boolean saveCurrentRowObj;
 
     public ExcelBaseReadExecutor(ExcelReaderContext<R> context) {
         this.context = context;
-        this.gson = new Gson();
     }
 
     /**
@@ -66,15 +64,14 @@ public abstract class ExcelBaseReadExecutor<R> {
      * @return Continue read next row
      */
     protected boolean readHeadBefore(List<ExcelListener> rowReadListeners, Row row) {
-        boolean continueRead = true;
         if (this.context.isHeadBefore()) {
             for (Cell cell : row) {
                 Object value = this.getValue(null, cell, null, null, false, false, RowType.OTHER, ExecType.SIMPLE);
                 ListenerChain.doReadCell(rowReadListeners, value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER);
             }
-            continueRead = ListenerChain.doReadRow(rowReadListeners, null, row, RowType.OTHER);
+            return ListenerChain.doReadRow(rowReadListeners, null, row, RowType.OTHER);
         }
-        return continueRead;
+        return true;
     }
 
     /**
@@ -129,12 +126,12 @@ public abstract class ExcelBaseReadExecutor<R> {
                     return cell.getDateCellValue();
                 }
                 if (execType == ExecType.BIND) {
-                    return rowType == RowType.BODY ? gson.fromJson(gson.toJson(cell.getNumericCellValue()), field.getType()) : cell.getNumericCellValue();
+                    return rowType == RowType.BODY ? JsonUtils.toObj(JsonUtils.toJson(cell.getNumericCellValue()), field.getType()) : cell.getNumericCellValue();
                 }
                 return cell.getNumericCellValue();
             case FORMULA:
                 if (execType == ExecType.BIND) {
-                    return rowType == RowType.BODY ? gson.fromJson(gson.toJson(cell.getStringCellValue()), field.getType()) : cell.getStringCellValue();
+                    return rowType == RowType.BODY ? JsonUtils.toObj(JsonUtils.toJson(cell.getStringCellValue()), field.getType()) : cell.getStringCellValue();
                 }
                 return cell.getStringCellValue();
             default:

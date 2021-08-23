@@ -7,7 +7,7 @@ package cn.gjing.tools.excel.convert;
  **/
 public interface DataConvert<T> {
     /**
-     * Convert to an entity field
+     * Convert to an entity field,Executes before the listener
      *
      * @param value  Excel cell value
      * @param entity Current generated excel entity
@@ -16,7 +16,7 @@ public interface DataConvert<T> {
     Object toEntityAttribute(T entity, Object value);
 
     /**
-     * Convert to excel cell value
+     * Convert to excel cell value,Executes before the listener
      *
      * @param entity Current excel entity
      * @param value  The value of the current field
