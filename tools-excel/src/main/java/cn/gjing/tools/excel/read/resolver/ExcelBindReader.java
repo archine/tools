@@ -1,5 +1,6 @@
 package cn.gjing.tools.excel.read.resolver;
 
+import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
