@@ -19,7 +19,7 @@ import lombok.*;
 public class ExcelFieldProperty {
     /**
      * Array of Excel header names.
-     * If multiple headers appear in the array and you want to merge the same header when exporting,
+     * If multiple headers appear in the array, and you want to merge the same header when exporting,
      * you need to activate the multi-header mode before the export is executed.
      * The last one in the array belongs to the real header,
      * and if you are importing a multilevel header Excel file, you need to specify the real header start subscript.

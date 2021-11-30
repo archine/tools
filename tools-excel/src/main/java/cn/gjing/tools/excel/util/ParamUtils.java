@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel.util;
 
-import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelType;
 
 import java.security.MessageDigest;
@@ -93,7 +92,7 @@ public final class ParamUtils {
      */
     public static <T> void requireNonNull(T obj, String message) {
         if (obj == null) {
-            throw new ExcelResolverException(message);
+            throw new NullPointerException(message);
         }
     }
 

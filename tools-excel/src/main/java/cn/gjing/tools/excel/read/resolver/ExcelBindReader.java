@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel.read.resolver;
 
-import cn.gjing.tools.excel.exception.ExcelTemplateException;
 import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
@@ -111,14 +110,14 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
 
     /**
      * Check whether the imported Excel file matches the Excel mapping entity class.
-     * Thrown {@link ExcelTemplateException} if there is don't match.
+     * Thrown {@link ExcelTemplateException} if is don't match.
      *
      * @param key Unique key
      * @return this
      **/
     public ExcelBindReader<R> check(String key) {
         super.context.setCheckTemplate(true);
-        if (!StringUtils.isEmpty(key)) {
+        if (StringUtils.hasLength(key)) {
             this.context.setUniqueKey(key);
         }
         return this;

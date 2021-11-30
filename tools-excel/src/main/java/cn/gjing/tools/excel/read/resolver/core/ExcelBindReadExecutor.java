@@ -6,8 +6,8 @@ import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelAssertException;
 import cn.gjing.tools.excel.exception.ExcelInitException;
-import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
+import cn.gjing.tools.excel.metadata.ELMeta;
 import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.metadata.listener.ExcelListener;
@@ -20,8 +20,6 @@ import cn.gjing.tools.excel.util.ParamUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Field;
@@ -59,8 +57,8 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
             super.context.setCheckTemplate(false);
         }
         super.checkSheet(sheetName);
-        this.reader(headerIndex, super.context.getResultReadListener() == null ? null : new ArrayList<>(), super.context.getListenerCache(),
-                new SpelExpressionParser(), new StandardEvaluationContext());
+        this.reader(headerIndex, super.context.getResultReadListener() == null ? null : new ArrayList<>(),
+                super.context.getListenerCache(), new StandardEvaluationContext());
     }
 
     /**
@@ -69,7 +67,7 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
      * @param headerIndex Excel header index
      * @param dataList    All data
      */
-    private void reader(int headerIndex, List<R> dataList, List<ExcelListener> rowReadListeners, ExpressionParser parser, EvaluationContext context) {
+    private void reader(int headerIndex, List<R> dataList, List<ExcelListener> rowReadListeners, EvaluationContext context) {
         R r;
         super.saveCurrentRowObj = true;
         boolean continueRead = true;
@@ -107,44 +105,30 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
                 Cell valueCell = row.getCell(c);
                 Object value;
-                try {
-                    if (valueCell != null) {
-                        value = super.getValue(r, valueCell, field, head, excelField.trim(), excelField.required(), RowType.BODY, ExecType.BIND);
-                        context.setVariable(field.getName(), value);
-                        this.assertValue(parser, context, row, c, field, excelField);
-                        value = this.convert(r, value, parser, context, field.getAnnotation(ExcelDataConvert.class), this.createDataConvert(field, excelField));
-                        value = ListenerChain.doReadCell(rowReadListeners, value, valueCell, row.getRowNum(), c, RowType.BODY);
-                        if (value != null) {
-                            this.setValue(r, field, value);
-                        }
-                    } else {
-                        if (excelField.required()) {
-                            super.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, head, null);
-                        }
-                        context.setVariable(field.getName(), null);
-                        this.assertValue(parser, context, row, c, field, excelField);
-                        value = this.convert(r, null, parser, context, field.getAnnotation(ExcelDataConvert.class), this.createDataConvert(field, excelField));
-                        value = ListenerChain.doReadCell(rowReadListeners, value, null, row.getRowNum(), c, RowType.BODY);
-                        if (value != null) {
-                            this.setValue(r, field, value);
-                        }
-                    }
+                if (valueCell != null) {
+                    value = super.getValue(r, valueCell, field, head, excelField.trim(), excelField.required(), RowType.BODY, ExecType.BIND);
                     context.setVariable(field.getName(), value);
-                } catch (Exception e) {
-                    if (e instanceof ExcelAssertException) {
-                        throw (ExcelAssertException) e;
+                    this.assertValue(context, row, c, field, excelField);
+                    value = this.convert(r, value, context, field.getAnnotation(ExcelDataConvert.class), this.createDataConvert(field, excelField));
+                    value = ListenerChain.doReadCell(rowReadListeners, value, valueCell, row.getRowNum(), c, RowType.BODY);
+                } else {
+                    if (excelField.required()) {
+                        super.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, head, null);
                     }
-                    throw new ExcelResolverException(e.getMessage());
+                    context.setVariable(field.getName(), null);
+                    this.assertValue(context, row, c, field, excelField);
+                    value = this.convert(r, null, context, field.getAnnotation(ExcelDataConvert.class), this.createDataConvert(field, excelField));
+                    value = ListenerChain.doReadCell(rowReadListeners, value, null, row.getRowNum(), c, RowType.BODY);
                 }
+                if (value != null) {
+                    this.setValue(r, field, value);
+                }
+                context.setVariable(field.getName(), value);
             }
             if (super.saveCurrentRowObj) {
-                try {
-                    continueRead = ListenerChain.doReadRow(rowReadListeners, r, row, RowType.BODY);
-                    if (dataList != null) {
-                        dataList.add(r);
-                    }
-                } catch (Exception e) {
-                    throw new ExcelResolverException(e.getMessage());
+                continueRead = ListenerChain.doReadRow(rowReadListeners, r, row, RowType.BODY);
+                if (dataList != null) {
+                    dataList.add(r);
                 }
             }
         }
@@ -159,15 +143,14 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
      *
      * @param entity           Current entity
      * @param value            Attribute values
-     * @param parser           El parser
      * @param dataConvert      dataConvert
      * @param excelDataConvert excelDataConvert
      * @param context          EL context
      * @return new value
      */
-    private Object convert(R entity, Object value, ExpressionParser parser, EvaluationContext context, ExcelDataConvert excelDataConvert, DataConvert<?> dataConvert) {
+    private Object convert(R entity, Object value, EvaluationContext context, ExcelDataConvert excelDataConvert, DataConvert<?> dataConvert) {
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr2())) {
-            return parser.parseExpression(excelDataConvert.expr2()).getValue(context);
+            return ELMeta.PARSER.getParser().parseExpression(excelDataConvert.expr2()).getValue(context);
         }
         return dataConvert.toEntityAttribute(JsonUtils.toObj(JsonUtils.toJson(entity), (Type) entity.getClass()), value);
     }
@@ -219,17 +202,16 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
     /**
      * Cell value assert
      *
-     * @param parser     El parser
      * @param context    EL context
      * @param row        Current row
      * @param c          Current col index
      * @param field      Current field
      * @param excelField ExcelFiled annotation on current filed
      */
-    private void assertValue(ExpressionParser parser, EvaluationContext context, Row row, int c, Field field, ExcelField excelField) {
+    private void assertValue(EvaluationContext context, Row row, int c, Field field, ExcelField excelField) {
         ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
         if (excelAssert != null) {
-            Boolean test = parser.parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
+            Boolean test = ELMeta.PARSER.getParser().parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
             if (test != null && !test) {
                 throw new ExcelAssertException(excelAssert.message(), excelField, field, row.getRowNum(), c);
             }

@@ -1,7 +1,6 @@
 package cn.gjing.tools.excel.write.resolver.core;
 
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
-import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.util.BeanUtils;
@@ -52,24 +51,20 @@ class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
                 String headName = property.getValue()[index];
                 currentRowHeadArray[colIndex] = headName;
                 Cell headCell = headRow.createCell(headRow.getPhysicalNumberOfCells());
+                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
                 headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell,
                         property, index, headCell.getColumnIndex(), RowType.HEAD, headName);
                 headCell.setCellValue(headName);
                 if (this.context.isNeedValid() && index == this.context.getHeaderSeries() - 1) {
-                    try {
-                        Field field = this.context.getExcelFields().get(colIndex);
-                        for (ExcelValidAnnotationHandler validAnnotationHandler : this.context.getValidAnnotationHandlers()) {
-                            Annotation annotation = this.context.getExcelFields().get(colIndex).getAnnotation(validAnnotationHandler.getAnnotationClass());
-                            if (annotation != null) {
-                                validAnnotationHandler.handle(annotation, this.context, field, headRow, colIndex, boxValues);
-                                break;
-                            }
+                    Field field = this.context.getExcelFields().get(colIndex);
+                    for (ExcelValidAnnotationHandler validAnnotationHandler : this.context.getValidAnnotationHandlers()) {
+                        Annotation annotation = this.context.getExcelFields().get(colIndex).getAnnotation(validAnnotationHandler.getAnnotationClass());
+                        if (annotation != null) {
+                            validAnnotationHandler.handle(annotation, this.context, field, headRow, colIndex, boxValues);
+                            break;
                         }
-                    } catch (Exception e) {
-                        throw new ExcelResolverException("Add excel validation failure: " + headName + ", " + e.getMessage());
                     }
                 }
-                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
                 ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property, index,
                         headCell.getColumnIndex(), RowType.HEAD);
             }
@@ -97,22 +92,18 @@ class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
                 Object value = BeanUtils.getFieldValue(o, field);
                 Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
                 context.setVariable(field.getName(), value);
-                try {
-                    value = this.convert(value, o, field.getAnnotation(ExcelDataConvert.class), context,
-                            this.createDataConvert(colIndex, property));
-                    value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(),
-                            valueRow, valueCell, property, index, valueCell.getColumnIndex(), RowType.BODY, value);
-                    ExcelUtils.setCellValue(valueCell, value);
-                    if (property.isAutoMerge()) {
-                        this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
-                                valueCell.getColumnIndex(), value, o, dataSize, field);
-                    }
-                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
-                    ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
-                            property, index, valueCell.getColumnIndex(), RowType.BODY);
-                } catch (Exception e) {
-                    throw new ExcelResolverException(e.getMessage());
+                ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
+                value = this.convert(value, o, field.getAnnotation(ExcelDataConvert.class), context,
+                        this.createDataConvert(colIndex, property));
+                value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(),
+                        valueRow, valueCell, property, index, valueCell.getColumnIndex(), RowType.BODY, value);
+                ExcelUtils.setCellValue(valueCell, value);
+                if (property.isAutoMerge()) {
+                    this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
+                            valueCell.getColumnIndex(), value, o, dataSize, field);
                 }
+                ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
+                        property, index, valueCell.getColumnIndex(), RowType.BODY);
             }
             ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), valueRow, o, index, RowType.BODY);
         }

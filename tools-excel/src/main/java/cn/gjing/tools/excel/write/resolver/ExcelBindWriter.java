@@ -3,6 +3,7 @@ package cn.gjing.tools.excel.write.resolver;
 import cn.gjing.tools.excel.Excel;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.ExecType;
+import cn.gjing.tools.excel.metadata.annotation.ListenerNative;
 import cn.gjing.tools.excel.metadata.aware.ExcelWorkbookAware;
 import cn.gjing.tools.excel.metadata.aware.ExcelWriteContextAware;
 import cn.gjing.tools.excel.metadata.listener.DefaultExcelStyleListener;
@@ -63,7 +64,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * To write
      *
      * @param data     data
-     * @param needHead Whether need excel head
+     * @param needHead Whether you need excel head
      * @return this
      */
     public ExcelBindWriter write(List<?> data, boolean needHead) {
@@ -75,7 +76,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      *
      * @param data      data
      * @param sheetName sheet name
-     * @param needHead  Whether need excel head
+     * @param needHead  Whether you need excel head
      * @return this
      */
     public ExcelBindWriter write(List<?> data, String sheetName, boolean needHead) {
@@ -110,7 +111,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      *
      * @param data      data
      * @param boxValues dropdown box values
-     * @param needHead  Whether need excel head
+     * @param needHead  Whether you need excel head
      * @return this
      */
     public ExcelBindWriter write(List<?> data, boolean needHead, Map<String, String[]> boxValues) {
@@ -123,7 +124,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @param data      data
      * @param sheetName sheet name
      * @param boxValues dropdown box values
-     * @param needHead  Whether need excel head
+     * @param needHead  Whether you need excel head
      * @return this
      */
     public ExcelBindWriter write(List<?> data, String sheetName, boolean needHead, Map<String, String[]> boxValues) {
@@ -181,7 +182,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @param excelClass    Excel mapped entity
      * @param ignores       The exported field is to be ignored
      * @param resetListener Clear all listener caches, but do not clear listeners flagged by @ListenerNative
-     * @param resetAll      Whether to delete all listeners. If false, the listeners annotated by @ListenerNative will be retained
+     * @param resetAll      Whether to delete all listeners. If false, the listeners annotated by {@link ListenerNative} will be retained
      * @return this
      */
     public ExcelBindWriter resetExcelClass(Class<?> excelClass, boolean resetListener, boolean resetAll, String... ignores) {
@@ -252,14 +253,16 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * Bind the exported Excel file to the currently set unique key,
      * Can be used to {@link ExcelBindReader#check} for a match with an entity class when a file is imported.
      *
-     * @param key Unique key ,Each exported file recommends that the key be set to be unique
+     * @param key Unique key ,Each exported file recommends that the key be set to be unique.
+     *            Priority is higher than at {@link Excel#uniqueKey()}.
+     *            If empty, the unique key in the annotation is used
      * @return this
      */
     public ExcelBindWriter bind(String key) {
-        if (!StringUtils.isEmpty(key)) {
-            this.context.setBind(true);
+        if (StringUtils.hasLength(key)) {
             this.context.setUniqueKey(key);
         }
+        this.context.setBind(true);
         return this;
     }
 

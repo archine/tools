@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel.read.resolver.core;
 
-import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
@@ -40,15 +39,11 @@ class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 }
                 Cell cell = row.getCell(i);
                 Object value;
-                try {
-                    if (cell != null) {
-                        value = this.getValue(null, cell, null, head, false, false, RowType.BODY, ExecType.SIMPLE);
-                        ListenerChain.doReadCell(super.context.getListenerCache(), value, cell, row.getRowNum(), i, RowType.BODY);
-                    } else {
-                        ListenerChain.doReadCell(super.context.getListenerCache(), null, null, row.getRowNum(), i, RowType.BODY);
-                    }
-                } catch (Exception e) {
-                    throw new ExcelResolverException(e.getMessage());
+                if (cell != null) {
+                    value = this.getValue(null, cell, null, head, false, false, RowType.BODY, ExecType.SIMPLE);
+                    ListenerChain.doReadCell(super.context.getListenerCache(), value, cell, row.getRowNum(), i, RowType.BODY);
+                } else {
+                    ListenerChain.doReadCell(super.context.getListenerCache(), null, null, row.getRowNum(), i, RowType.BODY);
                 }
             }
             continueRead = ListenerChain.doReadRow(super.context.getListenerCache(), null, row, RowType.BODY);

@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel.write.resolver.core;
 
-import cn.gjing.tools.excel.exception.ExcelResolverException;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.util.ExcelUtils;
@@ -41,12 +40,12 @@ class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
                 currentRowHeadArray[colIndex] = headName;
                 ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
                 Cell headCell = headRow.createCell(headRow.getPhysicalNumberOfCells());
+                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
                 headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(),
                         headRow, headCell, property, index, headCell.getColumnIndex(), RowType.HEAD, headName);
                 headCell.setCellValue(headName);
                 ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property,
                         index, headCell.getColumnIndex(), RowType.HEAD);
-                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index, colIndex);
             }
             ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, currentRowHeadArray,
                     index, RowType.HEAD);
@@ -67,21 +66,17 @@ class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
                 Object value = o.get(colIndex);
                 ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
                 Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
-                try {
-                    value = this.convert(value, o, null, context, this.createDataConvert(colIndex, property));
-                    value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
-                            property, index, valueCell.getColumnIndex(), RowType.BODY, value);
-                    ExcelUtils.setCellValue(valueCell, value);
-                    if (property.isAutoMerge()) {
-                        this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
-                                valueCell.getColumnIndex(), value, o, dataSize, null);
-                    }
-                    ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell, property
-                            , index, valueCell.getColumnIndex(), RowType.BODY);
-                    ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
-                } catch (Exception e) {
-                    throw new ExcelResolverException(e.getMessage());
+                ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
+                value = this.convert(value, o, null, context, this.createDataConvert(colIndex, property));
+                value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
+                        property, index, valueCell.getColumnIndex(), RowType.BODY, value);
+                ExcelUtils.setCellValue(valueCell, value);
+                if (property.isAutoMerge()) {
+                    this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
+                            valueCell.getColumnIndex(), value, o, dataSize, null);
                 }
+                ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell, property
+                        , index, valueCell.getColumnIndex(), RowType.BODY);
             }
             ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), valueRow, o, index, RowType.BODY);
         }

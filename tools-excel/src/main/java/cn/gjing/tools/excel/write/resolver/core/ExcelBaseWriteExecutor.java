@@ -4,6 +4,7 @@ import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.exception.ExcelInitException;
+import cn.gjing.tools.excel.metadata.ELMeta;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.util.JsonUtils;
 import cn.gjing.tools.excel.util.ParamUtils;
@@ -13,8 +14,6 @@ import cn.gjing.tools.excel.write.merge.ExcelOldRowModel;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -32,13 +31,11 @@ public abstract class ExcelBaseWriteExecutor {
     protected final Map<Class<? extends DataConvert<?>>, DataConvert<?>> dataConvertMap;
     protected Map<Class<? extends ExcelAutoMergeCallback<?>>, ExcelAutoMergeCallback<?>> mergeCallbackMap;
     protected Map<Integer, ExcelOldRowModel> oldRowModelMap;
-    protected final ExpressionParser parser;
 
     public ExcelBaseWriteExecutor(ExcelWriterContext context) {
         this.context = context;
         this.dataConvertMap = new HashMap<>(16);
         this.dataConvertMap.put(DefaultDataConvert.class, new DefaultDataConvert());
-        this.parser = new SpelExpressionParser();
     }
 
     /**
@@ -147,7 +144,7 @@ public abstract class ExcelBaseWriteExecutor {
      */
     protected Object convert(Object value, Object obj, ExcelDataConvert excelDataConvert, EvaluationContext context, DataConvert<?> dataConvert) {
         if (excelDataConvert != null && !"".equals(excelDataConvert.expr1())) {
-            return this.parser.parseExpression(excelDataConvert.expr1()).getValue(context);
+            return ELMeta.PARSER.getParser().parseExpression(excelDataConvert.expr1()).getValue(context);
         }
         if (dataConvert != null) {
             return dataConvert.toExcelAttribute(JsonUtils.toObj(JsonUtils.toJson(obj), (Type) obj.getClass()), value);

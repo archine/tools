@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel;
 
-
 import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.write.resolver.ExcelBindWriter;
 
@@ -10,7 +9,7 @@ import static cn.gjing.tools.excel.metadata.ExcelType.XLS;
 
 /**
  * Excel mapped entity annotation
- * The entity class marked by the annotation will be declared as a excel mapped entity
+ * The entity class marked by the annotation will be declared as an Excel mapped entity
  *
  * @author Gjing
  **/
@@ -26,7 +25,7 @@ public @interface Excel {
     String value() default "";
 
     /**
-     * Excel type to be exported
+     * Excel file type to be exported
      *
      * @return Default XLS
      */
@@ -74,7 +73,7 @@ public @interface Excel {
      * Set a unique ID for the exported Excel file,
      * which can be used to check whether it is the specified file at import time.
      * The default is to use the current mapping entity Class as the unique ID,
-     * which you can also set with {@link ExcelBindWriter#bind(String)}
+     * which you can also set by {@link ExcelBindWriter#bind(String)},The priority is higher than this value
      *
      *
      * @return key

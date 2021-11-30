@@ -1,11 +1,11 @@
 package cn.gjing.tools.excel.util;
 
+import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.metadata.listener.ExcelListener;
 import cn.gjing.tools.excel.read.listener.ExcelEmptyReadListener;
 import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.write.BigTitle;
-import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.write.listener.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;

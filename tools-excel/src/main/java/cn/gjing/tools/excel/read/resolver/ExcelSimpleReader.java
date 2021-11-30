@@ -4,6 +4,7 @@ import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.metadata.ExecType;
 import cn.gjing.tools.excel.metadata.listener.ExcelReadListener;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
+import cn.gjing.tools.excel.read.listener.ExcelRowReadListener;
 import cn.gjing.tools.excel.read.resolver.core.ExcelBaseReader;
 
 import java.io.InputStream;
@@ -13,7 +14,7 @@ import java.util.List;
  * Excel simple mode reader
  * No mapping entities need to be provided.
  * Instead of automatically turning each row into a Java entity,
- * you can manually assemble your own objects in {@link cn.gjing.tools.excel.read.listener.ExcelRowReadListener}
+ * you can manually assemble your own objects in {@link ExcelRowReadListener}
  *
  * @author Gjing
  **/

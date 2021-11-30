@@ -38,7 +38,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param excelClass Excel mapped entity
      * @param response   response
@@ -53,7 +53,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param excelClass       Excel mapped entity
      * @param response         response
@@ -67,7 +67,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param excelClass Excel mapped entity
      * @param response   response
@@ -81,7 +81,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param fileName         Excel file name，The priority is higher than the annotation specification
      * @param excelClass       Excel mapped entity
@@ -110,7 +110,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param fileName         Excel file name
      * @param response         response
@@ -122,7 +122,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param fileName  Excel file name
      * @param response  response
@@ -134,7 +134,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param fileName   Excel file name
      * @param response   response
@@ -149,7 +149,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an excel writer
+     * Create an Excel writer
      *
      * @param fileName         Excel file name
      * @param response         response

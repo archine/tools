@@ -239,13 +239,14 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * Bind the exported Excel file to the currently set unique key,
      * Can be used to {@link ExcelBindReader#check} for a match with an entity class when a file is imported.
      *
-     * @param key Unique key ,Each exported file recommends that the key be set to be unique
+     * @param key Unique key ,Each exported file recommends that the key be set to be unique.
+     *            If empty, the binding is invalid
      * @return this
      */
     public ExcelSimpleWriter bind(String key) {
-        if (!StringUtils.isEmpty(key)) {
-            this.context.setBind(true);
+        if (StringUtils.hasLength(key)) {
             this.context.setUniqueKey(key);
+            this.context.setBind(true);
         }
         return this;
     }

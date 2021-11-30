@@ -1,6 +1,5 @@
 package cn.gjing.tools.excel;
 
-
 import cn.gjing.tools.excel.convert.DataConvert;
 import cn.gjing.tools.excel.convert.DefaultDataConvert;
 import cn.gjing.tools.excel.metadata.ExcelColor;
@@ -22,7 +21,7 @@ import java.lang.annotation.*;
 public @interface ExcelField {
     /**
      * Array of Excel header names.
-     * If multiple headers appear in the array and you want to merge the same header when exporting,
+     * If multiple headers appear in the array, and you want to merge the same header when exporting,
      * you need to activate the multi-header mode before the export is executed.
      * The last one in the array belongs to the real header,
      * and if you are importing a multilevel header Excel file, you need to specify the real header start subscript.
@@ -42,7 +41,7 @@ public @interface ExcelField {
     String title() default "";
 
     /**
-     * Column width of the excel header
+     * Column width of the Excel header
      *
      * @return Column width
      */
