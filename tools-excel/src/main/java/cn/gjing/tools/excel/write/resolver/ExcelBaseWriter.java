@@ -25,7 +25,6 @@ public abstract class ExcelBaseWriter {
     protected HttpServletResponse response;
     protected ExcelWriterResolver writerResolver;
     protected final String defaultSheetName = "Sheet1";
-    protected boolean nullIsTemp = true;
 
     protected ExcelBaseWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response, boolean initDefaultStyle, ExecType type) {
         this.response = response;

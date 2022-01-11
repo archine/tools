@@ -193,18 +193,6 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
         return this.multiHead(true);
     }
 
-
-    /**
-     * Whether to set the exported file as a template file when the data is null
-     *
-     * @param isTemp True means to set the exported file to a template file
-     * @return this
-     */
-    public ExcelSimpleWriter temp(boolean isTemp) {
-        super.nullIsTemp = isTemp;
-        return this;
-    }
-
     /**
      * Add write listener
      *

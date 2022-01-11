@@ -277,17 +277,6 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Whether to set the exported file as a template file when the data is null
-     *
-     * @param isTemp True means to set the exported file to a template file
-     * @return this
-     */
-    public ExcelBindWriter temp(boolean isTemp) {
-        super.nullIsTemp = isTemp;
-        return this;
-    }
-
-    /**
      * Add write listener
      *
      * @param listener Write listener

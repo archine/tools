@@ -34,7 +34,9 @@ class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
         for (int index = 0; index < this.context.getHeaderSeries(); index++) {
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.HEAD);
             headRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
-            headRow.setHeight(this.context.getHeaderHeight());
+            if (this.context.getHeaderHeight() > 0) {
+                headRow.setHeight(this.context.getHeaderHeight());
+            }
             for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
                 String headName = this.context.getFieldProperties().get(colIndex).getValue()[index];
                 currentRowHeadArray[colIndex] = headName;
@@ -61,7 +63,9 @@ class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
             List<?> o = data2.get(index);
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.BODY);
             Row valueRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
-            valueRow.setHeight(this.context.getBodyHeight());
+            if (this.context.getBodyHeight() > 0) {
+                valueRow.setHeight(this.context.getBodyHeight());
+            }
             for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
                 Object value = o.get(colIndex);
                 ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
