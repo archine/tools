@@ -84,12 +84,12 @@ public abstract class ExcelBaseReadExecutor<R> {
             try {
                 this.context.setSheet(this.context.getWorkbook().getSheet(sheetName));
             } catch (Exception e) {
-                throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
+                throw new ExcelResolverException("The " + sheetName + " is not found in the workbook");
             }
         } else {
             Sheet sheet = this.context.getWorkbook().getSheet(sheetName);
             if (sheet == null) {
-                throw new ExcelResolverException("The" + sheetName + " is not found in the workbook");
+                throw new ExcelResolverException("The " + sheetName + " is not found in the workbook");
             }
             this.context.setSheet(sheet);
         }
