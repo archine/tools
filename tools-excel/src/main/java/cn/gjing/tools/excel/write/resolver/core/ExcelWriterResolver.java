@@ -50,7 +50,7 @@ public abstract class ExcelWriterResolver {
      */
     public void writeTitle(BigTitle bigTitle) {
         if (bigTitle.getLastCol() < 1) {
-            bigTitle.setLastCol(this.context.getExcelFields().size() - 1);
+            bigTitle.setLastCol(this.context.getFieldProperties().size() - 1);
         }
         if (bigTitle.getLines() < 1) {
             bigTitle.setLines(1);

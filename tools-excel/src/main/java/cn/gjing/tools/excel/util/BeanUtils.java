@@ -4,8 +4,6 @@ import cn.gjing.tools.excel.ExcelField;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,45 +46,37 @@ public final class BeanUtils {
     }
 
     /**
-     * Get all excel fields of the parent and child classes
+     * Get all excel field properties of the parent and child classes
      *
-     * @param excelClass      Excel mapped entity
-     * @param ignores         The exported field is to be ignored
-     * @param fieldProperties Excel field property
-     * @return Excel fields
+     * @param excelClass Excel mapped entity
+     * @param ignores    The exported field is to be ignored
+     * @return Excel filed properties
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<ExcelFieldProperty> fieldProperties) {
-        List<Field> fieldList = getAllFields(excelClass);
-        fieldList = fieldList.stream()
+    public static List<ExcelFieldProperty> getExcelFiledProperties(Class<?> excelClass, String[] ignores) {
+        List<ExcelFieldProperty> fieldProperties = new ArrayList<>();
+        getAllFields(excelClass).stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).order()))
-                .filter(e -> {
+                .forEach(e -> {
                     ExcelField excelField = e.getAnnotation(ExcelField.class);
                     String[] headNameArray = excelField.value();
                     for (String name : headNameArray) {
                         if (ParamUtils.contains(ignores, name)) {
-                            return false;
+                            return;
                         }
                     }
-                    if (fieldProperties != null) {
-                        fieldProperties.add(ExcelFieldProperty.builder()
-                                .value(excelField.value())
-                                .title(excelField.title())
-                                .width(excelField.width())
-                                .order(excelField.order())
-                                .format(excelField.format())
-                                .autoMerge(excelField.autoMerge().enable())
-                                .mergeEmpty(excelField.autoMerge().empty())
-                                .mergeCallback(excelField.autoMerge().callback())
-                                .convert(excelField.convert())
-                                .color(excelField.color())
-                                .fontColor(excelField.fontColor())
-                                .build());
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
-        return fieldList;
+                    fieldProperties.add(ExcelFieldProperty.builder()
+                            .value(excelField.value())
+                            .field(e)
+                            .title(excelField.title())
+                            .width(excelField.width())
+                            .order(excelField.order())
+                            .format(excelField.format())
+                            .color(excelField.color())
+                            .fontColor(excelField.fontColor())
+                            .build());
+                });
+        return fieldProperties;
     }
 
     /**
@@ -121,41 +111,5 @@ public final class BeanUtils {
             superclass = superclass.getSuperclass();
         }
         return fieldList;
-    }
-
-    /**
-     * Get the class of a generic in a generic interface
-     *
-     * @param source        A class that implements a generic interface
-     * @param typeInterface A generic interface
-     * @param paramIndex    Parameter subscript, starting at 0
-     * @return Class
-     */
-    public static Class<?> getInterfaceType(Class<?> source, Class<?> typeInterface, int paramIndex) {
-        Type[] genericInterfaces = source.getGenericInterfaces();
-        for (Type type : genericInterfaces) {
-            if (type.getTypeName().startsWith(typeInterface.getName())) {
-                ParameterizedType pt = (ParameterizedType) type;
-                return (Class<?>) pt.getActualTypeArguments()[paramIndex];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get the corresponding enum by value
-     *
-     * @param enumClass The enum class to get
-     * @param value     Enum value
-     * @return Enum
-     */
-    public static Enum<?> getEnum(Class<? extends Enum<?>> enumClass, String value) {
-        Enum<?>[] enumConstants = enumClass.getEnumConstants();
-        for (Enum<?> constant : enumConstants) {
-            if (value.equals(constant.name())) {
-                return constant;
-            }
-        }
-        throw new NullPointerException("Not found your enum");
     }
 }

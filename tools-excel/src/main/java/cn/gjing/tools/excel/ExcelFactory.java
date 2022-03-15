@@ -2,7 +2,6 @@ package cn.gjing.tools.excel;
 
 import cn.gjing.tools.excel.exception.ExcelInitException;
 import cn.gjing.tools.excel.exception.ExcelTemplateException;
-import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.ExcelType;
 import cn.gjing.tools.excel.read.ExcelReaderContext;
 import cn.gjing.tools.excel.read.resolver.ExcelBindReader;
@@ -22,8 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * Excel factory
@@ -92,21 +90,19 @@ public final class ExcelFactory {
      * @return ExcelWriter
      */
     public static ExcelBindWriter createWriter(String fileName, Class<?> excelClass, HttpServletResponse response, boolean initDefaultStyle, String... ignores) {
-        ParamUtils.requireNonNull(excelClass, "Excel mapping class cannot be null");
+        Objects.requireNonNull(excelClass, "Excel mapping class cannot be null");
         Excel excel = excelClass.getAnnotation(Excel.class);
-        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        List<ExcelFieldProperty> properties = new ArrayList<>();
+        Objects.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
         ExcelWriterContext context = new ExcelWriterContext();
-        context.setExcelFields(BeanUtils.getExcelFields(excelClass, ignores, properties));
         context.setExcelClass(excelClass);
-        context.setFieldProperties(properties);
+        context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelClass, ignores));
         context.setExcelType(excel.type());
-        context.setFileName(StringUtils.isEmpty(fileName) ? "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value() : fileName);
+        context.setFileName(StringUtils.hasText(fileName) ? fileName : "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value());
         context.setHeaderHeight(excel.headerHeight());
-        context.setHeaderSeries(properties.get(0).getValue().length);
+        context.setHeaderSeries(context.getFieldProperties().get(0).getValue().length);
         context.setBodyHeight(excel.bodyHeight());
         context.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
-        return new ExcelBindWriter(context, excel, response, initDefaultStyle);
+        return new ExcelBindWriter(context, excel, response,initDefaultStyle);
     }
 
     /**

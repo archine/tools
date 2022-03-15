@@ -2,6 +2,7 @@ package cn.gjing.tools.excel.write.resolver.core;
 
 import cn.gjing.tools.excel.convert.ExcelDataConvert;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
+import cn.gjing.tools.excel.metadata.HandleMeta;
 import cn.gjing.tools.excel.metadata.RowType;
 import cn.gjing.tools.excel.util.BeanUtils;
 import cn.gjing.tools.excel.util.ExcelUtils;
@@ -14,7 +15,6 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +58,10 @@ class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
                         property, index, headCell.getColumnIndex(), RowType.HEAD, headName);
                 headCell.setCellValue(headName);
                 if (this.context.isNeedValid() && index == this.context.getHeaderSeries() - 1) {
-                    Field field = this.context.getExcelFields().get(colIndex);
-                    for (ExcelValidAnnotationHandler validAnnotationHandler : this.context.getValidAnnotationHandlers()) {
-                        Annotation annotation = this.context.getExcelFields().get(colIndex).getAnnotation(validAnnotationHandler.getAnnotationClass());
+                    for (ExcelValidAnnotationHandler validAnnotationHandler : HandleMeta.INSTANCE.getHandlers()) {
+                        Annotation annotation = property.getField().getAnnotation(validAnnotationHandler.getAnnotationClass());
                         if (annotation != null) {
-                            validAnnotationHandler.handle(annotation, this.context, field, headRow, colIndex, boxValues);
+                            validAnnotationHandler.handle(annotation, this.context, property.getField(), headRow, colIndex, boxValues);
                             break;
                         }
                     }
@@ -90,21 +89,20 @@ class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
             if (this.context.getBodyHeight() > 0) {
                 valueRow.setHeight(this.context.getBodyHeight());
             }
-            for (int colIndex = 0, headSize = this.context.getExcelFields().size(); colIndex < headSize; colIndex++) {
-                Field field = this.context.getExcelFields().get(colIndex);
+            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
                 ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
-                Object value = BeanUtils.getFieldValue(o, field);
+                Object value = BeanUtils.getFieldValue(o, property.getField());
                 Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
-                context.setVariable(field.getName(), value);
+                context.setVariable(property.getField().getName(), value);
                 ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index, colIndex);
-                value = this.convert(value, o, field.getAnnotation(ExcelDataConvert.class), context,
+                value = this.convert(value, o, property.getField().getAnnotation(ExcelDataConvert.class), context,
                         this.createDataConvert(colIndex, property));
                 value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(),
                         valueRow, valueCell, property, index, valueCell.getColumnIndex(), RowType.BODY, value);
                 ExcelUtils.setCellValue(valueCell, value);
                 if (property.isAutoMerge()) {
                     this.autoMergeY(this.createMergeCallback(colIndex, property), valueRow, property.isMergeEmpty(), index,
-                            valueCell.getColumnIndex(), value, o, dataSize, field);
+                            valueCell.getColumnIndex(), value, o, dataSize, property.getField());
                 }
                 ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
                         property, index, valueCell.getColumnIndex(), RowType.BODY);

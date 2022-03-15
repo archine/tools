@@ -60,14 +60,14 @@ public @interface Excel {
      *
      * @return headHeight
      */
-    short headerHeight() default 400;
+    short headerHeight() default 450;
 
     /**
      * Excel body row height
      *
      * @return bodyHeight
      */
-    short bodyHeight() default 370;
+    short bodyHeight() default 390;
 
     /**
      * Set a unique ID for the exported Excel file,

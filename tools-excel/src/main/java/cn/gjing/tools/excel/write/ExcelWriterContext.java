@@ -3,10 +3,7 @@ package cn.gjing.tools.excel.write;
 import cn.gjing.tools.excel.metadata.AbstractExcelContext;
 import cn.gjing.tools.excel.metadata.ExcelFieldProperty;
 import cn.gjing.tools.excel.metadata.ExcelType;
-import cn.gjing.tools.excel.write.valid.handle.*;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,11 +43,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     private boolean isTemplate = false;
 
     /**
-     * Excel header fields
-     */
-    private List<Field> excelFields = new ArrayList<>();
-
-    /**
      * Whether you need to add a file identifier when exporting an Excel file,
      * which can be used for template validation of the file at import time
      */
@@ -69,12 +61,12 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     /**
      * Excel head row height
      */
-    private short headerHeight = 400;
+    private short headerHeight = 450;
 
     /**
      * Excel body row height
      */
-    private short bodyHeight = 370;
+    private short bodyHeight = 390;
 
     /**
      * Excel header series
@@ -85,11 +77,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
      * Excel filed property
      */
     private List<ExcelFieldProperty> fieldProperties;
-
-    /**
-     * Valid annotation handler
-     */
-    private List<ExcelValidAnnotationHandler> validAnnotationHandlers;
 
     public ExcelWriterContext() {
         super();
@@ -124,14 +111,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
 
     public void setNeedValid(boolean needValid) {
         this.needValid = needValid;
-        if (needValid && this.validAnnotationHandlers == null) {
-            this.validAnnotationHandlers = new ArrayList<>();
-            this.validAnnotationHandlers.add(new CustomValidHandler());
-            this.validAnnotationHandlers.add(new DateValidHandler());
-            this.validAnnotationHandlers.add(new DropdownBoxValidHandler());
-            this.validAnnotationHandlers.add(new NumericValidHandler());
-            this.validAnnotationHandlers.add(new RepeatValidHandler());
-        }
     }
 
     public boolean isMultiHead() {
@@ -156,14 +135,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
 
     public void setTemplate(boolean template) {
         isTemplate = template;
-    }
-
-    public List<Field> getExcelFields() {
-        return excelFields;
-    }
-
-    public void setExcelFields(List<Field> excelFields) {
-        this.excelFields = excelFields;
     }
 
     public boolean isBind() {
@@ -220,9 +191,5 @@ public final class ExcelWriterContext extends AbstractExcelContext {
 
     public void setFieldProperties(List<ExcelFieldProperty> fieldProperties) {
         this.fieldProperties = fieldProperties;
-    }
-
-    public List<ExcelValidAnnotationHandler> getValidAnnotationHandlers() {
-        return validAnnotationHandlers;
     }
 }

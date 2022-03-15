@@ -1,6 +1,7 @@
 package cn.gjing.tools.excel.metadata.listener;
 
 import cn.gjing.tools.excel.util.ParamUtils;
+import cn.gjing.tools.excel.util.ValidUtil;
 import cn.gjing.tools.excel.write.listener.ExcelCascadingDropdownBoxListener;
 import cn.gjing.tools.excel.write.valid.ExcelDropdownBox;
 import org.apache.poi.ss.usermodel.*;
@@ -64,10 +65,8 @@ public final class DefaultCascadingDropdownBoxListener implements ExcelCascading
             constraint = helper.createFormulaListConstraint(forMuaString);
             regions = new CellRangeAddressList(i, i, colIndex, colIndex);
             dataValidation = helper.createValidation(constraint, regions);
-            dataValidation.setErrorStyle(excelDropdownBox.rank().getRank());
-            dataValidation.createErrorBox(excelDropdownBox.errorTitle(), excelDropdownBox.errorContent());
-            dataValidation.createErrorBox(excelDropdownBox.errorTitle(), excelDropdownBox.errorContent());
-            dataValidation.setShowErrorBox(excelDropdownBox.showErrorBox());
+            ValidUtil.setErrorBox(dataValidation, excelDropdownBox.showErrorBox(), excelDropdownBox.rank(), excelDropdownBox.errorTitle(), excelDropdownBox.errorContent(),
+                    excelDropdownBox.showTip(), excelDropdownBox.tipTitle(), excelDropdownBox.tipContent());
             sheet.addValidationData(dataValidation);
         }
     }

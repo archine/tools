@@ -6,6 +6,8 @@ import cn.gjing.tools.excel.write.callback.DefaultExcelAutoMergeCallback;
 import cn.gjing.tools.excel.write.callback.ExcelAutoMergeCallback;
 import lombok.*;
 
+import java.lang.reflect.Field;
+
 /**
  * Excel filed property
  *
@@ -17,6 +19,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExcelFieldProperty {
+    /**
+     * Excel headers field
+     */
+    private Field field;
+
     /**
      * Array of Excel header names.
      * If multiple headers appear in the array, and you want to merge the same header when exporting,
